@@ -43,7 +43,7 @@ module.exports.routes = {
   // Route for Dews dataset
   'POST /dews/incidents': 'DewsController.getIndicator',
   'POST /dews/outbreaks': 'DewsController.getOutbreaks',
-  'POST /dews/calendar': 'DewsController.getCalendar',
+  'GET /dews/calendar': 'DewsController.getCalendar',
 
   /***************************************************************************
   *                                                                          *

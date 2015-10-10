@@ -118,16 +118,18 @@ module.exports = {
 
     // var location
 
+    var result = {};
+
     // Check input
     if (!req.param( 'disease' )) {
       return res.json(401, {err: '"indicator" and "disease" required for DEWS metric'});
     }
 
     // incidents per date by disease
-    var dewsQuery = "select report_date, sum(u5male + u5female + o5male + o5female) "
-                  += "from dews_outbreaks_2015 "
-                  += "where disease_name='" + req.param( 'disease' ) + "' "
-                  += "group by report_date";
+    var dewsQuery = "select report_date, sum(u5male + u5female + o5male + o5female) as value "
+                  + "from dews_outbreaks_2015 "
+                  + "where disease_name='" + req.param( 'disease' ) + "' "
+                  + "group by report_date";
 
     // Execute query
     Dews.query(dewsQuery, function (err, results){
@@ -135,7 +137,15 @@ module.exports = {
         return res.json({ "status": 0, "error": err });
       }
       else{
-        return res.json({ "data" : results.rows });
+
+        // for each row, format for cal-heatmap
+        results.rows.forEach(function(d, i){
+          // timestamp is seconds since 1st Jan 1970
+          result[new Date(d.report_date).getTime() / 1000] = parseInt(d.value);
+        });
+
+        // return result as json
+        return res.json({ "data" : result });
       }
     });                  
 
