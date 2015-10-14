@@ -47,6 +47,7 @@ module.exports = {
           return res.ok({
             id: user.id,
             token: sailsTokenAuth.issueToken({sid: user.id}),
+            organisation: user.organisation,
             username: user.username,
             email: user.email,
             roles: user.roles
@@ -76,6 +77,7 @@ module.exports = {
       }
 
       User.create({
+        organisation: req.param('organisation'),
         username: req.param('username'),
         email: req.param('email'), 
         password: req.param('password')
@@ -88,6 +90,7 @@ module.exports = {
           res.json({
             id: user.id,
             token: sailsTokenAuth.issueToken({sid: user.id}),
+            organisation: user.organisation,
             username: user.username,
             email: user.email,
             roles: user.roles

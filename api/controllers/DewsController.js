@@ -35,9 +35,6 @@ module.exports = {
                 + dewsSelect;
     }
 
-    // sails.log.debug(dewsQuery);
-    // return res.json(dewsQuery);
-
     // Execute query
     Dews.query(dewsQuery, function (err, results){
       if(err || !results.rows.length){
@@ -122,7 +119,7 @@ module.exports = {
 
     // Check input
     if (!req.param( 'disease' )) {
-      return res.json(401, {err: '"indicator" and "disease" required for DEWS metric'});
+      return res.json(401, {err: '"disease" required for DEWS calendar'});
     }
 
     // incidents per date by disease
@@ -149,6 +146,64 @@ module.exports = {
       }
     });                  
 
-  }  
+  },
+
+  getData: function(req, res){
+
+    // Check input
+    if (!req.param( 'disease' )) {
+      return res.json(401, {err: '"disease" required for DEWS map'});
+    }
+
+    // geojson query
+    var dewsQuery = "select array_to_json(array_agg(row_to_json(t))) as data "
+                  + "from ( "
+                    + "select * from dews_outbreaks_2015_points where disease_name = '" + req.param( 'disease' ) + "' "
+                  + ") t";
+
+    // Execute query
+    Dews.query(dewsQuery, function (err, results){
+      if(err || !results.rows.length){
+        return res.json({ "status": 0, "error": err });
+      }
+      else{
+        return res.json(results.rows[0]);
+      }
+    });
+
+  },
+
+  getMap: function(req, res){
+
+    // Check input
+    if (!req.param( 'disease' )) {
+      return res.json(401, {err: '"disease" required for DEWS map'});
+    }    
+
+    // geojson query
+    var dewsQuery = "SELECT row_to_json(fc) As featureCollection "
+              + "FROM ( SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features "
+              + "FROM ( SELECT 'Feature' As type, ST_AsGeoJSON(st_pointonsurface(dews.geom))::json As geometry, "
+                + "( SELECT row_to_json(p) "
+                  + "FROM ( SELECT prov_code, dist_code, province, district, disease_name, "
+                    + "sum( u5male + u5female + o5male + o5female) as incidents "
+                    + "GROUP BY prov_code, province, dist_code, district, disease_name "
+                  + ")p "
+                + ") As properties "
+                + "FROM dews_outbreaks_2015 As dews WHERE disease_name = '" + req.param( 'disease' ) + "' "
+                + "GROUP BY prov_code, province, dist_code, district, disease_name, geom "
+            + ") As f )  As fc;";
+
+    // Execute query
+    Dews.query(dewsQuery, function (err, results){
+      if(err || !results.rows.length){
+        return res.json({ "status": 0, "error": err });
+      }
+      else{
+        return res.json(results.rows[0].featurecollection);
+      }
+    });
+
+  }
 
 };
