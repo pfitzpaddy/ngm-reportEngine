@@ -97,7 +97,7 @@ module.exports = {
                     break;
                   default:
                     query += disease ? 'and ' : 'where ';
-                    query += 'and prov_code = ' + provCode + ' ';
+                    query += 'prov_code = ' + provCode + ' ';
                 }
                 
                 // group by date
@@ -157,7 +157,7 @@ module.exports = {
                       break;
                     default:
                       query += disease ? 'and ' : 'where ';
-                      query += 'and prov_code = ' + provCode + ' ';
+                      query += 'prov_code = ' + provCode + ' ';
                   }
 
                 query += ') t';
@@ -229,7 +229,7 @@ module.exports = {
                       break;
                     default:
                       query += disease ? 'AND ' : 'WHERE ';
-                      query += 'AND prov_code = ' + provCode + ' ';
+                      query += 'prov_code = ' + provCode + ' ';
                   }
             
             if(timeSeries) {
