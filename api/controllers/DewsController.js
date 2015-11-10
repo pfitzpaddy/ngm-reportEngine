@@ -31,20 +31,24 @@ module.exports = {
         query = 'select sum(' + indicator + ') as value from ' + table;
     }
 
-    // disease (any disease)
-    if(disease){
-      query += "where disease_name = '" + disease + "' ";
-    }
+            // disease (any disease)
+            switch(disease){
+              case '*':
+                // no action required
+                break;
+              default:
+                query += "where disease_id = '" + disease + "' ";
+            }
 
-    // prov code (any prov_code)
-    switch(provCode){
-      case '*':
-        // no action
-        break;
-      default:
-        query += disease ? 'and ' : 'where ';
-        query += 'prov_code IN(' + provCode +') ';
-    }
+            // prov code (any prov_code)
+            switch(provCode){
+              case '*':
+                // no action required
+                break;
+              default:
+                query += disease ? 'and ' : 'where ';
+                query += 'prov_code IN(' + provCode +') ';
+            }
 
     // Execute query
     Dews.query(query, function (err, results){
@@ -75,8 +79,16 @@ module.exports = {
 
     // incidents per date by disease
     query = 'select report_date, sum(u5male + u5female + o5male + o5female) as value '
-                + 'from ' + table
-                + "where disease_name='" + disease + "' ";
+                + 'from ' + table;
+
+                // disease (any disease)
+                switch(disease){
+                  case '*':
+                    // no action required
+                    break;
+                  default:
+                    query += "where disease_id = '" + disease + "' ";
+                }
 
                 // prov code (any prov_code)
                 switch(provCode){
@@ -84,6 +96,7 @@ module.exports = {
                     // no action
                     break;
                   default:
+                    query += disease ? 'and ' : 'where ';
                     query += 'and prov_code = ' + provCode + ' ';
                 }
                 
@@ -126,8 +139,16 @@ module.exports = {
     // geojson query
     query = 'select array_to_json(array_agg(row_to_json(t))) as data '
                 + 'from ( '
-                  + 'select * from ' + table + ' '  
-                  + "where disease_name = '" + disease + "' ";
+                  + 'select * from ' + table;
+                   
+                  // disease (any disease)
+                  switch(disease){
+                    case '*':
+                      // no action required
+                      break;
+                    default:
+                      query += "where disease_id = '" + disease + "' ";
+                  }
   
                   // prov code (any prov_code)
                   switch(provCode){
@@ -135,6 +156,7 @@ module.exports = {
                       // no action
                       break;
                     default:
+                      query += disease ? 'and ' : 'where ';
                       query += 'and prov_code = ' + provCode + ' ';
                   }
 
@@ -156,37 +178,67 @@ module.exports = {
 
     // params
     var query,
+        timeSeries = req.param( 'time_series' ) ? req.param( 'time_series' ) : false,
         disease = req.param( 'disease' ),
         provCode = req.param( 'prov_code' );
 
     // Check input
     if (!disease) {
       return res.json(401, {err: '"disease" required for DEWS map'});
-    }  
+    }
 
-    // geojson query
-    query = "SELECT row_to_json(fc) As featureCollection "
-              + "FROM ( SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features "
-              + "FROM ( SELECT 'Feature' As type, ST_AsGeoJSON(st_pointonsurface(dews.geom))::json As geometry, "
-                + "( SELECT row_to_json(p) "
-                  + "FROM ( SELECT prov_code, dist_code, province, district, disease_name, report_date, "
-                    + "sum( u5male + u5female + o5male + o5female) as incidents "
-                    + "GROUP BY prov_code, province, dist_code, district, disease_name, report_date "
-                  + ")p "
-                + ") As properties "
-                + "FROM health.moph_afg_dews_outbreaks_2015 As dews WHERE disease_name = '" + req.param( 'disease' ) + "' ";
+    if(timeSeries) {
+      // geojson query
+      query = 'SELECT row_to_json(fc) As featureCollection '
+                + "FROM ( SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features "
+                + "FROM ( SELECT 'Feature' As type, ST_AsGeoJSON(st_pointonsurface(dews.geom))::json As geometry, "
+                  + '( SELECT row_to_json(p) '
+                    + 'FROM ( SELECT prov_code, dist_code, province, district, disease_name, report_date, '
+                      + 'sum( u5male + u5female + o5male + o5female) as incidents '
+                      + 'GROUP BY prov_code, province, dist_code, district, disease_name, report_date '
+                    + ')p '
+                  + ') As properties '
+                  + 'FROM health.moph_afg_dews_outbreaks_2015 As dews ';
+    } else {
+      // geojson query
+      query = 'SELECT row_to_json(fc) As featureCollection '
+                + "FROM ( SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features "
+                + "FROM ( SELECT 'Feature' As type, ST_AsGeoJSON(st_pointonsurface(dews.geom))::json As geometry, "
+                  + '( SELECT row_to_json(p) '
+                    + 'FROM ( SELECT prov_code, dist_code, province, district, disease_name, '
+                      + 'sum( u5male + u5female + o5male + o5female) as incidents '
+                      + 'GROUP BY prov_code, province, dist_code, district, disease_name '
+                    + ')p '
+                  + ') As properties '
+                  + 'FROM health.moph_afg_dews_outbreaks_2015 As dews ';
+    }
 
-                // prov code (any prov_code)
-                switch(provCode){
-                  case '*':
-                    // no action
-                    break;
-                  default:
-                    query += 'AND prov_code = ' + provCode + ' ';
-                }
-
+                  // disease (any disease)
+                  switch(disease){
+                    case '*':
+                      // no action required
+                      break;
+                    default:
+                      query += "WHERE disease_id = '" + disease + "' ";
+                  }
+  
+                  // prov code (any prov_code)
+                  switch(provCode){
+                    case '*':
+                      // no action
+                      break;
+                    default:
+                      query += disease ? 'AND ' : 'WHERE ';
+                      query += 'AND prov_code = ' + provCode + ' ';
+                  }
+            
+            if(timeSeries) {
               query += "GROUP BY prov_code, province, dist_code, district, disease_name, report_date, geom "
-            + ") As f ) As fc;";
+            } else {
+              query += "GROUP BY prov_code, province, dist_code, district, disease_name, geom "
+            }
+
+            query += ") As f ) As fc;";
 
     // Execute query
     Dews.query(query, function (err, results){
