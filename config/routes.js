@@ -41,14 +41,18 @@ module.exports.routes = {
   'POST /register': 'AuthController.register',
 
   // Route for Dews dataset
-  'POST /dews/incidents': 'DewsController.getIndicator',
-  'POST /dews/outbreaks': 'DewsController.getOutbreaks',
-  'GET /dews/calendar': 'DewsController.getCalendar',
-  'GET /dews/data': 'DewsController.getData',
-  'GET /dews/map': 'DewsController.getMap',
+  'POST /dews/indicator': 'DewsController.getIndicator',
+  'POST /dews/calendar': 'DewsController.getCalendar',
+  'POST /dews/data': 'DewsController.getData',
+  'POST /dews/map': 'DewsController.getMap',
 
   // Metrics
   'POST /metrics/set': 'MetricsController.set',
+
+  // Flood
+  'POST /flood/risk': 'FloodController.getFloodRisk',
+  'POST /flood/risk/type': 'FloodController.getFloodRiskType',
+  'POST /flood/risk/area': 'FloodController.getFloodRiskArea',
 
   /***************************************************************************
   *                                                                          *
