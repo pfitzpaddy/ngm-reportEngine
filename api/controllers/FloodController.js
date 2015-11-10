@@ -66,7 +66,7 @@ module.exports = {
     }
 
     // complete query
-    query += 'FROM drr.provincial_flood_risk_indicators '
+    query += 'FROM drr.immap_afg_provincial_flood_risk_indicators '
 
     if(req.param('prov_code')){
       query += " WHERE prov_code = '" + provCode + "';";
@@ -128,7 +128,7 @@ module.exports = {
     }
 
     // complete query
-    query += 'FROM drr.provincial_flood_risk_indicators '
+    query += 'FROM drr.immap_afg_provincial_flood_risk_indicators '
 
     if(req.param('prov_code')){
       query += " WHERE prov_code = '" + provCode + "';";
@@ -173,7 +173,7 @@ module.exports = {
     switch(indicator){
       case 'floodRisk':
         query = 'select aggcode_simplified, agg_simplified_description as name, sum(fldarea) / 1000000 as y '
-                  + 'from drr.flood_risk_land_type ';
+                  + 'FROM drr.immap_afg_flood_risk_land_type_2015 ';
                   
                   if(provCode != 35) {
                     query += 'where prov_code = ' + provCode +' ';
@@ -185,7 +185,7 @@ module.exports = {
       default:
 
         query = 'select aggcode_si, agg_simpli as name, sum(area_sqm) / 1000000 as y '
-                + 'from drr.afg_landcover ';
+                + 'FROM drr.immap_afg_landcover_2015 ';
                 if(provCode != 35) {
                   query += 'where prov_code = ' + provCode +' ';
                 }
