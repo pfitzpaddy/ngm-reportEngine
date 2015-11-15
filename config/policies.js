@@ -26,13 +26,14 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  // '*': true,
+  '*': ['isAuthorized'], // Everything resctricted here
+  'UserController': {
+    'create': true // We dont need authorization here, allowing public access
+  },
 
-  // '*': ['tokenAuth'],
- 
-  // AuthController: {
-  //   '*': true
-  // }
+  'AuthController': {
+    '*': true // We dont need authorization here, allowing public access
+  }
 
   /***************************************************************************
   *                                                                          *

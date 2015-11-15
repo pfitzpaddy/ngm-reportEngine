@@ -8,6 +8,9 @@
 module.exports = {
 
 	// strict schema
+	schema: true,
+
+	// attributes
 	attributes: {
 		organisation: {
 			type: 'string',
