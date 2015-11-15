@@ -40,7 +40,7 @@ module.exports = {
 		},
 		lastLoggedIn: {
 			type: 'date',
-			required: true,
+			required: false,
 			defaultsTo: new Date(0)
 		},
 		gravatarUrl: {
