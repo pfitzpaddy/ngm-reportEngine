@@ -12,7 +12,7 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		organisation: {
+		organization: {
 			type: 'string',
 			required: true
 		},
