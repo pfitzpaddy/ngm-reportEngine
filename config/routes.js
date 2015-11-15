@@ -38,7 +38,7 @@ module.exports.routes = {
 
   // User authentication
   'GET /login': 'AuthController.login',
-  'POST /register': 'UserController.register',
+  'POST /create': 'UserController.create',
 
   // Route for Dews dataset
   'POST /dews/indicator': 'DewsController.getIndicator',

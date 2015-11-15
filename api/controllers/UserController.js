@@ -7,7 +7,7 @@
 
 module.exports = {
 
-  register: function(req, res) {
+  create: function(req, res) {
     //
     // if (req.param('password') !== req.param('confirmPassword')) {
     //   return res.json(401, {err: 'Password doesn\'t match'});
