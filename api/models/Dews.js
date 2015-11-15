@@ -9,7 +9,7 @@ module.exports = {
 
 	connection: 'ngmPostgreServer',
 
-  	migrate: 'safe',
+  	migrate: 'alter',
 
 	// strict schema
 	/*
