@@ -47,7 +47,7 @@ module.exports = {
           return res.ok({
             id: user.id,
             token: jwtToken.issueToken({sid: user.id}),
-            organisation: user.organisation,
+            organization: user.organization,
             username: user.username,
             email: user.email,
             roles: user.roles

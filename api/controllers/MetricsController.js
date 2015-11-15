@@ -10,7 +10,7 @@ module.exports = {
   // Check provided email address and password
   set: function (req, res) {
 
-    if (!req.param( 'organisation' ) 
+    if (!req.param( 'organization' ) 
           || !req.param( 'username' ) 
           || !req.param( 'email' ) 
           || !req.param( 'dashboard' ) 
@@ -21,7 +21,7 @@ module.exports = {
     }
 
     Metrics.create({
-      organisation: req.param('organisation'),
+      organization: req.param('organization'),
       username: req.param('username'),
       email: req.param('email'),
       dashboard: req.param('dashboard'),
