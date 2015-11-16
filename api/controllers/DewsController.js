@@ -46,7 +46,7 @@ module.exports = {
                 // no action required
                 break;
               default:
-                query += disease ? 'and ' : 'where ';
+                query += disease !== '*' ? 'and ' : 'where ';
                 query += 'prov_code IN(' + provCode +') ';
             }
 
@@ -96,7 +96,7 @@ module.exports = {
                     // no action
                     break;
                   default:
-                    query += disease ? 'and ' : 'where ';
+                    query += disease !== '*' ? 'and ' : 'where ';
                     query += 'prov_code = ' + provCode + ' ';
                 }
                 
@@ -156,7 +156,7 @@ module.exports = {
                       // no action
                       break;
                     default:
-                      query += disease ? 'and ' : 'where ';
+                      query += disease !== '*' ? 'and ' : 'where ';
                       query += 'prov_code = ' + provCode + ' ';
                   }
 
@@ -228,7 +228,7 @@ module.exports = {
                       // no action
                       break;
                     default:
-                      query += disease ? 'AND ' : 'WHERE ';
+                      query += disease !== '*' ? 'AND ' : 'WHERE ';
                       query += 'prov_code = ' + provCode + ' ';
                   }
             
