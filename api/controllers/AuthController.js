@@ -43,6 +43,19 @@ module.exports = {
 
         success: function (){
 
+          // update visit information
+          user.visits = user.visits + 1;
+          user.lastLoggedIn = new Date();
+
+          // save updates
+          user.save(function(error) {
+            if(error) {
+              // do something with the error. 
+            } else {
+              // value saved!
+            }
+          });
+
           // Send back user with token
           return res.ok({
             id: user.id,

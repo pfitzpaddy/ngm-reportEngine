@@ -38,6 +38,10 @@ module.exports = {
 			type: 'array',
 			defaultsTo: ["USER"]
 		},
+		visits: {
+			type: 'integer',
+			defaultsTo: 1
+		},		
 		lastLoggedIn: {
 			type: 'date',
 			required: false,
