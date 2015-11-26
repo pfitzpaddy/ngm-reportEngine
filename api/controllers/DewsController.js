@@ -13,13 +13,15 @@ module.exports = {
     // params
     var query,
         table = 'health.moph_afg_dews_outbreaks_2015 ',
+        startDate = req.param( 'start_date' ),
+        endDate = req.param( 'end_date' ),
         indicator = req.param( 'indicator' ),
         disease = req.param( 'disease' ),
         provCode = req.param( 'prov_code' );
 
     // Check input
-    if (!indicator) {
-      return res.json(401, {err: '"indicator" required for DEWS metric'});
+    if (!startDate || !endDate || !indicator) {
+      return res.json(401, {err: '"start_date", "end_date" & "indicator" required for DEWS metric'});
     }
 
     // indicator (any table column)
@@ -50,6 +52,11 @@ module.exports = {
                 query += 'prov_code IN(' + provCode +') ';
             }
 
+            // add startDate / endDate
+            query += (disease === '*') && (provCode === '*')  ? 'WHERE ' : 'AND ';
+            query += "report_date >= '" + startDate + "'"
+                  + " AND report_date <= '" + endDate + "';";
+
     // Execute query
     Dews.query(query, function (err, results){
       if(err || !results.rows.length){
@@ -68,13 +75,15 @@ module.exports = {
     // params
     var query,
         table = 'health.moph_afg_dews_outbreaks_2015 ',
+        startDate = req.param( 'start_date' ),
+        endDate = req.param( 'end_date' ),        
         disease = req.param( 'disease' ),
         provCode = req.param( 'prov_code' ),
         result = {};
 
     // Check input
-    if (!disease) {
-      return res.json(401, {err: '"disease" required for DEWS calendar'});
+    if (!startDate || !endDate || !disease) {
+      return res.json(401, {err: '"start_date", "end_date" & "disease" required for DEWS calendar'});
     }
 
     // incidents per date by disease
@@ -100,8 +109,14 @@ module.exports = {
                     query += 'prov_code = ' + provCode + ' ';
                 }
                 
+                // add startDate / endDate
+                query += (disease === '*') && (provCode === '*')  ? 'WHERE ' : 'AND ';
+                query += "report_date >= '" + startDate + "'"
+                      + " AND report_date <= '" + endDate + "' ";
+
                 // group by date
                 query += 'group by report_date';
+
 
     // Execute query
     Dews.query(query, function (err, results){
@@ -128,12 +143,14 @@ module.exports = {
     // params
     var query,
         table = 'health.moph_afg_dews_outbreaks_2015_pnts ',
+        startDate = req.param( 'start_date' ),
+        endDate = req.param( 'end_date' ),        
         disease = req.param( 'disease' ),
         provCode = req.param( 'prov_code' );
 
     // Check input
-    if (!disease) {
-      return res.json(401, {err: '"disease" required for DEWS map'});
+    if (!startDate || !endDate || !disease) {
+      return res.json(401, {err: '"start_date", "end_date" & "disease" required for DEWS map'});
     }
 
     // geojson query
@@ -160,6 +177,11 @@ module.exports = {
                       query += 'prov_code = ' + provCode + ' ';
                   }
 
+                // add startDate / endDate
+                query += (disease === '*') && (provCode === '*')  ? 'WHERE ' : 'AND ';
+                query += "report_date >= '" + startDate + "'"
+                      + " AND report_date <= '" + endDate + "';";
+
                 query += ') t';
 
     // Execute query
@@ -178,13 +200,15 @@ module.exports = {
 
     // params
     var query,
+        startDate = req.param( 'start_date' ),
+        endDate = req.param( 'end_date' ),    
         timeSeries = req.param( 'time_series' ) ? req.param( 'time_series' ) : false,
         disease = req.param( 'disease' ),
         provCode = req.param( 'prov_code' );
 
     // Check input
-    if (!disease) {
-      return res.json(401, {err: '"disease" required for DEWS map'});
+    if (!startDate || !endDate || !disease) {
+      return res.json(401, {err: '"start_date", "end_date" & "disease" required for DEWS map'});
     }
 
     if(timeSeries) {
