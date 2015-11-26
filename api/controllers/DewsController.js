@@ -115,7 +115,7 @@ module.exports = {
                       + " AND report_date <= '" + endDate + "' ";
 
                 // group by date
-                query += 'group by report_date';
+                query += 'group by report_date;';
 
 
     // Execute query
@@ -180,9 +180,9 @@ module.exports = {
                 // add startDate / endDate
                 query += (disease === '*') && (provCode === '*')  ? 'WHERE ' : 'AND ';
                 query += "report_date >= '" + startDate + "'"
-                      + " AND report_date <= '" + endDate + "';";
+                      + " AND report_date <= '" + endDate + "' ";
 
-                query += ') t';
+                query += ') t;';
 
     // Execute query
     Dews.query(query, function (err, results){
@@ -255,6 +255,11 @@ module.exports = {
                       query += disease !== '*' ? 'AND ' : 'WHERE ';
                       query += 'prov_code = ' + provCode + ' ';
                   }
+
+                  // add startDate / endDate
+                  query += (disease === '*') && (provCode === '*')  ? 'WHERE ' : 'AND ';
+                  query += "report_date >= '" + startDate + "'"
+                        + " AND report_date <= '" + endDate + "' ";              
             
             if(timeSeries) {
               query += "GROUP BY prov_code, province, dist_code, district, disease_name, report_date, geom "
