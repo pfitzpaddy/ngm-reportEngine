@@ -44,6 +44,7 @@ module.exports.routes = {
   'POST /dews/indicator': 'DewsController.getIndicator',
   'POST /dews/calendar': 'DewsController.getCalendar',
   'POST /dews/data': 'DewsController.getData',
+  'POST /dews/markers': 'DewsController.getMarkers',
   'POST /dews/map': 'DewsController.getMap',
 
   // Metrics
