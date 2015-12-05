@@ -207,10 +207,12 @@ var WatchkeeperController  = {
     }
 
               if(country !== '*') {
-                query += "WHERE country = '" + country + "' ";
+                query += "WHERE country = '" + country + "' AND ";
+              } else {
+                query += "WHERE ";
               }
-        query += "AND event_date >= '" + startDate + "' "
-              + " AND event_date <= '" + endDate + "' "
+        query += "event_date >= '" + startDate + "' "
+              + "AND event_date <= '" + endDate + "' "
               + 'GROUP BY adm_level_1, name '
               + 'ORDER by y desc '
               + 'LIMIT 5';
