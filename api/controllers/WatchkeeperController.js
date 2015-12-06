@@ -203,7 +203,7 @@ var WatchkeeperController  = {
     if(indicator === 'incident'){
       query = "SELECT country || ', ' || adm_level_1, country || ', ' || adm_level_1  as name, count(*)::integer as y FROM " + table + " ";
     }else {
-      query = "SELECT country || ', ' || adm_level_1, country || ', ' || adm_level_1  as name, sum(fatalities)::integer as y FROM " + table + " ";
+      query = "SELECT country || ', ' || adm_level_1, country || ', ' || adm_level_1  as name, count(*)::integer as metric, sum(fatalities)::integer as y FROM " + table + " ";
     }
 
               if(country !== '*') {
@@ -213,9 +213,13 @@ var WatchkeeperController  = {
               }
         query += "event_date >= '" + startDate + "' "
               + "AND event_date <= '" + endDate + "' "
-              + 'GROUP BY adm_level_1, name '
-              + 'ORDER by y desc '
-              + 'LIMIT 5';
+              + 'GROUP BY adm_level_1, name ';
+              if (indicator === 'incident') {
+                query += 'ORDER by y desc ';
+              } else {
+                query += 'ORDER by metric desc ';
+              }
+              query += 'LIMIT 5';
 
     // Execute query
     Flood.query(query, function (err, results){
