@@ -234,6 +234,55 @@ var WatchkeeperController  = {
 
   },
 
+  getData: function(req, res){
+
+    // params
+    var query,
+        table = 'security.acled_africa_incidents_2015',
+        startDate = req.param( 'start_date' ),
+        endDate = req.param( 'end_date' ),        
+        country = req.param( 'country' );
+
+    // Check input
+    if (!startDate || !endDate || !country) {
+      return res.json(401, {err: '"start_date", "end_date" & "country" required for data'});
+    }
+
+    // geojson query
+    query = 'select array_to_json(array_agg(row_to_json(t))) as data '
+                + 'from ( '
+                  + 'select * from ' + table + ' ';
+                   
+                  // country (any country)
+                  switch(country){
+                    case '*':
+                      // no action required
+                      break;
+                    default:
+                      query += "where country = '" + country + "' ";
+                  }
+
+                // add startDate / endDate
+                query += (country === '*') ? 'WHERE ' : 'AND ';
+                query += "event_date >= '" + startDate + "'"
+                      + " AND event_date <= '" + endDate + "' ";
+
+                query += ') t;';
+
+      sails.log.debug(query)
+
+    // Execute query
+    Dews.query(query, function (err, results){
+      if(err || !results.rows.length){
+        return res.json({ "status": 0, "error": err });
+      }
+      else{
+        return res.json(results.rows[0]);
+      }
+    });
+
+  },  
+
   getMarkerMessage: function(m, feature){
     
     // marker message 

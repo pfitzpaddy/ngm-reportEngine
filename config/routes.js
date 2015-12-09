@@ -55,6 +55,7 @@ module.exports.routes = {
   'POST /wk/indicator': 'WatchkeeperController.getIndicator',
   'POST /wk/difference': 'WatchkeeperController.getDifference',
   'POST /wk/markers': 'WatchkeeperController.getMarkers',
+  'POST /wk/data': 'WatchkeeperController.getData',
   'POST /wk/chart': 'WatchkeeperController.getChart',
 
   // Flood
