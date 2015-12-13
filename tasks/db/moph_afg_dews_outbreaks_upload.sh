@@ -53,7 +53,7 @@ sudo psql -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_impor
 	WHERE moph_afg_dews_outbreaks_import.province_code = s.prov_agcho_code;"
 
 # BACKUP TABLE!
-sudo psql -d immap_afg -U ngmadmin -c "CREATE TABLE moph_afg_dews_outbreaks_$(date +%Y_%m_%d_%H_%M_%S) AS SELECT * from dews.moph_afg_dews_outbreaks";
+sudo psql -d immap_afg -U ngmadmin -c "SELECT * INTO dews.moph_afg_dews_outbreaks_$(date +%Y_%m_%d_%H_%M_%S) FROM dews.moph_afg_dews_outbreaks";
 
 # DELETE all records equal to or greater then new import dataset
 sudo psql -d immap_afg -U ngmadmin -c "DELETE FROM dews.moph_afg_dews_outbreaks

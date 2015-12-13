@@ -26,7 +26,9 @@ module.exports = {
 
 	process: function  (req, res) {
 
-		var PythonShell = require('python-shell');
+		var fs = require('fs'),
+			exec = require('child_process').exec,
+			PythonShell = require('python-shell');
 
 		var options = {
 		  mode: 'text',
@@ -41,9 +43,11 @@ module.exports = {
 		  		error: 'Data import error, please check the ' + req.param('type').toUpperCase() + ' and try again!' 
 		  	});
 		  } else {
-			//
-			var exec = require('child_process').exec;
+			
+			// remove file
+			fs.unlink(req.param('file'));
 
+			// run bash script
 			function puts(error, stdout, stderr) { sys.puts(stdout) }
 			exec('. ' + options.scriptPath + '/../db/' + req.param('processScript'), function(error, stdout, stderr) {
 				if (!error) {
