@@ -43,6 +43,10 @@ module.exports.routes = {
   // Metrics
   'POST /metrics/set': 'MetricsController.set',
 
+  // Upload
+  'POST /upload-file': 'FileController.upload',
+  'POST /process': 'FileController.process',
+
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',
   'POST /dews/calendar': 'DewsController.getCalendar',

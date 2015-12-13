@@ -269,8 +269,6 @@ var WatchkeeperController  = {
 
                 query += ') t;';
 
-      sails.log.debug(query)
-
     // Execute query
     Dews.query(query, function (err, results){
       if(err || !results.rows.length){
