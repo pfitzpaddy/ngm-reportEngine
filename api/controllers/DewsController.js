@@ -200,7 +200,21 @@ var DewsController  = {
         return res.json({ "status": 0, "error": err });
       }
       else{
-        return res.json(results.rows[0]);
+
+        // 
+        var fields = [];
+        var json2csv = require('json2csv');
+
+        // get field names
+        for (var key in results.rows[0].data[0]) {
+          fields.push(key);
+        }
+        
+        // return csv
+        json2csv({ data: results.rows[0].data, fields: fields }, function(err, csv) {
+          if (err) console.log(err);
+          return res.json({ data: csv });
+        });
       }
     });
 
