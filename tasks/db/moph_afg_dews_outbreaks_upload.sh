@@ -14,19 +14,19 @@
 ##################################################
 
 # Add id columns to import table
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column disease_id bigint;"
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column province_code bigint;"
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column district_code bigint;"
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column geom geometry(Multipolygon, 4326);"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column disease_id bigint;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column province_code bigint;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column district_code bigint;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column geom geometry(Multipolygon, 4326);"
 
 # UPDATE disease_id
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_import
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import
 	SET disease_id = s.disease_id
 	FROM dews.disease_lookup s
 	WHERE moph_afg_dews_outbreaks_import.disease = s.disease_name;"
 
 # UPDATE province_code
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_import
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import
 	SET province_code = s.province_code
 	FROM dews.province_lookup s
 	WHERE moph_afg_dews_outbreaks_import.province = s.province_name;"
@@ -38,32 +38,32 @@ sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_ou
 # 	WHERE moph_afg_dews_outbreaks_import.district = s.district_name;
 
 # update province names
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Nangarhar' WHERE province = 'Nangarahr';"
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Sar-e-Pul' WHERE province = 'Sar-i- Pul';"
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Hilmand' WHERE province = 'Helmand';"
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Daykundi' WHERE province = 'Daykuni;'"
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Nangarhar' WHERE province = 'Nangarahr';"
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Sar-e-Pul' WHERE province = 'Sar-i- Pul';"
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Hilmand' WHERE province = 'Helmand';"
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Daykundi' WHERE province = 'Daykuni;'"
 
 # UPDATE geom (in future this will be district or village level)
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "UPDATE dews.moph_afg_dews_outbreaks_import
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import
 	SET geom = s.geom
 	FROM admin.afg_admin_1 s
 	WHERE moph_afg_dews_outbreaks_import.province_code = s.prov_agcho_code;"
 
 # BACKUP TABLE!
 # backup table by date
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "SELECT * INTO dews.moph_afg_dews_outbreaks_$(date +%s) FROM dews.moph_afg_dews_outbreaks";
+sudo -u postgres psql -d immap_afg -c "SELECT * INTO dews.moph_afg_dews_outbreaks_$(date +%s) FROM dews.moph_afg_dews_outbreaks";
 # clear restore table
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "DELETE FROM dews.moph_afg_dews_outbreaks_backup";
+sudo -u postgres psql -d immap_afg -c "DELETE FROM dews.moph_afg_dews_outbreaks_backup";
 # prepare restore table
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "SELECT * INTO dews.moph_afg_dews_outbreaks_backup FROM dews.moph_afg_dews_outbreaks";
+sudo -u postgres psql -d immap_afg -c "SELECT * INTO dews.moph_afg_dews_outbreaks_backup FROM dews.moph_afg_dews_outbreaks";
 
 # DELETE all records equal to or greater then new import dataset
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "DELETE FROM dews.moph_afg_dews_outbreaks
+sudo -u postgres psql -d immap_afg -c "DELETE FROM dews.moph_afg_dews_outbreaks
 	where report_date >= 
 	( SELECT min(report_date) as date FROM dews.moph_afg_dews_outbreaks_import );"
 
 # INSERT the imported data into the dews dataset
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "INSERT INTO dews.moph_afg_dews_outbreaks (
+sudo -u postgres psql -d immap_afg -c "INSERT INTO dews.moph_afg_dews_outbreaks (
 	u5male,
 	o5male,
 	u5female,
@@ -148,7 +148,7 @@ FROM dews.moph_afg_dews_outbreaks_import;"
 
 
 # DROP import table
-sudo psql -h localhost -d immap_afg -U ngmadmin -c "DROP TABLE dews.moph_afg_dews_outbreaks_import;"
+sudo -u postgres psql -d immap_afg -c "DROP TABLE dews.moph_afg_dews_outbreaks_import;"
 
 
 
