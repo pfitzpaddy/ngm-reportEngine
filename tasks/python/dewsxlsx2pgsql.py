@@ -17,7 +17,7 @@ if __name__ == "__main__":
 	schema = sys.argv[2]
 	table = sys.argv[3]
 	db_connection = 'postgresql://{}:{}@{}/{}'.format(user, password.strip(), host, database)
-
+	
 	# connection
 	engine = create_engine(db_connection)
 		

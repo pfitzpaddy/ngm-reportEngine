@@ -47,19 +47,24 @@ module.exports = {
 			// remove file
 			fs.unlink(req.param('file'));
 
-			// run bash script
-			function puts(error, stdout, stderr) { sys.puts(stdout) }
-			exec('. ' + options.scriptPath + '/../db/' + req.param('processScript'), function(error, stdout, stderr) {
-				if (!error) {
-					// success
-					res.json({ status:200 });
-				} else {
-					// return error
-				  	res.json(400, { 
-				  		error: 'Data processing error, please check the ' + req.param('type').toUpperCase() + ' and try again!' 
-				  	});
-				}
-			})
+			if (!req.param('processScript')) {
+				res.json({ status:200 });
+			} else {
+
+				// run processing script
+				function puts(error, stdout, stderr) { sys.puts(stdout) }
+				exec('. ' + options.scriptPath + '/../db/' + req.param('processScript'), function(error, stdout, stderr) {
+					if (!error) {
+						// success
+						res.json({ status:200 });
+					} else {
+						// return error
+					  	res.json(400, { 
+					  		error: 'Data processing error, please check the ' + req.param('type').toUpperCase() + ' and try again!' 
+					  	});
+					}
+				});
+			}
 		  }
 		});
 

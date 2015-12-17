@@ -1,0 +1,28 @@
+/**
+ * Local environment settings
+ *
+ * For more information, check out:
+ * http://sailsjs.org/#!/documentation/anatomy/myApp/config/local.js.html 
+ */
+
+module.exports = {
+	connections: {
+		ngmMongodbServer: {
+			adapter: 'sails-mongo',
+			host: 'localhost',
+			port: 27017,
+			// user: 'username',
+			// password: 'password',
+			database: 'ngmReportHub',
+			schema: true
+		},
+		ngmPostgreServer: {
+			adapter: 'sails-postgresql',
+			host: 'localhost',
+			port: 5432,
+			user: 'ngmadmin',
+			password: 'ngmAdminP@1234',
+			database: 'immap_afg'
+		}
+	}	
+}
