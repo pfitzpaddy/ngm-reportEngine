@@ -92,8 +92,7 @@ module.exports = {
 					});
 				} else {
 					// return error
-				  	res.json({
-				  		status: 200, 
+				  	res.json(400, {
 				  		error: 'PDF export error, please check the request and try again!' 
 				  	});
 				}
