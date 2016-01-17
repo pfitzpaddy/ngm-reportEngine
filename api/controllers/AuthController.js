@@ -10,16 +10,16 @@ module.exports = {
   // Check provided email address and password
   login: function (req, res) {
 
-    if (!req.param( 'name' ) || !req.param( 'password' )) {
+    if (!req.param( 'username' ) || !req.param( 'password' )) {
       return res.json(401, {err: 'username and password required'});
     }   
 
     // try to look up user using the provided username/email address
     User.findOne({
       or: [{
-          username: req.param( 'name' )
+          username: req.param( 'username' )
         },{
-          email: req.param( 'name' )
+          email: req.param( 'username' )
         }]
     }, function foundUser( err, user ) {
       if (err) return res.negotiate( err );

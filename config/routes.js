@@ -38,6 +38,7 @@ module.exports.routes = {
 
   // User authentication
   'GET /login': 'AuthController.login',
+  'POST /login': 'AuthController.login',
   'POST /create': 'UserController.create',
 
   // Metrics
@@ -46,6 +47,7 @@ module.exports.routes = {
   // Upload
   'POST /upload-file': 'FileController.upload',
   'POST /process': 'FileController.process',
+  'POST /print': 'FileController.print',
 
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',

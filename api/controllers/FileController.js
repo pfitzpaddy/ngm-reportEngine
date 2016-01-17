@@ -6,6 +6,8 @@
  */
 
 module.exports = {
+
+	//
 	upload: function  (req, res) {
 
 		//	call to /upload via GET is error
@@ -24,6 +26,7 @@ module.exports = {
 
 	},
 
+	//
 	process: function  (req, res) {
 
 		var fs = require('fs'),
@@ -68,6 +71,34 @@ module.exports = {
 		  }
 		});
 
-	},		
+	},
+
+	//
+	print: function  (req, res) {
+
+		var report = req.param('report'),
+			printUrl = req.param('printUrl'),
+			token = req.param('token'),
+			pageLoadTime = req.param('pageLoadTime'),
+			exec = require('child_process').exec;
+
+		exec('phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-print.js ' + report + ' ' + printUrl + ' ' + token + ' ' + pageLoadTime, 
+			function(error, stdout, stderr) {
+				if (!error) {
+					// success
+					res.json({ 
+						status:200, 
+						report: report + '.pdf' 
+					});
+				} else {
+					// return error
+				  	res.json({
+				  		status: 200, 
+				  		error: 'PDF export error, please check the request and try again!' 
+				  	});
+				}
+			}
+		);
+	}	
 };
 
