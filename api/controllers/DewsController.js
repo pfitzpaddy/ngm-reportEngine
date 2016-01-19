@@ -71,6 +71,64 @@ var DewsController  = {
 
   },
 
+  // Daily summary 
+  getSummary: function(req, res) {
+    // params
+    var query,
+        table = 'dews.moph_afg_dews_outbreaks ',
+        date = req.param( 'date' ),
+        disease = req.param( 'disease' ),
+        provCode = req.param( 'prov_code' ),
+        result = {};
+
+    // Check input
+    if (!date || !disease || !provCode) {
+      return res.json(401, {err: '"date", "disease" & "prov_code" required!'});
+    }
+
+    // incidents per date by disease
+    query = 'select disease, u5male, u5female, o5male, o5female, u5death, o5death, clinic_confirmed, village, district, province '
+                + 'from ' + table;
+
+        // disease (any disease)
+        switch(disease){
+          case '*':
+            // no action required
+            break;
+          default:
+            query += "where disease_id = '" + disease + "' ";
+        }
+
+        // prov code (any prov_code)
+        switch(provCode){
+          case '*':
+            // no action
+            break;
+          default:
+            query += disease !== '*' ? 'and ' : 'where ';
+            query += 'province_code = ' + provCode + ' ';
+        }                
+
+        // add startDate / endDate
+        query += (disease === '*') && (provCode === '*')  ? 'WHERE ' : 'AND ';
+        query += "report_date = '" + date + "'";
+
+    // Execute query
+    Dews.query(query, function (err, results){
+      if(err || !results.rows.length){
+        // return error
+        return res.json(400, { 
+            error: 'Data processing error, please try again!' 
+          });
+      }
+      else{
+        // return result as json
+        return res.json({ "data" : results.rows });
+      }
+    });        
+
+  },
+
   // Incident, death indicator
   getCalendar: function(req, res) {
 
