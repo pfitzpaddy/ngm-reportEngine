@@ -87,7 +87,7 @@ var DewsController  = {
     }
 
     // incidents per date by disease
-    query = 'select disease, u5male, u5female, o5male, o5female, u5death, o5death, clinic_confirmed, village, district, province '
+    query = 'select disease, u5male, u5female, o5male, o5female, u5death, o5death, sum(u5male + u5female + o5male + o5female + u5death + o5death) as total, clinic_confirmed, village, district, province '
                 + 'from ' + table;
 
         // disease (any disease)
@@ -111,7 +111,8 @@ var DewsController  = {
 
         // add startDate / endDate
         query += (disease === '*') && (provCode === '*')  ? 'WHERE ' : 'AND ';
-        query += "report_date = '" + date + "'";
+        query += "report_date = '" + date + "' ";
+        query += 'GROUP BY disease, u5male, u5female, o5male, o5female, u5death, o5death, clinic_confirmed, village, district, province;';
 
     // Execute query
     Dews.query(query, function (err, results){
