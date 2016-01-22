@@ -131,6 +131,73 @@ var DewsController  = {
   },
 
   // Incident, death indicator
+  getChart: function(req, res) {
+
+    // params
+    var query,
+        table = 'dews.moph_afg_dews_outbreaks ',
+        startDate = req.param( 'start_date' ),
+        endDate = req.param( 'end_date' ),        
+        disease = req.param( 'disease' ),
+        provCode = req.param( 'prov_code' ),
+        result = {};
+
+    // Check input
+    if (!startDate || !endDate || !disease) {
+      return res.json(401, {err: '"start_date", "end_date" & "disease" required for DEWS calendar'});
+    }
+
+    query = "with filled_dates as ( "
+            + "select day, 0 as blank_count from "
+            + "generate_series('" + startDate + "', '" + endDate + "', '1 day'::interval) "
+            + "as day "
+          + "), "
+          + "outbreak_counts as ( "
+            + "select date_trunc('day', report_date) as day, sum(u5male + u5female + o5male + o5female + u5death + o5death) as outbreak "
+              + "from dews.moph_afg_dews_outbreaks ";
+                
+                // disease (any disease)
+                switch(disease){
+                  case '*':
+                    // no action required
+                    break;
+                  default:
+                    query += "where disease_id = '" + disease + "' ";
+                }
+
+                // prov code (any prov_code)
+                switch(provCode){
+                  case '*':
+                    // no action
+                    break;
+                  default:
+                    query += disease !== '*' ? 'and ' : 'where ';
+                    query += 'province_code = ' + provCode + ' ';
+                }                
+
+      query +=  "group by date_trunc('day', report_date) "
+          + ") "
+          + "select to_char(filled_dates.day, 'YYYY-MM-DD') as name, "
+            + "coalesce(outbreak_counts.outbreak, filled_dates.blank_count) as y "
+            + "from filled_dates "
+              + "left outer join outbreak_counts on outbreak_counts.day = filled_dates.day "
+            + "order by filled_dates.day;"
+
+
+    // Execute query
+    Dews.query(query, function (err, results){
+      if(err || !results.rows.length){
+        return res.json({ "status": 0, "error": err });
+      }
+      else{
+        // return result as json
+        return res.json( results.rows );
+      }
+    });
+
+  },  
+
+  // Incident, death indicator
   getCalendar: function(req, res) {
 
     // params
@@ -148,7 +215,7 @@ var DewsController  = {
     }
 
     // incidents per date by disease
-    query = 'select report_date, sum(u5male + u5female + o5male + o5female) as value '
+    query = 'select report_date, sum(u5male + u5female + o5male + o5female + u5death + o5death) as value '
                 + 'from ' + table;
 
                 // disease (any disease)
@@ -409,7 +476,7 @@ var DewsController  = {
                 + "FROM ( SELECT 'Feature' As type, ST_AsGeoJSON(st_pointonsurface(dews.geom))::json As geometry, "
                   + '( SELECT row_to_json(p) '
                     + 'FROM ( SELECT province_code, dist_code, province, district, disease_name, report_date, '
-                      + 'sum( u5male + u5female + o5male + o5female) as incidents '
+                      + 'sum( u5male + u5female + o5male + o5female + u5death + o5death ) as incidents '
                       + 'GROUP BY province_code, province, dist_code, district, disease_name, report_date '
                     + ')p '
                   + ') As properties '
@@ -421,7 +488,7 @@ var DewsController  = {
                 + "FROM ( SELECT 'Feature' As type, ST_AsGeoJSON(st_pointonsurface(dews.geom))::json As geometry, "
                   + '( SELECT row_to_json(p) '
                     + 'FROM ( SELECT province_code, dist_code, province, district, disease_name, '
-                      + 'sum( u5male + u5female + o5male + o5female) as incidents '
+                      + 'sum( u5male + u5female + o5male + o5female + u5death + o5death ) as incidents '
                       + 'GROUP BY province_code, province, dist_code, district, disease_name '
                     + ')p '
                   + ') As properties '

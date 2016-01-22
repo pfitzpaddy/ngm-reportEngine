@@ -51,6 +51,7 @@ module.exports.routes = {
 
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',
+  'POST /dews/chart': 'DewsController.getChart',
   'POST /dews/calendar': 'DewsController.getCalendar',
   'POST /dews/summary': 'DewsController.getSummary',
   'POST /dews/data': 'DewsController.getData',
