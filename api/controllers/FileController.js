@@ -43,7 +43,7 @@ module.exports = {
 		  if (err) {
 		  	// return error
 		  	res.json(400, { 
-		  		error: 'Data import error, please check the ' + req.param('type').toUpperCase() + ' and try again!' 
+		  		error: 'Data import error, please try again!' 
 		  	});
 		  } else {
 			
@@ -63,7 +63,7 @@ module.exports = {
 					} else {
 						// return error
 					  	res.json(400, { 
-					  		error: 'Data processing error, please check the ' + req.param('type').toUpperCase() + ' and try again!' 
+					  		error: 'Data processing error, please try again!' 
 					  	});
 					}
 				});
@@ -93,7 +93,7 @@ module.exports = {
 				} else {
 					// return error
 				  	res.json(400, {
-				  		error: 'PDF export error, please check the request and try again!' 
+				  		error: 'PDF export error, please try again!' 
 				  	});
 				}
 			}

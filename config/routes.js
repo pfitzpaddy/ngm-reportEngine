@@ -49,6 +49,10 @@ module.exports.routes = {
   'POST /process': 'FileController.process',
   'POST /print': 'FileController.print',
 
+  // Eha
+  'POST /eha/summary': 'EhaController.getSummary',
+  'POST /eha/table': 'EhaController.getTable',
+
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',
   'POST /dews/chart': 'DewsController.getChart',
