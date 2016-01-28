@@ -384,8 +384,9 @@ var WatchkeeperController  = {
 
         }
 
-        // return markers
-        return res.json(markers);
+        // response with value
+        return res.json( { status:200, data: markers } );
+
       }
     });
 
