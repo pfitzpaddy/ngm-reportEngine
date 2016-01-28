@@ -53,6 +53,7 @@ module.exports.routes = {
   'POST /eha/summary': 'EhaController.getSummary',  
   'POST /eha/indicator': 'EhaController.getIndicator',
   'POST /eha/table': 'EhaController.getTable',
+  'POST /eha/markers': 'EhaController.getMarkers',
 
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',

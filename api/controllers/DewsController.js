@@ -448,7 +448,7 @@ var DewsController  = {
         }
 
         // return markers
-        return res.json(markers);
+        return res.json( { status:200, data: markers } );
       }
     });
 

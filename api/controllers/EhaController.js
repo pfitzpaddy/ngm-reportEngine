@@ -165,6 +165,74 @@ module.exports = {
 
     });
 
-  }  
+  },
+
+  getMarkers: function(req, res) {
+
+    // get metric
+    var query,
+        donor = req.param( 'donor' ),
+        organization = req.param( 'organization' ),
+        po_number = req.param( 'po_number' )
+        layer = req.param( 'layer' );
+
+      
+    // query
+    query = 'SELECT markers FROM eha.project_monitoring ';
+
+    // donor
+    switch(donor){
+      case '*':
+        // no action required
+        break;
+      default:
+        query += "WHERE donor_id = '" + donor + "' ";
+    }
+
+    // organization
+    switch(organization){
+      case '*':
+        // no action required
+        break;
+      default:
+        query += donor !== '*' ? 'AND ' : 'WHERE ';
+        query += "organization_id = '" + organization + "' ";
+    }
+
+    // organization
+    if(po_number){
+      query += "AND po_number = " + po_number + ";";
+    }    
+    
+    // execute query
+    Eha.query(query, function (error, results){
+
+      // return error
+      if(error) {
+        res.json( { status:400, error: error } );
+        return;
+      }
+
+      var i = 0,
+          markers = {};
+
+      results.rows.forEach(function(row, key){
+        if(row.markers) {
+          row.markers.forEach(function(d, key){
+            d.layer = layer;
+            d.lng = d.lon;
+            d.message = 'PO Number: ' + d.po_number + '<br/>Donor: ' + d.donor + ' | ' + d.organization + '<br/> Facility Type: ' + d.facility_type + '<br/>Location: ' + d.prov_na_en + ', ' + d.dist_na_en;
+            markers['marker' + i] = d;
+            i++;
+          });
+        }
+      });
+
+      // response with value
+      return res.json( { status:200, data: markers } );
+
+    });
+
+  }    
 
 };
