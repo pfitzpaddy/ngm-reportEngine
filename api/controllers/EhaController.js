@@ -13,7 +13,8 @@ module.exports = {
     var query,
         metric = req.param( 'metric' ),
         donor = req.param( 'donor' ),
-        organization = req.param( 'organization' );
+        organization = req.param( 'organization' ),
+        project = req.param( 'project' );
 
     query = 'SELECT sum(amount) as label, ( sum(installment_1 + installment_2 + installment_3) / sum(amount) ) * 100 as value FROM eha.project_monitoring ';
 
@@ -33,7 +34,17 @@ module.exports = {
           break;
         default:
           query += donor !== '*' ? 'AND ' : 'WHERE ';
-          query += "organization_id = '" + organization + "';";
+          query += "organization_id = '" + organization + "' ";
+      }
+
+      // project
+      switch(project){
+        case '*':
+          // no action required
+          break;
+        default:
+          query += donor || organization !== '*' ? 'AND ' : 'WHERE ';
+          query += "po_number = " + parseInt(project) + ";";
       }
 
     // execute query
@@ -69,7 +80,8 @@ module.exports = {
     var query,
         metric = req.param( 'metric' ),
         donor = req.param( 'donor' ),
-        organization = req.param( 'organization' );
+        organization = req.param( 'organization' ),
+        project = req.param( 'project' );
 
     switch(metric){
       case 'amount':
@@ -102,8 +114,18 @@ module.exports = {
         break;
       default:
         query += donor !== '*' ? 'AND ' : 'WHERE ';
-        query += "organization_id = '" + organization + "';";
+        query += "organization_id = '" + organization + "' ";
     }
+
+    // project
+    switch(project){
+      case '*':
+        // no action required
+        break;
+      default:
+        query += donor || organization !== '*' ? 'AND ' : 'WHERE ';
+        query += "po_number = " + parseInt(project) + ";";
+    }    
 
     // execute query
     Eha.query(query, function (error, results){
@@ -126,11 +148,11 @@ module.exports = {
     // get metric
     var query,
         donor = req.param( 'donor' ),
-        organization = req.param( 'organization' );
-
+        organization = req.param( 'organization' ),
+        project = req.param( 'project' );
       
     // query
-    query = 'SELECT po_number, donor, organization, start_date, end_date, project_title, facility_type, implementing_hfs, prov_na_en, dist_na_en FROM eha.project_monitoring ';
+    query = 'SELECT po_number, donor_id, donor, organization_id, organization, start_date, end_date, project_title, facility_type, implementing_hfs, prov_na_en, dist_na_en FROM eha.project_monitoring ';
 
     // donor
     switch(donor){
@@ -148,7 +170,17 @@ module.exports = {
         break;
       default:
         query += donor !== '*' ? 'AND ' : 'WHERE ';
-        query += "organization_id = '" + organization + "';";
+        query += "organization_id = '" + organization + "' ";
+    }
+
+    // project
+    switch(project){
+      case '*':
+        // no action required
+        break;
+      default:
+        query += donor || organization !== '*' ? 'AND ' : 'WHERE ';
+        query += "po_number = " + parseInt(project) + ";";
     }
     
     // execute query
@@ -173,7 +205,7 @@ module.exports = {
     var query,
         donor = req.param( 'donor' ),
         organization = req.param( 'organization' ),
-        po_number = req.param( 'po_number' )
+        project = req.param( 'project' ),
         layer = req.param( 'layer' );
 
       
@@ -199,10 +231,15 @@ module.exports = {
         query += "organization_id = '" + organization + "' ";
     }
 
-    // organization
-    if(po_number){
-      query += "AND po_number = " + po_number + ";";
-    }    
+    // project
+    switch(project){
+      case '*':
+        // no action required
+        break;
+      default:
+        query += donor || organization !== '*' ? 'AND ' : 'WHERE ';
+        query += "po_number = " + parseInt(project) + ";";
+    }
     
     // execute query
     Eha.query(query, function (error, results){
