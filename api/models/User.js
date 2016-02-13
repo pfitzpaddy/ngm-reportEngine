@@ -12,6 +12,9 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		organization_id: {
+			type: 'string'
+		},
 		organization: {
 			type: 'string',
 			required: true
@@ -38,21 +41,29 @@ module.exports = {
 			type: 'array',
 			defaultsTo: ["USER"]
 		},
+		app_home: {
+			type: 'string',
+			defaultsTo: 'health'
+		},
+		menu: {
+			type: 'array',
+			defaultsTo: []
+		},
 		visits: {
 			type: 'integer',
 			defaultsTo: 1
 		},		
-		lastLoggedIn: {
+		last_logged_in: {
 			type: 'date',
 			required: false,
 			defaultsTo: new Date(0)
 		},
-		gravatarUrl: {
+		gravatar_url: {
 			type: 'string'
 		}
 	},
 
-	// encrypt password before create
+	// encrypt password before create, assign org_id
 	beforeCreate: function ( values, next ) {
 
 		// encrypts the password/confirmation to be stored in the db
@@ -60,7 +71,43 @@ module.exports = {
 			if ( err ) return next( err );
 			values.password = encryptedPassword;
 			next();
-		});		
+		});
+
+		// org id by name
+		var org_name = values.organization.replace(/ /g, '_').toLowerCase()
+
+		// check if org exists
+    Organization.find({ organization_name: org_name }).exec(function (err, organization){
+		  
+		  if (err) {
+		    return res.negotiate(err);
+		  }
+
+		  // dosnt exist, create
+		  if(!organization.length){
+		  	// create org_id
+		  	Organization.create({
+		  		organization_name: org_name,
+		  		organization_display_name: values.organization,
+		  	}).exec(function (err, created){
+				  if (err) {
+				    return res.negotiate(err);
+				  }
+				  else {
+				  	// organization_id
+						values.organization_id = created.id;
+				  }
+				});
+		  }
+
+		  // exists
+		  else{
+		  	// organization_id
+		  	values.organization_id = organization[0].id;
+		  }
+		  
+		});
+
 	}
 
 };

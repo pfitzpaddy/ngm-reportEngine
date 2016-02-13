@@ -1,6 +1,9 @@
 ﻿##################################################
 # DEWS UPDATE
-# Description;
+# Description
+# Note
+# - Data is imported as table dews.moph_afg_dews_outbreaks_import using dewsxlsx2pgsql.py
+# Steps
 #	- import Dews update in xlsx
 #	- add columns to import table
 #	- update import table with disease_id

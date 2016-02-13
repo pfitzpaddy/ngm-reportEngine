@@ -45,7 +45,7 @@ module.exports = {
 
           // update visit information
           user.visits = user.visits + 1;
-          user.lastLoggedIn = new Date();
+          user.last_logged_in = new Date();
 
           // save updates
           user.save(function(error) {
@@ -60,10 +60,13 @@ module.exports = {
           return res.ok({
             id: user.id,
             token: jwtToken.issueToken({sid: user.id}),
+            organization_id: user.organization_id,
             organization: user.organization,
             username: user.username,
             email: user.email,
-            roles: user.roles
+            roles: user.roles,
+            app_home: user.app_home,
+            menu: user.menu
           });
         }
       });

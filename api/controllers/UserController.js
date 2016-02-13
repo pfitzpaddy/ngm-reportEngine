@@ -39,10 +39,13 @@ module.exports = {
           res.json({
             id: user.id,
             token: jwtToken.issueToken({sid: user.id}),
+            organization_id: user.organization_id,
             organization: user.organization,
             username: user.username,
             email: user.email,
-            roles: user.roles
+            roles: user.roles,
+            app_home: user.app_home,
+            menu: user.menu
           });
         }
       });
