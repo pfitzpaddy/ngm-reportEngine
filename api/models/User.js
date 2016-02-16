@@ -90,13 +90,13 @@ module.exports = {
 		  		organization_name: org_name,
 		  		organization_display_name: values.organization,
 		  	}).exec(function (err, created){
-				  if (err) {
-				    return res.negotiate(err);
-				  }
-				  else {
-				  	// organization_id
+					if (err) {
+					  return res.negotiate(err);
+					}
+					else {
+						// organization_id
 						values.organization_id = created.id;
-				  }
+					}
 				});
 		  }
 
