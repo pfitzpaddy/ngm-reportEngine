@@ -47,7 +47,21 @@ module.exports = {
 		},
 		menu: {
 			type: 'array',
-			defaultsTo: []
+			defaultsTo: [{
+        icon: "zoom_in",
+        liClass: "teal z-depth-2",
+        aClass: "white-text",
+        iClass: "medium material-icons",
+        href: "#/health/project",
+        title: "PROJECTS"
+       },{
+				icon: "assessment",
+				liClass: "teal z-depth-2",
+				aClass: "white-text",
+				iClass: "medium material-icons",
+				href: "#/health/3w",
+				title: "HEALTH 3W"
+      }]
 		},
 		visits: {
 			type: 'integer',

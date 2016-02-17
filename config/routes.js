@@ -62,6 +62,9 @@ module.exports.routes = {
   'POST /health/project/getProjectList': 'ProjectController.getProjects',
   'POST /health/project/deleteProject': 'ProjectController.deleteProjectById',
 
+  // Health Projects
+  'POST /health/total': 'ProjectDashboardController.getTotal',
+
   // Activities Projects
   'POST /health/activity/create': 'ProjectController.createActivity',
 
