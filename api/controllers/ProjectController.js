@@ -11,8 +11,8 @@ module.exports = {
   create: function(req, res) {
 
     // request input
-    if (!req.param('organization_id')) {
-      return res.json(401, {err: 'organization_id required!'});
+    if (!req.param('organization_id') || !req.param('user_id') || !req.param('username') ) {
+      return res.json(401, {err: 'organization_id, user_id, username required!'});
     }
 
     // project for UI
@@ -20,7 +20,9 @@ module.exports = {
 
     // create Project with organization_id
     Project.create({
-      organization_id: req.param('organization_id')
+      organization_id: req.param('organization_id'),
+      user_id: req.param('user_id'),
+      username: req.param('username')
     }).exec(function(err, project){
       
       // return error
@@ -175,8 +177,10 @@ module.exports = {
         activities = req.param('project').activities,
         status = req.param('project').details.project_status;
 
-    // update project status
-    project.project_status = 'active';
+    // update project status if new
+    if( status === 'new' ){
+      project.project_status = 'active';
+    }
 
     // set project by project id
     Project.update({ id: project.id }, project).exec(function(err, project){
@@ -190,7 +194,11 @@ module.exports = {
         // for each created activity
         activities.forEach(function(activity, index){
 
-          Activity.update({ id: activity.id }, activity).exec(function(err, activity){               
+          // update activity
+          Activity.update({ id: activity.id }, activity).exec(function(err, activity){
+
+            // return error
+            if (err) return res.negotiate( err );
 
             // beneficiaries
             Beneficiaries.create(activities[index].beneficiaries).exec(function(err, b){
@@ -204,8 +212,13 @@ module.exports = {
                 // return error
                 if (err) return res.negotiate( err );
 
-                // return new Project
-                return res.json(200, project);
+                // if final record
+                if(index === activities.length-1){
+
+                  // return new Project
+                  return res.json(200, project);
+
+                }
 
               });
 
@@ -218,8 +231,34 @@ module.exports = {
       // update
       } else {
 
-        // return new Project
-        return res.json(200, project);
+        // for each created activity
+        activities.forEach(function(activity, index){
+
+          // update activities
+          Activity.update({ id: activity.id }, activity).exec(function(err, activity){          
+
+            // return error
+            if (err) return res.negotiate( err ); 
+
+            // update beneficiaries
+            Beneficiaries.update({ id: activities[index].beneficiaries.id }, activities[index].beneficiaries).exec(function(err, b){
+
+              // return error
+              if (err) return res.negotiate( err );
+
+              // if final record
+              if(index === activities.length-1){
+
+                // return new Project
+                return res.json(200, project);
+
+              }
+
+            });
+
+          });
+
+        });
 
       }
 

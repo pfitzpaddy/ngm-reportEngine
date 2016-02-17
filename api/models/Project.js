@@ -16,6 +16,14 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		user_id: {
+			type: 'integer',
+			required: true			
+		},
+		username: {
+			type: 'string',
+			required: true			
+		},		
 		project_name: {
 			type: 'string'
 		},
@@ -26,8 +34,7 @@ module.exports = {
 			type: 'integer'
 		},
 		project_budget_progress: {
-			type: 'integer',
-			defaultsTo: 0
+			type: 'integer'
 		},		
 		project_donor: {
 			type: 'string'
