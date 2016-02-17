@@ -49,18 +49,21 @@ module.exports.routes = {
   'POST /process': 'FileController.process',
   'POST /print': 'FileController.print',
 
-  // Provinces
+  // Locations
   'POST /health/getProvincesList': 'ProvinceController.getProvincesList',
   'POST /health/getDistrictsList': 'DistrictController.getDistrictsList',
   'POST /health/getFacilityTypeList': 'FacilityController.getFacilityTypeList',
   'POST /health/getFacilityList': 'FacilityController.getFacilityList',
 
   // Health Projects
-  'POST /health/create': 'ProjectController.create',
-  'POST /health/getProject': 'ProjectController.getProjectById',
-  'POST /health/setProject': 'ProjectController.setProjectById',
-  'POST /health/getProjectList': 'ProjectController.getProjects',
-  'POST /health/deleteProject': 'ProjectController.deleteProjectById',
+  'POST /health/project/create': 'ProjectController.create',
+  'POST /health/project/getProject': 'ProjectController.getProjectById',
+  'POST /health/project/setProject': 'ProjectController.setProjectById',
+  'POST /health/project/getProjectList': 'ProjectController.getProjects',
+  'POST /health/project/deleteProject': 'ProjectController.deleteProjectById',
+
+  // Activities Projects
+  'POST /health/activity/create': 'ProjectController.createActivity',
 
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',

@@ -23,43 +23,24 @@ module.exports = {
 		activity_id: {
 			type: 'string',
 			required: true
-		},		
-		prov_code: {
+		},
+		under5male:{
 			type: 'integer',
-			required: true
+			defaultsTo: 0			
 		},
-		prov_name: {
-			type: 'string',
-			required: true
-		},
-		dist_code: {
+		under5female:{
 			type: 'integer',
-			required: true
+			defaultsTo: 0
 		},
-		dist_name: {
-			type: 'string',
-			required: true
-		},
-		fac_id: {
+		over5male:{
 			type: 'integer',
-			required: true
+			defaultsTo: 0
 		},
-		fac_type: {
-			type: 'string',
-			required: true
-		},
-		fac_name: {
-			type: 'string',
-			required: true
-		},
-		lng: {
-			type: 'float',
-			required: true
-		},
-		lat: {
-			type: 'float',
-			required: true
+		over5female:{
+			type: 'integer',
+			defaultsTo: 0
 		}
+
 	}
 
 };

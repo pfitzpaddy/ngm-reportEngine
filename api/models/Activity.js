@@ -16,39 +16,16 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_name: {
-			type: 'string'
-		},
-		project_description: {
-			type: 'string'
-		},
-		project_budget: {
-			type: 'integer'
-		},
-		project_budget_progress: {
-			type: 'integer',
-			defaultsTo: 0
-		},		
-		project_donor: {
-			type: 'string'
-		},
-		project_status: {
+		project_id: {
 			type: 'string',
-			defaultsTo: 'new'
+			required: true
 		},
-		project_start_date: {
-			type: 'date',
-      defaultsTo: function () {
-          return new Date();
-      }
+		activity_type: {
+			type: 'string'
 		},
-		project_end_date: {
-			type: 'date',
-      defaultsTo: function () {
-      	var d = new Date();
-        return new Date(d.getFullYear(), d.getMonth() + 1, d.getDate());
-      }
-		},		
+		activity_description: {
+			type: 'string'			
+		}
 	}
 
 };
