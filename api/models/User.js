@@ -27,7 +27,15 @@ module.exports = {
 		password: {
 			type: 'string',
 			required: true
-		},			
+		},
+		position: {
+			type: 'string',
+			required: true
+		},		
+		phone: {
+			type: 'integer',
+			required: true
+		},
 		email: {
 			type: 'email',
 			unique: true,
@@ -78,17 +86,17 @@ module.exports = {
 	},
 
 	// encrypt password before create, assign org_id
-	beforeCreate: function ( values, next ) {
+	beforeCreate: function ( user, next ) {
 
 		// encrypts the password/confirmation to be stored in the db
-		require( 'bcrypt' ).hash( values.password, 10, function passwordEncrypted( err, encryptedPassword ) {
+		require( 'bcrypt' ).hash( user.password, 10, function passwordEncrypted( err, encryptedPassword ) {
 			if ( err ) return next( err );
-			values.password = encryptedPassword;
+			user.password = encryptedPassword;
 			next();
 		});
 
 		// org id by name
-		var org_name = values.organization.replace(/ /g, '_').toLowerCase()
+		var org_name = user.organization.replace(/ /g, '_').toLowerCase();
 
 		// check if org exists
     Organization.find({ organization_name: org_name }).exec(function (err, organization){
@@ -102,14 +110,14 @@ module.exports = {
 		  	// create org_id
 		  	Organization.create({
 		  		organization_name: org_name,
-		  		organization_display_name: values.organization,
+		  		organization_display_name: user.organization,
 		  	}).exec(function (err, created){
 					if (err) {
 					  return res.negotiate(err);
 					}
 					else {
 						// organization_id
-						values.organization_id = created.id;
+						user.organization_id = created.id;
 					}
 				});
 		  }
@@ -117,7 +125,7 @@ module.exports = {
 		  // exists
 		  else{
 		  	// organization_id
-		  	values.organization_id = organization[0].id;
+		  	user.organization_id = organization[0].id;
 		  }
 		  
 		});

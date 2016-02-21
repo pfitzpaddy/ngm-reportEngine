@@ -7,7 +7,7 @@
 
 module.exports = {
 
-  // create Project
+  // get total metrics 
   getTotal: function( req, res ){
 
     // request input
@@ -36,7 +36,7 @@ module.exports = {
       case 'projects':
 
         // no. of organizations
-        Project.count().exec(function(err, value){
+        Project.count({ project_status: { '!' : 'new' } }).exec(function(err, value){
           
           // return error
           if (err) return res.negotiate( err );
@@ -103,6 +103,36 @@ module.exports = {
 
     }
 
+  },
 
-  }
+  // create Project
+  getMarkers: function( req, res ){
+
+    var markers = {};
+
+    // get all locations
+    Location.find().exec(function(err, locations){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+      locations.forEach(function(d,i){
+
+        // create markers
+        markers['marker' + i] = {
+          layer: 'health',
+          lat: d.lat,
+          lng: d.lng,
+          message: '<div class="count" style="text-align:center">' + d.fac_name + '</div><div style="text-align:center"> in ' + d.prov_name + ', ' + d.dist_name + '</div>'
+        };
+
+      })
+
+      // return new Project
+      return res.json(200, { 'data': markers });
+
+    });
+
+  }  
+
 };

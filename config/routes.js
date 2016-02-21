@@ -37,8 +37,8 @@ module.exports.routes = {
   // }
 
   // User authentication
-  'GET /login': 'AuthController.login',
-  'POST /login': 'AuthController.login',
+  'GET /login': 'UserController.login',
+  'POST /login': 'UserController.login',
   'POST /create': 'UserController.create',
 
   // Metrics
@@ -50,23 +50,24 @@ module.exports.routes = {
   'POST /print': 'FileController.print',
 
   // Locations
-  'POST /health/getProvincesList': 'ProvinceController.getProvincesList',
-  'POST /health/getDistrictsList': 'DistrictController.getDistrictsList',
-  'POST /health/getFacilityTypeList': 'FacilityController.getFacilityTypeList',
-  'POST /health/getFacilityList': 'FacilityController.getFacilityList',
+  'POST /health/getProvincesList': 'Health/ListController.getProvincesList',
+  'POST /health/getDistrictsList': 'Health/ListController.getDistrictsList',
+  'POST /health/getFacilityTypeList': 'Health/ListController.getFacilityTypeList',
+  'POST /health/getFacilityList': 'Health/ListController.getFacilityList',
 
   // Health Projects
-  'POST /health/project/create': 'ProjectController.create',
-  'POST /health/project/getProject': 'ProjectController.getProjectById',
-  'POST /health/project/setProject': 'ProjectController.setProjectById',
-  'POST /health/project/getProjectList': 'ProjectController.getProjects',
-  'POST /health/project/deleteProject': 'ProjectController.deleteProjectById',
+  'POST /health/project/create': 'Health/ProjectController.create',
+  'POST /health/project/getProject': 'Health/ProjectController.getProjectById',
+  'POST /health/project/setProject': 'Health/ProjectController.setProjectById',
+  'POST /health/project/getProjectList': 'Health/ProjectController.getProjects',
+  'POST /health/project/deleteProject': 'Health/ProjectController.deleteProjectById',
 
-  // Health Projects
-  'POST /health/total': 'ProjectDashboardController.getTotal',
+  // Health Dashboard
+  'POST /health/total': 'Health/ProjectDashboardController.getTotal',
+  'POST /health/markers': 'Health/ProjectDashboardController.getMarkers',
 
-  // Activities Projects
-  'POST /health/activity/create': 'ProjectController.createActivity',
+  // Health Activity
+  'POST /health/activity/create': 'Health/ProjectController.createActivity',
 
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',
