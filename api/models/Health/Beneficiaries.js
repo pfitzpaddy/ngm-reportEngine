@@ -20,10 +20,14 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		activity_id: {
+		beneficiary_name: {
 			type: 'string',
 			required: true
 		},
+		beneficiary_category: {
+			type: 'string',
+			required: true
+		},		
 		under5male:{
 			type: 'integer',
 			defaultsTo: 0			

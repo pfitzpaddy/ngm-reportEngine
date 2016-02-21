@@ -19,11 +19,7 @@ module.exports = {
 		project_id: {
 			type: 'string',
 			required: true
-		},
-		activity_id: {
-			type: 'string',
-			required: true
-		},		
+		},	
 		prov_code: {
 			type: 'integer',
 			required: true

@@ -25,10 +25,12 @@ module.exports = {
 			required: true			
 		},		
 		project_name: {
-			type: 'string'
+			type: 'string',
+			defaultsTo: 'New Project'
 		},
 		project_description: {
-			type: 'string'
+			type: 'string',
+			defaultsTo: 'Complete the project details to register a new project'
 		},
 		project_budget: {
 			type: 'integer'

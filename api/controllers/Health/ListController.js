@@ -43,7 +43,7 @@ module.exports = {
   getFacilityTypeList: function(req, res) {
 
     // create Project with organization_id
-    Type.find().sort('fact_type ASC').exec(function(err, facilityTypes){
+    Type.find().sort('fac_type ASC').exec(function(err, facilityTypes){
       
       // return error
       if (err) return res.negotiate( err );
