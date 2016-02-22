@@ -59,6 +59,8 @@ module.exports.routes = {
   'POST /health/project/create': 'Health/ProjectController.create',
   'POST /health/project/getProjectDetails': 'Health/ProjectController.getProjectDetailsById',
   'POST /health/project/setProjectDetails': 'Health/ProjectController.setProjectDetails',
+  'POST /health/project/setProjectLocations': 'Health/ProjectController.setProjectLocations',
+  'POST /health/project/setProjectBeneficiaries': 'Health/ProjectController.setProjectBeneficiaries',
 
   'POST /health/project/getProjectList': 'Health/ProjectController.getProjects',
   'POST /health/project/deleteProject': 'Health/ProjectController.deleteProjectById',
@@ -66,9 +68,6 @@ module.exports.routes = {
   // Health Dashboard
   'POST /health/total': 'Health/ProjectDashboardController.getTotal',
   'POST /health/markers': 'Health/ProjectDashboardController.getMarkers',
-
-  // Health Activity
-  'POST /health/activity/create': 'Health/ProjectController.createActivity',
 
   // Dews 
   'POST /dews/indicator': 'DewsController.getIndicator',
