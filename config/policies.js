@@ -36,6 +36,11 @@ module.exports.policies = {
   },
 
   // public
+  'ProjectDashboardController': {
+    '*': true
+  },  
+
+  // public
   'FloodController': {
     '*': true
   }
