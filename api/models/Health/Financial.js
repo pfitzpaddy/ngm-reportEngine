@@ -12,6 +12,10 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		username: {
+			type: 'string',
+			required: true
+		},		
 		organization_id: {
 			type: 'string',
 			required: true
@@ -20,39 +24,31 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		prov_code: {
-			type: 'integer',
-			required: true
-		},
-		prov_name: {
+		expenditure_item: {
 			type: 'string',
 			required: true
 		},
-		dist_code: {
-			type: 'integer',
-			required: true
-		},
-		dist_name: {
+		expenditure_name: {
 			type: 'string',
 			required: true
+		},		
+		expenditure_status: {
+			type: 'string',
+			required: true
+		},		
+		expenditure_budget:{
+			type: 'integer',
+			defaultsTo: 0			
 		},
-		fac_id: {
-			type: 'integer'
-		},
-		fac_type: {
-			type: 'string'
-		},
-		fac_name: {
-			type: 'string'
-		},
-		lng: {
-			type: 'float',
+		expenditure_start_date: {
+			type: 'date',
 			required: true
 		},
-		lat: {
-			type: 'float',
+		expenditure_end_date: {
+			type: 'date',
 			required: true
 		}
+
 	}
 
 };

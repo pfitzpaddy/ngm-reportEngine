@@ -24,31 +24,40 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		beneficiary_name: {
+		indicator_one_id: {
 			type: 'string',
-			required: true
-		},
-		beneficiary_category: {
-			type: 'string',
-			required: true
+			defaultsTo: 'people_served_fatp_services'
 		},		
-		under5male:{
-			type: 'integer',
-			defaultsTo: 0			
-		},
-		under5female:{
+		indicator_one: {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over5male:{
+		indicator_two_id: {
+			type: 'string',
+			defaultsTo: 'people_served_conflict_white_areas'
+		},		
+		indicator_two: {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over5female:{
+		indicator_three_id: {
+			type: 'string',
+			defaultsTo: 'alarms_investigated_within_48_hours'
+		},		
+		indicator_three: {
+			type: 'integer'
+		},
+		indicator_three_total: {
+			type: 'integer'
+		},		
+		indicator_four_id: {
+			type: 'string',
+			defaultsTo: 'people_served_natural_disasters'
+		},		
+		indicator_four: {
 			type: 'integer',
 			defaultsTo: 0
 		}
-
 	}
 
 };

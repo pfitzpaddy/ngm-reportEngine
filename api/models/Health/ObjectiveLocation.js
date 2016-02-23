@@ -20,11 +20,29 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		activity_type: {
-			type: 'string'
+		prov_code: {
+			type: 'integer',
+			required: true
 		},
-		activity_description: {
-			type: 'string'			
+		prov_name: {
+			type: 'string',
+			required: true
+		},
+		dist_code: {
+			type: 'integer',
+			required: true
+		},
+		dist_name: {
+			type: 'string',
+			required: true
+		},
+		lng: {
+			type: 'float',
+			required: true
+		},
+		lat: {
+			type: 'float',
+			required: true
 		}
 	}
 

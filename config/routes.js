@@ -49,7 +49,7 @@ module.exports.routes = {
   'POST /process': 'FileController.process',
   'POST /print': 'FileController.print',
 
-  // Locations
+  // Location lists
   'POST /health/getProvincesList': 'Health/ListController.getProvincesList',
   'POST /health/getDistrictsList': 'Health/ListController.getDistrictsList',
   'POST /health/getFacilityTypeList': 'Health/ListController.getFacilityTypeList',
@@ -57,12 +57,21 @@ module.exports.routes = {
 
   // Health Projects
   'POST /health/project/create': 'Health/ProjectController.create',
+  'POST /health/project/getProjectList': 'Health/ProjectController.getProjects',  
+  'POST /health/project/getUserProjectCount': 'Health/ProjectController.getUserProjectCountById',
+  // get project details, locations, beneficiaries
   'POST /health/project/getProjectDetails': 'Health/ProjectController.getProjectDetailsById',
   'POST /health/project/setProjectDetails': 'Health/ProjectController.setProjectDetails',
+  // set project locations
   'POST /health/project/setProjectLocations': 'Health/ProjectController.setProjectLocations',
   'POST /health/project/setProjectBeneficiaries': 'Health/ProjectController.setProjectBeneficiaries',
+  // get/set project financials
+  'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',
+  'POST /health/project/setProjectFinancials': 'Health/ProjectController.setProjectFinancialsById',
+  // get/set project objectives
+  'POST /health/project/getProjectObjectives': 'Health/ProjectController.getProjectObjectivesById',
+  'POST /health/project/setProjectObjectives': 'Health/ProjectController.setProjectObjectivesById',
 
-  'POST /health/project/getProjectList': 'Health/ProjectController.getProjects',
   'POST /health/project/deleteProject': 'Health/ProjectController.deleteProjectById',
 
   // Health Dashboard

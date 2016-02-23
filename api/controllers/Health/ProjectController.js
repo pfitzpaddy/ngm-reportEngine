@@ -68,6 +68,125 @@ module.exports = {
 
   },
 
+  // get the total number of projects by user
+  getUserProjectCountById: function(req, res) {
+    
+    // request input
+    if (!req.param('username')) {
+      return res.json(401, { err: 'username required!' });
+    }
+
+    // get project by organization_id & status
+    Project.count({
+      username: req.param('username')
+    }).exec(function(err, value){
+      
+      // return error
+      if (err) return res.negotiate( err );
+
+      // else
+      return res.json(200, { 'value': value });
+
+    });
+
+  },
+
+  // set project details
+  setProjectDetails: function(req, res) {
+
+    // request input
+    if (!req.param('project')) {
+      return res.json(401, { err: 'project required!' });
+    }
+
+    // get project
+    var project = req.param('project').details,
+        status = req.param('project').details.project_status;
+
+    // update project status if new
+    if( status === 'new' ){
+      project.project_status = 'active';
+    }
+
+    // set project by project id
+    Project.update({ id: project.id }, project).exec(function(err, project){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+      // return new Project
+      return res.json(200, project);
+
+    });
+
+  },  
+
+  // set project locations
+  setProjectLocations: function(req, res){
+
+    // request input
+    if (!req.param('project')) {
+      return res.json(401, { err: 'project required!' });
+    }
+
+    // get project
+    var $project = req.param('project').details,
+        $locations = req.param('project').locations;
+
+    // destroy all locations
+    Location.destroy({ project_id: $project.id }).exec(function(err){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+      // create
+      Location.create($locations).exec(function(err, locations){
+
+        // return error
+        if (err) return res.negotiate( err );        
+
+        // return new Project
+        return res.json(200, locations);        
+
+      });
+
+    });
+
+  },
+
+  // set project beneficiaries
+  setProjectBeneficiaries: function(req, res){
+
+     // request input
+    if (!req.param('project')) {
+      return res.json(401, { err: 'project required!' });
+    }
+
+    // get project
+    var $project = req.param('project').details,
+        $beneficiaries = req.param('project').beneficiaries;
+
+    // destroy all beneficiaries
+    Beneficiaries.destroy({ project_id: $project.id }).exec(function(err){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+      // create
+      Beneficiaries.create($beneficiaries).exec(function(err, beneficiaries){
+
+        // return error
+        if (err) return res.negotiate( err );        
+
+        // return new Project
+        return res.json(200, beneficiaries);        
+
+      });
+
+    });
+
+  },
+
   // get project details by id
   getProjectDetailsById: function(req, res){
     
@@ -118,69 +237,47 @@ module.exports = {
 
   },
 
-  // set project details
-  setProjectDetails: function(req, res) {
-
+  // get project details by id
+  getProjectFinancialsById: function(req, res){
+    
     // request input
-    if (!req.param('project')) {
-      return res.json(401, { err: 'project required!' });
+    if (!req.param('id')) {
+      return res.json(401, { err: 'id required!' });
     }
 
-    // get project
-    var project = req.param('project').details,
-        status = req.param('project').details.project_status;
-
-    // update project status if new
-    if( status === 'new' ){
-      project.project_status = 'active';
-    }
-
-    // set project by project id
-    Project.update({ id: project.id }, project).exec(function(err, project){
-
+    // project for UI
+    var projectObject = {};
+    
+    // get project by organization_id
+    Project.findOne({ id: req.param('id') }).exec(function(err, project){
+      
       // return error
       if (err) return res.negotiate( err );
 
-      // return new Project
-      return res.json(200, project);
+      // set details
+      projectObject.details = project;
 
-    });
-
-  },
-
-  setProjectLocations: function(req, res){
-
-    // request input
-    if (!req.param('project')) {
-      return res.json(401, { err: 'project required!' });
-    }
-
-    // get project
-    var $project = req.param('project').details,
-        $locations = req.param('project').locations;
-
-    // destroy all locations
-    Location.destroy({ project_id: $project.id }).exec(function(err){
-
-      // return error
-      if (err) return res.negotiate( err );
-
-      // create
-      Location.create($locations).exec(function(err, locations){
+      // get beneficiaries
+      Financial.find({ project_id: req.param('id') }).exec(function(err, financials){
 
         // return error
-        if (err) return res.negotiate( err );        
+        if (err) return res.negotiate( err );
 
-        // return new Project
-        return res.json(200, locations);        
+        // set financials
+        projectObject.financials = financials;
 
-      });
+        // return project json
+        return res.json(200, projectObject);    
 
-    });
+      });     
+
+
+    });    
 
   },
 
-  setProjectBeneficiaries: function(req, res){
+  // set project financials by id
+  setProjectFinancialsById: function(req, res){
 
      // request input
     if (!req.param('project')) {
@@ -189,28 +286,125 @@ module.exports = {
 
     // get project
     var $project = req.param('project').details,
-        $beneficiaries = req.param('project').beneficiaries;
+        $financials = req.param('project').financials;
 
-    // destroy all beneficiaries
-    Beneficiaries.destroy({ project_id: $project.id }).exec(function(err){
+    // destroy all financials
+    Financial.destroy({ project_id: $project.id }).exec(function(err){
 
       // return error
       if (err) return res.negotiate( err );
 
       // create
-      Beneficiaries.create($beneficiaries).exec(function(err, beneficiaries){
+      Financial.create($financials).exec(function(err, financials){
 
         // return error
         if (err) return res.negotiate( err );        
 
         // return new Project
-        return res.json(200, beneficiaries);        
+        return res.json(200, financials);        
 
       });
 
     });
 
-  },  
+  },
+
+  // get project details by id
+  getProjectObjectivesById: function(req, res){
+    
+    // request input
+    if (!req.param('id')) {
+      return res.json(401, { err: 'id required!' });
+    }
+
+    // project for UI
+    var projectObject = {};
+    
+    // get project by organization_id
+    Project.findOne({ id: req.param('id') }).exec(function(err, project){
+      
+      // return error
+      if (err) return res.negotiate( err );
+
+      // set details
+      projectObject.details = project;
+
+      // get beneficiaries
+      Objective.findOne({ project_id: req.param('id')}).exec(function(err, objectives){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // set objectives
+        projectObject.objectives = objectives;
+
+        // get beneficiaries
+        ObjectiveLocation.find({ project_id: req.param('id')}).exec(function(err, locations){
+
+          // return error
+          if (err) return res.negotiate( err );
+
+          // set objectives
+          projectObject.objectiveLocations = locations;
+
+          // return project json
+          return res.json(200, projectObject);    
+
+        });
+
+      });
+
+    });    
+
+  },
+
+  // set project objectives by id
+  setProjectObjectivesById: function(req, res){
+
+     // request input
+    if (!req.param('project')) {
+      return res.json(401, { err: 'project required!' });
+    }
+
+    // get project
+    var $project = req.param('project').details,
+        $objectives = req.param('project').objectives,
+        $objectiveLocations = req.param('project').objectiveLocations;
+
+    // destroy all objectives
+    Objective.destroy({ project_id: $project.id }).exec(function(err){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+      ObjectiveLocation.destroy({ project_id: $project.id }).exec(function(err){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        ObjectiveLocation.create($objectiveLocations).exec(function(err, locations){
+
+          // return error
+          if (err) return res.negotiate( err );          
+
+          // create
+          Objective.create($objectives).exec(function(err, objectives){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return project json
+            return res.json(200, objectives);
+
+          });
+
+        });
+
+      });
+
+    });
+
+  },
 
   // delete project
   deleteProjectById: function(req, res) {
