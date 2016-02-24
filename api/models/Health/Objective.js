@@ -28,7 +28,19 @@ module.exports = {
 			type: 'string',
 			defaultsTo: 'people_served_fatp_services'
 		},		
-		indicator_one: {
+		indicator_one_under5male: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_one_under5female: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_one_over5male: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_one_over5female: {
 			type: 'integer',
 			defaultsTo: 0
 		},
@@ -36,7 +48,19 @@ module.exports = {
 			type: 'string',
 			defaultsTo: 'people_served_conflict_white_areas'
 		},		
-		indicator_two: {
+		indicator_two_under5male: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_two_under5female: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_two_over5male: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_two_over5female: {
 			type: 'integer',
 			defaultsTo: 0
 		},
@@ -54,10 +78,22 @@ module.exports = {
 			type: 'string',
 			defaultsTo: 'people_served_natural_disasters'
 		},		
-		indicator_four: {
+		indicator_four_under5male: {
 			type: 'integer',
 			defaultsTo: 0
-		}
+		},
+		indicator_four_under5female: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_four_over5male: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		indicator_four_over5female: {
+			type: 'integer',
+			defaultsTo: 0
+		},
 	}
 
 };

@@ -36,7 +36,7 @@ module.exports.policies = {
   },
 
   // public
-  'ProjectDashboardController': {
+  'Health/ProjectDashboardController': {
     '*': true
   },  
 

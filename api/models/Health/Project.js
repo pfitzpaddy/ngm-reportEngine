@@ -28,6 +28,9 @@ module.exports = {
 			type: 'string',
 			defaultsTo: 'New Project'
 		},
+		project_type: {
+			type: 'string'
+		},
 		project_description: {
 			type: 'string',
 			defaultsTo: 'Complete the project details to register a new project'
