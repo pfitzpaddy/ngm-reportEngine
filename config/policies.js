@@ -41,6 +41,11 @@ module.exports.policies = {
   },  
 
   // public
+  'FileController': {
+    'print': true
+  },
+
+  // public
   'FloodController': {
     '*': true
   }
