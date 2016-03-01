@@ -50,10 +50,10 @@ module.exports.routes = {
   'POST /print': 'FileController.print',
 
   // Location lists
-  'POST /health/getProvincesList': 'Health/ListController.getProvincesList',
-  'POST /health/getDistrictsList': 'Health/ListController.getDistrictsList',
-  'POST /health/getFacilityTypeList': 'Health/ListController.getFacilityTypeList',
-  'POST /health/getFacilityList': 'Health/ListController.getFacilityList',
+  'GET /health/getProvincesList': 'Health/ListController.getProvincesList',
+  'GET /health/getDistrictsList': 'Health/ListController.getDistrictsList',
+  'GET /health/getFacilityTypeList': 'Health/ListController.getFacilityTypeList',
+  'GET /health/getFacilityList': 'Health/ListController.getFacilityList',
 
   // Health Projects
   'POST /health/project/create': 'Health/ProjectController.create',

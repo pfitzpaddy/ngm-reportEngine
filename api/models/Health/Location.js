@@ -36,6 +36,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		conflict: {
+			type: 'boolean',
+			required: true
+		},
 		fac_id: {
 			type: 'integer'
 		},

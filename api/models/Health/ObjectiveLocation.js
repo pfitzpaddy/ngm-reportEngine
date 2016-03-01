@@ -36,6 +36,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		conflict: {
+			type: 'boolean',
+			required: true
+		},
 		lng: {
 			type: 'float',
 			required: true
