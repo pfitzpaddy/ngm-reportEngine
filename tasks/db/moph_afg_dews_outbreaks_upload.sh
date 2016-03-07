@@ -16,6 +16,16 @@
 #	- drop import table
 ##################################################
 
+# update column types
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_specimens_sent TYPE text USING date_specimens_sent::text;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_specimens_sent TYPE date USING date_specimens_sent::date;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_results_shared TYPE text USING date_results_shared::text;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_results_shared TYPE date USING date_results_shared::date;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_outbreak_started TYPE text USING date_outbreak_started::text;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_outbreak_started TYPE date USING date_outbreak_started::date;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_outbreak_declared_over TYPE text USING date_outbreak_declared_over::text;"
+sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import ALTER COLUMN date_outbreak_declared_over TYPE date USING date_outbreak_declared_over::date;"
+
 # Add id columns to import table
 sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column disease_id bigint;"
 sudo -u postgres psql -d immap_afg -c "ALTER TABLE dews.moph_afg_dews_outbreaks_import add column province_code bigint;"
@@ -44,7 +54,7 @@ sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_impor
 sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Nangarhar' WHERE province = 'Nangarahr';"
 sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Sar-e-Pul' WHERE province = 'Sar-i- Pul';"
 sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Hilmand' WHERE province = 'Helmand';"
-sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Daykundi' WHERE province = 'Daykuni;'"
+sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import SET province = 'Daykundi' WHERE province = 'Daykuni';"
 
 # UPDATE geom (in future this will be district or village level)
 sudo -u postgres psql -d immap_afg -c "UPDATE dews.moph_afg_dews_outbreaks_import
@@ -67,9 +77,6 @@ sudo -u postgres psql -d immap_afg -c "DELETE FROM dews.moph_afg_dews_outbreaks
 
 # INSERT the imported data into the dews dataset
 sudo -u postgres psql -d immap_afg -c "INSERT INTO dews.moph_afg_dews_outbreaks (
-	u5male,
-	o5male,
-	u5female,
 	disease_id,
 	disease,
 	report_date,
@@ -78,9 +85,14 @@ sudo -u postgres psql -d immap_afg -c "INSERT INTO dews.moph_afg_dews_outbreaks 
 	rumour,
 	clinic_confirmed,
 	lab_confirmed,
+	u5male,
+	o5male,
+	u5female,
 	o5female,
+	total_cases,
 	u5death,
 	o5death,
+	total_deaths,
 	num_close_contacts,
 	village,
 	district_code,
@@ -102,15 +114,9 @@ sudo -u postgres psql -d immap_afg -c "INSERT INTO dews.moph_afg_dews_outbreaks 
 	date_outbreak_started,
 	date_outbreak_declared_over,
 	remarks,
-	investigated_by,
-	total_cases,
-	total_deaths,
 	geom
 )
 SELECT
-	u5male,
-	o5male,
-	u5female,
 	disease_id,
 	disease,
 	report_date,
@@ -119,9 +125,14 @@ SELECT
 	rumour,
 	clinic_confirmed,
 	lab_confirmed,
+	u5male,
+	o5male,
+	u5female,
 	o5female,
+	total_cases,
 	u5death,
 	o5death,
+	total_deaths,
 	num_close_contacts,
 	village,
 	district_code,
@@ -143,9 +154,6 @@ SELECT
 	date_outbreak_started,
 	date_outbreak_declared_over,
 	remarks,
-	investigated_by,
-	total_cases,
-	total_deaths,
 	geom
 FROM dews.moph_afg_dews_outbreaks_import;"
 

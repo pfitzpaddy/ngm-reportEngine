@@ -30,9 +30,6 @@ if __name__ == "__main__":
 	# assign column names
 	df.columns = [
 		'id',
-		'u5male',
-		'o5male',
-		'u5female',
 		'disease',
 		'report_date',
 		'investigation_date',
@@ -40,9 +37,14 @@ if __name__ == "__main__":
 		'rumour',
 		'clinic_confirmed',
 		'lab_confirmed',
+		'u5male',
+		'o5male',
+		'u5female',
 		'o5female',
+		'total_cases',
 		'u5death',
 		'o5death',
+		'total_deaths',
 		'num_close_contacts',
 		'village',
 		'district',
@@ -61,10 +63,7 @@ if __name__ == "__main__":
 		'controlled',
 		'date_outbreak_started',
 		'date_outbreak_declared_over',
-		'remarks',
-		'investigated_by',
-		'total_cases',
-		'total_deaths'
+		'remarks'
 	]
 
 	# data to sql
