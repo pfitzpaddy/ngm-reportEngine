@@ -153,7 +153,7 @@ var DewsController  = {
             + "as day "
           + "), "
           + "outbreak_counts as ( "
-            + "select date_trunc('day', report_date) as day, sum(u5male + u5female + o5male + o5female + u5death + o5death) as outbreak "
+            + "select date_trunc('day', report_date) as day, sum(total_cases + total_deaths) as outbreak "
               + "from dews.moph_afg_dews_outbreaks ";
                 
                 // disease (any disease)
@@ -215,7 +215,7 @@ var DewsController  = {
     }
 
     // incidents per date by disease
-    query = 'select report_date, sum(u5male + u5female + o5male + o5female + u5death + o5death) as value '
+    query = 'select report_date, sum(total_cases + total_deaths) as value '
                 + 'from ' + table;
 
                 // disease (any disease)
