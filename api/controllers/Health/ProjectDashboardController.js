@@ -116,6 +116,9 @@ module.exports = {
       // return error
       if (err) return res.negotiate( err );
 
+      // return no locations
+      if (!locations.length) return res.json(200, { 'data': {} });
+
       // foreach location
       locations.forEach(function(d,i){
 
