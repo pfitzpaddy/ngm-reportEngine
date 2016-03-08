@@ -20,6 +20,18 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		user_id: {
+			type: 'integer',
+			required: true
+		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		project_title: {
+			type: 'string',
+			required: true
+		},
 		prov_code: {
 			type: 'integer',
 			required: true

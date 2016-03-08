@@ -18,13 +18,13 @@ module.exports = {
 		},
 		user_id: {
 			type: 'integer',
-			required: true			
+			required: true
 		},
 		username: {
 			type: 'string',
-			required: true			
-		},		
-		project_name: {
+			required: true
+		},
+		project_title: {
 			type: 'string',
 			defaultsTo: 'New Project'
 		},

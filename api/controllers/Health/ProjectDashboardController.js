@@ -116,20 +116,46 @@ module.exports = {
       // return error
       if (err) return res.negotiate( err );
 
+      // foreach location
       locations.forEach(function(d,i){
 
-        // create markers
-        markers['marker' + i] = {
-          layer: 'health',
-          lat: d.lat,
-          lng: d.lng,
-          message: '<div class="count" style="text-align:center">' + d.fac_name + '</div><div style="text-align:center"> in ' + d.prov_name + ', ' + d.dist_name + '</div>'
-        };
+        // get user details
+        User.findOne({ username: d.username }).exec(function(err, user){
 
-      })
+          // return error
+          if (err) return res.negotiate( err );
 
-      // return new Project
-      return res.json(200, { 'data': markers });
+          // popup message
+          var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
+                      + '<div style="text-align:center"> in ' + d.prov_name + ', ' + d.dist_name + '</div>'
+                      + '<div style="text-align:center">' + d.fac_name + '</div>'
+                      + '<div style="text-align:center">' + d.fac_type + '</div>'
+                      + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
+                      + '<div style="text-align:center">' + user.name + '</div>'
+                      + '<div style="text-align:center">' + user.position + '</div>'
+                      + '<div style="text-align:center">' + user.phone + '</div>'
+                      + '<div style="text-align:center">' + user.email + '</div>';
+
+          // create markers
+          markers['marker' + i] = {
+            layer: 'health',
+            lat: d.lat,
+            lng: d.lng,
+            message: message
+          };
+
+
+          // if last location
+          if(i === locations.length-1){
+            
+            // return markers
+            return res.json(200, { 'data': markers });
+
+          }
+
+        });
+
+      });
 
     });
 
