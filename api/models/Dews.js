@@ -9,31 +9,7 @@ module.exports = {
 
 	connection: 'ngmPostgreServer',
 
-  	migrate: 'safe',
-
-	// strict schema
-	/*
-	attributes: {
-		diseaseName: {
-			type: 'string'
-		},
-		province: {
-			type: 'string'
-		},			
-		district: {
-			type: 'string'
-		},
-		distCode: {
-			type: 'string',
-		},
-		u5female: {
-			type: 'integer'
-		},		
-		u5male: {
-			type: 'integer'
-		}
-	}
-	*/
+  migrate: 'safe'
 
 };
 
