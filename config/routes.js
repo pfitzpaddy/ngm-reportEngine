@@ -32,10 +32,6 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  // '/': {
-  //   view: 'homepage'
-  // }
-
   // User authentication
   'GET /login': 'UserController.login',
   'POST /login': 'UserController.login',
@@ -71,34 +67,27 @@ module.exports.routes = {
   // get/set project objectives
   'POST /health/project/getProjectObjectives': 'Health/ProjectController.getProjectObjectivesById',
   'POST /health/project/setProjectObjectives': 'Health/ProjectController.setProjectObjectivesById',
-
   'POST /health/project/deleteProject': 'Health/ProjectController.deleteProjectById',
-
   // Health Dashboard
   'POST /health/total': 'Health/ProjectDashboardController.getTotal',
   'POST /health/markers': 'Health/ProjectDashboardController.getMarkers',
 
   // Dews 
-  'POST /dews/indicator': 'DewsController.getIndicator',
-  'POST /dews/chart': 'DewsController.getChart',
-  'POST /dews/calendar': 'DewsController.getCalendar',
-  'POST /dews/summary': 'DewsController.getSummary',
-  'POST /dews/data': 'DewsController.getData',
-  'POST /dews/markers': 'DewsController.getMarkers',
-  'POST /dews/map': 'DewsController.getMap',
+  'POST /dews/indicator': 'Dews/DewsController.getIndicator',
+  'POST /dews/chart': 'Dews/DewsController.getChart',
+  'POST /dews/calendar': 'Dews/DewsController.getCalendar',
+  'POST /dews/summary': 'Dews/DewsController.getSummary',
+  'POST /dews/data': 'Dews/DewsController.getData',
+  'POST /dews/markers': 'Dews/DewsController.getMarkers',
+  'POST /dews/map': 'Dews/DewsController.getMap',
 
   // Watchkeeper
-  'POST /wk/calendar': 'WatchkeeperController.getCalendar',
-  'POST /wk/indicator': 'WatchkeeperController.getIndicator',
-  'POST /wk/difference': 'WatchkeeperController.getDifference',
-  'POST /wk/markers': 'WatchkeeperController.getMarkers',
-  'POST /wk/data': 'WatchkeeperController.getData',
-  'POST /wk/chart': 'WatchkeeperController.getChart',
-
-  // Flood
-  'POST /flood/risk': 'FloodController.getFloodRisk',
-  'POST /flood/risk/type': 'FloodController.getFloodRiskType',
-  'POST /flood/risk/area': 'FloodController.getFloodRiskArea',
+  'POST /wk/calendar': 'Watchkeeper/WatchkeeperController.getCalendar',
+  'POST /wk/indicator': 'Watchkeeper/WatchkeeperController.getIndicator',
+  'POST /wk/difference': 'Watchkeeper/WatchkeeperController.getDifference',
+  'POST /wk/markers': 'Watchkeeper/WatchkeeperController.getMarkers',
+  'POST /wk/data': 'Watchkeeper/WatchkeeperController.getData',
+  'POST /wk/chart': 'Watchkeeper/WatchkeeperController.getChart',
 
   /***************************************************************************
   *                                                                          *

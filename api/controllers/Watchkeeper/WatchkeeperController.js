@@ -1,5 +1,5 @@
 /**
- * DewsController
+ * WatchkeeperController
  *
  * @description :: Server-side logic for managing auths
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
@@ -222,7 +222,7 @@ var WatchkeeperController  = {
               query += 'LIMIT 5';
 
     // Execute query
-    Flood.query(query, function (err, results){
+    Dews.query(query, function (err, results){
       if(err || !results.rows.length){
         return res.json({ "status": 0, "error": err });
       }
