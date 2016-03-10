@@ -15,15 +15,23 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		username: {
-			type: 'string',
-			required: true
-		},		
 		organization_id: {
 			type: 'string',
 			required: true
 		},
+		organization: {
+			type: 'string',
+			required: true
+		},
 		project_id: {
+			type: 'string',
+			required: true
+		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		email: {
 			type: 'string',
 			required: true
 		},

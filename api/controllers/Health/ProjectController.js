@@ -11,19 +11,15 @@ module.exports = {
   create: function(req, res) {
 
     // request input
-    if (!req.param('organization_id') || !req.param('user_id') || !req.param('username') ) {
-      return res.json(401, { err: 'organization_id, user_id, username required!' });
+    if (!req.param('project') ) {
+      return res.json(401, { err: 'project required!' });
     }
 
     // project for UI
     var projectObject = {};
 
     // create Project with organization_id
-    Project.create({
-      organization_id: req.param('organization_id'),
-      user_id: req.param('user_id'),
-      username: req.param('username')
-    }).exec(function(err, project){
+    Project.create(req.param('project')).exec(function(err, project){
       
       // return error
       if (err) return res.negotiate( err );

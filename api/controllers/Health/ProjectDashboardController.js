@@ -162,6 +162,105 @@ module.exports = {
 
     });
 
-  }  
+  },
+
+  // project details
+  getProjectDetailsCsv: function(req, res) {
+
+    // get all projects (not empty)
+    Project.find({ project_status: { '!' : 'new' } }).exec(function(err, projects){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+        // require
+        var fields = [];
+        var json2csv = require('json2csv');
+
+        // get field names
+        for (var key in projects[0].toObject()) {
+          fields.push(key);
+        }
+
+        // return csv
+        json2csv({ data: projects, fields: fields }, function(err, csv) {
+          
+          // error
+          if (err) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        });
+
+    });
+
+  },
+
+  // project details
+  getProjectLocationsCsv: function(req, res) {
+
+    // get all locations
+    Location.find().exec(function(err, locations){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+        // require
+        var fields = [];
+        var json2csv = require('json2csv');
+
+        // get field names
+        for (var key in locations[0].toObject()) {
+          fields.push(key);
+        }
+
+        // return csv
+        json2csv({ data: locations, fields: fields }, function(err, csv) {
+          
+          // error
+          if (err) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        });
+
+    });
+
+  },
+
+  // project details
+  getProjectBeneficiariesCsv: function(req, res) {
+
+    // get all beneficiaries
+    Beneficiaries.find().exec(function(err, beneficiaries){
+
+      // return error
+      if (err) return res.negotiate( err );
+
+        // require
+        var fields = [];
+        var json2csv = require('json2csv');
+
+        // get field names
+        for (var key in beneficiaries[0].toObject()) {
+          fields.push(key);
+        }
+
+        // return csv
+        json2csv({ data: beneficiaries, fields: fields }, function(err, csv) {
+          
+          // error
+          if (err) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        });
+
+    });
+
+  }
 
 };

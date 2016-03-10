@@ -19,14 +19,18 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		user_id: {
-			type: 'integer',
+		organization: {
+			type: 'string',
 			required: true
 		},
 		username: {
 			type: 'string',
 			required: true
 		},
+		email: {
+			type: 'string',
+			required: true
+		},	
 		project_title: {
 			type: 'string',
 			defaultsTo: 'New Project'
