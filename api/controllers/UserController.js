@@ -122,6 +122,7 @@ module.exports = {
         organization_id: user.organization_id,
         organization: user.organization,
         user_id: user.id,
+        name: user.name,
         username: user.username,
         email: user.email,
         token: jwtToken.issueToken({sid: user.id})
