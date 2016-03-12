@@ -32,10 +32,12 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  // User authentication
+  // User authentication / password reset
   'GET /login': 'UserController.login',
   'POST /login': 'UserController.login',
   'POST /create': 'UserController.create',
+  'POST /send-email': 'UserController.passwordResetEmail',
+  'POST /password-reset': 'UserController.passwordReset',
 
   // Metrics
   'POST /metrics/set': 'MetricsController.set',

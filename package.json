@@ -28,6 +28,7 @@
     "rc": "~0.5.0",
     "sails": "~0.11.0",
     "sails-disk": "~0.10.0",
+    "sails-hook-email": "^0.12.1",
     "sails-mongo": "^0.11.4",
     "sails-postgresql": "~0.10.16"
   },

@@ -31,24 +31,13 @@ module.exports.policies = {
    
   // public
   'UserController': {
-    'create': true,
-    'login': true
+    '*': true
   },
 
   // public
   'Health/ProjectDashboardController': {
     '*': true
-  },  
-
-  // public
-  'FileController': {
-    'print': true
-  },
-
-  // public
-  'FloodController': {
-    '*': true
-  }
+  }  
 
   /***************************************************************************
   *                                                                          *
