@@ -101,6 +101,39 @@ module.exports = {
   },
 
   // 
+  updateLogin: function(req, res){
+
+    // check params
+    if ( !req.param( 'user' ) ) {
+      return res.json(401, { err: 'user required' });
+    }
+    
+    // get user by email
+    User.findOne({ email: req.param( 'user' ).email }).exec(function(err, user){
+      
+      // return error
+      if (err) return res.negotiate( err );
+
+      // return error
+      if (!user) return res.json(401, { err: 'User not found!' });
+
+      // update visit information
+      user.visits = user.visits + 1;
+      user.last_logged_in = new Date();
+
+      // save updates
+      user.save(function(err) {
+        if(err) return res.negotiate( err );
+      });
+
+      // return updated user
+      return res.json(200, user);     
+
+    });
+
+  },
+
+  // 
   passwordResetEmail: function(req, res){
 
     // check params

@@ -36,6 +36,7 @@ module.exports.routes = {
   'GET /login': 'UserController.login',
   'POST /login': 'UserController.login',
   'POST /create': 'UserController.create',
+  'POST /update': 'UserController.updateLogin',
   'POST /send-email': 'UserController.passwordResetEmail',
   'POST /password-reset': 'UserController.passwordReset',
 
