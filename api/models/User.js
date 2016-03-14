@@ -82,7 +82,7 @@ module.exports = {
 		last_logged_in: {
 			type: 'date',
 			required: false,
-			defaultsTo: new Date(0)
+			defaultsTo: new Date()
 		},
 		gravatar_url: {
 			type: 'string'
