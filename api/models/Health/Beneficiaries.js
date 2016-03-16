@@ -47,19 +47,27 @@ module.exports = {
 			type: 'string',
 			required: true
 		},		
-		under5male:{
+		under18male:{
 			type: 'integer',
 			defaultsTo: 0			
 		},
-		under5female:{
+		under18female:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over5male:{
+		over18male:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over5female:{
+		over18female:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		over59male:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		over59female:{
 			type: 'integer',
 			defaultsTo: 0
 		}
