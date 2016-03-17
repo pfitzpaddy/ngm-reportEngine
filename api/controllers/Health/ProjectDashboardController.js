@@ -15,7 +15,8 @@ module.exports = {
       return res.json(401, {err: 'indicator required!'});
     }
 
-    var indicator = req.param('indicator');
+    var indicator = req.param('indicator'),
+        conflict = req.param('conflict') ? req.param('conflict') : false;
 
     switch(indicator){
 
@@ -50,7 +51,7 @@ module.exports = {
       case 'locations':
 
         // no. of organizations
-        Location.count().exec(function(err, value){
+        Location.count({ conflict: conflict }).exec(function(err, value){
           
           // return error
           if (err) return res.negotiate( err );
@@ -72,7 +73,7 @@ module.exports = {
           if (err) return res.negotiate( err );
 
           data.forEach(function(d,i){
-            value += d.under5male + d.under5female + d.over5male + d.over5female;
+            value += d.under18male + d.under18female + d.over18male + d.over18female + d.over59male + d.over59female;
           });
 
           // return new Project
@@ -91,8 +92,10 @@ module.exports = {
           // return error
           if (err) return res.negotiate( err );
 
-          data.forEach(function(d,i){
-            value += d[indicator];
+          data.forEach(function(d){
+            indicator.forEach(function(i){
+              value += d[i];
+            });
           });
 
           // return new Project
