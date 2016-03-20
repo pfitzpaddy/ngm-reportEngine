@@ -50,8 +50,17 @@ module.exports = {
         break;
       case 'locations':
 
+        // empty filter
+        var filter = {};
+
+        // if conflict
+        if (conflict) {
+          // conflict filter
+          filter = { conflict: conflict };
+        }
+
         // no. of organizations
-        Location.count({ conflict: conflict }).exec(function(err, value){
+        Location.count(filter).exec(function(err, value){
           
           // return error
           if (err) return res.negotiate( err );

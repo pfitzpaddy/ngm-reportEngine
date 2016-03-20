@@ -228,7 +228,7 @@ var WatchkeeperController  = {
       }
       else{
         //
-        return res.json( results.rows );
+        return res.json(200, { data: results.rows });
       }
     });
 
