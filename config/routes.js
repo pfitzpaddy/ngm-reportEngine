@@ -72,10 +72,11 @@ module.exports.routes = {
   'POST /health/project/setProjectObjectives': 'Health/ProjectController.setProjectObjectivesById',
   'POST /health/project/deleteProject': 'Health/ProjectController.deleteProjectById',
   // Health Dashboard
-  'POST /health/total': 'Health/ProjectDashboardController.getTotal',
+  'POST /health/total': 'Health/ProjectDashboardController.getIndicator',
   'POST /health/markers': 'Health/ProjectDashboardController.getMarkers',
 
   // Health data downloads
+  'GET /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
   'GET /health/data/details': 'Health/ProjectDashboardController.getProjectDetailsCsv',
   'GET /health/data/locations': 'Health/ProjectDashboardController.getProjectLocationsCsv',
   'GET /health/data/beneficiaries': 'Health/ProjectDashboardController.getProjectBeneficiariesCsv',

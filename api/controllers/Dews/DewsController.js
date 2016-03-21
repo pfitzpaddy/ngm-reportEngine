@@ -191,7 +191,7 @@ var DewsController  = {
       }
       else{
         // return result as json
-        return res.json( results.rows );
+        return res.json(200, { data: results.rows });
       }
     });
 
