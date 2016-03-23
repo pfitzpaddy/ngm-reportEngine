@@ -15,6 +15,11 @@ module.exports = {
 
 	// attributes
 	attributes: {
+
+		// add a reference to Location
+    location_id: {
+      model: 'location'
+    },
 		organization_id: {
 			type: 'string',
 			required: true

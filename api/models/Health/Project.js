@@ -42,6 +42,15 @@ module.exports = {
 			type: 'string',
 			defaultsTo: 'Complete the project details to register a new project'
 		},
+		prov_code: {
+			type: 'array'
+		},
+		dist_code: {
+			type: 'array'
+		},
+		beneficiary_category: {
+			type: 'array'
+		},
 		project_budget: {
 			type: 'integer'
 		},

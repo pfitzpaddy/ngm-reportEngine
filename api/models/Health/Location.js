@@ -23,10 +23,6 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_id: {
-			type: 'string',
-			required: true
-		},
 		username: {
 			type: 'string',
 			required: true
@@ -35,29 +31,27 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_title: {
+		project_id: {
 			type: 'string',
 			required: true
+		},
+		project_title: {
+			type: 'string'
 		},
 		prov_code: {
-			type: 'integer',
-			required: true
+			type: 'integer'
 		},
 		prov_name: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		dist_code: {
-			type: 'integer',
-			required: true
+			type: 'integer'
 		},
 		dist_name: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		conflict: {
-			type: 'boolean',
-			required: true
+			type: 'boolean'
 		},
 		fac_id: {
 			type: 'integer'
@@ -69,13 +63,16 @@ module.exports = {
 			type: 'string'
 		},
 		lng: {
-			type: 'float',
-			required: true
+			type: 'float'
 		},
 		lat: {
-			type: 'float',
-			required: true
-		}
+			type: 'float'
+		},
+    // add reference to Beneficiaries
+    beneficiaries: {
+      collection: 'beneficiaries',
+      via: 'location_id'
+    }
 	}
 
 };
