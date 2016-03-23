@@ -33,32 +33,38 @@ module.exports = {
 		},	
 		project_title: {
 			type: 'string',
-			defaultsTo: 'New Project'
+			required: true
 		},
 		project_type: {
-			type: 'string'
+			type: 'string',
+			required: true
 		},
 		project_description: {
 			type: 'string',
-			defaultsTo: 'Complete the project details to register a new project'
+			required: true
 		},
 		prov_code: {
-			type: 'array'
+			type: 'array',
+			required: true
 		},
 		dist_code: {
-			type: 'array'
+			type: 'array',
+			required: true
 		},
 		beneficiary_category: {
-			type: 'array'
+			type: 'array',
+			required: true
 		},
 		project_budget: {
-			type: 'integer'
+			type: 'integer',
+			required: true
 		},
 		project_budget_progress: {
 			type: 'integer'
 		},		
 		project_donor: {
-			type: 'string'
+			type: 'string',
+			required: true
 		},
 		project_status: {
 			type: 'string',
@@ -66,17 +72,22 @@ module.exports = {
 		},
 		project_start_date: {
 			type: 'date',
-      defaultsTo: function () {
-          return new Date();
-      }
+			required: true
 		},
 		project_end_date: {
 			type: 'date',
-      defaultsTo: function () {
-      	var d = new Date();
-        return new Date(d.getFullYear(), d.getMonth() + 1, d.getDate());
-      }
-		},		
+			required: true
+		},
+    // add reference to Locations
+    locations: {
+      collection: 'location',
+      via: 'project_id'
+    },
+    // add reference to Locations
+    financials: {
+      collection: 'financial',
+      via: 'project_id'
+    }
 	}
 
 };

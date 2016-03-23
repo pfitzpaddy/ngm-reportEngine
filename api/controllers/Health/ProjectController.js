@@ -7,38 +7,8 @@
 
 module.exports = {
 
-  // create Project
-  create: function(req, res) {
-
-    // request input
-    if (!req.param('project') ) {
-      return res.json(401, { err: 'project required!' });
-    }
-
-    // project for UI
-    var projectObject = {};
-
-    // create Project with organization_id
-    Project.create(req.param('project')).exec(function(err, project){
-      
-      // return error
-      if (err) return res.negotiate( err );
-
-      // project details
-      projectObject.details = project;
-
-      // project locations
-      projectObject.locations = [];
-
-      // return new Project
-      return res.json(200, projectObject);
-
-    });
-
-  },
-
   // set project details
-  setProjectDetails: function(req, res) {
+  setProjectById: function(req, res) {
 
     // request input
     if (!req.param('project')) {
@@ -46,76 +16,47 @@ module.exports = {
     }
 
     // get project
-    var $project = req.param('project').details,
-        $status = req.param('project').details.project_status;
+    var $project = req.param('project'),
+        $status = req.param('project').project_status;
 
     // update project status if new
     if( $status === 'new' ){
       $project.project_status = 'active';
     }
 
-    // set project by project id
-    Project.update( { id: $project.id }, $project ).exec(function(err, project){
+    // if no id, create
+    if (!$project.id) {
 
-      // return error
-      if (err) return res.negotiate( err );
+      // create
+      Project.create( $project ).exec(function(err, project){
 
-      // return new Project
-      return res.json(200, project);
+        // return error
+        if (err) return res.negotiate( err );
 
-    });
+        // return project
+        return res.json(200, project);
 
-  },
+      });
 
-  // set project locations
-  setProjectLocations: function(req, res){
-
-    // request input
-    if (!req.param('project')) {
-      return res.json(401, { err: 'project required!' });
-    }
-
-    // get project
-    var $locations = req.param('project').locations;
-
-    // for each location
-    $locations.forEach(function(d, i){ 
-
-      // location exists
-      if (d.id) {
-
-        // update locations/beneficiaries
-        Location.update( { id: d.id }, d ).exec(function(err, locations){
-            
-            // return error
-            if (err) return res.negotiate( err );
-
-            // return new Project
-            return res.json(200, locations);
-
-        });
-
-      } else {
+    } else {
         
-        // create
-        Location.create( d ).exec(function(err, location){
+      // update project
+      Project.update( { id: $project.id }, $project ).exec(function(err, project){
 
-          // return error
-          if (err) return res.negotiate( err );
+        // return error
+        if (err) return res.negotiate( err );    
 
-          //
-          return res.json(200, location);
+        // return Project
+        return res.json(200, project[0]);
 
-        });
+      });
 
-      }
-    
-    });
+    }
 
   },
 
   // get project details by id
-  getProjectDetailsById: function(req, res){
+  getProjectById: function(req, res){
     
     // request input
     if (!req.param('id')) {
@@ -123,33 +64,32 @@ module.exports = {
     }
 
     // project for UI
-    var projectObject = {};
+    var $project = {};
     
     // get project by organization_id
-    Project.findOne({ id: req.param('id') }).exec(function(err, project){
+    Project.findOne( { id: req.param('id') } ).exec(function(err, project){
       
       // return error
       if (err) return res.negotiate( err );
 
-      // set details
-      projectObject.details = project;
+      // clone project to update
+      $project = project.toObject();
 
       // get beneficiaries
-      Location.find({ project_id: req.param('id') }).populate( 'beneficiaries' ).exec(function(err, locations){
+      Location.find().where( { project_id: $project.id  } ).populate( 'beneficiaries' ).exec(function(err, locations){
 
         // return error
         if (err) return res.negotiate( err );
 
-        // set locations
-        projectObject.locations = locations; 
+        // add locations
+        $project.locations = locations;
 
-        // return project json
-        return res.json(200, projectObject);
+        // return project
+        return res.json(200, $project);
 
-      });     
+      });
 
-
-    });    
+    });   
 
   },
 
@@ -160,33 +100,15 @@ module.exports = {
     if (!req.param('id')) {
       return res.json(401, { err: 'id required!' });
     }
-
-    // project for UI
-    var projectObject = {};
     
     // get project by organization_id
-    Project.findOne({ id: req.param('id') }).exec(function(err, project){
+    Project.findOne({ id: req.param('id') }).populateAll().exec(function(err, project){
       
       // return error
       if (err) return res.negotiate( err );
 
-      // set details
-      projectObject.details = project;
-
-      // get financials
-      Financial.find({ project_id: req.param('id') }).exec(function(err, financials){
-
-        // return error
-        if (err) return res.negotiate( err );
-
-        // set financials
-        projectObject.financials = financials;
-
-        // return project json
-        return res.json(200, projectObject);
-
-      });     
-
+      // return project json
+      return res.json(200, project);
 
     });    
 

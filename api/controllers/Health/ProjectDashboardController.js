@@ -57,7 +57,7 @@ var ProjectDashboardController  = {
     project_filter = params.project[0] === 'all' ? {} : { project_type: params.project }; 
 
     // filter projects by params
-    Project.find().where( date_filter ).where( project_filter ).where( { project_status: { '!' : 'new' } } ).exec(function(err, projects){
+    Project.find().where( date_filter ).where( project_filter ).exec(function(err, projects){
 
       // return error
       if (err) return res.negotiate( err );

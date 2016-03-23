@@ -23,9 +23,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		// add a reference to Project
 		project_id: {
-			type: 'string',
-			required: true
+			model: 'project'
 		},
 		expenditure_item: {
 			type: 'string',
@@ -50,8 +50,11 @@ module.exports = {
 		expenditure_end_date: {
 			type: 'date',
 			required: true
-		}
-
+		},
+    timestamp: {
+    	type: 'string',
+    	required: true
+    }
 	}
 
 };
