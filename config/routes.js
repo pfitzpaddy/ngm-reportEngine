@@ -59,22 +59,18 @@ module.exports.routes = {
   // get project details, locations, beneficiaries
   'POST /health/project/getProject': 'Health/ProjectController.getProjectById',
   'POST /health/project/setProject': 'Health/ProjectController.setProjectById',
-  // get/set project financials
+  // get project financials
   'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',
-  // 'POST /health/project/setProjectFinancials': 'Health/ProjectController.setProjectFinancialsById',
-  // get/set project objectives
-  'POST /health/project/deleteProject': 'Health/ProjectController.deleteProjectById',
   
 
-  // Health Dashboard
-  'POST /health/total': 'Health/ProjectDashboardController.getIndicator',
-  'POST /health/markers': 'Health/ProjectDashboardController.getMarkers',
+  // Health Dashboard & Data
+  'POST /health/indicator': 'Health/ProjectDashboardController.getHealthDetails',
+  // Health contacts
+  'POST /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
 
-  // Health data downloads
-  'GET /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
-  'GET /health/data/details': 'Health/ProjectDashboardController.getProjectDetailsCsv',
-  'GET /health/data/locations': 'Health/ProjectDashboardController.getProjectLocationsCsv',
-  'GET /health/data/beneficiaries': 'Health/ProjectDashboardController.getProjectBeneficiariesCsv',
+  // 'GET /health/data/details': 'Health/ProjectDashboardController.getProjectDetailsCsv',
+  // 'GET /health/data/locations': 'Health/ProjectDashboardController.getProjectLocationsCsv',
+  // 'GET /health/data/beneficiaries': 'Health/ProjectDashboardController.getProjectBeneficiariesCsv',
 
 
   // Dews 

@@ -7,7 +7,7 @@
 
 // module.exports
 
-var WatchkeeperController  = {
+var WatchkeeperController = {
 
   // difference
   getDifference: function(req, res) {

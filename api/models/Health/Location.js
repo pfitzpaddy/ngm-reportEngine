@@ -40,7 +40,12 @@ module.exports = {
 		},
 		project_type: {
 			type: 'string'
-		},		
+		},
+		// list of locations beneficiary categories
+		beneficiary_category: {
+			type: 'array',
+			required: true
+		},
 		prov_code: {
 			type: 'integer',
 			required: true
