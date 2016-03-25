@@ -581,8 +581,6 @@ var ProjectDashboardController = {
       // error
       if ( err ) return res.negotiate( err );
 
-      console.log( csv );
-
       // success
       return res.json( 200, { data: csv } );
 
