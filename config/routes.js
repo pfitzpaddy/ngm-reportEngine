@@ -65,8 +65,9 @@ module.exports.routes = {
 
   // Health Dashboard & Data
   'POST /health/indicator': 'Health/ProjectDashboardController.getHealthDetails',
-  // Health contacts
+  // data 
   'POST /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
+  'POST /health/data/financials': 'Health/ProjectDashboardController.getFinancialListCsv',
 
   // 'GET /health/data/details': 'Health/ProjectDashboardController.getProjectDetailsCsv',
   // 'GET /health/data/locations': 'Health/ProjectDashboardController.getProjectLocationsCsv',

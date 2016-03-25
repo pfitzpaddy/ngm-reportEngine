@@ -63,7 +63,7 @@ module.exports = {
 			type: 'integer'
 		},		
 		project_donor: {
-			type: 'string',
+			type: 'array',
 			required: true
 		},
 		project_status: {

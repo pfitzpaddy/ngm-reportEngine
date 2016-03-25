@@ -35,6 +35,64 @@ var ProjectDashboardController = {
 
   },
 
+  // financial spending
+  getFinancialListCsv: function(req, res){
+
+    // request input
+    if ( !req.param('project')  ) {
+      return res.json(401, { err: 'project required!' } );
+    }
+
+    var $project = req.param('project');
+
+    // require
+    var fields = [ 
+      'organization_id', 
+      'organization', 
+      'username', 
+      'email', 
+      'project_status', 
+      'project_title', 
+      'project_description',
+      'project_start_date',
+      'project_end_date',
+      'expenditure_item',
+      'expenditure_name',
+      'expenditure_start_date',
+      'expenditure_end_date',
+      'expenditure_status',
+      'expenditure_budget',
+      'createdAt',
+      'updatedAt'
+    ];
+    var json2csv = require('json2csv');
+
+    console.log($project);
+
+    // add project details to csv
+    $project.financials.forEach(function(d, i){
+      // set values
+      $project.financials[i].email = $project.email;
+      $project.financials[i].project_status = $project.project_status;
+      $project.financials[i].project_title = $project.project_title;
+      $project.financials[i].project_description = $project.project_description;
+      $project.financials[i].project_start_date = $project.project_start_date;
+      $project.financials[i].project_end_date = $project.project_end_date;
+    });
+
+    // return csv
+    json2csv({ data: $project.financials, fields: fields }, function(err, csv) {
+      
+      // error
+      if (err) return res.negotiate( err );
+
+      // success
+      return res.json( 200, { data: csv } );
+
+    });
+
+  },
+
   // calculate beneficiaries for $projects
   getBeneficiaries: function( $data, type ){
 
@@ -222,7 +280,9 @@ var ProjectDashboardController = {
           
           // filter by $projects
           $projects.forEach(function(d, i){
-            organization_ids.push(d.organization_id);
+            if ( d.project_status === 'active' ) {
+              organization_ids.push(d.organization_id);
+            }
           });
 
           // no. of organizations
@@ -538,12 +598,22 @@ var ProjectDashboardController = {
 
         });
 
+        // remove unwanted keys
+        delete $locations[0].id;
+        delete $locations[0].project_id;
+        delete $locations[0].beneficiaries;
+        delete $locations[0].timestamp;
+
         // get field names
         for (var key in $locations[0]) {
-          if ( key !== 'beneficiaries' ) {
-            fields.push(key);
-          }
+          // include
+          fields.push(key);
         }
+
+        var no_nuts = _.filter(fields,function(item) {
+          console.log(item);
+          return;
+        });        
   
         // assign for csv
         data = $locations;
@@ -561,11 +631,12 @@ var ProjectDashboardController = {
 
         });
 
+        delete $projects[0].id;
+        delete $projects[0].locations;
+
         // get field names
         for (var key in $projects[0]) {
-          if ( key !== 'locations' ) {
-            fields.push(key);
-          }
+          fields.push(key);
         }
   
         // assign for csv
