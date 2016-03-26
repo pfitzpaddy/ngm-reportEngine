@@ -67,8 +67,6 @@ var ProjectDashboardController = {
     ];
     var json2csv = require('json2csv');
 
-    console.log($project);
-
     // add project details to csv
     $project.financials.forEach(function(d, i){
       // set values
@@ -591,29 +589,24 @@ var ProjectDashboardController = {
         });
 
         // project
-        $locations.forEach(function(l, i){
+        $locations.forEach(function(l, i){      
           
           // add beneficiaries with underscore (get beneficiaries from fn for one location at a time)
           _.extend($locations[i], ProjectDashboardController.getBeneficiaries( [ $locations[i] ], 'locations' ) );
 
-        });
+          // remove unwanted keys
+          delete $locations[i].id;
+          delete $locations[i].project_id;
+          delete $locations[i].beneficiaries;
+          delete $locations[i].timestamp;          
 
-        // remove unwanted keys
-        delete $locations[0].id;
-        delete $locations[0].project_id;
-        delete $locations[0].beneficiaries;
-        delete $locations[0].timestamp;
+        });
 
         // get field names
         for (var key in $locations[0]) {
           // include
           fields.push(key);
-        }
-
-        var no_nuts = _.filter(fields,function(item) {
-          console.log(item);
-          return;
-        });        
+        }     
   
         // assign for csv
         data = $locations;
@@ -629,10 +622,11 @@ var ProjectDashboardController = {
           // add beneficiaries with underscore (get beneficiaries from fn for one project at a time)
           _.extend($projects[i], ProjectDashboardController.getBeneficiaries( [ $projects[i] ], 'projects' ) );
 
-        });
+          // remove unwanted keys
+          delete $projects[i].id;
+          delete $projects[i].locations;          
 
-        delete $projects[0].id;
-        delete $projects[0].locations;
+        });
 
         // get field names
         for (var key in $projects[0]) {

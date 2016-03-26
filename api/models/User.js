@@ -66,14 +66,7 @@ module.exports = {
         iClass: "medium material-icons",
         href: "#/health/project",
         title: "PROJECTS"
-       },{
-				icon: "assessment",
-				liClass: "teal z-depth-2",
-				aClass: "white-text",
-				iClass: "medium material-icons",
-				href: "#/health/4w",
-				title: "HEALTH 4W"
-      }]
+       }]
 		},
 		visits: {
 			type: 'integer',
