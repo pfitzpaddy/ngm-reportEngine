@@ -147,7 +147,7 @@ var ProjectDashboardController = {
       $data.forEach(function(l, j){
         // beneficiareis
         l.beneficiaries.forEach(function(b, k){
-          // sum beneficiaries
+          // sum beneficiaries     
           sumBeneficiaries(b, k);
         });
       });
@@ -209,8 +209,8 @@ var ProjectDashboardController = {
     // get projects by organization_id
     Project.find()
       .where(filters.date_filter)
-      .where(filters.project_type_filter)
       .where(filters.project_status_filter)
+      .where(filters.project_type_filter)
       .where(filters.beneficiaries_filter)
       .where(filters.prov_code_filter)
       .where(filters.dist_code_filter)
@@ -230,32 +230,65 @@ var ProjectDashboardController = {
 
           // clone project to update
           $projects[i] = d.toObject();
+          // add locations
+          $projects[i].locations = [];
 
-          // get beneficiaries
-          Location.find().where( { project_id: $projects[i].id  } ).populate( 'beneficiaries' ).exec(function( err, locations ){
+          // get locations
+          Location.find()
+            .where( { project_id: $projects[i].id  } )
+            .where(filters.prov_code_filter)
+            .where(filters.dist_code_filter)            
+            .exec(function( err, locations ){
 
             // return error
             if (err) return res.negotiate( err );
 
-            // add locations
-            $projects[i].locations = locations;
+            // add beneficiaries
+            locations.forEach(function(l, j){
 
-            // run metrics
-            if ( i === projects.length - 1 ) {
+              // clone locations
+              $projects[i].locations[j] = l.toObject();
+              // clone beneficiaries
+              $projects[i].locations[j].beneficiaries = [];
 
-              // if indicator, else data
-              if ( params.indicator ) {
+              // get beneficiaries
+              Beneficiaries.find().where( { location_id: $projects[i].locations[j].id  } ).exec(function( err, beneficiaries ){
 
-                // calculate and return metric
-                ProjectDashboardController.getIndicatorMetric( params, filters, $projects, res );
+                // return error
+                if (err) return res.negotiate( err );
 
-              } else {
+                // add beneficiaries
+                $projects[i].locations[j].beneficiaries = beneficiaries;
 
-                // prepare download
-                ProjectDashboardController.getCsvDownload( params, filters, $projects, res );
+                // run metrics
+                if ( i === ( projects.length - 1 ) && j === ( locations.length - 1 ) ) {
 
-              }
-            }
+                  // process final result (remove projects with empty locations)
+                  var projectsFiltered = []
+                  $projects.forEach(function(p) {
+                    if( p.locations.length ){
+                      projectsFiltered.push(p);
+                    }
+                  });
+
+                  // if indicator, else data
+                  if ( params.indicator ) {             
+
+                    // calculate and return metric
+                    ProjectDashboardController.getIndicatorMetric( params, filters, projectsFiltered, res );
+
+                  } else {
+
+                    // prepare download
+                    ProjectDashboardController.getCsvDownload( params, filters, projectsFiltered, res );
+
+                  }
+                
+                };
+
+              });
+
+            });
 
           });
 
@@ -308,6 +341,7 @@ var ProjectDashboardController = {
 
             // get project locations
             var value = 0;
+
             $projects.forEach(function(p, i){
               // project dist list count
               value += p.locations.length;
@@ -346,7 +380,6 @@ var ProjectDashboardController = {
 
           break;
         case 'beneficiaries':
-
           // beneficiaries
           var beneficiaries = ProjectDashboardController.getBeneficiaries( $projects, 'projects' );
 
@@ -559,6 +592,8 @@ var ProjectDashboardController = {
           // return new Project
           return res.json(200, result );
 
+          break;
+
       }
 
   },
@@ -580,16 +615,16 @@ var ProjectDashboardController = {
         var $locations = [];
 
         // for each project
-        $projects.forEach(function(p, i){
+        $projects.forEach(function(p, i){      
           // create one list of locations 
           p.locations.forEach(function(l, i){
             // push location to list
-            $locations.push( l.toObject() );
+            $locations.push( l );
           });
         });
 
         // project
-        $locations.forEach(function(l, i){      
+        $locations.forEach(function(l, i){
           
           // add beneficiaries with underscore (get beneficiaries from fn for one location at a time)
           _.extend($locations[i], ProjectDashboardController.getBeneficiaries( [ $locations[i] ], 'locations' ) );
