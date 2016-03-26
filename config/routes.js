@@ -69,11 +69,6 @@ module.exports.routes = {
   'POST /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
   'POST /health/data/financials': 'Health/ProjectDashboardController.getFinancialListCsv',
 
-  // 'GET /health/data/details': 'Health/ProjectDashboardController.getProjectDetailsCsv',
-  // 'GET /health/data/locations': 'Health/ProjectDashboardController.getProjectLocationsCsv',
-  // 'GET /health/data/beneficiaries': 'Health/ProjectDashboardController.getProjectBeneficiariesCsv',
-
-
   // Dews 
   'POST /dews/indicator': 'Dews/DewsController.getIndicator',
   'POST /dews/chart': 'Dews/DewsController.getChart',
