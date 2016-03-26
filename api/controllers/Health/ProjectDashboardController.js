@@ -257,8 +257,10 @@ var ProjectDashboardController = {
                 // return error
                 if (err) return res.negotiate( err );
 
-                // add beneficiaries
-                $projects[i].locations[j].beneficiaries = beneficiaries;
+                // add beneficiaries if location exists
+                if ( $projects[i].locations ){
+                  $projects[i].locations[j].beneficiaries = beneficiaries;
+                }
 
                 // run metrics
                 if ( i === ( projects.length - 1 ) && j === ( locations.length - 1 ) ) {
