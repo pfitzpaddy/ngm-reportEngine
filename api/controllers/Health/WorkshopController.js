@@ -12,6 +12,7 @@ module.exports = {
 
     // update financials
     Workshop.create( [{
+      order: 1,
       title: 'Workshop Group 1',
       date: 'Monday April 4, 2016',
       time: '9am till 2pm',
@@ -26,6 +27,7 @@ module.exports = {
         workshop_id: '1'
       }]
     },{
+      order: 2,
       title: 'Workshop Group 2',
       date: 'Tuesday April 5, 2016',
       time: '9am till 2pm',
@@ -40,6 +42,7 @@ module.exports = {
         workshop_id: '2'
       }]
     },{
+      order: 3,
       title: 'Workshop Group 3',
       date: 'Wednesday April 6, 2016',
       time: '9am till 2pm',
@@ -54,6 +57,7 @@ module.exports = {
         workshop_id: '3'
       }]
     },{
+      order: 4,
       title: 'Workshop Group 4',
       date: 'Thursday April 7, 2016',
       time: '9am till 2pm',
