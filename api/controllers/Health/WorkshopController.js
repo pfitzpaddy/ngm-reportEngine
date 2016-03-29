@@ -17,33 +17,13 @@ module.exports = {
       time: '9am till 2pm incl. lunch',
       theme: 'lime lighten-4',
       participants: [{
-        workshop_id: '1',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '1'
       },{
-        workshop_id: '1',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '1'
       },{
-        workshop_id: '1',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '1'
       },{
-        workshop_id: '1',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '1'
       }]
     },{
       title: 'Workshop Group 2',
@@ -51,33 +31,13 @@ module.exports = {
       time: '9am till 2pm',
       theme: 'light-blue lighten-4',
       participants: [{
-        workshop_id: '2',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '2'
       },{
-        workshop_id: '2',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '2'
       },{
-        workshop_id: '2',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '2'
       },{
-        workshop_id: '2',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '2'
       }]
     },{
       title: 'Workshop Group 3',
@@ -85,33 +45,13 @@ module.exports = {
       time: '9am till 2pm',
       theme: 'teal lighten-4',
       participants: [{
-        workshop_id: '3',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '3'
       },{
-        workshop_id: '3',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '3'
       },{
-        workshop_id: '3',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '3'
       },{
-        workshop_id: '3',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '3'
       }]
     },{
       title: 'Workshop Group 4',
@@ -119,33 +59,13 @@ module.exports = {
       time: '9am till 2pm',
       theme: 'blue lighten-3',
       participants: [{
-        workshop_id: '4',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '4'
       },{
-        workshop_id: '4',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '4'
       },{
-        workshop_id: '4',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '4'
       },{
-        workshop_id: '4',
-        organization: '',
-        name: '',
-        email: '',
-        phone: '',
-        duty_station: ''
+        workshop_id: '4'
       }]
     }] ).exec(function(err, workshops){
         

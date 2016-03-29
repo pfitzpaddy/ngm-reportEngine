@@ -28,7 +28,7 @@ module.exports = {
 			type: 'string'
 		},
 		phone: {
-			type: 'string'
+			type: 'integer'
 		},
 		email: {
 			type: 'string',
