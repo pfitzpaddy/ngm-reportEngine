@@ -37,11 +37,16 @@ module.exports.policies = {
   // public
   'MetricsController': {
     '*': true
-  },  
+  },
 
   // public
   'FileController': {
     'print': true
+  },  
+
+  // public
+  'Health/WorkshopController': {
+    '*': true
   },  
 
   // public

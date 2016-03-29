@@ -54,6 +54,15 @@ module.exports.routes = {
   'GET /health/getFacilityTypeList': 'Health/ListController.getFacilityTypeList',
   'GET /health/getFacilityList': 'Health/ListController.getFacilityList',
 
+
+  // HEALTH
+  
+  // workshop
+  'GET /health/workshop/create': 'Health/WorkshopController.create',
+  'GET /health/workshop/get': 'Health/WorkshopController.getWorkshop',
+  'POST /health/workshop/set': 'Health/WorkshopController.setWorkshop',
+
+
   // Health Projects
   'POST /health/project/getProjectsList': 'Health/ProjectController.getProjectsList',
   // get project details, locations, beneficiaries

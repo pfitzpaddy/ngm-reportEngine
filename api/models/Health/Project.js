@@ -36,7 +36,7 @@ module.exports = {
 			required: true
 		},
 		project_type: {
-			type: 'string',
+			type: 'array',
 			required: true
 		},
 		project_description: {
