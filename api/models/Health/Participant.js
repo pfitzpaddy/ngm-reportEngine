@@ -34,6 +34,9 @@ module.exports = {
 			type: 'string',
 			unique: true
 		},
+		duty_station: {
+			type: 'array'
+		},
 		taken: {
 			type: 'boolean',
 			defaultsTo: false
