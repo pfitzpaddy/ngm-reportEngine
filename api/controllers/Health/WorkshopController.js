@@ -14,7 +14,7 @@ module.exports = {
     Workshop.create( [{
       title: 'Workshop Group 1',
       date: 'Monday April 4, 2016',
-      time: '9am till 2pm incl. lunch',
+      time: '9am till 2pm',
       theme: 'lime lighten-4',
       participants: [{
         workshop_id: '1'
@@ -55,7 +55,7 @@ module.exports = {
       }]
     },{
       title: 'Workshop Group 4',
-      date: 'Monday April 4, 2016',
+      date: 'Thursday April 7, 2016',
       time: '9am till 2pm',
       theme: 'blue lighten-3',
       participants: [{
