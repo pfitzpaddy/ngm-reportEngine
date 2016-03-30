@@ -30,7 +30,11 @@ module.exports = {
 		email: {
 			type: 'string',
 			required: true
-		},	
+		},
+		project_status: {
+			type: 'string',
+			defaultsTo: 'new'
+		},
 		project_title: {
 			type: 'string',
 			required: true
@@ -39,9 +43,33 @@ module.exports = {
 			type: 'array',
 			required: true
 		},
+		project_donor: {
+			type: 'array',
+			required: true
+		},
+		project_budget: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_progress: {
+			type: 'integer'
+		},
+		project_start_date: {
+			type: 'date',
+			required: true
+		},
+		project_end_date: {
+			type: 'date',
+			required: true
+		},
 		project_description: {
 			type: 'string',
 			required: true
+		},
+		// add reference to target beneficiaries
+		target_beneficiaries: {
+      collection: 'targetbeneficiaries',
+      via: 'project_id'
 		},
 		prov_code: {
 			type: 'array',
@@ -53,29 +81,6 @@ module.exports = {
 		},
 		beneficiary_category: {
 			type: 'array',
-			required: true
-		},
-		project_budget: {
-			type: 'integer',
-			required: true
-		},
-		project_budget_progress: {
-			type: 'integer'
-		},		
-		project_donor: {
-			type: 'array',
-			required: true
-		},
-		project_status: {
-			type: 'string',
-			defaultsTo: 'new'
-		},
-		project_start_date: {
-			type: 'date',
-			required: true
-		},
-		project_end_date: {
-			type: 'date',
 			required: true
 		},
     // add reference to Locations

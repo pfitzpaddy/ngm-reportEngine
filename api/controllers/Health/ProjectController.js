@@ -67,7 +67,7 @@ module.exports = {
     var $project = {};
     
     // get project by organization_id
-    Project.findOne( { id: req.param('id') } ).exec(function(err, project){
+    Project.findOne( { id: req.param('id') } ).populate('target_beneficiaries').exec(function(err, project){
       
       // return error
       if (err) return res.negotiate( err );

@@ -92,27 +92,27 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		under18male:{
+		under5male:{
 			type: 'integer',
 			defaultsTo: 0			
 		},
-		under18female:{
+		under5female:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over18male:{
+		over5male:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over18female:{
+		over5female:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over59male:{
+		cba:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over59female:{
+		pla:{
 			type: 'integer',
 			defaultsTo: 0
 		}

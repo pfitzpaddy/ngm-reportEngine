@@ -30,39 +30,40 @@ module.exports = {
 		// add a reference to Project
 		project_id: {
 			model: 'project'
-		},
-		expenditure_item: {
-			type: 'string',
-			required: true
-		},
-		expenditure_name: {
-			type: 'string',
-			required: true
 		},		
-		expenditure_status: {
+		beneficiary_name: {
 			type: 'string',
 			required: true
-		},		
-		expenditure_budget_afn:{
+		},
+		beneficiary_category: {
+			type: 'string',
+			required: true
+		},
+		under5male:{
 			type: 'integer',
 			defaultsTo: 0			
 		},
-		expenditure_budget_usd:{
+		under5female:{
 			type: 'integer',
-			defaultsTo: 0			
+			defaultsTo: 0
 		},
-		expenditure_start_date: {
-			type: 'date',
-			required: true
+		over5male:{
+			type: 'integer',
+			defaultsTo: 0
 		},
-		expenditure_end_date: {
-			type: 'date',
-			required: true
+		over5female:{
+			type: 'integer',
+			defaultsTo: 0
 		},
-    timestamp: {
-    	type: 'string',
-    	required: true
-    }
+		cba:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		pla:{
+			type: 'integer',
+			defaultsTo: 0
+		}
+
 	}
 
 };
