@@ -18,6 +18,9 @@ module.exports = {
 		workshop: {
 			model: 'workshop'
 		},
+		item: {
+			type: 'integer'
+		},
 		workshop_id: {
 			type: 'string'
 		},
