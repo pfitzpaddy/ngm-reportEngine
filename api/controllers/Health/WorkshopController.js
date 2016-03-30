@@ -18,12 +18,16 @@ module.exports = {
       time: '9am till 2pm',
       theme: 'lime lighten-4',
       participants: [{
+        item: 1,
         workshop_id: '1'
       },{
+        item: 2,
         workshop_id: '1'
       },{
+        item: 3,
         workshop_id: '1'
       },{
+        item: 4,
         workshop_id: '1'
       }]
     },{
@@ -33,12 +37,16 @@ module.exports = {
       time: '9am till 2pm',
       theme: 'light-blue lighten-4',
       participants: [{
+        item: 1,
         workshop_id: '2'
       },{
+        item: 2,
         workshop_id: '2'
       },{
+        item: 3,
         workshop_id: '2'
       },{
+        item: 4,
         workshop_id: '2'
       }]
     },{
@@ -48,12 +56,16 @@ module.exports = {
       time: '9am till 2pm',
       theme: 'teal lighten-4',
       participants: [{
+        item: 1,
         workshop_id: '3'
       },{
+        item: 2,
         workshop_id: '3'
       },{
+        item: 3,
         workshop_id: '3'
       },{
+        item: 4,
         workshop_id: '3'
       }]
     },{
@@ -63,12 +75,16 @@ module.exports = {
       time: '9am till 2pm',
       theme: 'blue lighten-3',
       participants: [{
+        item: 1,
         workshop_id: '4'
       },{
+        item: 2,
         workshop_id: '4'
       },{
+        item: 3,
         workshop_id: '4'
       },{
+        item: 4,
         workshop_id: '4'
       }]
     }] ).exec(function(err, workshops){
