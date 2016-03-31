@@ -346,27 +346,6 @@ var DewsController  = {
 
   },
 
-  getMarkerMessage: function(m, feature){
-    
-    // marker message 
-    var message = '',
-        messageArray = m.split('__');
-    
-    // parse markermessage to set html
-    messageArray.forEach(function(d, i){
-      // evaluate html from features
-      if( d.search('value') > 0 ){
-        message += (eval('(' + d + ')').value);
-      } else {
-        message += d;
-      }
-    });
-
-    // return html formatted msg
-    return message;
-
-  },  
-
   getMarkers: function(req, res){
 
     // params
@@ -435,12 +414,15 @@ var DewsController  = {
         if (results.rows[0].featurecollection.features) {
           results.rows[0].featurecollection.features.forEach(function(feature, key) {
 
+            // message
+            var message = '<div class="count" style="text-align:center">' + feature.properties.incidents + '</div> cases in ' + feature.properties.province + ', ' + feature.properties.district;
+
             // create markers
             markers['marker' + key] = {
               layer: layer,
               lat: feature.geometry.coordinates[1],
               lng: feature.geometry.coordinates[0],
-              message: DewsController.getMarkerMessage(message, feature)
+              message: message
             };
 
           });  
