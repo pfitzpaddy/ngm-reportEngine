@@ -95,15 +95,14 @@ var ProjectDashboardController = {
   getBeneficiaries: function( $data, type ){
 
     var beneficiaries = {
-      under18male: 0,
-      under18female: 0,
-      under18_total: 0,
-      over18male: 0,
-      over18female: 0,
-      over18_total: 0,
-      over59male: 0,
-      over59female: 0,
-      over59_total: 0,
+      under5male: 0,
+      under5female: 0,
+      under5_total: 0,
+      over5male: 0,
+      over5female: 0,
+      over5_total: 0,
+      pla: 0,
+      cba: 0,
       beneficiaries_total: 0
     };
 
@@ -111,18 +110,17 @@ var ProjectDashboardController = {
     function sumBeneficiaries(b, k) {
       
       // totals segment
-      beneficiaries.under18male += b.under18male;
-      beneficiaries.under18female += b.under18female;
-      beneficiaries.over18male += b.over18male;
-      beneficiaries.over18female += b.over18female;
-      beneficiaries.over59male += b.over59male;
-      beneficiaries.over59female += b.over59female;              
+      beneficiaries.under5male += b.under5male;
+      beneficiaries.under5female += b.under5female;
+      beneficiaries.over5male += b.over5male;
+      beneficiaries.over5female += b.over5female;
+      beneficiaries.pla += b.pla;
+      beneficiaries.cba += b.cba;              
       // totals baseline
-      beneficiaries.under18_total += b.under18male + b.under18female;
-      beneficiaries.over18_total += b.over18male + b.over18female;
-      beneficiaries.over59_total += b.over59male + b.over59female;
+      beneficiaries.under5_total += b.under5male + b.under5female;
+      beneficiaries.over5_total += b.over5male + b.over5female;
       // total
-      beneficiaries.beneficiaries_total += b.under18male + b.under18female + b.over18male + b.over18female + b.over59male + b.over59female;
+      beneficiaries.beneficiaries_total += b.under5male + b.under5female + b.over5male + b.over5female + b.pla + b.cba;
 
     }
 
@@ -512,83 +510,83 @@ var ProjectDashboardController = {
           switch(params.indicator){
 
             // indicator
-            case 'under18':
+            case 'under5':
 
               // calc %
-              var malePerCent = ( beneficiaries.under18male / ( beneficiaries.under18male + beneficiaries.under18female ) ) * 100;
-              var femalePerCent = ( beneficiaries.under18female / ( beneficiaries.under18male + beneficiaries.under18female ) ) * 100;
-              var totalPerCent = ( beneficiaries.under18_total / ( beneficiaries.under18_total + beneficiaries.over18_total + beneficiaries.over59_total ) ) * 100;
+              var malePerCent = ( beneficiaries.under5male / ( beneficiaries.under5male + beneficiaries.under5female ) ) * 100;
+              var femalePerCent = ( beneficiaries.under5female / ( beneficiaries.under5male + beneficiaries.under5female ) ) * 100;
+              var totalPerCent = ( beneficiaries.under5_total / ( beneficiaries.under5_total + beneficiaries.over5_total ) ) * 100;
               
               // assign data left
               result.label.left.label.label = malePerCent;
-              result.label.left.subLabel.label = beneficiaries.under18male;
+              result.label.left.subLabel.label = beneficiaries.under5male;
               // assign data center
               result.label.center.label.label = totalPerCent;
-              result.label.center.subLabel.label = beneficiaries.under18_total
+              result.label.center.subLabel.label = beneficiaries.under5_total
               // assign data right
               result.label.right.label.label = femalePerCent;
-              result.label.right.subLabel.label = beneficiaries.under18female;
+              result.label.right.subLabel.label = beneficiaries.under5female;
 
               // highcharts female
               result.data[0].y = femalePerCent;
-              result.data[0].label = beneficiaries.under18_total;
+              result.data[0].label = beneficiaries.under5_total;
               // highcharts male
               result.data[1].y = malePerCent;
-              result.data[1].label = beneficiaries.under18_total;
+              result.data[1].label = beneficiaries.under5_total;
               
               break;
 
-            case 'over18':
+            case 'over5':
               
               // calc %
-              var malePerCent = ( beneficiaries.over18male / ( beneficiaries.over18male + beneficiaries.over18female ) ) * 100;
-              var femalePerCent = ( beneficiaries.over18female / ( beneficiaries.over18female + beneficiaries.over18male ) ) * 100;
-              var totalPerCent = ( beneficiaries.over18_total / ( beneficiaries.under18_total + beneficiaries.over18_total + beneficiaries.over59_total ) ) * 100;
+              var malePerCent = ( beneficiaries.over5male / ( beneficiaries.over5male + beneficiaries.over5female ) ) * 100;
+              var femalePerCent = ( beneficiaries.over5female / ( beneficiaries.over5female + beneficiaries.over5male ) ) * 100;
+              var totalPerCent = ( beneficiaries.over5_total / ( beneficiaries.under5_total + beneficiaries.over5_total ) ) * 100;
               
               // assign data left
               result.label.left.label.label = malePerCent;
-              result.label.left.subLabel.label = beneficiaries.over18male;
+              result.label.left.subLabel.label = beneficiaries.over5male;
               // assign data center
               result.label.center.label.label = totalPerCent 
-              result.label.center.subLabel.label = beneficiaries.over18_total
+              result.label.center.subLabel.label = beneficiaries.over5_total
               // assign data right
               result.label.right.label.label = femalePerCent;
-              result.label.right.subLabel.label = beneficiaries.over18female;
+              result.label.right.subLabel.label = beneficiaries.over5female;
 
               // highcharts female
               result.data[0].y = femalePerCent;
-              result.data[0].label = beneficiaries.over18_total;
+              result.data[0].label = beneficiaries.over5_total;
               // highcharts male
               result.data[1].y = malePerCent;
-              result.data[1].label = beneficiaries.over18_total;
+              result.data[1].label = beneficiaries.over5_total;
 
               break; 
 
-            case 'over59':
+            // case 'over59':
               
-              // calc %
-              var malePerCent = ( beneficiaries.over59male / ( beneficiaries.over59male + beneficiaries.over59female ) ) * 100;
-              var femalePerCent = ( beneficiaries.over59female / ( beneficiaries.over59male + beneficiaries.over59female ) ) * 100;
-              var totalPerCent = ( beneficiaries.over59_total / ( beneficiaries.under18_total + beneficiaries.over18_total + beneficiaries.over59_total ) ) * 100;
+            //   // calc %
+            //   var malePerCent = ( beneficiaries.pla / ( beneficiaries.pla + beneficiaries.cba ) ) * 100;
+            //   var femalePerCent = ( beneficiaries.cba / ( beneficiaries.pla + beneficiaries.cba ) ) * 100;
+            //   // var totalPerCent = ( beneficiaries.over59_total / ( beneficiaries.under5_total + beneficiaries.over5_total + beneficiaries.over59_total ) ) * 100;
               
-              // assign data left
-              result.label.left.label.label = malePerCent;
-              result.label.left.subLabel.label = beneficiaries.over59male;
-              // assign data center
-              result.label.center.label.label = totalPerCent 
-              result.label.center.subLabel.label = beneficiaries.over59_total
-              // assign data right
-              result.label.right.label.label = femalePerCent;
-              result.label.right.subLabel.label = beneficiaries.over59female;
+            //   // assign data left
+            //   result.label.left.label.label = malePerCent;
+            //   result.label.left.subLabel.label = beneficiaries.pla;
+            //   // assign data center
+            //   result.label.center.label.label = totalPerCent 
+            //   result.label.center.subLabel.label = beneficiaries.over59_total
+            //   // assign data right
+            //   result.label.right.label.label = femalePerCent;
+            //   result.label.right.subLabel.label = beneficiaries.cba;
 
-              // highcharts female
-              result.data[0].y = femalePerCent;
-              result.data[0].label = beneficiaries.over59_total;
-              // highcharts male
-              result.data[1].y = malePerCent;
-              result.data[1].label = beneficiaries.over59_total;
+            //   // highcharts female
+            //   result.data[0].y = femalePerCent;
+            //   result.data[0].label = beneficiaries.over59_total;
+            //   // highcharts male
+            //   result.data[1].y = malePerCent;
+            //   result.data[1].label = beneficiaries.over59_total;
 
-              break;
+            //   break;
           }
 
           // return new Project

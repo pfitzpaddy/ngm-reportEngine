@@ -47,13 +47,22 @@ module.exports = {
 			type: 'array',
 			required: true
 		},
-		project_budget: {
+		project_budget_usd: {
 			type: 'integer',
 			required: true
 		},
-		project_budget_progress: {
-			type: 'integer'
+		project_budget_afn: {
+			type: 'integer',
+			required: true
 		},
+		project_budget_progress_usd: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_progress_afn: {
+			type: 'integer',
+			required: true
+		},		
 		project_start_date: {
 			type: 'date',
 			required: true
@@ -61,6 +70,12 @@ module.exports = {
 		project_end_date: {
 			type: 'date',
 			required: true
+		},
+		implementing_partners_checked: {
+			type: 'boolean'
+		},
+		implementing_partners: {
+			type: 'string'
 		},
 		project_description: {
 			type: 'string',
