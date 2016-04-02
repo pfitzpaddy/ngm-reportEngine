@@ -56,12 +56,10 @@ module.exports = {
 			required: true
 		},
 		project_budget_progress_usd: {
-			type: 'integer',
-			required: true
+			type: 'integer'
 		},
 		project_budget_progress_afn: {
-			type: 'integer',
-			required: true
+			type: 'integer'
 		},		
 		project_start_date: {
 			type: 'date',
