@@ -277,7 +277,7 @@ var ProjectDashboardController = {
                     // calculate and return metric
                     ProjectDashboardController.getIndicatorMetric( params, filters, projectsFiltered, res );
 
-                  } else {
+                  } else{
 
                     // prepare download
                     ProjectDashboardController.getCsvDownload( params, filters, projectsFiltered, res );
@@ -632,8 +632,9 @@ var ProjectDashboardController = {
           // remove unwanted keys
           delete $locations[i].id;
           delete $locations[i].project_id;
+          delete $locations[i].implementing_partners_checked;
           delete $locations[i].beneficiaries;
-          delete $locations[i].timestamp;          
+          delete $locations[i].timestamp;      
 
         });
 

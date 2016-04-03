@@ -158,15 +158,12 @@ module.exports = {
   getProjectsList: function(req, res) {
 
     // request input
-    if (!req.param('organization_id') || !req.param('project_status')) {
-      return res.json(401, { err: 'organization_id, project_status required!' });
-    }    
+    if ( !req.param('filter') ) {
+      return res.json(401, { err: 'filter required!' });
+    }
     
     // get project by organization_id & status
-    Project.find({ 
-      organization_id: req.param('organization_id'),
-      project_status: req.param('project_status')
-    }).sort('updatedAt DESC').exec(function(err, projects){
+    Project.find( req.param( 'filter' ) ).sort('updatedAt DESC').exec(function(err, projects){
       
       // return error
       if (err) return res.negotiate( err );
