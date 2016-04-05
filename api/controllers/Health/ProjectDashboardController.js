@@ -159,21 +159,22 @@ var ProjectDashboardController = {
   getHealthDetails: function( req, res ){
 
     // request input
-    if ( !req.param('start_date') || !req.param('end_date') || !req.param('project_type') || !req.param('beneficiary_category') || !req.param('prov_code') || !req.param('dist_code') ) {
-      return res.json(401, {err: 'indicator, start_date, end_date, project_status, project_type, beneficiary_category, prov_code, dist_code required!'});
-    }
+    // if ( ( !req.param('project_id') ) || ( !req.param('start_date') || !req.param('end_date') || !req.param('project_type') || !req.param('beneficiary_category') || !req.param('prov_code') || !req.param('dist_code') ) ) {
+    //   return res.json(401, {err: 'indicator, start_date, end_date, project_status, project_type, beneficiary_category, prov_code, dist_code required!'});
+    // }
 
     // get params
     var params = {
       details: req.param('details') ? req.param('details') : false,
       indicator: req.param('indicator') ? req.param('indicator') : false,
-      start_date: req.param('start_date'),
-      end_date: req.param('end_date'),
-      project_status: req.param('project_status'),
-      project_type: req.param('project_type'),
-      beneficiary_category: req.param('beneficiary_category'),
-      prov_code: req.param('prov_code'),
-      dist_code: req.param('dist_code'),
+      project_id: req.param('project_id') ? req.param('project_id') : false,
+      start_date: req.param('start_date') ? req.param('start_date') : '1990-01-01',
+      end_date: req.param('end_date') ? req.param('end_date') : '2020-12-31',
+      project_status: req.param('project_status') ? req.param('project_status') : false,
+      project_type: req.param('project_type') ? req.param('project_type') : ['all'],
+      beneficiary_category: req.param('beneficiary_category') ? req.param('beneficiary_category') : ['all'],
+      prov_code: req.param('prov_code') ? req.param('prov_code') : '*',
+      dist_code: req.param('dist_code') ? req.param('dist_code') : '*',
       conflict: req.param('conflict') ? req.param('conflict') : false
     }
 
@@ -182,6 +183,9 @@ var ProjectDashboardController = {
 
     // filters
     var filters = {
+
+      // project_id
+      project_id: params.project_id ? { id: params.project_id } : {},
       
       // date_filter
       date_filter: { 
@@ -206,6 +210,7 @@ var ProjectDashboardController = {
     
     // get projects by organization_id
     Project.find()
+      .where(filters.project_id)
       .where(filters.date_filter)
       .where(filters.project_status_filter)
       .where(filters.project_type_filter)

@@ -80,10 +80,18 @@ module.exports = {
 			printUrl = req.param('printUrl'),
 			token = req.param('token'),
 			pageLoadTime = req.param('pageLoadTime'),
-			exec = require('child_process').exec;
+			viewportWidth = req.param('viewportWidth'),
+			viewportHeight = req.param('viewportHeight'),
+			exec = require('child_process').exec,
+			cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-print.js ' + report + ' ' + printUrl + ' ' + token + ' ' + pageLoadTime;
+		
+		// width
+		cmd = viewportWidth ? cmd + ' ' + viewportWidth : cmd;
+		// height
+		cmd = viewportHeight ? cmd + ' ' + viewportHeight: cmd;
 
-		exec('phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-print.js ' + report + ' ' + printUrl + ' ' + token + ' ' + pageLoadTime, 
-			function(error, stdout, stderr) {
+		exec( cmd,
+			function( error, stdout, stderr ) {
 				if (!error) {
 					// success
 					res.json({ 
