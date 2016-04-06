@@ -108,11 +108,19 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		cba:{
+		penta3_vacc_male_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		pla:{
+		penta3_vacc_female_under1:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		skilled_birth_attendant:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		conflict_trauma_treated:{
 			type: 'integer',
 			defaultsTo: 0
 		}
