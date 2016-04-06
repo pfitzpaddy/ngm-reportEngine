@@ -68,6 +68,8 @@ module.exports.routes = {
   // get project details, locations, beneficiaries
   'POST /health/project/getProject': 'Health/ProjectController.getProjectById',
   'POST /health/project/setProject': 'Health/ProjectController.setProjectById',
+  'POST /health/project/delete': 'Health/ProjectController.deleteProjectById',
+  'GET /health/project/delete': 'Health/ProjectController.deleteProjectById',
   // get project financials
   'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',
   
