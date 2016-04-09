@@ -82,7 +82,6 @@ module.exports = {
 
           // update visit information
           user.visits = user.visits + 1;
-          user.last_logged_in = new Date();
 
           // save updates
           user.save(function(err) {
@@ -119,7 +118,6 @@ module.exports = {
 
       // update visit information
       user.visits = user.visits + 1;
-      user.last_logged_in = new Date();
 
       // save updates
       user.save(function(err) {

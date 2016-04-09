@@ -48,15 +48,18 @@ module.exports.routes = {
   'POST /process': 'FileController.process',
   'POST /print': 'FileController.print',
 
-  // Location lists
-  'GET /health/getProvincesList': 'Health/ListController.getProvincesList',
-  'GET /health/getDistrictsList': 'Health/ListController.getDistrictsList',
-  'GET /health/getFacilityTypeList': 'Health/ListController.getFacilityTypeList',
-  'GET /health/getFacilityList': 'Health/ListController.getFacilityList',
+  // Locaiton lists
+  'GET /location/getProvinceList': 'LocationController.getProvinceList',
+  'GET /location/getProvinceMenu': 'LocationController.getProvinceMenu',
+  'GET /location/getDistriceList': 'LocationController.getDistrictList',
 
 
   // HEALTH
-  
+
+  // Facility lists
+  'GET /health/getFacilityTypeList': 'Health/FacilityController.getFacilityTypeList',
+  'GET /health/getFacilityList': 'Health/FacilityController.getFacilityList',  
+
   // workshop
   'GET /health/workshop/create': 'Health/WorkshopController.create',
   'GET /health/workshop/get': 'Health/WorkshopController.getWorkshop',

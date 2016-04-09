@@ -8,7 +8,7 @@
 module.exports = {
 
   // get Provinces
-  getProvincesList: function(req, res) {
+  getProvinceList: function(req, res) {
 
     // create Project with organization_id
     Province.find().sort('prov_name ASC').exec(function(err, provinces){
@@ -24,7 +24,7 @@ module.exports = {
   },
 
   // get Districts
-  getDistrictsList: function(req, res) {
+  getDistrictList: function(req, res) {
 
     // create Project with organization_id
     District.find().sort('dist_name ASC').exec(function(err, districts){
@@ -39,33 +39,31 @@ module.exports = {
 
   },
 
-  // get facilityTypes
-  getFacilityTypeList: function(req, res) {
+  // get Provinces
+  getProvinceMenu: function(req, res) {
+
+    var $provinces = {
+      'afghanistan': { prov_code: '*', prov_name:'Afghanistan', lat:34.5, lng:66, zoom:6 }
+    };
 
     // create Project with organization_id
-    Type.find().sort('fac_type ASC').exec(function(err, facilityTypes){
+    Province.find().sort('prov_name ASC').exec(function(err, provinces){
       
       // return error
       if (err) return res.negotiate( err );
 
       // return new Project
-      return res.json(200, facilityTypes);
+      provinces.forEach( function( d, i ) {
 
-    });
+        // key
+        var key = d.prov_name.toLowerCase().replace(/\s/g, '-');
 
-  },
+        // create menu option
+        $provinces[key] = d;
 
-  // get facilities
-  getFacilityList: function(req, res) {
+      });
 
-    // create Project with organization_id
-    Facility.find().sort('fac_name ASC').exec(function(err, facilities){
-      
-      // return error
-      if (err) return res.negotiate( err );
-
-      // return new Project
-      return res.json(200, facilities);
+      return res.json(200, $provinces);
 
     });
 

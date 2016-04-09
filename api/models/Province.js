@@ -8,22 +8,22 @@
 module.exports = {
 
 	// connection
-	connection: 'ngmHealthClusterServer',
+	connection: 'ngmReportHubServer',
 
 	// strict schema
 	schema: true,
 
 	// attributes
-	attributes: {
-		prov_code: {
-			type: 'integer',
-			required: true
-		},
-		prov_name: {
-			type: 'string',
-			required: true
-		}
-	}
+	// attributes: {
+	// 	prov_code: {
+	// 		type: 'integer',
+	// 		required: true
+	// 	},
+	// 	prov_name: {
+	// 		type: 'string',
+	// 		required: true
+	// 	}
+	// }
 
 };
 

@@ -71,11 +71,6 @@ module.exports = {
 		visits: {
 			type: 'integer',
 			defaultsTo: 1
-		},		
-		last_logged_in: {
-			type: 'date',
-			required: false,
-			defaultsTo: new Date()
 		},
 		gravatar_url: {
 			type: 'string'
