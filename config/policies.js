@@ -44,6 +44,11 @@ module.exports.policies = {
     'print': true
   },  
 
+    // public
+  'LocationController': {
+    '*': true
+  },
+
   // public
   'Health/WorkshopController': {
     '*': true
