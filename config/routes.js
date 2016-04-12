@@ -47,6 +47,7 @@ module.exports.routes = {
   'POST /upload-file': 'FileController.upload',
   'POST /process': 'FileController.process',
   'POST /print': 'FileController.print',
+  'POST /proxy': 'FileController.proxy',
 
   // Locaiton lists
   'GET /location/getProvinceList': 'LocationController.getProvinceList',

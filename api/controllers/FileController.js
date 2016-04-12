@@ -106,6 +106,31 @@ module.exports = {
 				}
 			}
 		);
-	}	
+	},
+
+	//
+	proxy: function  (req, res) {
+
+    // request input
+    if ( !req.param( 'url' ) ) {
+      return res.json(401, { err: 'url required!' } );
+    }
+
+		var url = req.param( 'url' ),
+			exec = require('child_process').exec,
+			cmd = 'curl -v --header "Authorization: \'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\'" -G "' + url + '"';
+
+		exec( cmd, function( error, stdout, stderr ) {
+				if (!error) {
+					// success
+					res.json( 200, JSON.parse( stdout ) );
+				} else {
+					// return error
+				  	res.json(400, { error: 'Request error! Please try again...' });
+				}
+			}
+		);
+	}
+
 };
 

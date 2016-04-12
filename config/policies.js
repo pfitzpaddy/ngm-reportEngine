@@ -33,7 +33,7 @@ module.exports.policies = {
   'UserController': {
     '*': true
   },
-
+  
   // public
   'MetricsController': {
     '*': true
@@ -41,7 +41,8 @@ module.exports.policies = {
 
   // public
   'FileController': {
-    'print': true
+    'print': true,
+    'proxy': true
   },  
 
     // public
