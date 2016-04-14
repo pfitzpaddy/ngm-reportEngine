@@ -89,16 +89,12 @@ module.exports = {
 			type: 'array',
 			required: true
 		},
-		beneficiary_category: {
-			type: 'array',
-			required: true
-		},
     // add reference to Locations
     locations: {
       collection: 'location',
       via: 'project_id'
     },
-    // add reference to Locations
+    // add reference to financials
     financials: {
       collection: 'financial',
       via: 'project_id'

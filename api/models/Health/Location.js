@@ -42,10 +42,10 @@ module.exports = {
 			type: 'string'
 		},
 		// list of locations beneficiary categories
-		beneficiary_category: {
-			type: 'array',
-			required: true
-		},
+		// beneficiary_category: {
+		// 	type: 'array',
+		// 	required: true
+		// },
 		prov_code: {
 			type: 'integer',
 			required: true
@@ -66,10 +66,6 @@ module.exports = {
 			type: 'boolean',
 			required: true
 		},
-		fac_id: {
-			type: 'integer',
-			required: true
-		},
 		fac_type: {
 			type: 'string',
 			required: true
@@ -87,10 +83,10 @@ module.exports = {
 			required: true
 		},
     // add reference to Beneficiaries
-    beneficiaries: {
-      collection: 'beneficiaries',
-      via: 'location_id'
-    },
+    // beneficiaries: {
+    //   collection: 'beneficiaries',
+    //   via: 'location_id'
+    // },
     timestamp: {
     	type: 'string',
     	required: true

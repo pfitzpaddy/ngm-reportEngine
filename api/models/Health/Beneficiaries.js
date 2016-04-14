@@ -88,7 +88,7 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		beneficiary_category: {
+		beneficiary_type: {
 			type: 'string',
 			required: true
 		},
