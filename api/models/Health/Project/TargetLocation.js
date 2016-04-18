@@ -23,6 +23,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		// add a reference to Project
+		project_id: {
+			model: 'project'
+		},
 		username: {
 			type: 'string',
 			required: true
@@ -31,21 +35,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		// add a reference to Project
-		project_id: {
-			model: 'project'
-		},
 		project_title: {
 			type: 'string'
 		},
 		project_type: {
 			type: 'string'
 		},
-		// list of locations beneficiary categories
-		// beneficiary_category: {
-		// 	type: 'array',
-		// 	required: true
-		// },
 		prov_code: {
 			type: 'integer',
 			required: true
@@ -81,16 +76,7 @@ module.exports = {
 		lat: {
 			type: 'float',
 			required: true
-		},
-    // add reference to Beneficiaries
-    // beneficiaries: {
-    //   collection: 'beneficiaries',
-    //   via: 'location_id'
-    // },
-    timestamp: {
-    	type: 'string',
-    	required: true
-    }
+		}
 	},
 
 	// add project_id from locations 

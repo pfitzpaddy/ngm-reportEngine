@@ -19,6 +19,14 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		project_id: {
+			type: 'string',
+			required: true
+		},		
+		// add a reference to Project
+		report_id: {
+			model: 'report'
+		},
 		organization: {
 			type: 'string',
 			required: true
@@ -27,41 +35,58 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		// add a reference to Project
-		project_id: {
-			model: 'project'
-		},
-		expenditure_item: {
+		email: {
 			type: 'string',
 			required: true
 		},
-		expenditure_name: {
+		project_title: {
 			type: 'string',
 			required: true
-		},		
-		expenditure_status: {
+		},
+		project_type: {
 			type: 'string',
 			required: true
-		},		
-		expenditure_budget_afn:{
+		},
+		prov_code: {
 			type: 'integer',
-			defaultsTo: 0			
+			required: true
 		},
-		expenditure_budget_usd:{
+		prov_name: {
+			type: 'string',
+			required: true
+		},
+		dist_code: {
 			type: 'integer',
-			defaultsTo: 0			
-		},
-		expenditure_start_date: {
-			type: 'date',
 			required: true
 		},
-		expenditure_end_date: {
-			type: 'date',
+		dist_name: {
+			type: 'string',
 			required: true
 		},
-    timestamp: {
-    	type: 'string',
-    	required: true
+		conflict: {
+			type: 'boolean',
+			required: true
+		},
+		fac_type: {
+			type: 'string',
+			required: true
+		},
+		fac_name: {
+			type: 'string',
+			required: true
+		},
+		lng: {
+			type: 'float',
+			required: true
+		},
+		lat: {
+			type: 'float',
+			required: true
+		},
+    // add reference to Locations
+    beneficiaries: {
+      collection: 'beneficiaries',
+      via: 'location_id'
     }
 	}
 

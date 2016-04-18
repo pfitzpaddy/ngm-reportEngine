@@ -23,14 +23,14 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		username: {
-			type: 'string',
-			required: true
-		},
 		// add a reference to Project
 		project_id: {
 			model: 'project'
-		},		
+		},
+		username: {
+			type: 'string',
+			required: true
+		},	
 		beneficiary_name: {
 			type: 'string',
 			required: true

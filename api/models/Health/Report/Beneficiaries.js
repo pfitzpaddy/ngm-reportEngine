@@ -26,16 +26,16 @@ module.exports = {
 		project_id: {
 			type: 'string'
 		},
+		// add a reference to Location
+    location_id: {
+      model: 'location'
+    },
 		project_title: {
 			type: 'string'
 		},
 		project_type: {
 			type: 'string'
 		},
-		// add a reference to Location
-    location_id: {
-      model: 'location'
-    },
 		username: {
 			type: 'string',
 			required: true
@@ -64,10 +64,6 @@ module.exports = {
 			type: 'boolean',
 			required: true
 		},
-		fac_id: {
-			type: 'integer',
-			required: true
-		},
 		fac_type: {
 			type: 'string',
 			required: true
@@ -75,15 +71,7 @@ module.exports = {
 		fac_name: {
 			type: 'string',
 			required: true
-		},
-		lng: {
-			type: 'float',
-			required: true
-		},
-		lat: {
-			type: 'float',
-			required: true
-		},		
+		},	
 		beneficiary_name: {
 			type: 'string',
 			required: true
@@ -124,27 +112,6 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		}
-
-	},
-
-	// add project_id from locations 
-	beforeCreate: function( $beneficiaries, next ) {
-
-		// get location
-		Location.findOne().where( { id: $beneficiaries.location_id } ).exec(function(err, location){
-
-			// return error
-			if ( err ) return next( err );
-
-			// add project details
-			$beneficiaries.project_id = location.project_id;
-			$beneficiaries.project_title = location.project_title;
-			$beneficiaries.project_title = location.project_type;
-
-			// 'next!'
-			next();
-
-		});
 
 	}
 

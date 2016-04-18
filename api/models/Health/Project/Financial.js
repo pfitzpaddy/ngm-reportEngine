@@ -15,42 +15,52 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		prov_code: {
-			type: 'integer',
-			required: true
-		},
-		prov_name: {
+		organization_id: {
 			type: 'string',
 			required: true
 		},
-		dist_code: {
-			type: 'integer',
-			required: true
+		// add a reference to Project
+		project_id: {
+			model: 'project'
 		},
-		dist_name: {
+		organization: {
 			type: 'string',
 			required: true
 		},
-		fac_id: {
-			type: 'integer',
-			required: true
-		},
-		fac_type: {
+		username: {
 			type: 'string',
 			required: true
 		},
-		fac_name: {
+		expenditure_item: {
 			type: 'string',
 			required: true
 		},
-		lng: {
-			type: 'float',
+		expenditure_name: {
+			type: 'string',
+			required: true
+		},		
+		expenditure_status: {
+			type: 'string',
+			required: true
+		},		
+		expenditure_budget_afn:{
+			type: 'integer'		
+		},
+		expenditure_budget_usd:{
+			type: 'integer'		
+		},
+		expenditure_start_date: {
+			type: 'date',
 			required: true
 		},
-		lat: {
-			type: 'float',
+		expenditure_end_date: {
+			type: 'date',
 			required: true
-		}						
+		},
+    timestamp: {
+    	type: 'string',
+    	required: true
+    }
 	}
 
 };
