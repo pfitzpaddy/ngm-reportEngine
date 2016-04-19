@@ -118,7 +118,9 @@ module.exports = {
 
 		var url = req.param( 'url' ),
 			exec = require('child_process').exec,
-			cmd = 'curl -v --header "Authorization: \'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\'" -G "' + url + '"';
+			cmd = 'curl -v --header "Authorization: \'Basic cGZpdHpnZXJhbGQ6UEB0cmljazc=\'" -G "' + url + '"';
+			
+			console.log( cmd )
 
 		exec( cmd, function( error, stdout, stderr ) {
 				if (!error) {
