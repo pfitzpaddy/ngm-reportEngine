@@ -120,6 +120,7 @@ module.exports = {
 
 			// project start and end date
 			var moment = require('moment'),
+					report_active,
 					s_date = moment( project.project_start_date ),
 					e_date = moment( project.project_end_date );
 
@@ -132,8 +133,16 @@ module.exports = {
 			// for each report month
 			for ( m = 0; m < reports; m++ ) {
 
-				// status
-				var report_status = moment().diff( moment( s_date ).add( m, 'M' ) ) >= 0 ? 'todo' : 'pending';
+				// default is active
+				report_active = true;
+
+				// should be reports just for 2016 period!
+				if ( moment( s_date ).add( m, 'M' ).year() < 2016  ) {
+					report_active = false;
+				}
+
+				// report_status 'todo' open from 10th of every month
+				var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf('month').add( 9, 'd' ) ) >= 0 ? 'todo' : 'pending';
 
 				// create report
 				$reports.push({
@@ -146,10 +155,11 @@ module.exports = {
 					project_title: project.project_title,
 					project_type: project.project_type,
 					report_status: report_status,
+					report_active: report_active,
 					report_month: moment( s_date ).add( m, 'M' ).month(),
 					report_year: moment( s_date ).add( m, 'M' ).year(),
-					reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format( 'YYYY-MM-DD' ),
-					reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 10).format( 'YYYY-MM-DD' ),
+					reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
+					reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 10).format(),
 					locations: []
 				});
 

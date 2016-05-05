@@ -7,7 +7,7 @@
 
 module.exports = {
 
-  // get all Projects by organization
+  // get all reports by project id
   getReportsList: function( req, res ) {
 
     // request input
@@ -28,7 +28,7 @@ module.exports = {
 
   },
 
-  // get all Projects by organization
+  // get all Reports by project id
   getReportById: function( req, res ) {
 
     // request input
@@ -66,11 +66,11 @@ module.exports = {
 
   },
 
-  // set report details
-  setReportById: function(req, res) {
+  // set report details by report id
+  setReportById: function( req, res ) {
 
     // request input
-    if (!req.param('report')) {
+    if ( !req.param( 'report' ) ) {
       return res.json(401, { err: 'report required!' });
     }
     
@@ -81,13 +81,182 @@ module.exports = {
     Report.update( { id: $report.id }, $report ).exec( function( err, report ){
 
       // return error
-      if (err) return res.negotiate( err );    
+      if ( err ) return res.negotiate( err );    
 
       // return Report
-      return res.json(200, report[0]);
+      return res.json( 200, report[0] );
 
     });
 
-  }  
+  },
+
+  // updates reports required for completion
+    // run this 11 day of the month
+  setReportsToDo: function( req, res ) {
+
+    // active projects ids
+    var moment = require('moment'),
+        project_ids = [];
+
+    // only run if date is above monthly reporting period
+    if ( moment().date() >= 10 ) {
+  
+      // find active projects
+      Project.find( { project_status: 'active' } )
+        .exec( function( err, projects ){
+
+          // return error
+          if ( err ) return res.negotiate( err );            
+
+          // for each project
+          projects.forEach( function( project, i ){
+
+            // get project_id
+            project_ids.push( project.id );
+
+          });
+
+          // find active reports for the next reporting period
+          Report
+            .update( { project_id: project_ids, report_month: moment().add( 1, 'M' ).month() },
+                     { report_active: true, report_status: 'todo' } )
+            .exec( function( err, reports ){
+
+              // return error
+              if ( err ) return res.negotiate( err );               
+
+              // return reports
+              return res.json( 200, { msg: 'success' } );
+
+          });
+
+      });
+
+    } else {
+
+      // return reports
+      return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
+    }
+
+  },
+
+  // send notification for new reporting period
+    // run this on return of above method on 11 day of the month
+  setReportsNotification: function( req, res ) {
+
+    // active projects ids
+    var moment = require('moment'),
+        project_ids = [],
+        notification = {},
+        counter = 0;
+
+    // only run if date is above monthly reporting period
+    // if ( moment().date() >= 10 ) {
+    if ( moment().date() >= 2 ) {
+  
+      // find active projects
+      Project.find( { project_status: 'active' } )
+        .exec( function( err, projects ){
+
+          // return error
+          if ( err ) return res.negotiate( err );
+
+          // for each project
+          projects.forEach( function( project, i ) {
+
+            // get project_id
+            project_ids.push( project.id );
+
+          });
+
+          // find active reports for the next reporting period
+            // chaining reads easier!
+          Report
+            .find()
+            .where({ project_id: project_ids })
+            .where({ report_month: moment().add( 1, 'M' ).month() })
+            .where({ report_active: true })
+            .where({ report_status: 'todo' })
+            .exec( function( err, reports ){
+
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // for each report, group by username
+              reports.forEach( function( report, i ) {
+
+                // if username dosnt exist
+                if ( !notification[ report.username ] ) {
+
+                  // add for notification email template
+                  notification[ report.username ] = {
+                    username: report.username,
+                    email: report.email,
+                    report_month: moment().add( 1, 'M' ).format( 'MMMM' ),
+                    reports: []
+                  };
+                }
+
+                // add report urls
+                notification[ report.username ].reports.push({
+                  project_title: report.project_title,
+                  report_url: req.param( 'url' ) + '#/health/projects/report/' + report.project_id + '/' + report.id
+                });
+
+              });
+
+              // each user, send only one email!
+              for ( var user in notification ) {
+
+                // add to counter
+                counter++;
+
+                // send email
+                sails.hooks.email.send( 'notification', {
+                    username: notification[ user ].username,
+                    email: notification[ user ].email,
+                    report_month: notification[ user ].report_month,
+                    reports: notification[ user ].reports,
+                    sendername: 'ReportHub'
+                  }, {
+                    to: notification[ user ].email,
+                    subject: 'ReportHub - Reporting Period for ' + moment().add( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
+                  }, function(err) {
+                    
+                    // return error
+                    if (err) return res.negotiate( err );
+
+                    // return 
+                    if ( counter === Object.keys( notification ).length ) {
+                      
+                      // email sent
+                      return res.json(200, { 'data': 'success' });
+                    }
+
+                  });
+
+              }
+
+          });
+
+      });
+
+    } else {
+
+      // return reports
+      return res.json( 200, { msg: 'Reporting not open for ' + moment().format( 'MMMM' ) + '!' } );
+    }
+
+  },
+
+  // sends reminder for active reports not yet submitted
+  setReportsReminder: function( req, res ) {
+
+    // insert code here!
+
+    // complete
+
+  }
 
 };
+

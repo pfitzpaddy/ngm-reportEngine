@@ -74,6 +74,8 @@ module.exports.routes = {
   'POST /health/report/getReportsList': 'Health/ReportController.getReportsList',  
   'POST /health/report/getReport': 'Health/ReportController.getReportById',
   'POST /health/report/setReport': 'Health/ReportController.setReportById',
+  'GET /health/report/setReportsToDo': 'Health/ReportController.setReportsToDo',
+  'GET /health/report/setReportsNotification': 'Health/ReportController.setReportsNotification',
 
   // get project financials
   'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',

@@ -165,18 +165,14 @@ module.exports = {
         if (err) return res.negotiate( err );
 
         // send email
-        sails.hooks.email.send(
-          'email',
-          {
+        sails.hooks.email.send( 'password-reset', {
             recipientName: reset.name,
             senderName: 'ReportHub',
             url: req.param( 'url' ) + reset.token,
-          },
-          {
+          }, {
             to: reset.email,
             subject: 'ReportHub Password Reset'
-          },
-          function(err) { 
+          }, function(err) {
             
             // return error
             if (err) return res.negotiate( err );
@@ -184,8 +180,7 @@ module.exports = {
             // email sent
             return res.json(200, {'data': 'success' });
 
-          }
-        );
+          });
 
       }); 
 
