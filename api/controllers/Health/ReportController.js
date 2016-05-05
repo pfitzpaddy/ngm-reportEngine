@@ -151,9 +151,8 @@ module.exports = {
         counter = 0;
 
     // only run if date is above monthly reporting period
-    // if ( moment().date() >= 10 ) {
-    if ( moment().date() >= 2 ) {
-  
+    if ( moment().date() >= 10 ) {
+      
       // find active projects
       Project.find( { project_status: 'active' } )
         .exec( function( err, projects ){
@@ -182,6 +181,9 @@ module.exports = {
               // return error
               if ( err ) return res.negotiate( err );
 
+              // no reports return
+              if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );              
+
               // for each report, group by username
               reports.forEach( function( report, i ) {
 
@@ -200,7 +202,7 @@ module.exports = {
                 // add report urls
                 notification[ report.username ].reports.push({
                   project_title: report.project_title,
-                  report_url: req.param( 'url' ) + '#/health/projects/report/' + report.project_id + '/' + report.id
+                  report_url: req.protocol + '://' + req.host + '/#/health/projects/report/' + report.project_id + '/' + report.id
                 });
 
               });
@@ -212,7 +214,7 @@ module.exports = {
                 counter++;
 
                 // send email
-                sails.hooks.email.send( 'notification', {
+                sails.hooks.email.send( 'notification-open', {
                     username: notification[ user ].username,
                     email: notification[ user ].email,
                     report_month: notification[ user ].report_month,
@@ -252,9 +254,112 @@ module.exports = {
   // sends reminder for active reports not yet submitted
   setReportsReminder: function( req, res ) {
 
-    // insert code here!
+    // active projects ids
+    var moment = require('moment'),
+        project_ids = [],
+        notification = {},
+        counter = 0;
 
-    // complete
+    // only run if date is 1 week before monthly reporting period required
+    if ( moment().date() >= 3 ) {
+      
+      // find active projects
+      Project.find( { project_status: 'active' } )
+        .exec( function( err, projects ){
+
+          // return error
+          if ( err ) return res.negotiate( err );
+
+          // for each project
+          projects.forEach( function( project, i ) {
+
+            // get project_id
+            project_ids.push( project.id );
+
+          });
+
+          // find active reports for the next reporting period
+            // chaining reads easier!
+          Report
+            .find()
+            .where({ project_id: project_ids })
+            .where({ report_month: moment().subtract( 1, 'M' ).month() })
+            .where({ report_active: true })
+            .where({ report_status: 'todo' })
+            .exec( function( err, reports ){
+
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // no reports return
+              if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+
+              // for each report, group by username
+              reports.forEach( function( report, i ) {
+
+                // if username dosnt exist
+                if ( !notification[ report.username ] ) {
+
+                  // add for notification email template
+                  notification[ report.username ] = {
+                    username: report.username,
+                    email: report.email,
+                    report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
+                    reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
+                    reports: []
+                  };
+                }
+
+                // add report urls
+                notification[ report.username ].reports.push({
+                  project_title: report.project_title,
+                  report_url: req.protocol + '://' + req.host + '/#/health/projects/report/' + report.project_id + '/' + report.id
+                });
+
+              });
+
+              // each user, send only one email!
+              for ( var user in notification ) {
+
+                // add to counter
+                counter++;
+
+                // send email
+                sails.hooks.email.send( 'notification-due', {
+                    username: notification[ user ].username,
+                    email: notification[ user ].email,
+                    report_month: notification[ user ].report_month,
+                    reporting_due_date: notification[ user ].reporting_due_date,
+                    reports: notification[ user ].reports,
+                    sendername: 'ReportHub'
+                  }, {
+                    to: notification[ user ].email,
+                    subject: 'ReportHub - Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + ' is Due Soon!'
+                  }, function(err) {
+                    
+                    // return error
+                    if (err) return res.negotiate( err );
+
+                    // return 
+                    if ( counter === Object.keys( notification ).length ) {
+                      
+                      // email sent
+                      return res.json( 200, { 'data': 'success' });
+                    }
+
+                  });
+
+              }
+
+            });
+
+          });
+
+      } else {
+
+        // return reports
+        return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+      }
 
   }
 
