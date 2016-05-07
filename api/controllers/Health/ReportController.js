@@ -283,7 +283,7 @@ module.exports = {
           Report
             .find()
             .where({ project_id: project_ids })
-            .where({ report_month: moment().subtract( 1, 'M' ).month() })
+            .where({ report_month: { '<=': moment().subtract( 1, 'M' ).month() } })
             .where({ report_active: true })
             .where({ report_status: 'todo' })
             .exec( function( err, reports ){
@@ -313,6 +313,7 @@ module.exports = {
                 // add report urls
                 notification[ report.username ].reports.push({
                   project_title: report.project_title,
+                  report_month: moment().month( report.report_month ).format( 'MMMM' ),
                   report_url: req.protocol + '://' + req.host + '/#/health/projects/report/' + report.project_id + '/' + report.id
                 });
 

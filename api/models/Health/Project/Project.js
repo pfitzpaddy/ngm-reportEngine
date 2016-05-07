@@ -109,29 +109,27 @@ module.exports = {
 		}
 	},
 
-	// add project_id from locations 
-	afterCreate: function( $project, next ) {
+	// add reports to project with project locations
+	afterUpdate: function( $project, next ) {
 
 		// get new project
 		Project.findOne().where( { id: $project.id } ).populateAll().exec( function( err, project ){
 
 			// return error
-			if ( err ) return next( err );			
+			if ( err ) return next( err );
 
 			// project start and end date
 			var moment = require('moment'),
+					$reports = [],
 					report_active,
 					s_date = moment( project.project_start_date ),
 					e_date = moment( project.project_end_date );
 
 			// number of reports
-			var reports = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed( 0 );
-
-			// project reports
-			$reports = [];
+			var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed( 0 );
 
 			// for each report month
-			for ( m = 0; m < reports; m++ ) {
+			for ( m = 0; m < reports_duration; m++ ) {
 
 				// default is active
 				report_active = true;
@@ -196,7 +194,7 @@ module.exports = {
 			});
 
 	    // create
-	    Report.create( $reports ).exec( function( err, report ){
+	    Report.findOrCreate( $reports ).exec( function( err, report ){
 
 	      // return cb ( error )
 	      if ( err ) return next( err );
@@ -208,30 +206,7 @@ module.exports = {
 
 	  });
 
-	},
-
-	// beforeUpdate: function( $project, next ) {
-
-	// 	// fetch all reports by project
-
-	// 	// from the start of the project till the end
-			
-	// 		// make a report for each month
-
-	// 			// if month exists 
-
-	// 				// use that
-
-	// 			// else
-				
-	// 				// each month has each location
-
-	// 				// each location has empty beneficiaries ( maybe not necissary here )
-
-	// 	// 'next!'
-	// 	// next();
-
-	// }
+	}
 
 };
 

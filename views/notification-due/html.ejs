@@ -8,13 +8,13 @@
 	<body>
 		<p>Hi <%= username %>,</p>
 		<p>
-			The reporting period for <b><%= report_month %></b> is due on the <%= reporting_due_date %>! Follow the links below to complete the report
+			The reporting period for <b><%= report_month %></b> is due on the <%= reporting_due_date %>! Follow the links below to complete your pending reports.
 			<ul>
 			<% for(var i=0; i < reports.length; i++) { %>
 				<li><%= reports[i].project_title %></li>
 				<ul>
 					<li>
-						<a title="<%= report_month %> Report" href="<%= reports[i].report_url %>"><%= report_month %> Report</a>
+						<a title="<%= reports[i].report_month %> Report" href="<%= reports[i].report_url %>"><%= reports[i].report_month %> Report</a>
 					</li>
 				</ul>
 				<br/>
