@@ -70,6 +70,44 @@ module.exports = {
 		conflict_trauma_treated:{
 			type: 'integer',
 			defaultsTo: 0
+		},
+		capacity_building_topic: {
+			type: 'string'
+		},		
+		capacity_building_sessions:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		capacity_building_male:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		capacity_building_female:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		capacity_building_doctors:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		capacity_building_nurses:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		education_topic: {
+			type: 'string'
+		},		
+		education_sessions:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		education_male:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		education_female:{
+			type: 'integer',
+			defaultsTo: 0
 		}
 	}
 

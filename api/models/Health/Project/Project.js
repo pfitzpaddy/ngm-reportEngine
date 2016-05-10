@@ -110,7 +110,25 @@ module.exports = {
 	},
 
 	// add reports to project with project locations
+	afterCreate: function( $project, next ) {
+
+		//
+		updateReports( $project, next );
+
+	},
+
+	// add reports to project with project locations
 	afterUpdate: function( $project, next ) {
+
+		//
+		updateReports( $project, next );
+
+	}
+
+};
+
+// update reports
+function updateReports( $project, next ) {
 
 		// get new project
 		Project.findOne().where( { id: $project.id } ).populateAll().exec( function( err, project ){
@@ -163,50 +181,53 @@ module.exports = {
 
 			}
 
-			// for each report
-			$reports.forEach( function( report, r_index ){
+			// if target_locations exist
+			if ( project.target_locations.length ) {
 
-				// for each project location
-				project.target_locations.forEach( function( location, l_index ){
+				// for each report
+				$reports.forEach( function( report, r_index ) {
 
-					// add location placeholder
-					$reports[r_index].locations.push({
-						organization_id: project.organization_id,
-						organization: project.organization,
-						project_id: project.id,
-						username: project.username,
-						email: project.email,
-						project_title: project.project_title,
-						project_type: project.project_type,
-						prov_code: location.prov_code,
-						prov_name: location.prov_name,
-						dist_code: location.dist_code,
-						dist_name: location.dist_name,
-						conflict: location.conflict,
-						fac_type: location.fac_type,
-						fac_name: location.fac_name,
-						lat: location.lat,
-						lng: location.lng
+					// for each project location
+					project.target_locations.forEach( function( location, l_index ) {
+
+						// clone target_location
+						var l = location.toObject();
+						delete l.id;
+
+						// add location placeholder
+						$reports[r_index].locations.push( l );
+
 					});
+
+	    		// findOrCreate
+	    		Report
+	    			.findOrCreate( { project_id: $reports[ r_index ].project_id,
+	    												report_month: $reports[ r_index ].report_month, 
+	    												report_year: $reports[ r_index ].report_year 
+	    										}, $reports[ r_index ] ).exec( function( err, report ) {
+
+			      // return cb ( error )
+			      if ( err ) return next( err );
+
+			      // return once all reports updated
+			      if ( r_index === $reports.length-1  ) {
+
+				      // return cb
+				      next();
+
+			      }
+
+			    });
 
 				});
 
-			});
+		  } else {
+		      
+				// return cb
+				next();
 
-	    // create
-	    Report.findOrCreate( $reports ).exec( function( err, report ){
-
-	      // return cb ( error )
-	      if ( err ) return next( err );
-
-	      // return cb
-	      next();
-
-	    });
+		  }
 
 	  });
 
 	}
-
-};
-
