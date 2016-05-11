@@ -35,6 +35,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		report_active: {
+			type: 'boolean',
+			defaultsTo: true
+		},
 		report_status: {
 			type: 'string',
 			defaultsTo: 'todo'
@@ -57,10 +61,6 @@ module.exports = {
 		},
 		report_submitted: {
 			type: 'date'
-		},
-		report_active: {
-			type: 'boolean',
-			defaultsTo: true
 		},
 		project_title: {
 			type: 'string',

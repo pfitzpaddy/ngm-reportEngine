@@ -199,25 +199,43 @@ function updateReports( $project, next ) {
 
 					});
 
-	    		// findOrCreate
-	    		Report
-	    			.findOrCreate( { project_id: $reports[ r_index ].project_id,
-	    												report_month: $reports[ r_index ].report_month, 
-	    												report_year: $reports[ r_index ].report_year 
-	    										}, $reports[ r_index ] ).exec( function( err, report ) {
+					// set all reports_active to false
+					Report.update( { project_id: $reports[ r_index ].project_id }, { report_active: false } )
+						.exec( function( err, update_reports ) {
 
 			      // return cb ( error )
 			      if ( err ) return next( err );
 
-			      // return once all reports updated
-			      if ( r_index === $reports.length-1  ) {
+		    		// findOrCreate
+		    		Report
+		    			.findOrCreate( { project_id: $reports[ r_index ].project_id,
+		    												report_month: $reports[ r_index ].report_month, 
+		    												report_year: $reports[ r_index ].report_year 
+		    										}, $reports[ r_index ] ).exec( function( err, report ) {
 
-				      // return cb
-				      next();
+				      // return cb ( error )
+				      if ( err ) return next( err );
+				      
+				      // update reports between project start and end dates back to 'active'
+				      if ( moment( s_date ).month() >= report.report_month <= moment( e_date ).month() ) {
+				      	// set to false
+				      	report.report_active = true;
+				      	// save
+				      	report.save();
+				      	
+				      }
 
-			      }
+				      // return once all reports updated
+				      if ( r_index === $reports.length-1  ) {
 
-			    });
+					      // return cb
+					      next();
+
+				      }
+
+				    });
+
+		    	});
 
 				});
 
