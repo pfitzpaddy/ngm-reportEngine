@@ -142,7 +142,7 @@ module.exports = {
 
   // send notification for new reporting period
     // run this on return of above method on 11 day of the month
-  setReportsNotification: function( req, res ) {
+  setReportsOpen: function( req, res ) {
 
     // active projects ids
     var moment = require('moment'),

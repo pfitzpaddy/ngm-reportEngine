@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl http://reporthub.immap.org/api/health/report/setReportsNotification
+curl http://reporthub.immap.org/api/health/report/setReportsOpen
