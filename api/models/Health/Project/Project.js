@@ -58,9 +58,19 @@ module.exports = {
 			type: 'array',
 			required: true
 		},
+		project_type_other: {
+			type: 'string'
+		},
+		project_code: {
+			type: 'array',
+			required: true
+		},
 		project_donor: {
 			type: 'array',
 			required: true
+		},
+		project_donor_other: {
+			type: 'string'
 		},
 		project_budget_currency: {
 			type: 'string',

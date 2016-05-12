@@ -86,14 +86,6 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		capacity_building_doctors:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		capacity_building_nurses:{
-			type: 'integer',
-			defaultsTo: 0
-		},
 		education_topic: {
 			type: 'string'
 		},		
