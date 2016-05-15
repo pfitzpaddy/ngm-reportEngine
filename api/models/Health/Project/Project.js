@@ -55,19 +55,16 @@ module.exports = {
 			required: true
 		},
 		project_type: {
-			type: 'array',
-			required: true
+			type: 'array'
 		},
 		project_type_other: {
 			type: 'string'
 		},
 		project_code: {
-			type: 'array',
-			required: true
+			type: 'string'
 		},
 		project_donor: {
-			type: 'array',
-			required: true
+			type: 'array'
 		},
 		project_donor_other: {
 			type: 'string'
