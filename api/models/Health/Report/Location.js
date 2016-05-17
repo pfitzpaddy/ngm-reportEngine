@@ -15,6 +15,10 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		// add a reference to Report
+		report_id: {
+			model: 'report'
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -22,10 +26,6 @@ module.exports = {
 		project_id: {
 			type: 'string',
 			required: true
-		},		
-		// add a reference to Project
-		report_id: {
-			model: 'report'
 		},
 		organization: {
 			type: 'string',
@@ -83,7 +83,7 @@ module.exports = {
 			type: 'float',
 			required: true
 		},
-    // add reference to Locations
+    // add reference to Beneficiaries
     beneficiaries: {
       collection: 'beneficiaries',
       via: 'location_id'

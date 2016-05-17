@@ -32,8 +32,13 @@ module.exports = {
     target_locations: {
       collection: 'targetlocation',
       via: 'project_id'
-    },  
-    // add reference to financials
+    },
+		// add reference to Budget Progress
+		project_budget_progress: {
+      collection: 'budgetprogress',
+      via: 'project_id'
+		},    
+    // add reference to financials ( if WHO associated project )
     financials: {
       collection: 'financial',
       via: 'project_id'
@@ -69,19 +74,17 @@ module.exports = {
 		project_donor_other: {
 			type: 'string'
 		},
-		project_budget_currency: {
-			type: 'string',
-			required: true
-		},
 		project_budget: {
 			type: 'integer',
 			required: true
 		},
-		project_budget_recieved: {
-			type: 'integer'
+		project_budget_currency: {
+			type: 'string',
+			required: true
 		},
-		project_budget_spent: {
-			type: 'integer'
+		project_budget_recieved: {
+			type: 'integer',
+			required: true
 		},
 		project_start_date: {
 			type: 'date',
@@ -164,8 +167,8 @@ function updateReports( $project, next ) {
 					report_active = false;
 				}
 
-				// report_status 'todo' open from 10th of every month
-				var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf('month').add( 9, 'd' ) ) >= 0 ? 'todo' : 'pending';
+				// report_status 'todo' open from 15th of every month
+				var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf('month').add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
 
 				// create report
 				$reports.push({
@@ -182,7 +185,7 @@ function updateReports( $project, next ) {
 					report_month: moment( s_date ).add( m, 'M' ).month(),
 					report_year: moment( s_date ).add( m, 'M' ).year(),
 					reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
-					reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 10).format(),
+					reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format(),
 					locations: []
 				});
 

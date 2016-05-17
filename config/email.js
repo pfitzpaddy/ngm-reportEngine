@@ -1,0 +1,22 @@
+-e /**
+ * (sails.config.email)
+ *
+ *  For more information on this configuration file, see:
+ *  https://github.com/balderdashy/sails-hook-email/#configuration
+ *
+ */
+module.exports.email = {
+
+  testMode: false,
+
+  service: 'Gmail',
+
+  from: 'pfitzgerald@immap.org',
+
+  auth: { user: 'ngmreporthub@gmail.com' , pass: 'ngmAdminP@1234' },
+
+  templateDir: 'views/email',
+
+  senderName: 'ReportHub'
+
+};

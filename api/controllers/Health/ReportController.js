@@ -99,7 +99,7 @@ module.exports = {
         project_ids = [];
 
     // only run if date is above monthly reporting period
-    if ( moment().date() >= 10 ) {
+    if ( moment().date() >= 15 ) {
   
       // find active projects
       Project.find( { project_status: 'active' } )
@@ -151,7 +151,7 @@ module.exports = {
         counter = 0;
 
     // only run if date is above monthly reporting period
-    if ( moment().date() >= 10 ) {
+    if ( moment().date() >= 15 ) {
       
       // find active projects
       Project.find( { project_status: 'active' } )
@@ -261,7 +261,7 @@ module.exports = {
         counter = 0;
 
     // only run if date is 1 week before monthly reporting period required
-    if ( moment().date() >= 3 ) {
+    if ( moment().date() >= 10 ) {
       
       // find active projects
       Project.find( { project_status: 'active' } )

@@ -141,9 +141,6 @@ module.exports = {
 		education_female:{
 			type: 'integer',
 			defaultsTo: 0
-		},
-		training_topic: {
-			type: 'string'
 		}
 		
 	}
