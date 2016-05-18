@@ -102,8 +102,7 @@ module.exports = {
 			required: true
 		},
 		beneficiary_type: {
-			type: 'array',
-			required: true			
+			type: 'array'
 		},
 		prov_code: {
 			type: 'array',
