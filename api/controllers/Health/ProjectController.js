@@ -25,16 +25,16 @@ module.exports = {
     }
 
     // if no id, create
-    if (!$project.id) {
+    if ( !$project.id ) {
 
       // create
-      Project.create( $project ).exec(function(err, project){
+      Project.create( $project ).exec( function( err, project ){
 
         // return error
-        if (err) return res.negotiate( err );
+        if ( err ) return res.negotiate( err );
 
         // return project
-        return res.json(200, project);
+        return res.json( 200, project );
 
       });
 
@@ -67,7 +67,7 @@ module.exports = {
     var $project = {};
     
     // get project by organization_id
-    Project.findOne( { id: req.param('id') } ).populate('target_beneficiaries').exec(function(err, project){
+    Project.findOne( { id: req.param('id') } ).populateAll().exec(function(err, project){
       
       // return error
       if (err) return res.negotiate( err );
@@ -75,19 +75,8 @@ module.exports = {
       // clone project to update
       $project = project.toObject();
 
-      // get beneficiaries
-      Location.find().where( { project_id: $project.id  } ).populate( 'beneficiaries' ).exec(function(err, locations){
-
-        // return error
-        if (err) return res.negotiate( err );
-
-        // add locations
-        $project.locations = locations;
-
-        // return project
-        return res.json(200, $project);
-
-      });
+      // return project
+      return res.json(200, $project);
 
     });   
 
@@ -127,7 +116,7 @@ module.exports = {
         $financials = req.param('project').financials;
 
     // financials exist
-    if ($financials.id) {
+    if ( $financials.id ) {
       
       // update financials
       Financial.update( { id: $financials.id }, $financials ).exec(function(err, financials){

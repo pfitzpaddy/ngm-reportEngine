@@ -23,88 +23,84 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		// add a reference to Project
 		project_id: {
-			type: 'string',
-			required: true
+			model: 'project'
 		},
 		username: {
 			type: 'string',
 			required: true
-		},
-		email: {
+		},	
+		beneficiary_name: {
 			type: 'string',
 			required: true
 		},
-		indicator_one_id: {
+		beneficiary_type: {
 			type: 'string',
-			defaultsTo: 'people_served_fatp_services'
+			required: true
+		},
+		under5male:{
+			type: 'integer',
+			defaultsTo: 0			
+		},
+		under5female:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		over5male:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		over5female:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		penta3_vacc_male_under1:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		penta3_vacc_female_under1:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		skilled_birth_attendant:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		conflict_trauma_treated:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		capacity_building_topic: {
+			type: 'string'
 		},		
-		indicator_one_under5male: {
+		capacity_building_sessions:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		indicator_one_under5female: {
+		capacity_building_male:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		indicator_one_over5male: {
+		capacity_building_female:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		indicator_one_over5female: {
-			type: 'integer',
-			defaultsTo: 0
-		},
-		indicator_two_id: {
-			type: 'string',
-			defaultsTo: 'people_served_conflict_white_areas'
+		education_topic: {
+			type: 'string'
 		},		
-		indicator_two_under5male: {
+		education_sessions:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		indicator_two_under5female: {
+		education_male:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		indicator_two_over5male: {
+		education_female:{
 			type: 'integer',
 			defaultsTo: 0
-		},
-		indicator_two_over5female: {
-			type: 'integer',
-			defaultsTo: 0
-		},
-		indicator_three_id: {
-			type: 'string',
-			defaultsTo: 'alarms_investigated_within_48_hours'
-		},		
-		indicator_three: {
-			type: 'integer'
-		},
-		indicator_three_total: {
-			type: 'integer'
-		},		
-		indicator_four_id: {
-			type: 'string',
-			defaultsTo: 'people_served_natural_disasters'
-		},		
-		indicator_four_under5male: {
-			type: 'integer',
-			defaultsTo: 0
-		},
-		indicator_four_under5female: {
-			type: 'integer',
-			defaultsTo: 0
-		},
-		indicator_four_over5male: {
-			type: 'integer',
-			defaultsTo: 0
-		},
-		indicator_four_over5female: {
-			type: 'integer',
-			defaultsTo: 0
-		},
+		}
 	}
 
 };

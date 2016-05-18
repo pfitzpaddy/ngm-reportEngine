@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!-- Default home page -->
+<html>
+	<head>
+		<style>
+		</style>
+	</head>
+	<body>
+		<p>Hi <%= username %>,</p>
+		<p>
+			A new user has registered to your organization. The details are provided below;
+			<ul>
+				<li><b>Username: </b><%= newusername %></li>
+				<li><b>Name: </b><%= name %></li>
+				<li><b>Position: </b><%= position %></li>
+				<li><b>Phone: </b><%= phone %></li>
+				<li><b>Email: </b><%= email %></li>
+				<br/>
+			</ul>	
+		</p>
+
+		<p>
+			If you do not recognize this user as a member of your organization please reply to this email immediately.
+		</p>
+
+		<p><br/><%= sendername %></p>
+
+	</body>
+</html>

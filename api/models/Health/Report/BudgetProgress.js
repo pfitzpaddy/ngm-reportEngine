@@ -1,5 +1,5 @@
 /**
-* User.js
+* BudgetProgress.js
 *
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
@@ -23,46 +23,30 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		username: {
-			type: 'string',
-			required: true
-		},
 		// add a reference to Project
 		project_id: {
 			model: 'project'
 		},
-		expenditure_item: {
+		project_title: {
 			type: 'string',
 			required: true
 		},
-		expenditure_name: {
-			type: 'string',
-			required: true
-		},		
-		expenditure_status: {
-			type: 'string',
-			required: true
-		},		
-		expenditure_budget_afn:{
+		project_budget: {
 			type: 'integer',
-			defaultsTo: 0			
+			required: true
 		},
-		expenditure_budget_usd:{
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_budget_amount_recieved: {
 			type: 'integer',
-			defaultsTo: 0			
+			required: true
 		},
-		expenditure_start_date: {
+		project_budget_date_recieved: {
 			type: 'date',
 			required: true
-		},
-		expenditure_end_date: {
-			type: 'date',
-			required: true
-		},
-    timestamp: {
-    	type: 'string',
-    	required: true
-    }
+		}
 	}
 
 };

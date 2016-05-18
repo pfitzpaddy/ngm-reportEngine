@@ -15,11 +15,35 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		// add a reference to Report
+		report_id: {
+			model: 'report'
+		},
 		organization_id: {
 			type: 'string',
 			required: true
 		},
 		project_id: {
+			type: 'string',
+			required: true
+		},
+		organization: {
+			type: 'string',
+			required: true
+		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		email: {
+			type: 'string',
+			required: true
+		},
+		project_title: {
+			type: 'string',
+			required: true
+		},
+		project_type: {
 			type: 'string',
 			required: true
 		},
@@ -43,6 +67,14 @@ module.exports = {
 			type: 'boolean',
 			required: true
 		},
+		fac_type: {
+			type: 'string',
+			required: true
+		},
+		fac_name: {
+			type: 'string',
+			required: true
+		},
 		lng: {
 			type: 'float',
 			required: true
@@ -50,7 +82,12 @@ module.exports = {
 		lat: {
 			type: 'float',
 			required: true
-		}
+		},
+    // add reference to Beneficiaries
+    beneficiaries: {
+      collection: 'beneficiaries',
+      via: 'location_id'
+    }
 	}
 
 };

@@ -61,6 +61,11 @@ module.exports.policies = {
   },
 
   // public
+  'Health/ReportController': {
+    '*': true
+  },
+
+  // public
   'Health/ListController': {
     '*': true
   }

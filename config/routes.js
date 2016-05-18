@@ -57,15 +57,10 @@ module.exports.routes = {
 
   // HEALTH
 
-  // Facility lists
-  'GET /health/getFacilityTypeList': 'Health/FacilityController.getFacilityTypeList',
-  'GET /health/getFacilityList': 'Health/FacilityController.getFacilityList',  
-
   // workshop
   'GET /health/workshop/create': 'Health/WorkshopController.create',
   'GET /health/workshop/get': 'Health/WorkshopController.getWorkshop',
   'POST /health/workshop/set': 'Health/WorkshopController.setWorkshop',
-
 
   // Health Projects
   'POST /health/project/getProjectsList': 'Health/ProjectController.getProjectsList',
@@ -74,15 +69,24 @@ module.exports.routes = {
   'POST /health/project/setProject': 'Health/ProjectController.setProjectById',
   'POST /health/project/delete': 'Health/ProjectController.deleteProjectById',
   'GET /health/project/delete': 'Health/ProjectController.deleteProjectById',
+
+  // get project reports
+  'POST /health/report/getReportsList': 'Health/ReportController.getReportsList',  
+  'POST /health/report/getReport': 'Health/ReportController.getReportById',
+  'POST /health/report/setReport': 'Health/ReportController.setReportById',
+  'GET /health/report/setReportsToDo': 'Health/ReportController.setReportsToDo',
+  'GET /health/report/setReportsOpen': 'Health/ReportController.setReportsOpen',
+  'GET /health/report/setReportsReminder': 'Health/ReportController.setReportsReminder',
+
   // get project financials
   'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',
   
-
   // Health Dashboard & Data
   'POST /health/indicator': 'Health/ProjectDashboardController.getHealthDetails',
   // data 
   'POST /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
   'POST /health/data/financials': 'Health/ProjectDashboardController.getFinancialListCsv',
+
 
   // Dews 
   'POST /dews/indicator': 'Dews/DewsController.getIndicator',
