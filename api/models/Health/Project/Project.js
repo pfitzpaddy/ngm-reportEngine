@@ -82,10 +82,6 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_budget_recieved: {
-			type: 'integer',
-			required: true
-		},
 		project_start_date: {
 			type: 'date',
 			required: true
