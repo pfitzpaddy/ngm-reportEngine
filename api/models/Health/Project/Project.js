@@ -205,6 +205,7 @@ function updateReports( $project, next ) {
 					});
 
 					// set all reports_active to false
+					// Report.update( { project_id: $reports[ r_index ].project_id }, { report_active: false, locations: $reports[r_index].locations } )
 					Report.update( { project_id: $reports[ r_index ].project_id }, { report_active: false } )
 						.exec( function( err, update_reports ) {
 
@@ -222,7 +223,7 @@ function updateReports( $project, next ) {
 				      if ( err ) return next( err );
 				      
 				      // update reports between project start and end dates back to 'active'
-				      if ( moment( s_date ).month() >= report.report_month <= moment( e_date ).month() ) {
+				      if ( ( report.report_year >= 2016  ) && ( moment( s_date ).month() >= report.report_month <= moment( e_date ).month() ) ) {
 				      	// set to false
 				      	report.report_active = true;
 				      	// save
