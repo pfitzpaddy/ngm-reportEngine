@@ -74,6 +74,9 @@ module.exports = {
     locations: {
       collection: 'location',
       via: 'report_id'
+    },
+    notes: {
+    	type: 'string'
     }
 	}
 
