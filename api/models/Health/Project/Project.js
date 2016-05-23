@@ -205,9 +205,9 @@ function updateReports( $project, next ) {
 					});
 
 					// console.log
-					console.log( '-------------------' );
-					console.log( report.report_month );
-					console.log( $reports[r_index].locations );
+					// console.log( '-------------------' );
+					// console.log( report.report_month );
+					// console.log( $reports[r_index].locations );
 
 					// set all reports_active to false
 					Report.update( { project_id: $reports[ r_index ].project_id }, { report_active: false } )
