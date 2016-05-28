@@ -19,6 +19,10 @@ module.exports = {
 		report_id: {
 			model: 'report'
 		},
+		target_location_id: {
+			type: 'string',
+			required: true
+		},
 		organization_id: {
 			type: 'string',
 			required: true

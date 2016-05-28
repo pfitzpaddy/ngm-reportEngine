@@ -78,7 +78,7 @@ module.exports = {
     notes: {
     	type: 'string'
     }
+	
 	}
 
 };
-

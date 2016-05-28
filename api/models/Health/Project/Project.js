@@ -115,147 +115,263 @@ module.exports = {
 	},
 
 	// add reports to project with project locations
-	afterCreate: function( $project, next ) {
+	afterCreate: function( project, next ) {
+		
+		// for each project target locations
+		TargetLocation
+			.find()
+			.where( { project_id: project.id } )
+			.exec( function( err, target_locations ) {
 
-		//
-		updateReports( $project, next );
+				// return error
+				if ( err ) return next( err );
+
+				// generate an array of reports
+				var reports = getProjectReports( project, target_locations );
+
+				// create
+				Report
+					.create( reports )
+					.exec( function( err, reports ) {
+
+						// return error
+						if ( err ) return next( err );
+
+						// next!
+						next();
+						
+					});
+
+			});
 
 	},
 
 	// add reports to project with project locations
-	afterUpdate: function( $project, next ) {
+	afterUpdate: function( project, next ) {
 
-		//
-		updateReports( $project, next );
+		// for each project target locations
+		TargetLocation
+			.find()
+			.where( { project_id: project.id } )
+			.exec( function( err, target_locations ) {
 
+				// set all reports_active to false
+				Report
+					.update( { project_id: project.id }, { report_active: false } )
+					.exec( function( err, updated_reports ) {
+
+						// return error
+						if ( err ) return next( err );						
+
+						// no reports
+						if ( !updated_reports.length ) {
+
+							//
+							next();
+
+						}	else {
+							
+							// generate an array of reports
+							var reports = getProjectReports( project, target_locations );
+
+							if ( !reports[0].locations.length ) return next();
+
+							// update reports
+							updateProjectReports( reports, next );
+
+						}
+
+					});
+				
+
+			});
 	}
 
 };
 
-// update reports
-function updateReports( $project, next ) {
 
-		// get new project
-		Project.findOne().where( { id: $project.id } ).populateAll().exec( function( err, project ){
+// generate an array of reports
+function getProjectReports( project, target_locations ) {
 
-			// return error
-			if ( err ) return next( err );
+	// declare variables
+	var moment = require('moment'),
+			reports = [],
+			report_active = true,
+			s_date = moment( project.project_start_date ),
+			e_date = moment( project.project_end_date );
 
-			// project start and end date
-			var moment = require('moment'),
-					$reports = [],
-					report_active,
-					s_date = moment( project.project_start_date ),
-					e_date = moment( project.project_end_date );
+	// number of reports
+	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed( 0 );
 
-			// number of reports
-			var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed( 0 );
+	// for each report month
+	for ( m = 0; m < reports_duration; m++ ) {
 
-			// for each report month
-			for ( m = 0; m < reports_duration; m++ ) {
+		// should be reports just for 2016 period!
+		if ( moment( s_date ).add( m, 'M' ).year() < 2016  ) {
+			report_active = false;
+		}
 
-				// default is active
-				report_active = true;
+		// report_status 'todo' open from 15th of every month
+		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf('month').add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
 
-				// should be reports just for 2016 period!
-				if ( moment( s_date ).add( m, 'M' ).year() < 2016  ) {
-					report_active = false;
-				}
+		// create report
+		var report = {
+			// defaults 
+			project_id: project.id,
+			organization_id: project.organization_id,
+			organization: project.organization,
+			username: project.username,
+			email: project.email,
+			project_title: project.project_title,
+			project_type: project.project_type,
+			report_status: report_status,
+			report_active: report_active,
+			report_month: moment( s_date ).add( m, 'M' ).month(),
+			report_year: moment( s_date ).add( m, 'M' ).year(),
+			reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
+			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format(),
+			locations: []
+		};
 
-				// report_status 'todo' open from 15th of every month
-				var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf('month').add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
+		// add report locations
+		report.locations = getProjectReportLocations( target_locations );
 
-				// create report
-				$reports.push({
-					// defaults 
-					project_id: project.id,
-					organization_id: project.organization_id,
-					organization: project.organization,
-					username: project.username,
-					email: project.email,
-					project_title: project.project_title,
-					project_type: project.project_type,
-					report_status: report_status,
-					report_active: report_active,
-					report_month: moment( s_date ).add( m, 'M' ).month(),
-					report_year: moment( s_date ).add( m, 'M' ).year(),
-					reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
-					reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format(),
-					locations: []
-				});
-
-			}
-
-			// if target_locations exist
-			if ( project.target_locations.length ) {
-
-				// for each report
-				$reports.forEach( function( report, r_index ) {
-
-					// for each project location
-					project.target_locations.forEach( function( location, l_index ) {
-
-						// clone target_location
-						var l = location.toObject();
-						delete l.id;
-
-						// add location placeholder
-						$reports[r_index].locations.push( l );
-
-					});
-
-					// console.log
-					// console.log( '-------------------' );
-					// console.log( report.report_month );
-					// console.log( $reports[r_index].locations );
-
-					// set all reports_active to false
-					Report.update( { project_id: $reports[ r_index ].project_id }, { report_active: false } )
-						.exec( function( err, update_reports ) {
-
-			      // return cb ( error )
-			      if ( err ) return next( err );
-
-		    		// findOrCreate
-		    		Report
-		    			.findOrCreate( { project_id: $reports[ r_index ].project_id,
-		    												report_month: $reports[ r_index ].report_month, 
-		    												report_year: $reports[ r_index ].report_year 
-		    										}, $reports[ r_index ] ).exec( function( err, report ) {
-
-				      // return cb ( error )
-				      if ( err ) return next( err );
-				      
-				      // update reports between project start and end dates back to 'active'
-				      if ( ( report.report_year >= 2016  ) && ( moment( s_date ).month() >= report.report_month <= moment( e_date ).month() ) ) {
-				      	// set to false
-				      	report.report_active = true;
-				      	// save
-				      	report.save();
-				      	
-				      }
-
-				      // return once all reports updated
-				      if ( r_index === $reports.length-1  ) {
-
-					      // return cb
-					      next();
-
-				      }
-
-				    });
-
-		    	});
-
-				});
-
-		  } else {
-		      
-				// return cb
-				next();
-
-		  }
-
-	  });
+		// add report to reports
+		reports.push( report );
 
 	}
+
+	// return the reports for the project period
+	return reports;
+
+};
+
+// generate an array of reports
+function getProjectReportLocations( target_locations ) {
+
+	// variables
+	var locations = [];
+
+	// for project target_locations
+	target_locations.forEach( function( target_location, t_index ) {
+
+		// clone target_location
+		var l = target_location.toObject();
+				l.target_location_id = l.id;
+				delete l.id;
+
+		locations.push( l );
+		
+	});
+
+	// return locations array
+	return locations;
+
+};
+
+// update existing project reports
+function updateProjectReports( reports, next ) {
+
+	// number of reports to update
+	var counter = 0,
+			length = reports.length;
+
+	// for each report
+	reports.forEach( function( report, r_index ) {
+
+		// updateOrCreate (returns array)
+		Report
+			.update( { 	project_id: reports[ r_index ].project_id,
+									report_month: reports[ r_index ].report_month, 
+									report_year: reports[ r_index ].report_year
+								}, { report_active: true } )
+			.exec( function( err, report ) {
+
+				// return error
+				if ( err ) return next( err );
+
+				// if no report - create
+				if ( !report.length ) {
+
+					// create with association
+					Report
+						.create( reports[ r_index ] )
+						.exec( function( err, report ) {
+
+							// return error
+							if ( err ) return next( err );
+
+							// counter
+							counter++;							
+
+							// final update
+							if ( counter === length ) {
+								// next!
+								next();
+
+							}
+							
+						});
+
+				} else {
+
+
+					// Update locations and manual
+
+
+
+
+
+					// get locations
+					Location
+						.find()
+						.where( { report_id: report[0].id } )
+						.populateAll()
+						.exec( function( err, locations ){
+
+							// return error
+							if ( err ) return next( err );
+
+							// for each location
+							locations.forEach( function( location, l_index){
+
+								// check if exists
+								if ( location.beneficiaries.length ) {
+									reports[ r_index ].locations[ l_index ].beneficiaries = location.beneficiaries;
+								}
+								
+							});
+
+							// updates locations association
+							Report
+								.update( { 	project_id: reports[ r_index ].project_id,
+														report_month: reports[ r_index ].report_month, 
+														report_year: reports[ r_index ].report_year
+													}, { locations: reports[ r_index ].locations } )
+								.exec( function( err, report ) {
+
+									// return error
+									if ( err ) return next( err );
+
+									// counter
+									counter++;							
+									
+									// final update ?
+									if ( counter === length ) {
+										
+										// next!
+										next();
+									}
+
+								});
+
+						
+						});
+
+				}
+
+			});
+
+	});
+
+}
