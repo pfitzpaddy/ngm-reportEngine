@@ -257,7 +257,6 @@ function getProjectReportLocations( target_locations ) {
 
 		// clone target_location
 		var l = target_location.toObject();
-				l.target_location_id = l.id;
 				delete l.id;
 
 		locations.push( l );
@@ -315,13 +314,6 @@ function updateProjectReports( reports, next ) {
 
 				} else {
 
-
-					// Update locations and manual
-
-
-
-
-
 					// get locations
 					Location
 						.find()
@@ -335,7 +327,7 @@ function updateProjectReports( reports, next ) {
 							// for each location
 							locations.forEach( function( location, l_index){
 
-								// check if exists
+								// add beneficiaries if existing
 								if ( location.beneficiaries.length ) {
 									reports[ r_index ].locations[ l_index ].beneficiaries = location.beneficiaries;
 								}
