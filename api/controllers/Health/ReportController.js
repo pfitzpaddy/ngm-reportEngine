@@ -99,7 +99,7 @@ module.exports = {
         project_ids = [];
 
     // only run if date is above monthly reporting period
-    if ( moment().date() >= 15 ) {
+    // if ( moment().date() >= 15 ) {
   
       // find active projects
       Project.find( { project_status: 'active' } )
@@ -132,11 +132,11 @@ module.exports = {
 
       });
 
-    } else {
+    // } else {
 
       // return reports
-      return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
-    }
+      // return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
+    // }
 
   },
 
