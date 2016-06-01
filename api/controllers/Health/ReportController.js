@@ -174,7 +174,7 @@ module.exports = {
             .find()
             .where({ project_id: project_ids })
             // .where({ report_month: moment().add( 1, 'M' ).month() })
-            .where({ report_month: moment().month() })
+            .where({ report_month: moment().subtract( 1, 'M' ).month() })
             .where({ report_active: true })
             .where({ report_status: 'todo' })
             .exec( function( err, reports ){
@@ -196,7 +196,7 @@ module.exports = {
                     username: report.username,
                     email: report.email,
                     // report_month: moment().add( 1, 'M' ).format( 'MMMM' ),
-                    report_month: moment().format( 'MMMM' ),
+                    report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
                     reports: []
                   };
                 }
@@ -225,7 +225,7 @@ module.exports = {
                   }, {
                     to: notification[ user ].email,
                     // subject: 'ReportHub - Reporting Period for ' + moment().add( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
-                    subject: 'ReportHub - Reporting Period for ' + moment().format( 'MMMM' ) + ' Now Open!'
+                    subject: 'ReportHub - Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
                   }, function(err) {
                     
                     // return error

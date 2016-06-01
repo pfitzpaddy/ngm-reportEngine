@@ -201,7 +201,7 @@ function getProjectReports( project, target_locations ) {
 			e_date = moment( project.project_end_date );
 
 	// number of reports
-	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed( 0 );
+	var reports_duration = Math.ceil( moment.duration( e_date.diff( s_date ) ).asMonths() );
 
 	// for each report month
 	for ( m = 0; m < reports_duration; m++ ) {
