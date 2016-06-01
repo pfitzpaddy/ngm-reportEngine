@@ -118,7 +118,8 @@ module.exports = {
 
           // find active reports for the next reporting period
           Report
-            .update( { project_id: project_ids, report_month: moment().add( 1, 'M' ).month() },
+            // .update( { project_id: project_ids, report_month: moment().add( 1, 'M' ).month() },
+            .update( { project_id: project_ids, report_month: moment().month() },
                      { report_active: true, report_status: 'todo' } )
             .exec( function( err, reports ){
 
@@ -151,7 +152,7 @@ module.exports = {
         counter = 0;
 
     // only run if date is above monthly reporting period
-    if ( moment().date() >= 15 ) {
+    // if ( moment().date() >= 15 ) {
       
       // find active projects
       Project.find( { project_status: 'active' } )
@@ -173,7 +174,8 @@ module.exports = {
           Report
             .find()
             .where({ project_id: project_ids })
-            .where({ report_month: moment().add( 1, 'M' ).month() })
+            // .where({ report_month: moment().add( 1, 'M' ).month() })
+            .where({ report_month: moment().month() })
             .where({ report_active: true })
             .where({ report_status: 'todo' })
             .exec( function( err, reports ){
@@ -194,7 +196,8 @@ module.exports = {
                   notification[ report.username ] = {
                     username: report.username,
                     email: report.email,
-                    report_month: moment().add( 1, 'M' ).format( 'MMMM' ),
+                    // report_month: moment().add( 1, 'M' ).format( 'MMMM' ),
+                    report_month: moment().format( 'MMMM' ),
                     reports: []
                   };
                 }
@@ -222,7 +225,8 @@ module.exports = {
                     sendername: 'ReportHub'
                   }, {
                     to: notification[ user ].email,
-                    subject: 'ReportHub - Reporting Period for ' + moment().add( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
+                    // subject: 'ReportHub - Reporting Period for ' + moment().add( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
+                    subject: 'ReportHub - Reporting Period for ' + moment().format( 'MMMM' ) + ' Now Open!'
                   }, function(err) {
                     
                     // return error
@@ -243,11 +247,11 @@ module.exports = {
 
       });
 
-    } else {
+    // } else {
 
-      // return reports
-      return res.json( 200, { msg: 'Reporting not open for ' + moment().format( 'MMMM' ) + '!' } );
-    }
+    //   // return reports
+    //   return res.json( 200, { msg: 'Reporting not open for ' + moment().format( 'MMMM' ) + '!' } );
+    // }
 
   },
 
