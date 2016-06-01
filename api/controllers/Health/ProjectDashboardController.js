@@ -35,62 +35,6 @@ var ProjectDashboardController = {
 
   },
 
-  // financial spending
-  getFinancialListCsv: function(req, res){
-
-    // request input
-    if ( !req.param('project')  ) {
-      return res.json(401, { err: 'project required!' } );
-    }
-
-    var $project = req.param('project');
-
-    // require
-    var fields = [ 
-      'organization_id', 
-      'organization', 
-      'username', 
-      'email', 
-      'project_status', 
-      'project_title', 
-      'project_description',
-      'project_start_date',
-      'project_end_date',
-      'expenditure_item',
-      'expenditure_name',
-      'expenditure_start_date',
-      'expenditure_end_date',
-      'expenditure_status',
-      'expenditure_budget',
-      'createdAt',
-      'updatedAt'
-    ];
-    var json2csv = require('json2csv');
-
-    // add project details to csv
-    $project.financials.forEach(function(d, i){
-      // set values
-      $project.financials[i].email = $project.email;
-      $project.financials[i].project_status = $project.project_status;
-      $project.financials[i].project_title = $project.project_title;
-      $project.financials[i].project_description = $project.project_description;
-      $project.financials[i].project_start_date = $project.project_start_date;
-      $project.financials[i].project_end_date = $project.project_end_date;
-    });
-
-    // return csv
-    json2csv({ data: $project.financials, fields: fields }, function(err, csv) {
-      
-      // error
-      if (err) return res.negotiate( err );
-
-      // success
-      return res.json( 200, { data: csv } );
-
-    });
-
-  },
-
   // calculate beneficiaries for $projects
   getBeneficiaries: function( $data, type ){
 
@@ -190,9 +134,9 @@ var ProjectDashboardController = {
       // date_filter
       date_filter: { 
         or: [{
-          project_start_date: { '>=': new Date(params.start_date), '<=': new Date(params.end_date) }
+          project_start_date: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) }
         },{ 
-          project_end_date: { '>=': new Date(params.start_date), '<=': new Date(params.end_date) } 
+          project_end_date: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } 
         }]
       },
       // project_status
@@ -210,94 +154,108 @@ var ProjectDashboardController = {
     
     // get projects by organization_id
     Project.find()
-      .where(filters.project_id)
-      .where(filters.date_filter)
-      .where(filters.project_status_filter)
-      .where(filters.project_type_filter)
-      .where(filters.beneficiaries_filter)
-      .where(filters.prov_code_filter)
-      .where(filters.dist_code_filter)
-      .exec(function(err, projects){
+      .where( filters.project_id )
+      .where( filters.date_filter )
+      .where( filters.project_status_filter )
+      .where( filters.project_type_filter )
+      .where( filters.beneficiaries_filter )
+      .where( filters.prov_code_filter )
+      .where( filters.dist_code_filter )
+      .exec( function( err, projects ){
       
         // return error
         if (err) return res.negotiate( err );
 
         // if no projects
-        if (!projects.length) {
+        if ( !projects.length ) {
           // return zero
           return res.json( 200, { 'value': 0 } );
-        } 
+        }
+
+        // if indicator, else data
+        if ( params.indicator ) {
+
+          // calculate and return metric
+          ProjectDashboardController.getIndicatorMetric( params, filters, projects, res );
+
+        } else{
+
+          // prepare download
+          ProjectDashboardController.getCsvDownload( params, filters, projects, res );
+
+        }        
+
 
         // for each project, construct full object with associations
-        projects.forEach(function(d, i){
+        // projects.forEach(function(d, i){
 
-          // clone project to update
-          $projects[i] = d.toObject();
-          // add locations
-          $projects[i].locations = [];
+        //   // clone project to update
+        //   $projects[i] = d.toObject();
+        //   // add locations
+        //   $projects[i].locations = [];
 
-          // get locations
-          Location.find()
-            .where( { project_id: $projects[i].id  } )
-            .where(filters.prov_code_filter)
-            .where(filters.dist_code_filter)            
-            .exec(function( err, locations ){
+        //   // get locations
+        //   Location.find()
+        //     .where( { project_id: $projects[i].id  } )
+        //     .where(filters.prov_code_filter)
+        //     .where(filters.dist_code_filter)            
+        //     .exec(function( err, locations ){
 
-            // return error
-            if (err) return res.negotiate( err );
+        //     // return error
+        //     if (err) return res.negotiate( err );
 
-            // add beneficiaries
-            locations.forEach(function(l, j){
+        //     // add beneficiaries
+        //     locations.forEach(function(l, j){
 
-              // clone locations
-              $projects[i].locations[j] = l.toObject();
-              // clone beneficiaries
-              $projects[i].locations[j].beneficiaries = [];
+        //       // clone locations
+        //       $projects[i].locations[j] = l.toObject();
+        //       // clone beneficiaries
+        //       $projects[i].locations[j].beneficiaries = [];
 
-              // get beneficiaries
-              Beneficiaries.find().where( { location_id: $projects[i].locations[j].id  } ).exec(function( err, beneficiaries ){
+        //       // get beneficiaries
+        //       Beneficiaries.find().where( { location_id: $projects[i].locations[j].id  } ).exec(function( err, beneficiaries ){
 
-                // return error
-                if (err) return res.negotiate( err );
+        //         // return error
+        //         if (err) return res.negotiate( err );
 
-                // add beneficiaries if location exists
-                if ( $projects[i].locations ){
-                  $projects[i].locations[j].beneficiaries = beneficiaries;
-                }
+        //         // add beneficiaries if location exists
+        //         if ( $projects[i].locations ){
+        //           $projects[i].locations[j].beneficiaries = beneficiaries;
+        //         }
 
-                // run metrics
-                if ( i === ( projects.length - 1 ) && j === ( locations.length - 1 ) ) {
+        //         // run metrics
+        //         if ( i === ( projects.length - 1 ) && j === ( locations.length - 1 ) ) {
 
-                  // process final result (remove projects with empty locations)
-                  var projectsFiltered = []
-                  $projects.forEach(function(p) {
-                    if( p.locations.length ){
-                      projectsFiltered.push(p);
-                    }
-                  });
+        //           // process final result (remove projects with empty locations)
+        //           var projectsFiltered = []
+        //           $projects.forEach(function(p) {
+        //             if( p.locations.length ){
+        //               projectsFiltered.push(p);
+        //             }
+        //           });
 
-                  // if indicator, else data
-                  if ( params.indicator ) {             
+        //           // if indicator, else data
+        //           if ( params.indicator ) {             
 
-                    // calculate and return metric
-                    ProjectDashboardController.getIndicatorMetric( params, filters, projectsFiltered, res );
+        //             // calculate and return metric
+        //             ProjectDashboardController.getIndicatorMetric( params, filters, projectsFiltered, res );
 
-                  } else{
+        //           } else{
 
-                    // prepare download
-                    ProjectDashboardController.getCsvDownload( params, filters, projectsFiltered, res );
+        //             // prepare download
+        //             ProjectDashboardController.getCsvDownload( params, filters, projectsFiltered, res );
 
-                  }
+        //           }
                 
-                };
+        //         };
 
-              });
+        //       });
 
-            });
+        //     });
 
-          });
+        //   });
 
-        });
+        // });
 
       });
 
@@ -307,297 +265,339 @@ var ProjectDashboardController = {
   getIndicatorMetric: function( params, filters, $projects, res ) {
 
     // return indicator
-    switch(params.indicator){
+    switch( params.indicator ){
 
-        case 'organizations':
+      // organizations
+      case 'partners':
 
-          // organization_ids
-          var organization_ids = [];
+        // organization_ids
+        var organization_ids = [];
+        
+        // filter by $projects
+        $projects.forEach( function( d, i ){
+          if ( d.project_status === 'active' ) {
+            organization_ids.push( d.organization_id );
+          }
+        });
+
+        // no. of organizations
+        Organization.count( { id: organization_ids } ).exec( function( err, value ){
+
+          // return error
+          if ( err ) return res.negotiate( err );
+
+          // return new Project
+          return res.json( 200, { 'value': value } );
+
+        });
+
+        break;
+
+      // proejcts
+      case 'projects':
+
+        // return new Project
+        return res.json( 200, { 'value': $projects.length });
+
+        break;
+
+      // locations
+      case 'locations':
+
+        // 
+        return res.json(200, { 'value': 0, 'value_total': 0 });
+
+        // params
+        // var project_ids = [],
+        //     conflict = !params.conflict ? { } : { conflict: true };
+
+        // // each project id
+        // $projects.forEach( function( p, i ){
+        //   // project dist list count
+        //   project_ids.push( p.id );
+        // });
+
+
+
+        // // actual locations
+        // TargetLocation
+        //   .find()
+        //   .where( { project_id: project_ids } )
+        //   .where( conflict )
+        //   .exec( function( err, locations ) {
+
+        //     // return error
+        //     if (err) return res.negotiate( err );
+
+        //     // return new Project
+        //     return res.json(200, { 'value': locations.length, 'value_total': 0 });
+
+        //   });      
+
+        // project locations
+        // if ( !params.conflict ) {
+
+        //   // get project locations
+        //   var value = 0;
+
+        //   $projects.forEach(function(p, i){
+        //     // project dist list count
+        //     value += p.locations.length;
+        //   });
           
-          // filter by $projects
-          $projects.forEach(function(d, i){
-            if ( d.project_status === 'active' ) {
-              organization_ids.push(d.organization_id);
-            }
-          });
+        //   // return new Project
+        //   return res.json(200, { 'value': value });
 
-          // no. of organizations
-          Organization.count( { id: organization_ids } ).exec(function(err, value){
+        // } else {
 
-            // return error
-            if (err) return res.negotiate( err );
+        //   // get conflict locations
+        //   var value = 0;
+        //   $projects.forEach(function(p, i){
+        //     p.locations.forEach(function(l, j){
+        //       if ( l.conflict ) {
+        //         value++;
+        //       }
+        //     });
+        //   });
 
-            // return new Project
-            return res.json(200, { 'value': value });
-
-          });
-
-          break;
-        case 'projects':
-
-          // return new Project
-          return res.json(200, { 'value': $projects.length });
-
-          break;
-        case 'locations':
-
-          // project locations
-          if ( !params.conflict ) {
-
-            // get project locations
-            var value = 0;
-
-            $projects.forEach(function(p, i){
-              // project dist list count
-              value += p.locations.length;
-            });
+        //   // total conflict locations 
+        //   District.find()
+        //     .where( filters.prov_code_filter )
+        //     .where( filters.dist_code_filter )
+        //     .where( { conflict: true } ).exec(function(err, total){
             
-            // return new Project
-            return res.json(200, { 'value': value });
+        //     // return error
+        //     if (err) return res.negotiate( err );
 
-          } else {
+        //     // return new Project
+        //     return res.json(200, { 'value': value, 'value_total': total.length });
 
-            // get conflict locations
-            var value = 0;
-            $projects.forEach(function(p, i){
-              p.locations.forEach(function(l, j){
-                if ( l.conflict ) {
-                  value++;
-                }
-              });
-            });
+        //   });
 
-            // total conflict locations 
-            District.find()
-              .where( filters.prov_code_filter )
-              .where( filters.dist_code_filter )
-              .where( { conflict: true } ).exec(function(err, total){
-              
-              // return error
-              if (err) return res.negotiate( err );
+        // }
 
-              // return new Project
-              return res.json(200, { 'value': value, 'value_total': total.length });
+        break;
 
-            });
+      default:
+        //
+        return res.json(200, { 'value': 0 } );
 
-          }
+        break;
 
-          break;
-        case 'beneficiaries':
-          // beneficiaries
-          var beneficiaries = ProjectDashboardController.getBeneficiaries( $projects, 'projects' );
+        // case 'beneficiaries':
+        //   // beneficiaries
+        //   var beneficiaries = ProjectDashboardController.getBeneficiaries( $projects, 'projects' );
 
-          // return new Project
-          return res.json(200, { 'value': beneficiaries.beneficiaries_total });
+        //   // return new Project
+        //   return res.json(200, { 'value': beneficiaries.beneficiaries_total });
 
-          break;
-        case 'markers':
+        //   break;
+        // case 'markers':
 
-          // leaflet markers
-          var markers = {},
-              locationIds = [];
+        //   // leaflet markers
+        //   var markers = {},
+        //       locationIds = [];
 
-          // $projects
-          $projects.forEach(function(p, i){
-            // each location
-            p.locations.forEach(function(l, j){
-              locationIds.push(l.id);
-            });
-          });
+        //   // $projects
+        //   $projects.forEach(function(p, i){
+        //     // each location
+        //     p.locations.forEach(function(l, j){
+        //       locationIds.push(l.id);
+        //     });
+        //   });
 
-          // get all locations
-          Location.find( { id: locationIds } ).exec(function(err, locations){
+        //   // get all locations
+        //   Location.find( { id: locationIds } ).exec(function(err, locations){
 
-            // return error
-            if (err) return res.negotiate( err );
+        //     // return error
+        //     if (err) return res.negotiate( err );
 
-            // return no locations
-            if (!locations.length) return res.json(200, { 'data': {} });
+        //     // return no locations
+        //     if (!locations.length) return res.json(200, { 'data': {} });
 
-            // foreach location
-            locations.forEach(function(d, i){
+        //     // foreach location
+        //     locations.forEach(function(d, i){
 
-              // get user details
-              User.findOne({ username: d.username }).exec(function(err, user){
+        //       // get user details
+        //       User.findOne({ username: d.username }).exec(function(err, user){
 
-                // return error
-                if (err) return res.negotiate( err );
+        //         // return error
+        //         if (err) return res.negotiate( err );
 
-                // popup message
-                var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
-                            + '<div style="text-align:center"> in ' + d.prov_name + ', ' + d.dist_name + '</div>'
-                            + '<div style="text-align:center">' + d.fac_type + '</div>'
-                            + '<div style="text-align:center">' + d.fac_name + '</div>'
-                            + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
-                            + '<div style="text-align:center">' + user.name + '</div>'
-                            + '<div style="text-align:center">' + user.position + '</div>'
-                            + '<div style="text-align:center">' + user.phone + '</div>'
-                            + '<div style="text-align:center">' + user.email + '</div>';
+        //         // popup message
+        //         var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
+        //                     + '<div style="text-align:center"> in ' + d.prov_name + ', ' + d.dist_name + '</div>'
+        //                     + '<div style="text-align:center">' + d.fac_type + '</div>'
+        //                     + '<div style="text-align:center">' + d.fac_name + '</div>'
+        //                     + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
+        //                     + '<div style="text-align:center">' + user.name + '</div>'
+        //                     + '<div style="text-align:center">' + user.position + '</div>'
+        //                     + '<div style="text-align:center">' + user.phone + '</div>'
+        //                     + '<div style="text-align:center">' + user.email + '</div>';
 
-                // create markers
-                markers['marker' + i] = {
-                  layer: 'health',
-                  lat: d.lat,
-                  lng: d.lng,
-                  message: message
-                };
+        //         // create markers
+        //         markers['marker' + i] = {
+        //           layer: 'health',
+        //           lat: d.lat,
+        //           lng: d.lng,
+        //           message: message
+        //         };
 
 
-                // if last location
-                if(i === locations.length-1){
+        //         // if last location
+        //         if(i === locations.length-1){
                   
-                  // return markers
-                  return res.json(200, { 'data': markers });
+        //           // return markers
+        //           return res.json(200, { 'data': markers });
 
-                }
+        //         }
 
-              });
+        //       });
 
-            });
+        //     });
 
-          });
+        //   });
 
-          break;
-        default:
+        //   break;
+        // default:
 
-          // labels
-          var beneficiaries,
-              result = {
-                label: {
-                  left: {
-                    label: {
-                      prefix: 'M',
-                      label: 0,
-                      postfix: '%'
-                    },
-                    subLabel: {
-                      label: 0
-                    }
-                  },
-                  center: {
-                    label: {
-                      label: 0,
-                      postfix: '%'
-                    },
-                    subLabel: {
-                      label: 0
-                    }
-                  },
-                  right: {
-                    label: {
-                      prefix: 'F',
-                      label: 0,
-                      postfix: '%'
-                    },
-                    subLabel: {
-                      label: 0
-                    }
-                  }
-                },
-                data: [{
-                  'y': 0,
-                  'color': '#f48fb1',
-                  'name': 'Female',
-                  'label': 0,
-                },{
-                  'y': 0,
-                  'color': '#90caf9',
-                  'name': 'Male',
-                  'label': 0,
-                }]
-              };
+        //   // labels
+        //   var beneficiaries,
+        //       result = {
+        //         label: {
+        //           left: {
+        //             label: {
+        //               prefix: 'M',
+        //               label: 0,
+        //               postfix: '%'
+        //             },
+        //             subLabel: {
+        //               label: 0
+        //             }
+        //           },
+        //           center: {
+        //             label: {
+        //               label: 0,
+        //               postfix: '%'
+        //             },
+        //             subLabel: {
+        //               label: 0
+        //             }
+        //           },
+        //           right: {
+        //             label: {
+        //               prefix: 'F',
+        //               label: 0,
+        //               postfix: '%'
+        //             },
+        //             subLabel: {
+        //               label: 0
+        //             }
+        //           }
+        //         },
+        //         data: [{
+        //           'y': 0,
+        //           'color': '#f48fb1',
+        //           'name': 'Female',
+        //           'label': 0,
+        //         },{
+        //           'y': 0,
+        //           'color': '#90caf9',
+        //           'name': 'Male',
+        //           'label': 0,
+        //         }]
+        //       };
 
-          // get beneficiaries
-          var beneficiaries = ProjectDashboardController.getBeneficiaries( $projects, 'projects' );
+        //   // get beneficiaries
+        //   var beneficiaries = ProjectDashboardController.getBeneficiaries( $projects, 'projects' );
 
-          // breakdown
-          switch(params.indicator){
+        //   // breakdown
+        //   switch(params.indicator){
 
-            // indicator
-            case 'under5':
+        //     // indicator
+        //     case 'under5':
 
-              // calc %
-              var malePerCent = ( beneficiaries.under5male / ( beneficiaries.under5male + beneficiaries.under5female ) ) * 100;
-              var femalePerCent = ( beneficiaries.under5female / ( beneficiaries.under5male + beneficiaries.under5female ) ) * 100;
-              var totalPerCent = ( beneficiaries.under5_total / ( beneficiaries.under5_total + beneficiaries.over5_total ) ) * 100;
+        //       // calc %
+        //       var malePerCent = ( beneficiaries.under5male / ( beneficiaries.under5male + beneficiaries.under5female ) ) * 100;
+        //       var femalePerCent = ( beneficiaries.under5female / ( beneficiaries.under5male + beneficiaries.under5female ) ) * 100;
+        //       var totalPerCent = ( beneficiaries.under5_total / ( beneficiaries.under5_total + beneficiaries.over5_total ) ) * 100;
               
-              // assign data left
-              result.label.left.label.label = malePerCent;
-              result.label.left.subLabel.label = beneficiaries.under5male;
-              // assign data center
-              result.label.center.label.label = totalPerCent;
-              result.label.center.subLabel.label = beneficiaries.under5_total
-              // assign data right
-              result.label.right.label.label = femalePerCent;
-              result.label.right.subLabel.label = beneficiaries.under5female;
+        //       // assign data left
+        //       result.label.left.label.label = malePerCent;
+        //       result.label.left.subLabel.label = beneficiaries.under5male;
+        //       // assign data center
+        //       result.label.center.label.label = totalPerCent;
+        //       result.label.center.subLabel.label = beneficiaries.under5_total
+        //       // assign data right
+        //       result.label.right.label.label = femalePerCent;
+        //       result.label.right.subLabel.label = beneficiaries.under5female;
 
-              // highcharts female
-              result.data[0].y = femalePerCent;
-              result.data[0].label = beneficiaries.under5_total;
-              // highcharts male
-              result.data[1].y = malePerCent;
-              result.data[1].label = beneficiaries.under5_total;
+        //       // highcharts female
+        //       result.data[0].y = femalePerCent;
+        //       result.data[0].label = beneficiaries.under5_total;
+        //       // highcharts male
+        //       result.data[1].y = malePerCent;
+        //       result.data[1].label = beneficiaries.under5_total;
               
-              break;
+        //       break;
 
-            case 'over5':
+        //     case 'over5':
               
-              // calc %
-              var malePerCent = ( beneficiaries.over5male / ( beneficiaries.over5male + beneficiaries.over5female ) ) * 100;
-              var femalePerCent = ( beneficiaries.over5female / ( beneficiaries.over5female + beneficiaries.over5male ) ) * 100;
-              var totalPerCent = ( beneficiaries.over5_total / ( beneficiaries.under5_total + beneficiaries.over5_total ) ) * 100;
+        //       // calc %
+        //       var malePerCent = ( beneficiaries.over5male / ( beneficiaries.over5male + beneficiaries.over5female ) ) * 100;
+        //       var femalePerCent = ( beneficiaries.over5female / ( beneficiaries.over5female + beneficiaries.over5male ) ) * 100;
+        //       var totalPerCent = ( beneficiaries.over5_total / ( beneficiaries.under5_total + beneficiaries.over5_total ) ) * 100;
               
-              // assign data left
-              result.label.left.label.label = malePerCent;
-              result.label.left.subLabel.label = beneficiaries.over5male;
-              // assign data center
-              result.label.center.label.label = totalPerCent 
-              result.label.center.subLabel.label = beneficiaries.over5_total
-              // assign data right
-              result.label.right.label.label = femalePerCent;
-              result.label.right.subLabel.label = beneficiaries.over5female;
+        //       // assign data left
+        //       result.label.left.label.label = malePerCent;
+        //       result.label.left.subLabel.label = beneficiaries.over5male;
+        //       // assign data center
+        //       result.label.center.label.label = totalPerCent 
+        //       result.label.center.subLabel.label = beneficiaries.over5_total
+        //       // assign data right
+        //       result.label.right.label.label = femalePerCent;
+        //       result.label.right.subLabel.label = beneficiaries.over5female;
 
-              // highcharts female
-              result.data[0].y = femalePerCent;
-              result.data[0].label = beneficiaries.over5_total;
-              // highcharts male
-              result.data[1].y = malePerCent;
-              result.data[1].label = beneficiaries.over5_total;
+        //       // highcharts female
+        //       result.data[0].y = femalePerCent;
+        //       result.data[0].label = beneficiaries.over5_total;
+        //       // highcharts male
+        //       result.data[1].y = malePerCent;
+        //       result.data[1].label = beneficiaries.over5_total;
 
-              break; 
+        //       break; 
 
-            // case 'over59':
+        //     // case 'over59':
               
-            //   // calc %
-            //   var malePerCent = ( beneficiaries.pla / ( beneficiaries.pla + beneficiaries.cba ) ) * 100;
-            //   var femalePerCent = ( beneficiaries.cba / ( beneficiaries.pla + beneficiaries.cba ) ) * 100;
-            //   // var totalPerCent = ( beneficiaries.over59_total / ( beneficiaries.under5_total + beneficiaries.over5_total + beneficiaries.over59_total ) ) * 100;
+        //     //   // calc %
+        //     //   var malePerCent = ( beneficiaries.pla / ( beneficiaries.pla + beneficiaries.cba ) ) * 100;
+        //     //   var femalePerCent = ( beneficiaries.cba / ( beneficiaries.pla + beneficiaries.cba ) ) * 100;
+        //     //   // var totalPerCent = ( beneficiaries.over59_total / ( beneficiaries.under5_total + beneficiaries.over5_total + beneficiaries.over59_total ) ) * 100;
               
-            //   // assign data left
-            //   result.label.left.label.label = malePerCent;
-            //   result.label.left.subLabel.label = beneficiaries.pla;
-            //   // assign data center
-            //   result.label.center.label.label = totalPerCent 
-            //   result.label.center.subLabel.label = beneficiaries.over59_total
-            //   // assign data right
-            //   result.label.right.label.label = femalePerCent;
-            //   result.label.right.subLabel.label = beneficiaries.cba;
+        //     //   // assign data left
+        //     //   result.label.left.label.label = malePerCent;
+        //     //   result.label.left.subLabel.label = beneficiaries.pla;
+        //     //   // assign data center
+        //     //   result.label.center.label.label = totalPerCent 
+        //     //   result.label.center.subLabel.label = beneficiaries.over59_total
+        //     //   // assign data right
+        //     //   result.label.right.label.label = femalePerCent;
+        //     //   result.label.right.subLabel.label = beneficiaries.cba;
 
-            //   // highcharts female
-            //   result.data[0].y = femalePerCent;
-            //   result.data[0].label = beneficiaries.over59_total;
-            //   // highcharts male
-            //   result.data[1].y = malePerCent;
-            //   result.data[1].label = beneficiaries.over59_total;
+        //     //   // highcharts female
+        //     //   result.data[0].y = femalePerCent;
+        //     //   result.data[0].label = beneficiaries.over59_total;
+        //     //   // highcharts male
+        //     //   result.data[1].y = malePerCent;
+        //     //   result.data[1].label = beneficiaries.over59_total;
 
-            //   break;
-          }
+        //     //   break;
+        //   }
 
-          // return new Project
-          return res.json(200, result );
+        //   // return new Project
+        //   return res.json(200, result );
 
-          break;
+        //   break;
 
       }
 
