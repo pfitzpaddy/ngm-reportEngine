@@ -8,23 +8,24 @@
 var ProjectDashboardController = {
 
   // contact list
-  getContactListCsv: function(req, res){
+  getContactListCsv: function( req, res ){
 
-    // get all projects (not empty)
-    User.find({ app_home: 'health' }).exec(function(err, users){
+    // require
+    var json2csv = require( 'json2csv' ),
+        fields = [ 'name', 'organization', 'position', 'phone', 'email', 'createdAt' ],
+        fieldNames = [ 'Name', 'Organization', 'Position', 'Phone', 'Email', 'Joined ReportHub' ];
+
+    // get all projects ( not empty )
+    User.find({ app_home: 'health' }).exec(function( err, users ){
 
       // return error
-      if (err) return res.negotiate( err );      
-
-      // require
-      var fields = ['name', 'organization', 'position', 'phone', 'email', 'createdAt'];
-      var json2csv = require('json2csv');
+      if ( err ) return res.negotiate( err );
 
       // return csv
-      json2csv({ data: users, fields: fields }, function(err, csv) {
+      json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
         
         // error
-        if (err) return res.negotiate( err );
+        if ( err ) return res.negotiate( err );
 
         // success
         return res.json( 200, { data: csv } );
@@ -36,66 +37,96 @@ var ProjectDashboardController = {
   },
 
   // calculate beneficiaries for $projects
-  getBeneficiaries: function( $data, type ){
+  // getBeneficiaries: function( $data, type ){
 
-    var beneficiaries = {
-      under5male: 0,
-      under5female: 0,
-      under5_total: 0,
-      over5male: 0,
-      over5female: 0,
-      over5_total: 0,
-      pla: 0,
-      cba: 0,
-      beneficiaries_total: 0
-    };
+  //   var beneficiaries = {
+  //     under5male: 0,
+  //     under5female: 0,
+  //     under5_total: 0,
+  //     over5male: 0,
+  //     over5female: 0,
+  //     over5_total: 0,
+  //     pla: 0,
+  //     cba: 0,
+  //     beneficiaries_total: 0
+  //   };
 
-    // sum beneficiaries
-    function sumBeneficiaries(b, k) {
+  //   // sum beneficiaries
+  //   function sumBeneficiaries(b, k) {
       
-      // totals segment
-      beneficiaries.under5male += b.under5male;
-      beneficiaries.under5female += b.under5female;
-      beneficiaries.over5male += b.over5male;
-      beneficiaries.over5female += b.over5female;
-      beneficiaries.pla += b.pla;
-      beneficiaries.cba += b.cba;              
-      // totals baseline
-      beneficiaries.under5_total += b.under5male + b.under5female;
-      beneficiaries.over5_total += b.over5male + b.over5female;
-      // total
-      beneficiaries.beneficiaries_total += b.under5male + b.under5female + b.over5male + b.over5female + b.pla + b.cba;
+  //     // totals segment
+  //     beneficiaries.under5male += b.under5male;
+  //     beneficiaries.under5female += b.under5female;
+  //     beneficiaries.over5male += b.over5male;
+  //     beneficiaries.over5female += b.over5female;
+  //     beneficiaries.pla += b.pla;
+  //     beneficiaries.cba += b.cba;              
+  //     // totals baseline
+  //     beneficiaries.under5_total += b.under5male + b.under5female;
+  //     beneficiaries.over5_total += b.over5male + b.over5female;
+  //     // total
+  //     beneficiaries.beneficiaries_total += b.under5male + b.under5female + b.over5male + b.over5female + b.pla + b.cba;
 
-    }
+  //   }
 
-    // project
-    if ( type === 'projects' ) {
-      // run for peoject
-      $data.forEach(function(p, i){
-        // locations
-        p.locations.forEach(function(l, j){
-          // beneficiareis
-          l.beneficiaries.forEach(function(b, k){
-            // sum beneficiaries
-            sumBeneficiaries(b, k);
-          });
-        });
-      });
-    }
+  //   // project
+  //   if ( type === 'projects' ) {
+  //     // run for peoject
+  //     $data.forEach(function(p, i){
+  //       // locations
+  //       p.locations.forEach(function(l, j){
+  //         // beneficiareis
+  //         l.beneficiaries.forEach(function(b, k){
+  //           // sum beneficiaries
+  //           sumBeneficiaries(b, k);
+  //         });
+  //       });
+  //     });
+  //   }
 
-    // location
-    if ( type === 'locations' ) {
-      // locations
-      $data.forEach(function(l, j){
-        // beneficiareis
-        l.beneficiaries.forEach(function(b, k){
-          // sum beneficiaries     
-          sumBeneficiaries(b, k);
-        });
-      });
-    }
+  //   // location
+  //   if ( type === 'locations' ) {
+  //     // locations
+  //     $data.forEach(function(l, j){
+  //       // beneficiareis
+  //       l.beneficiaries.forEach(function(b, k){
+  //         // sum beneficiaries     
+  //         sumBeneficiaries(b, k);
+  //       });
+  //     });
+  //   }
 
-    return beneficiaries;    
+  //   return beneficiaries;    
+
+  // },
+
+  // prepare and return csv based on filtered project
+  getCsvDownload: function( params, filters, projects, res ) {
+
+    // require
+    var data = [],
+        fields = [],
+        fieldNames = [],
+        json2csv = require('json2csv');    
+
+    // return indicator
+    switch( params.details ){
+
+      // summarise beneficiaries by location ( district )
+      case 'locations':
+
+        // code here!
+
+        break;
+
+      // OCHA project progress export
+      default:
+
+        // code here!
+
+        break;
+
+    }    
 
   },
 
@@ -604,95 +635,95 @@ var ProjectDashboardController = {
   },
 
   // prepare and return csv based on filtered project
-  getCsvDownload: function( params, filters, $projects, res ) {
+  // getCsvDownload: function( params, filters, $projects, res ) {
 
-    // require
-    var data = [],
-        fields = [],
-        _ = require('underscore'),
-        json2csv = require('json2csv');
+  //   // require
+  //   var data = [],
+  //       fields = [],
+  //       _ = require('underscore'),
+  //       json2csv = require('json2csv');
 
-    // return indicator
-    switch( params.details ){
+  //   // return indicator
+  //   switch( params.details ){
 
-      case 'locations':
+  //     case 'locations':
 
-        var $locations = [];
+  //       var $locations = [];
 
-        // for each project
-        $projects.forEach(function(p, i){      
-          // create one list of locations 
-          p.locations.forEach(function(l, i){
-            // push location to list
-            $locations.push( l );
-          });
-        });
+  //       // for each project
+  //       $projects.forEach(function(p, i){      
+  //         // create one list of locations 
+  //         p.locations.forEach(function(l, i){
+  //           // push location to list
+  //           $locations.push( l );
+  //         });
+  //       });
 
-        // project
-        $locations.forEach(function(l, i){
+  //       // project
+  //       $locations.forEach(function(l, i){
           
-          // add beneficiaries with underscore (get beneficiaries from fn for one location at a time)
-          _.extend($locations[i], ProjectDashboardController.getBeneficiaries( [ $locations[i] ], 'locations' ) );
+  //         // add beneficiaries with underscore (get beneficiaries from fn for one location at a time)
+  //         _.extend($locations[i], ProjectDashboardController.getBeneficiaries( [ $locations[i] ], 'locations' ) );
 
-          // remove unwanted keys
-          delete $locations[i].id;
-          delete $locations[i].project_id;
-          delete $locations[i].implementing_partners_checked;
-          delete $locations[i].beneficiaries;
-          delete $locations[i].timestamp;      
+  //         // remove unwanted keys
+  //         delete $locations[i].id;
+  //         delete $locations[i].project_id;
+  //         delete $locations[i].implementing_partners_checked;
+  //         delete $locations[i].beneficiaries;
+  //         delete $locations[i].timestamp;      
 
-        });
+  //       });
 
-        // get field names
-        for (var key in $locations[0]) {
-          // include
-          fields.push(key);
-        }     
+  //       // get field names
+  //       for (var key in $locations[0]) {
+  //         // include
+  //         fields.push(key);
+  //       }     
   
-        // assign for csv
-        data = $locations;
+  //       // assign for csv
+  //       data = $locations;
 
-        break;
+  //       break;
 
-      // default is projects
-      default:
+  //     // default is projects
+  //     default:
 
-        // project
-        $projects.forEach(function(p, i){
+  //       // project
+  //       $projects.forEach(function(p, i){
           
-          // add beneficiaries with underscore (get beneficiaries from fn for one project at a time)
-          _.extend($projects[i], ProjectDashboardController.getBeneficiaries( [ $projects[i] ], 'projects' ) );
+  //         // add beneficiaries with underscore (get beneficiaries from fn for one project at a time)
+  //         _.extend($projects[i], ProjectDashboardController.getBeneficiaries( [ $projects[i] ], 'projects' ) );
 
-          // remove unwanted keys
-          delete $projects[i].id;
-          delete $projects[i].locations;          
+  //         // remove unwanted keys
+  //         delete $projects[i].id;
+  //         delete $projects[i].locations;          
 
-        });
+  //       });
 
-        // get field names
-        for (var key in $projects[0]) {
-          fields.push(key);
-        }
+  //       // get field names
+  //       for (var key in $projects[0]) {
+  //         fields.push(key);
+  //       }
   
-        // assign for csv
-        data = $projects;
+  //       // assign for csv
+  //       data = $projects;
 
-        break;  
+  //       break;  
 
-    }
+  //   }
 
-    // return csv
-    json2csv( { data: data, fields: fields }, function( err, csv ) {
+  //   // return csv
+  //   json2csv( { data: data, fields: fields }, function( err, csv ) {
       
-      // error
-      if ( err ) return res.negotiate( err );
+  //     // error
+  //     if ( err ) return res.negotiate( err );
 
-      // success
-      return res.json( 200, { data: csv } );
+  //     // success
+  //     return res.json( 200, { data: csv } );
 
-    });
+  //   });
 
-  }
+  // }
 
 };
 
