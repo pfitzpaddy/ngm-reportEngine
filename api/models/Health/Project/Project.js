@@ -214,6 +214,10 @@ function getProjectReports( project, target_locations ) {
 		// report_status 'todo' open from 15th of every month
 		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf('month').add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
 
+		console.log( 'TEST' )
+		console.log( report_active )
+		console.log( report_status )
+
 		// create report
 		var report = {
 			// defaults 
