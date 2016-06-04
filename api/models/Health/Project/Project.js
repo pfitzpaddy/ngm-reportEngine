@@ -233,6 +233,9 @@ function getProjectReports( project, target_locations ) {
 			locations: []
 		};
 
+		console.log( 'TEST' )
+		console.log( report )		
+
 		// add report locations
 		report.locations = getProjectReportLocations( target_locations );
 
@@ -285,12 +288,6 @@ function updateProjectReports( reports, next ) {
 									report_year: reports[ r_index ].report_year
 								}, { report_active: true } )
 			.exec( function( err, report ) {
-
-				console.log( 'TEST' )
-				console.log( reports[ r_index ].report_month )
-				console.log( reports[ r_index ].report_active )
-				console.log( reports[ r_index ].report_status )
-				console.log( report )
 
 				// return error
 				if ( err ) return next( err );
