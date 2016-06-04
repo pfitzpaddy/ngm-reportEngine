@@ -116,6 +116,10 @@ var ProjectDashboardController = {
       case 'locations':
 
         // code here!
+        console.log( 'locations' );
+
+        //
+        return res.json( 200, { data: [] } );
 
         break;
 
@@ -123,6 +127,138 @@ var ProjectDashboardController = {
       default:
 
         // code here!
+        console.log( 'project progress' );
+
+        // json2csv
+        fields = [ 'organization', 'project_code' ];
+        fieldNames = [ 'Partner', 'Project Code' ];
+
+        // counter
+        var counter = 0,
+            length = projects.length;       
+
+        // for each project
+        projects.forEach( function( project, i ) {
+
+          // for each project
+          data[i] = {
+            organization: projects[i].organization,
+            project_code: projects[i].project_code
+          }
+
+          console.log( '----------- project -------------' );
+          console.log( project.id );
+
+          // locations
+          Beneficiaries
+            .find()
+            .where( { project_id: project.id } )
+            .exec( function( err, beneficiaries ) {
+
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              console.log( beneficiaries )
+
+              // beneficiaries
+              // beneficiaries.forEach( function( err, b ){
+
+                //
+                // console.log( b.beneficiary_type );
+
+                // data
+                // data[i] = {
+                //   prov_code: b.prov_code,
+                //   prov_name: b.prov_name,
+                  
+                // }
+
+                // final update
+                if ( counter === length ) {
+                  // next!
+                  return res.json( 200, { data: [] } );
+
+                }
+
+              // });
+
+
+            });
+
+            // for each location
+
+              // ( prov, prov code )
+
+              // for each beneficiaries
+
+                // based on type
+
+                // sum the values ( u5male, u5female, o5male, o5female, total )
+
+        });
+
+
+
+        // proejcts by beneficiaries by type
+
+        // find active reports
+        // Report
+        //   .find()
+        //   .where({ project_id: project_ids })
+        //   .where({ report_active: true })
+        //   .populateAll()
+        //   .exec( function( err, reports ){
+
+        //     // return error
+        //     if ( err ) return res.negotiate( err );
+
+        //     // code here!
+        //     console.log( 'report' );
+
+        //     // each report
+        //     reports.forEach( function( report, i ) {
+        //       // each report location
+        //       report.locations.forEach( function( location, j ) {
+        //         location_ids.push( location.id )
+        //       });
+
+        //     });
+
+        //     // get beneficiaries by location
+
+        //     Location
+        //       .find()
+        //       .where({ id: location_ids })
+        //       .populateAll()
+        //       .exec( function( err, locations ){
+
+        //         // return error
+        //         if ( err ) return res.negotiate( err );
+
+        //         // code here!
+        //         console.log( 'locations' );
+                
+        //         //
+        //         var sum = 0;
+        //         locations.forEach( function( location, i ) {
+        //           if ( location.beneficiaries.length ) {
+        //             location.beneficiaries.forEach( function( beneficiaries, j ) {
+        //               sum += beneficiaries.under5male;
+        //             });
+        //           }
+        //         });
+
+                
+        //         console.log( sum );
+
+        //         // org, project name, project code, prov, prov code, ben category, u5male, u5female, o5male, o5female, total
+                  
+        //         //
+        //         return res.json( 200, { data: [] } );                      
+
+        //       });        
+
+        //   });
 
         break;
 
@@ -130,7 +266,7 @@ var ProjectDashboardController = {
 
   },
 
-  // dashboard params to filter $projects
+  // dashboard params to filter projects
   getHealthDetails: function( req, res ){
 
     // request input
@@ -153,15 +289,10 @@ var ProjectDashboardController = {
       conflict: req.param('conflict') ? req.param('conflict') : false
     }
 
-    // filtered project
-    var $projects = [];
-
     // filters
     var filters = {
-
       // project_id
       project_id: params.project_id ? { id: params.project_id } : {},
-      
       // date_filter
       date_filter: { 
         or: [{
@@ -293,7 +424,7 @@ var ProjectDashboardController = {
   },
 
   // calculate indicator value from filtered project ids
-  getIndicatorMetric: function( params, filters, $projects, res ) {
+  getIndicatorMetric: function( params, filters, projects, res ) {
 
     // return indicator
     switch( params.indicator ){
@@ -305,7 +436,7 @@ var ProjectDashboardController = {
         var organization_ids = [];
         
         // filter by $projects
-        $projects.forEach( function( d, i ){
+        projects.forEach( function( d, i ){
           if ( d.project_status === 'active' ) {
             organization_ids.push( d.organization_id );
           }
@@ -328,7 +459,7 @@ var ProjectDashboardController = {
       case 'projects':
 
         // return new Project
-        return res.json( 200, { 'value': $projects.length });
+        return res.json( 200, { 'value': projects.length });
 
         break;
 
