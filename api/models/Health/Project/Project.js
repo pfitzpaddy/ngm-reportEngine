@@ -197,11 +197,12 @@ function getProjectReports( project, target_locations ) {
 	var moment = require('moment'),
 			reports = [],
 			report_active = true,
-			s_date = moment( project.project_start_date ),
-			e_date = moment( project.project_end_date );
+			// set start date / end date to start and end of respective months
+			s_date = moment( project.project_start_date ).startOf( 'month' ),
+			e_date = moment( project.project_end_date ).endOf( 'month' );
 
 	// number of reports
-	var reports_duration = Math.ceil( moment.duration( e_date.diff( s_date ) ).asMonths() );
+	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
 
 	// for each report month
 	for ( m = 0; m < reports_duration; m++ ) {
@@ -212,7 +213,7 @@ function getProjectReports( project, target_locations ) {
 		}
 
 		// report_status 'todo' open from 15th of every month
-		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf('month').add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
+		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf( 'month' ).add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
 
 		// create report
 		var report = {
@@ -233,9 +234,6 @@ function getProjectReports( project, target_locations ) {
 			locations: []
 		};
 
-		console.log( 'TEST' )
-		console.log( report )		
-
 		// add report locations
 		report.locations = getProjectReportLocations( target_locations );
 
@@ -243,7 +241,7 @@ function getProjectReports( project, target_locations ) {
 		reports.push( report );
 
 	}
-
+	
 	// return the reports for the project period
 	return reports;
 
