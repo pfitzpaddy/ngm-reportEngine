@@ -288,8 +288,9 @@ function updateProjectReports( reports, next ) {
 
 				console.log( 'TEST' )
 				console.log( reports[ r_index ].report_month )
-				console.log( report_active )
-				console.log( report_status )				
+				console.log( reports[ r_index ].report_active )
+				console.log( reports[ r_index ].report_status )
+				console.log( report )
 
 				// return error
 				if ( err ) return next( err );
