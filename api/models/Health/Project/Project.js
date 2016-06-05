@@ -174,6 +174,7 @@ module.exports = {
 							// generate an array of reports
 							var reports = getProjectReports( project, target_locations );
 
+							// if no locations, next
 							if ( !reports[0].locations.length ) return next();
 
 							// update reports
@@ -241,7 +242,7 @@ function getProjectReports( project, target_locations ) {
 		reports.push( report );
 
 	}
-	
+
 	// return the reports for the project period
 	return reports;
 

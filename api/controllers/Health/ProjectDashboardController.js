@@ -101,12 +101,12 @@ var ProjectDashboardController = {
   // },
 
   // prepare and return csv based on filtered project
-  getCsvDownload: function( params, filters, projects, res ) {
+  getCsvDownload: function( params, filters, projects, project_ids, res ) {
 
     // require
-    var data = [],
-        fields = [],
-        fieldNames = [],
+    var data,
+        fields,
+        fieldNames,
         json2csv = require('json2csv');    
 
     // return indicator
@@ -125,77 +125,212 @@ var ProjectDashboardController = {
 
       // OCHA project progress export
       default:
+          
+        // 
+        console.log( '--- progress report ---' );
 
-        // code here!
-        console.log( 'project progress' );
-
+        // store data by project
+        var projectStore = {}
         // json2csv
-        fields = [ 'organization', 'project_code' ];
-        fieldNames = [ 'Partner', 'Project Code' ];
+        fields = [ 'organization', 'project_code', 'prov_code', 'prov_name', 'lat', 'lng' ],
+        fieldNames = [ 'Partner', 'Project Code', 'Province Code', 'Province Name', 'lat', 'lng' ];
 
-        // counter
-        var counter = 0,
-            length = projects.length;       
-
-        // for each project
-        projects.forEach( function( project, i ) {
-
-          // for each project
-          data[i] = {
-            organization: projects[i].organization,
-            project_code: projects[i].project_code
-          }
-
-          console.log( '----------- project -------------' );
-          console.log( project.id );
-
-          // locations
-          Beneficiaries
-            .find()
-            .where( { project_id: project.id } )
-            .exec( function( err, beneficiaries ) {
-
-              // return error
-              if ( err ) return res.negotiate( err );
-
-              console.log( beneficiaries )
-
-              // beneficiaries
-              // beneficiaries.forEach( function( err, b ){
-
-                //
-                // console.log( b.beneficiary_type );
-
-                // data
-                // data[i] = {
-                //   prov_code: b.prov_code,
-                //   prov_name: b.prov_name,
-                  
-                // }
-
-                // final update
-                if ( counter === length ) {
-                  // next!
-                  return res.json( 200, { data: [] } );
-
-                }
-
-              // });
-
-
-            });
-
-            // for each location
-
-              // ( prov, prov code )
-
-              // for each beneficiaries
-
-                // based on type
-
-                // sum the values ( u5male, u5female, o5male, o5female, total )
+        // record basic project details
+        projects.forEach( function( p, i ){
+          //
+          projectStore[ p.id ] = {}
+          projectStore[ p.id ].organization = p.organization;
+          projectStore[ p.id ].project_code = p.project_code;
 
         });
+        
+        // get reports
+        Report
+          .find()
+          .where( { project_id: project_ids } )
+          .populateAll()
+          .exec( function( err, reports ) {
+
+            // return error
+            if ( err ) return res.negotiate( err );
+
+            // each location
+            var location_ids = [];
+
+            // for each report/location
+            reports.forEach( function( r, i ){
+              r.locations.forEach( function( l, j ){
+
+                // locations
+                location_ids.push( l.id );
+                // project location
+                projectStore[ l.project_id ][ l.prov_code ] = {}
+                projectStore[ l.project_id ][ l.prov_code ].prov_code = l.prov_code;
+                projectStore[ l.project_id ][ l.prov_code ].prov_name = l.prov_name;
+                projectStore[ l.project_id ][ l.prov_code ].lat = l.lat;
+                projectStore[ l.project_id ][ l.prov_code ].lng = l.lng;
+
+              });
+            });
+
+            // beneficiaires
+            Beneficiaries
+              .find()
+              .where( { location_id: location_ids } )
+              .exec( function( err, beneficiaries ){
+                
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                // beneficiaries
+                beneficiaries.forEach( function( b, i ){
+
+                  // 
+                  console.log( b.project_id );
+                  console.log( b.prov_code );
+                  console.log( b.beneficiary_type );
+
+                  // project location
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] = {}
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male = b.under5male + b.penta3_vacc_male_under1;
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male = b.over5male + b.education_male + b.capacity_building_male;
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female = b.under5female + b.penta3_vacc_female_under1;
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female = b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female;
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total = b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female;
+
+                });
+
+              });            
+
+            //
+            // console.log( projectStore );
+
+            // do some fancy data stuff here
+
+            //
+            return res.json( 200, { data: [] } );          
+
+            // beneficiaires
+            // Beneficiaries
+            //   .find()
+            //   .where( { location_id: location_ids )
+            //   .exec( function( err, beneficiaries ){
+                
+            //     // return error
+            //     if ( err ) return res.negotiate( err );
+
+            //     // length
+            //     var counter = 0,
+            //         length = beneficiaries.length;
+
+            //     // project[id][beneficiary_type]
+
+
+            //     // beneficiaires
+            //     beneficiaries.forEach( function( b, i ) {
+
+            //       //
+            //       counter++;
+
+            //       //
+
+
+            //       //
+            //       data = [];
+
+            //       // final update
+            //       if ( counter === length ) {
+                    
+            //         // return csv
+            //         json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                      
+            //           // error
+            //           if ( err ) return res.negotiate( err );
+
+            //           // success
+            //           return res.json( 200, { data: csv } );
+
+            //         });
+
+            //       }
+
+            //     });
+                
+
+            //   });
+
+
+          });
+
+
+
+
+        // for each project
+        // projects.forEach( function( project, i ) {
+
+        //   // for each project
+        //   data[i] = {
+        //     organization: projects[i].organization,
+        //     project_code: projects[i].project_code
+        //   }
+
+        //   // locations
+        //   Beneficiaries
+        //     .find()
+        //     .where( { project_id: project.id } )
+        //     .exec( function( err, beneficiaries ) {
+
+        //       // return error
+        //       if ( err ) return res.negotiate( err );
+
+        //       // beneficiaries
+        //       // beneficiaries.forEach( function( err, b ){
+
+        //         //
+        //         // console.log( b.beneficiary_type );
+
+        //         // data
+        //         // data[i] = {
+        //         //   prov_code: b.prov_code,
+        //         //   prov_name: b.prov_name,
+                  
+        //         // }
+
+        //         // 
+        //         counter++;
+
+        //         // final update
+        //         if ( counter === length ) {
+                  
+        //           // return csv
+        //           json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                    
+        //             // error
+        //             if ( err ) return res.negotiate( err );
+
+        //             // success
+        //             return res.json( 200, { data: csv } );
+
+        //           });
+
+        //         }
+
+        //       // });
+
+
+        //     });
+
+        //     // for each location
+
+        //       // ( prov, prov code )
+
+        //       // for each beneficiaries
+
+        //         // based on type
+
+        //         // sum the values ( u5male, u5female, o5male, o5female, total )
+
+        // });
 
 
 
@@ -329,21 +464,26 @@ var ProjectDashboardController = {
         if (err) return res.negotiate( err );
 
         // if no projects
-        if ( !projects.length ) {
-          // return zero
-          return res.json( 200, { 'value': 0 } );
-        }
+        if ( !projects.length ) return res.json( 200, { 'value': 0 } );
+
+        // get project ids
+        var project_ids = [];        
+        projects.forEach( function( p, i ) {
+          // project id
+          project_ids.push( p.id );
+
+        });
 
         // if indicator, else data
         if ( params.indicator ) {
 
           // calculate and return metric
-          ProjectDashboardController.getIndicatorMetric( params, filters, projects, res );
+          ProjectDashboardController.getIndicatorMetric( params, filters, projects, project_ids, res );
 
         } else{
 
           // prepare download
-          ProjectDashboardController.getCsvDownload( params, filters, projects, res );
+          ProjectDashboardController.getCsvDownload( params, filters, projects, project_ids, res );
 
         }        
 
@@ -424,7 +564,7 @@ var ProjectDashboardController = {
   },
 
   // calculate indicator value from filtered project ids
-  getIndicatorMetric: function( params, filters, projects, res ) {
+  getIndicatorMetric: function( params, filters, projects, project_ids, res ) {
 
     // return indicator
     switch( params.indicator ){
