@@ -7,51 +7,6 @@
 
 module.exports = {
 
-  // fix beneficiaries
-  setBeneficiariesProjectId: function( req, res ){
-
-    Location
-      .find()
-      .populateAll()
-      .exec( function ( err, locations ){
-
-        //
-        if ( err ) return res.negotiate( err );
-
-        // 
-        var counter = 0;
-            length = locations.length;       
-
-        // for each report/location 
-        locations.forEach( function( l, i ){
-
-          // 
-          Beneficiaries
-            .update( { location_id: l.id }, { project_id: l.project_id } )
-            .exec( function( err, beneficiaries ){
-
-              //
-              if ( err ) return res.negotiate( err );
-
-              // 
-              counter++;
-
-              // 
-              if ( counter === length ) {
-                //
-                return res.json( 200, { msg: 'success' } );
-              }
-
-            });          
-
-        });
-
-      });
-
-  },
-
-
-
   // get all reports by project id
   getReportsList: function( req, res ) {
 
