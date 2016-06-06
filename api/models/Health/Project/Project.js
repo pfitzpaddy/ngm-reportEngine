@@ -167,25 +167,7 @@ module.exports = {
 						if ( !updated_reports.length ) {
 
 							//
-							// next();
-
-							console.log('no reports!');
-
-							// generate an array of reports
-							var reports = getProjectReports( project, target_locations );
-
-							// create
-							Report
-								.create( reports )
-								.exec( function( err, reports ) {
-
-									// return error
-									if ( err ) return next( err );
-
-									// next!
-									next();
-									
-								});							
+							next();
 
 						}	else {
 							
