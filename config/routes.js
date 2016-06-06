@@ -69,7 +69,16 @@ module.exports.routes = {
   'POST /health/project/setProject': 'Health/ProjectController.setProjectById',
   'POST /health/project/delete': 'Health/ProjectController.deleteProjectById',
   'GET /health/project/delete': 'Health/ProjectController.deleteProjectById',
-  
+
+  //
+  'GET /health/location/setLocationLatLng': 'Health/ReportController.setLocationLatLng',
+  'GET /health/location/setLocationProvLatLng': 'Health/ReportController.setLocationProvLatLng',
+
+  //
+  'GET /health/location/setTargetLocationLatLng': 'Health/ReportController.setTargetLocationLatLng',
+  'GET /health/location/setTargetLocationProvLatLng': 'Health/ReportController.setTargetLocationProvLatLng',
+
+
   // get project reports
   'POST /health/report/getReportsList': 'Health/ReportController.getReportsList',  
   'POST /health/report/getReport': 'Health/ReportController.getReportById',

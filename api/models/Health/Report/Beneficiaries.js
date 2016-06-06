@@ -30,7 +30,11 @@ module.exports = {
 		report_id: {
 			type: 'string',
 			required: true
-		},		
+		},
+		report_month: {
+			type: 'integer',
+			required: true
+		},
 		// add a reference to Location
     location_id: {
       model: 'location'
