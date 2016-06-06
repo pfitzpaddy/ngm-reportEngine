@@ -7,6 +7,216 @@
 
 module.exports = {
 
+  //
+  setTargetLocationLatLng: function( req, res ){
+
+    TargetLocation
+      .find()
+      .exec( function( err, locations ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = locations.length;
+
+        // location
+        locations.forEach( function( l, i ){
+
+          if ( l.lat ) {
+
+            TargetLocation
+              .update( { id: l.id }, { dist_lng: l.lng, dist_lat: l.lat  } )
+              .exec( function( err, updatedLocation ){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                //
+                counter++;
+
+                //
+                if ( counter === length ) {
+                  return res.json( 200, { msg: 'success'  } );
+                }              
+
+              });
+
+          } else {
+
+            //
+            counter++;
+
+            //
+            if ( counter === length ) {
+              return res.json( 200, { msg: 'success'  } );
+            }
+
+          }
+
+        });
+
+      });
+
+  }, 
+
+  setTargetLocationProvLatLng: function( req, res ){
+
+    TargetLocation
+      .find()
+      .exec( function( err, locations ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = locations.length;
+
+        // location
+        locations.forEach( function( l, i ){
+
+          //
+          Province
+            .findOne()
+            .where( { prov_code: l.prov_code } )
+            .exec( function( err, province ){
+
+              // return error
+              if ( err ) return res.negotiate( err );              
+
+              // 
+              TargetLocation
+                .update( { id: l.id }, { prov_lng: province.lng, prov_lat: province.lat  } )
+                .exec( function( err, updatedLocation ){
+
+                  // return error
+                  if ( err ) return res.negotiate( err );
+
+                  //
+                  counter++;
+
+                  //
+                  if ( counter === length ) {
+                    return res.json( 200, { msg: 'success'  } );
+                  }              
+
+                });
+
+            });
+        });
+
+      });
+
+  },
+
+
+  //
+  setLocationLatLng: function( req, res ){
+
+    Location
+      .find()
+      .exec( function( err, locations ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = locations.length;
+
+        // location
+        locations.forEach( function( l, i ){
+
+          if ( l.lat ) {
+
+            Location
+              .update( { id: l.id }, { dist_lng: l.lng, dist_lat: l.lat  } )
+              .exec( function( err, updatedLocation ){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                //
+                counter++;
+
+                //
+                if ( counter === length ) {
+                  return res.json( 200, { msg: 'success'  } );
+                }              
+
+              });
+
+          } else {
+
+            //
+            counter++;
+
+            //
+            if ( counter === length ) {
+              return res.json( 200, { msg: 'success'  } );
+            }
+
+          }
+
+        });
+
+      });
+
+  },
+
+  //
+  setLocationProvLatLng: function( req, res ){
+
+    Location
+      .find()
+      .exec( function( err, locations ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = locations.length;
+
+        // location
+        locations.forEach( function( l, i ){
+
+          //
+          Province
+            .findOne()
+            .where( { prov_code: l.prov_code } )
+            .exec( function( err, province ){
+
+              // return error
+              if ( err ) return res.negotiate( err );              
+
+              // 
+              Location
+                .update( { id: l.id }, { prov_lng: province.lng, prov_lat: province.lat  } )
+                .exec( function( err, updatedLocation ){
+
+                  // return error
+                  if ( err ) return res.negotiate( err );
+
+                  //
+                  counter++;
+
+                  //
+                  if ( counter === length ) {
+                    return res.json( 200, { msg: 'success'  } );
+                  }              
+
+                });
+
+            });
+        });
+
+      });
+
+  },  
+
   // get all reports by project id
   getReportsList: function( req, res ) {
 
