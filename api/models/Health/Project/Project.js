@@ -171,6 +171,9 @@ module.exports = {
 
 							console.log('no reports!');
 
+							// generate an array of reports
+							var reports = getProjectReports( project, target_locations );
+
 							// create
 							Report
 								.create( reports )
