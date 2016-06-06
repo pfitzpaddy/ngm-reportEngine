@@ -69,11 +69,19 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		lng: {
+		prov_lng: {
 			type: 'float',
 			required: true
 		},
-		lat: {
+		prov_lat: {
+			type: 'float',
+			required: true
+		},
+		dist_lng: {
+			type: 'float',
+			required: true
+		},
+		dist_lat: {
 			type: 'float',
 			required: true
 		}
