@@ -215,6 +215,9 @@ function getProjectReports( project, target_locations ) {
 			report_active = false;
 		}
 
+		console.log( 'CREATE REPORT' )
+		console.log( report_active );
+
 		// report_status 'todo' open from 15th of every month
 		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf( 'month' ).add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
 
@@ -289,6 +292,10 @@ function updateProjectReports( reports, next ) {
 		if ( reports[ r_index ].report_year < 2016  ) {
 			report_active = false;
 		}
+
+		console.log( 'UPDATE' )
+		console.log( reports[ r_index ].project_id )
+		console.log( report_active )
 
 		// updateOrCreate (returns array)
 		Report
