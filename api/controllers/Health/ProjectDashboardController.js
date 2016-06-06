@@ -126,12 +126,14 @@ var ProjectDashboardController = {
       // OCHA project progress export
       default:
 
+        // store data by project
+        var projectStore = {};
+        
         // json2csv
         fields = [ 'organization', 'project_code', 'project_title', 'prov_code', 'prov_name', 'beneficiary_type', 'under5male', 'over5male', 'under5female', 'over5female', 'total', 'lat', 'lng' ],
         fieldNames = [ 'Partner', 'Project Code', 'Project Title', 'Province Code', 'Province Name', 'Beneficiary Category', 'under5male', 'over5male', 'under5female', 'over5female', 'Total', 'lat', 'lng' ];
 
-        // store data by project
-        var projectStore = {}
+        // projects
         projects.forEach( function( p, i ){
           // project details
           projectStore[ p.id ] = {}
@@ -139,186 +141,167 @@ var ProjectDashboardController = {
           projectStore[ p.id ].project_code = p.project_code;
           projectStore[ p.id ].project_title = p.project_title;
 
-        });
-
-        // locations
-        Location
+        });        
+        
+        // get reports
+        Report
           .find()
           .where( { project_id: project_ids } )
-          .where( { report_id: { '!': null } } )
+          .where( { report_status: 'complete' } )
           .populateAll()
-          .exec( function( err, locations ) {
+          .exec( function( err, reports ) {
 
             // return error
             if ( err ) return res.negotiate( err );
 
-            //
-            console.log( locations );
+            // each location
+            var location_ids = [];
 
-            //
-            return res.json( 200, { data: [] } );
+            // for each report/location
+            reports.forEach( function( r, i ){
+              r.locations.forEach( function( l, j ){
 
-          });          
-        
-        // get reports
-        // Report
-        //   .find()
-        //   .where( { project_id: project_ids } )
-        //   .where( { report_status: 'complete' } )
-        //   .populateAll()
-        //   .exec( function( err, reports ) {
+                // locations
+                location_ids.push( l.id );
+                // project location
+                projectStore[ l.project_id ][ l.prov_code ] = {}
+                projectStore[ l.project_id ][ l.prov_code ].prov_code = l.prov_code;
+                projectStore[ l.project_id ][ l.prov_code ].prov_name = l.prov_name;
+                projectStore[ l.project_id ][ l.prov_code ].lat = l.prov_lat;
+                projectStore[ l.project_id ][ l.prov_code ].lng = l.prov_lng;
 
-        //     // return error
-        //     if ( err ) return res.negotiate( err );
+              });
+            });
 
-        //     // each location
-        //     var location_ids = [];
-
-        //     // for each report/location
-        //     reports.forEach( function( r, i ){
-        //       r.locations.forEach( function( l, j ){
-
-        //         // locations
-        //         location_ids.push( l.id );
-        //         // project location
-        //         projectStore[ l.project_id ][ l.prov_code ] = {}
-        //         projectStore[ l.project_id ][ l.prov_code ].prov_code = l.prov_code;
-        //         projectStore[ l.project_id ][ l.prov_code ].prov_name = l.prov_name;
-        //         projectStore[ l.project_id ][ l.prov_code ].lat = l.prov_lat;
-        //         projectStore[ l.project_id ][ l.prov_code ].lng = l.prov_lng;
-
-        //       });
-        //     });
-
-        //     // beneficiaires
-        //     Beneficiaries
-        //       .find()
-        //       .where( { location_id: location_ids } )
-        //       .exec( function( err, beneficiaries ){
+            // beneficiaires
+            Beneficiaries
+              .find()
+              .where( { location_id: location_ids } )
+              .exec( function( err, beneficiaries ){
                 
-        //         // return error
-        //         if ( err ) return res.negotiate( err );
+                // return error
+                if ( err ) return res.negotiate( err );
 
-        //         // beneficiaries
-        //         beneficiaries.forEach( function( b, i ){
+                // beneficiaries
+                beneficiaries.forEach( function( b, i ){
 
-        //           // project location
-        //           if ( !projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] ) {
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] = {};
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male = 0;
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male = 0;
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female = 0;
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female = 0;
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total = 0;
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
-        //             projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
-        //           }
+                  // project location
+                  if ( !projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] ) {
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] = {};
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male = 0;
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male = 0;
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female = 0;
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female = 0;
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total = 0;
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
+                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
+                  }
 
-        //           // summary
-        //           projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated / 4 );
-        //           projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated / 4 );
-        //           projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated / 4 );
-        //           projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated / 4 );
-        //           projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
+                  // summary
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated / 4 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated / 4 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated / 4 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated / 4 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
 
-        //         });
+                });
   
-        //         // flatten json
-        //         function flatten( json ) {
-        //           var array = [];
-        //           for( var i in json ) {
-        //             if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
-        //               array.push( json[ i ] );
-        //             }
-        //           }
-        //           return array;
-        //         }
+                // flatten json
+                function flatten( json ) {
+                  var array = [];
+                  for( var i in json ) {
+                    if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
+                      array.push( json[ i ] );
+                    }
+                  }
+                  return array;
+                }
 
-        //         // flatten by project
-        //         var projectArray = flatten( projectStore );
-        //         projectArray.forEach( function( p, i ) {
+                // flatten by project
+                var projectArray = flatten( projectStore );
+                projectArray.forEach( function( p, i ) {
 
-        //           // flatten location
-        //           var locationArray = flatten( p );
+                  // flatten location
+                  var locationArray = flatten( p );
 
-        //           // no reports, provide basic info
-        //           if( !locationArray.length ){ 
+                  // no reports, provide basic info
+                  if( !locationArray.length ){ 
 
-        //             // list project target locations
-        //             projects[i].prov_code.forEach( function( p_code, j ) {
+                    // list project target locations
+                    projects[i].prov_code.forEach( function( p_code, j ) {
 
-        //               // list project target beneficairies
-        //               projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
+                      // list project target beneficairies
+                      projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
 
-        //                 // empty project
-        //                 data.push({
-        //                   organization: p.organization,
-        //                   project_code: p.project_code,
-        //                   project_title: p.project_title,
-        //                   prov_code: p_code,
-        //                   prov_name: '',
-        //                   beneficiary_type: beneficiaries,
-        //                   under5male: 0,
-        //                   over5male: 0,
-        //                   under5female: 0,
-        //                   over5female: 0,
-        //                   total: 0,
-        //                   lat: 0,
-        //                   lng: 0
-        //                 });
+                        // empty project
+                        data.push({
+                          organization: p.organization,
+                          project_code: p.project_code,
+                          project_title: p.project_title,
+                          prov_code: p_code,
+                          prov_name: '',
+                          beneficiary_type: beneficiaries,
+                          under5male: 0,
+                          over5male: 0,
+                          under5female: 0,
+                          over5female: 0,
+                          total: 0,
+                          lat: 0,
+                          lng: 0
+                        });
 
-        //               });
+                      });
 
-        //             });
+                    });
 
-        //           } else {
+                  } else {
 
-        //             // each location
-        //             locationArray.forEach( function( l, j ) {
+                    // each location
+                    locationArray.forEach( function( l, j ) {
 
-        //               // beneficiaries
-        //               var beneficiariesArray = flatten( l );
-        //               beneficiariesArray.forEach( function( b, k ) {
+                      // beneficiaries
+                      var beneficiariesArray = flatten( l );
+                      beneficiariesArray.forEach( function( b, k ) {
 
-        //                 // active project
-        //                 data.push({
-        //                   organization: p.organization,
-        //                   project_code: p.project_code,
-        //                   project_title: p.project_title,
-        //                   prov_code: l.prov_code,
-        //                   prov_name: l.prov_name,
-        //                   beneficiary_type: b.beneficiary_name,
-        //                   under5male: b.under5male,
-        //                   over5male: b.over5male,
-        //                   under5female: b.under5female,
-        //                   over5female: b.over5female,
-        //                   total: b.total,
-        //                   lat: l.lat,
-        //                   lng: l.lng
-        //                 });
-        //               });
+                        // active project
+                        data.push({
+                          organization: p.organization,
+                          project_code: p.project_code,
+                          project_title: p.project_title,
+                          prov_code: l.prov_code,
+                          prov_name: l.prov_name,
+                          beneficiary_type: b.beneficiary_name,
+                          under5male: b.under5male,
+                          over5male: b.over5male,
+                          under5female: b.under5female,
+                          over5female: b.over5female,
+                          total: b.total,
+                          lat: l.lat,
+                          lng: l.lng
+                        });
+                      });
 
-        //             });
+                    });
 
-        //           }
+                  }
 
-        //         });
+                });
 
-        //         // return csv
-        //         json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                // return csv
+                json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
                   
-        //           // error
-        //           if ( err ) return res.negotiate( err );
+                  // error
+                  if ( err ) return res.negotiate( err );
 
-        //           // success
-        //           return res.json( 200, { data: csv } );
+                  // success
+                  return res.json( 200, { data: csv } );
 
-        //         });                
+                });
 
-        //       });
+              });
 
 
-        //   });
+          });
         
         break;
 

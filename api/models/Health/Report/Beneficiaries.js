@@ -24,8 +24,13 @@ module.exports = {
 			required: true
 		},
 		project_id: {
-			type: 'string'
+			type: 'string',
+			required: true
 		},
+		report_id: {
+			type: 'string',
+			required: true
+		},		
 		// add a reference to Location
     location_id: {
       model: 'location'
