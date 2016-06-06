@@ -27,6 +27,12 @@ module.exports = {
 		project_id: {
 			model: 'project'
 		},
+		project_code: {
+			type: 'string'
+		},
+		project_donor: {
+			type: 'array'
+		},	
 		project_title: {
 			type: 'string',
 			required: true
