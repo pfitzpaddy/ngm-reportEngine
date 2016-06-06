@@ -197,7 +197,6 @@ function getProjectReports( project, target_locations ) {
 	// declare variables
 	var moment = require('moment'),
 			reports = [],
-			report_active = true,
 			// set start date / end date to start and end of respective months
 			s_date = moment( project.project_start_date ).startOf( 'month' ),
 			e_date = moment( project.project_end_date ).endOf( 'month' );
@@ -207,6 +206,9 @@ function getProjectReports( project, target_locations ) {
 
 	// for each report month
 	for ( m = 0; m < reports_duration; m++ ) {
+
+		// report is true
+		var report_active = true;
 
 		// should be reports just for 2016 period!
 		if ( moment( s_date ).add( m, 'M' ).year() < 2016  ) {
@@ -280,12 +282,20 @@ function updateProjectReports( reports, next ) {
 	// for each report
 	reports.forEach( function( report, r_index ) {
 
+		// report is true
+		var report_active = true;
+
+		// should be reports just for 2016 period!
+		if ( reports[ r_index ].report_year < 2016  ) {
+			report_active = false;
+		}
+
 		// updateOrCreate (returns array)
 		Report
 			.update( { 	project_id: reports[ r_index ].project_id,
 									report_month: reports[ r_index ].report_month, 
 									report_year: reports[ r_index ].report_year
-								}, { report_active: true } )
+								}, { report_active: report_active } )
 			.exec( function( err, report ) {
 
 				// return error
