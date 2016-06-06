@@ -167,7 +167,22 @@ module.exports = {
 						if ( !updated_reports.length ) {
 
 							//
-							next();
+							// next();
+
+							console.log('no reports!');
+
+							// create
+							Report
+								.create( reports )
+								.exec( function( err, reports ) {
+
+									// return error
+									if ( err ) return next( err );
+
+									// next!
+									next();
+									
+								});							
 
 						}	else {
 							
