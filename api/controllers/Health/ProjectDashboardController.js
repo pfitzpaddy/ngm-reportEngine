@@ -5,6 +5,17 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+// flatten json
+function flatten( json ) {
+  var array = [];
+  for( var i in json ) {
+    if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
+      array.push( json[ i ] );
+    }
+  }
+  return array;
+}
+
 var ProjectDashboardController = {
 
   // contact list
@@ -107,6 +118,7 @@ var ProjectDashboardController = {
     var data = [],
         fields,
         fieldNames,
+        moment = require('moment'),
         json2csv = require('json2csv');    
 
     // return indicator
@@ -120,6 +132,62 @@ var ProjectDashboardController = {
 
         //
         return res.json( 200, { data: [] } );
+
+        break;
+
+      // summarise financial progress
+      case 'financial':
+
+        // store data by project
+        var projectStore = {};
+        
+        // json2csv
+        fields = [ 'organization', 'project_code', 'project_title', 'project_budget', 'project_budget_currency', 'project_donor', 'project_budget_date_recieved', 'project_budget_amount_recieved' ],
+        fieldNames = [ 'Partner', 'Project Code', 'Project Title', 'Total Project Budget', 'Project Budget Currency', 'Donor', 'Date Funds Recieved', 'Amount Recieved' ];
+
+        // projects
+        projects.forEach( function( p, i ){
+          // project details
+          projectStore[ p.id ] = {}
+          projectStore[ p.id ].organization = p.organization;
+          projectStore[ p.id ].project_code = p.project_code;
+          projectStore[ p.id ].project_title = p.project_title;
+
+        });
+
+        // get reports
+        BudgetProgress
+          .find()
+          .where( { project_id: project_ids } )
+          .exec( function( err, budget ) {
+
+            // error
+            if ( err ) return res.negotiate( err );
+
+            // budget
+            budget.forEach( function( b, i ){
+
+              // latest updated project details
+              budget[ i ].organization = projectStore[ b.project_id ].organization;
+              budget[ i ].project_code = projectStore[ b.project_id ].project_code;
+              budget[ i ].project_title = projectStore[ b.project_id ].project_title;
+              budget[ i ].project_budget_currency = b.project_budget_currency.toUpperCase();
+              budget[ i ].project_budget_date_recieved = moment( b.project_budget_date_recieved ).format('YYYY-MM-DD');
+
+            });
+            
+            // return csv
+            json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              return res.json( 200, { data: csv } );
+
+            });
+
+          });
 
         break;
 
@@ -141,7 +209,7 @@ var ProjectDashboardController = {
           projectStore[ p.id ].project_code = p.project_code;
           projectStore[ p.id ].project_title = p.project_title;
 
-        });        
+        });
         
         // get reports
         Report
@@ -205,17 +273,6 @@ var ProjectDashboardController = {
                   projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
 
                 });
-  
-                // flatten json
-                function flatten( json ) {
-                  var array = [];
-                  for( var i in json ) {
-                    if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
-                      array.push( json[ i ] );
-                    }
-                  }
-                  return array;
-                }
 
                 // flatten by project
                 var projectArray = flatten( projectStore );
@@ -337,13 +394,8 @@ var ProjectDashboardController = {
       // project_id
       project_id: params.project_id ? { id: params.project_id } : {},
       // date_filter
-      date_filter: { 
-        or: [{
-          project_start_date: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) }
-        },{ 
-          project_end_date: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } 
-        }]
-      },
+      date_filter_s: { project_start_date: { '<=': new Date( params.end_date ) } },
+      date_filter_e: { project_end_date: { '>=': new Date( params.start_date ) } },
       // project_status
       project_status_filter: params.project_status ? { project_status: params.project_status } : {},
       // project_type
@@ -360,7 +412,8 @@ var ProjectDashboardController = {
     // get projects by organization_id
     Project.find()
       .where( filters.project_id )
-      .where( filters.date_filter )
+      .where( filters.date_filter_s )
+      .where( filters.date_filter_e )
       .where( filters.project_status_filter )
       .where( filters.project_type_filter )
       .where( filters.beneficiaries_filter )
@@ -393,79 +446,7 @@ var ProjectDashboardController = {
           // prepare download
           ProjectDashboardController.getCsvDownload( params, filters, projects, project_ids, res );
 
-        }        
-
-
-        // for each project, construct full object with associations
-        // projects.forEach(function(d, i){
-
-        //   // clone project to update
-        //   $projects[i] = d.toObject();
-        //   // add locations
-        //   $projects[i].locations = [];
-
-        //   // get locations
-        //   Location.find()
-        //     .where( { project_id: $projects[i].id  } )
-        //     .where(filters.prov_code_filter)
-        //     .where(filters.dist_code_filter)            
-        //     .exec(function( err, locations ){
-
-        //     // return error
-        //     if (err) return res.negotiate( err );
-
-        //     // add beneficiaries
-        //     locations.forEach(function(l, j){
-
-        //       // clone locations
-        //       $projects[i].locations[j] = l.toObject();
-        //       // clone beneficiaries
-        //       $projects[i].locations[j].beneficiaries = [];
-
-        //       // get beneficiaries
-        //       Beneficiaries.find().where( { location_id: $projects[i].locations[j].id  } ).exec(function( err, beneficiaries ){
-
-        //         // return error
-        //         if (err) return res.negotiate( err );
-
-        //         // add beneficiaries if location exists
-        //         if ( $projects[i].locations ){
-        //           $projects[i].locations[j].beneficiaries = beneficiaries;
-        //         }
-
-        //         // run metrics
-        //         if ( i === ( projects.length - 1 ) && j === ( locations.length - 1 ) ) {
-
-        //           // process final result (remove projects with empty locations)
-        //           var projectsFiltered = []
-        //           $projects.forEach(function(p) {
-        //             if( p.locations.length ){
-        //               projectsFiltered.push(p);
-        //             }
-        //           });
-
-        //           // if indicator, else data
-        //           if ( params.indicator ) {             
-
-        //             // calculate and return metric
-        //             ProjectDashboardController.getIndicatorMetric( params, filters, projectsFiltered, res );
-
-        //           } else{
-
-        //             // prepare download
-        //             ProjectDashboardController.getCsvDownload( params, filters, projectsFiltered, res );
-
-        //           }
-                
-        //         };
-
-        //       });
-
-        //     });
-
-        //   });
-
-        // });
+        }
 
       });
 
@@ -514,8 +495,48 @@ var ProjectDashboardController = {
       // locations
       case 'locations':
 
-        // 
-        return res.json(200, { 'value': 0, 'value_total': 0 });
+
+        // $filter with distinct district by names (total locations)
+
+        // $filter with distinct district by names where conflict = true ( in conflict locations )
+
+        // distinct district by names where conflict = true
+
+        var locations = {},
+            conflict = !params.conflict ? { } : { conflict: true };
+
+        // actual locations
+        TargetLocation
+          .find()
+          .where( { project_id: project_ids } )
+          .where( conflict )
+          .exec( function( err, target_locations ) {
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // for each
+            target_locations.forEach( function( location, i ){
+              //
+              locations[ location.dist_name ] = location;
+
+            });
+
+            // actual locations
+            District
+              .find()
+              .where( { conflict: true } )
+              .exec( function( err, conflict_locations ) {    
+
+                // return error
+                if (err) return res.negotiate( err );
+
+                // return new Project
+                return res.json(200, { 'value': flatten( locations ).length, 'value_total': conflict_locations.length });
+
+              });
+
+          });
 
         // params
         // var project_ids = [],
@@ -811,98 +832,7 @@ var ProjectDashboardController = {
 
       }
 
-  },
-
-  // prepare and return csv based on filtered project
-  // getCsvDownload: function( params, filters, $projects, res ) {
-
-  //   // require
-  //   var data = [],
-  //       fields = [],
-  //       _ = require('underscore'),
-  //       json2csv = require('json2csv');
-
-  //   // return indicator
-  //   switch( params.details ){
-
-  //     case 'locations':
-
-  //       var $locations = [];
-
-  //       // for each project
-  //       $projects.forEach(function(p, i){      
-  //         // create one list of locations 
-  //         p.locations.forEach(function(l, i){
-  //           // push location to list
-  //           $locations.push( l );
-  //         });
-  //       });
-
-  //       // project
-  //       $locations.forEach(function(l, i){
-          
-  //         // add beneficiaries with underscore (get beneficiaries from fn for one location at a time)
-  //         _.extend($locations[i], ProjectDashboardController.getBeneficiaries( [ $locations[i] ], 'locations' ) );
-
-  //         // remove unwanted keys
-  //         delete $locations[i].id;
-  //         delete $locations[i].project_id;
-  //         delete $locations[i].implementing_partners_checked;
-  //         delete $locations[i].beneficiaries;
-  //         delete $locations[i].timestamp;      
-
-  //       });
-
-  //       // get field names
-  //       for (var key in $locations[0]) {
-  //         // include
-  //         fields.push(key);
-  //       }     
-  
-  //       // assign for csv
-  //       data = $locations;
-
-  //       break;
-
-  //     // default is projects
-  //     default:
-
-  //       // project
-  //       $projects.forEach(function(p, i){
-          
-  //         // add beneficiaries with underscore (get beneficiaries from fn for one project at a time)
-  //         _.extend($projects[i], ProjectDashboardController.getBeneficiaries( [ $projects[i] ], 'projects' ) );
-
-  //         // remove unwanted keys
-  //         delete $projects[i].id;
-  //         delete $projects[i].locations;          
-
-  //       });
-
-  //       // get field names
-  //       for (var key in $projects[0]) {
-  //         fields.push(key);
-  //       }
-  
-  //       // assign for csv
-  //       data = $projects;
-
-  //       break;  
-
-  //   }
-
-  //   // return csv
-  //   json2csv( { data: data, fields: fields }, function( err, csv ) {
-      
-  //     // error
-  //     if ( err ) return res.negotiate( err );
-
-  //     // success
-  //     return res.json( 200, { data: csv } );
-
-  //   });
-
-  // }
+  }
 
 };
 
