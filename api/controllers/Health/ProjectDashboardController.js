@@ -400,8 +400,8 @@ var ProjectDashboardController = {
   getHealthDetails: function( req, res ){
 
     // request input
-    // if ( ( !req.param('project_id') ) || ( !req.param('start_date') || !req.param('end_date') || !req.param('project_type') || !req.param('beneficiary_category') || !req.param('prov_code') || !req.param('dist_code') ) ) {
-    //   return res.json(401, {err: 'indicator, start_date, end_date, project_status, project_type, beneficiary_category, prov_code, dist_code required!'});
+    // if ( ( !req.param('project_id') ) || ( !req.param('start_date') || !req.param('end_date') || !req.param('project_type') || !req.param('beneficiary_type') || !req.param('prov_code') || !req.param('dist_code') ) ) {
+    //   return res.json(401, {err: 'indicator, start_date, end_date, project_status, project_type, beneficiary_type, prov_code, dist_code required!'});
     // }
 
     // get params
@@ -413,7 +413,7 @@ var ProjectDashboardController = {
       end_date: req.param('end_date') ? req.param('end_date') : '2020-12-31',
       project_status: req.param('project_status') ? req.param('project_status') : false,
       project_type: req.param('project_type') ? req.param('project_type') : ['all'],
-      beneficiary_category: req.param('beneficiary_category') ? req.param('beneficiary_category') : ['all'],
+      beneficiary_type: req.param('beneficiary_type') ? req.param('beneficiary_type') : ['all'],
       prov_code: req.param('prov_code') ? req.param('prov_code') : '*',
       dist_code: req.param('dist_code') ? req.param('dist_code') : '*',
       conflict: req.param('conflict') ? req.param('conflict') : false
@@ -431,7 +431,7 @@ var ProjectDashboardController = {
       // project_type
       project_type_filter: params.project_type[0] === 'all' ? {} : { project_type: params.project_type },
       // beneficiaries_filter
-      beneficiaries_filter: params.beneficiary_category[0] === 'all' ? {} : { beneficiary_category: params.beneficiary_category },
+      beneficiaries_filter: params.beneficiary_type[0] === 'all' ? {} : { beneficiary_type: params.beneficiary_type },
       // prov locations filter
       prov_code_filter: params.prov_code !== '*' ? { prov_code: params.prov_code } : {},
       // dist locations filter
