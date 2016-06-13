@@ -69,8 +69,91 @@ var ProjectDashboardController = {
       // summarise beneficiaries by location ( district )
       case 'locations':
 
-        //
-        return res.json( 200, { data: [] } );
+        // store data by project
+        var locationStore = {};
+        
+        // json2csv
+        fields = [ 'prov_name', 'prov_code', 'dist_name', 'dist_code', 'under5male', 'under5female', 'over5male', 'over5female', 'total', 'lng', 'lat' ],
+        fieldNames = [ 'Province Name', 'Province Code', 'District Name', 'District Code', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Total', 'lng', 'lat' ];
+
+        // get reports
+        Report
+          .find()
+          .where( { project_id: project_ids } )
+          // .where( { report_status: 'complete' } )
+          .populateAll()
+          .exec( function( err, reports ) {
+
+            // return error
+            if ( err ) return res.negotiate( err );
+
+            // each location
+            var location_ids = [];
+
+            // for each report/location
+            reports.forEach( function( r, i ){
+              r.locations.forEach( function( l, j ){
+
+                // locations
+                location_ids.push( l.id );
+                // location details
+                locationStore[ l.dist_code ] = {}
+                locationStore[ l.dist_code ].prov_code = l.prov_code;
+                locationStore[ l.dist_code ].prov_name = l.prov_name;
+                locationStore[ l.dist_code ].dist_code = l.dist_code;
+                locationStore[ l.dist_code ].dist_name = l.dist_name;
+                // beneficairies
+                locationStore[ l.dist_code ].under5male = 0;
+                locationStore[ l.dist_code ].under5female = 0;
+                locationStore[ l.dist_code ].over5male = 0;
+                locationStore[ l.dist_code ].over5female = 0;
+                locationStore[ l.dist_code ].total = 0;
+                // location lat, lng
+                locationStore[ l.dist_code ].lat = l.dist_lat;
+                locationStore[ l.dist_code ].lng = l.dist_lng;                
+
+              });
+            });
+
+            // beneficiaires
+            Beneficiaries
+              .find()
+              .where( { location_id: location_ids } )
+              .where( filters.prov_code_filter )
+              .where( filters.dist_code_filter )
+              .exec( function( err, beneficiaries ){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+                
+                // beneficiaries
+                beneficiaries.forEach( function( b, i ){
+
+                  // u5
+                  locationStore[ b.dist_code ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated / 4 );
+                  locationStore[ b.dist_code ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated / 4 );
+                  // o5
+                  locationStore[ b.dist_code ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated / 4 );
+                  locationStore[ b.dist_code ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated / 4 );
+                  // total
+                  locationStore[ b.dist_code ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
+
+                });
+
+                // return csv
+                json2csv({ data: flatten( locationStore ), fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                  
+                  // error
+                  if ( err ) return res.negotiate( err );
+
+                  // success
+                  return res.json( 200, { data: csv } );
+
+                });
+
+              });
+
+          });
 
         break;
 
