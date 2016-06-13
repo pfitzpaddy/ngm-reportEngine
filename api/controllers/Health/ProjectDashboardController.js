@@ -81,6 +81,7 @@ var ProjectDashboardController = {
           .find()
           .where( { project_id: project_ids } )
           // .where( { report_status: 'complete' } )
+          .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {
 
@@ -177,7 +178,7 @@ var ProjectDashboardController = {
 
         });
 
-        // get reports
+        // get financial details
         BudgetProgress
           .find()
           .where( { project_id: project_ids } )
@@ -240,6 +241,7 @@ var ProjectDashboardController = {
           .find()
           .where( { project_id: project_ids } )
           // .where( { report_status: 'complete' } )
+          .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {
 
@@ -426,6 +428,8 @@ var ProjectDashboardController = {
       // date_filter
       date_filter_s: { project_start_date: { '<=': new Date( params.end_date ) } },
       date_filter_e: { project_end_date: { '>=': new Date( params.start_date ) } },
+      // beneficiaries report_month
+      reporting_period: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
       // project_status
       project_status_filter: params.project_status ? { project_status: params.project_status } : {},
       // project_type
@@ -540,6 +544,9 @@ var ProjectDashboardController = {
 
             // return error
             if (err) return res.negotiate( err );
+
+            // if no length
+            if ( !target_locations.length ) return res.json(200, { 'value': 0 } );
 
             // for each
             target_locations.forEach( function( location, i ){
@@ -657,11 +664,15 @@ var ProjectDashboardController = {
           .find()
           .where( { project_id: project_ids } )
           // .where( { report_status: 'complete' } )
+          .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {
 
             // return error
             if ( err ) return res.negotiate( err );
+
+            // if no reports
+            if ( !reports.length ) return res.json(200, { 'value': 0 } );
 
             // each location
             var location_ids = [];
@@ -679,13 +690,17 @@ var ProjectDashboardController = {
             // beneficiaires
             Beneficiaries
               .find()
-              .where( { location_id: location_ids } )
+              .where( { location_id: location_ids } )   
+              .where( filters.beneficiaries_filter )
               .where( filters.prov_code_filter )
               .where( filters.dist_code_filter )
               .exec( function( err, beneficiaries ){
 
                 // return error
                 if ( err ) return res.negotiate( err );
+
+                // if no length
+                if ( !beneficiaries.length ) return res.json(200, { 'value': 0 } );     
                 
                 // beneficiaries
                 beneficiaries.forEach( function( b, i ){
@@ -772,11 +787,15 @@ var ProjectDashboardController = {
           .find()
           .where( { project_id: project_ids } )
           // .where( { report_status: 'complete' } )
+          .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {
 
             // return error
             if ( err ) return res.negotiate( err );
+
+            // if no length
+            if ( !reports.length ) return res.json(200, { 'value': 0 } );
 
             // each location
             var location_ids = [];
@@ -795,12 +814,16 @@ var ProjectDashboardController = {
             Beneficiaries
               .find()
               .where( { location_id: location_ids } )
+              .where( filters.beneficiaries_filter )
               .where( filters.prov_code_filter )
               .where( filters.dist_code_filter )
               .exec( function( err, beneficiaries ){
 
                 // return error
                 if ( err ) return res.negotiate( err );
+
+                // if no length
+                if ( !beneficiaries.length ) return res.json(200, { 'value': 0 } );
                 
                 // beneficiaries
                 beneficiaries.forEach( function( b, i ){
