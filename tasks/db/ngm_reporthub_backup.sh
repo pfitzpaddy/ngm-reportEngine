@@ -16,8 +16,8 @@ sudo mkdir $DIR
 # dump
 sudo mongodump --out $DIR
 # zip
-sudo zip -r $DIR/ngmReportHub.zip $DIR/$STAMP/ngmReportHub
-sudo zip -r $DIR/ngmHealthCluster.zip $DIR/$STAMP/ngmHealthCluster
+sudo zip -r $DIR/ngmReportHub.zip $DIR/ngmReportHub
+sudo zip -r $DIR/ngmHealthCluster.zip $DIR/ngmHealthCluster
 # copy to s3
 aws s3 cp $DIR/ngmReportHub.zip s3://s3-af-geonode/reporthub/
 aws s3 cp $DIR/ngmHealthCluster.zip s3://s3-af-geonode/reporthub/
