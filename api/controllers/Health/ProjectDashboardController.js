@@ -500,9 +500,7 @@ var ProjectDashboardController = {
         
         // filter by $projects
         projects.forEach( function( d, i ){
-          if ( d.project_status === 'active' ) {
-            organization_ids.push( d.organization_id );
-          }
+          organization_ids.push( d.organization_id );
         });
 
         // no. of organizations
