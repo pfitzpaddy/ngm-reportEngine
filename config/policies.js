@@ -42,10 +42,11 @@ module.exports.policies = {
   // public
   'FileController': {
     'print': true,
-    'proxy': true
-  },  
+    'proxy': true,
+    'export': true
+  },
 
-    // public
+  // public
   'LocationController': {
     '*': true
   },

@@ -48,6 +48,7 @@ module.exports.routes = {
   'POST /process': 'FileController.process',
   'POST /print': 'FileController.print',
   'POST /proxy': 'FileController.proxy',
+  'GET /export': 'FileController.export',
 
   // Locaiton lists
   'GET /location/getProvinceList': 'LocationController.getProvinceList',
@@ -80,7 +81,6 @@ module.exports.routes = {
 
   // get project financials
   'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',
-  
   // Health Dashboard & Data
   'POST /health/indicator': 'Health/ProjectDashboardController.getHealthDetails',
   // data 
