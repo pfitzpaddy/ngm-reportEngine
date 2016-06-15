@@ -315,32 +315,33 @@ var ProjectDashboardController = {
                     // list project target locations
                     projects[i].prov_code.forEach( function( p_code, j ) {
 
-                      //
-                      console.log( projects[i] );
+                      // if beneficiaries exist
+                      if ( projects[i].beneficiary_type ) {
+                        
+                        // list project target beneficairies
+                        projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
 
-                      // list project target beneficairies
-                      projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
+                          // empty project
+                          data.push({
+                            organization: p.organization,
+                            project_code: p.project_code,
+                            project_title: p.project_title,
+                            project_start_date: p.project_start_date,
+                            project_end_date: p.project_end_date,
+                            prov_code: p_code,
+                            prov_name: '',
+                            beneficiary_type: beneficiaries,
+                            under5male: 0,
+                            over5male: 0,
+                            under5female: 0,
+                            over5female: 0,
+                            total: 0,
+                            lat: 0,
+                            lng: 0
+                          });
 
-                        // empty project
-                        data.push({
-                          organization: p.organization,
-                          project_code: p.project_code,
-                          project_title: p.project_title,
-                          project_start_date: p.project_start_date,
-                          project_end_date: p.project_end_date,
-                          prov_code: p_code,
-                          prov_name: '',
-                          beneficiary_type: beneficiaries,
-                          under5male: 0,
-                          over5male: 0,
-                          under5female: 0,
-                          over5female: 0,
-                          total: 0,
-                          lat: 0,
-                          lng: 0
                         });
-
-                      });
+                      }
 
                     });
 
