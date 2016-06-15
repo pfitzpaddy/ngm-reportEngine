@@ -315,6 +315,9 @@ var ProjectDashboardController = {
                     // list project target locations
                     projects[i].prov_code.forEach( function( p_code, j ) {
 
+                      //
+                      console.log( projects[i] );
+
                       // list project target beneficairies
                       projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
 
