@@ -58,6 +58,108 @@ module.exports = {
 
   },
 
+  // beneficiaries user
+  setTargetBeneficiariesUser: function( req, res ) {
+
+    //
+    Organization
+      .find()
+      .exec( function( err, organization ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        //
+        var counter = 0,
+            length = organization.length;
+
+        // each org
+        organization.forEach( function( org, i ){
+
+          // target
+          TargetBeneficiaries
+            .find( { organization_id: org.id } )
+            .exec( function( err, target ){         
+
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // update
+              target.forEach( function( r, i ){
+
+                target[i].username = org.username;
+                target[i].email = org.email;
+                target[i].save(function(err){
+                  
+                  //
+                  counter++;
+                  if ( counter === length ) {
+                    // else
+                    return res.json( 200, { 'msg': 'complete!' } );
+                  }
+
+                });
+              });             
+
+            });
+
+        });
+
+      });
+
+  }, 
+
+  // locations user
+  setTargetLocationsUser: function( req, res ) {
+
+    //
+    Organization
+      .find()
+      .exec( function( err, organization ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        //
+        var counter = 0,
+            length = organization.length;
+
+        // each org
+        organization.forEach( function( org, i ){
+
+          // target
+          TargetLocation
+            .find( { organization_id: org.id } )
+            .exec( function( err, target ){         
+
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // update
+              target.forEach( function( r, i ){
+
+                target[i].username = org.username;
+                target[i].email = org.email;
+                target[i].save(function(err){
+                  
+                  //
+                  counter++;
+                  if ( counter === length ) {
+                    // else
+                    return res.json( 200, { 'msg': 'complete!' } );
+                  }
+
+                });
+              });             
+
+            });
+
+        });
+
+      });
+
+  },
+
   // get all reports by project id
   getReportsList: function( req, res ) {
 
