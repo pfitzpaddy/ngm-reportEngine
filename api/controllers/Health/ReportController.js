@@ -138,8 +138,9 @@ module.exports = {
               // update
               target.forEach( function( r, i ){
 
+                console.log( 'new' );
                 console.log( target[i].username );
-                console.log( org.username );
+                console.log( org );
 
                 target[i].username = org.username;
                 target[i].email = org.email;
