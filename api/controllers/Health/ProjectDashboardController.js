@@ -317,7 +317,7 @@ var ProjectDashboardController = {
 
                       // if beneficiaries exist
                       if ( projects[i].beneficiary_type ) {
-                        
+
                         // list project target beneficairies
                         projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
 
@@ -457,6 +457,7 @@ var ProjectDashboardController = {
       .where( filters.beneficiaries_filter )
       .where( filters.prov_code_filter )
       .where( filters.dist_code_filter )
+      .where( { organization: { '!': 'iMMAP' } } )
       .exec( function( err, projects ){
       
         // return error
