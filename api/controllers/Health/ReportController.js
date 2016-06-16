@@ -87,6 +87,10 @@ module.exports = {
               // update
               target.forEach( function( r, i ){
 
+                console.log( 'new' )
+                console.log( target[i].username )
+                console.log( p.username )
+
                 target[i].username = p.username;
                 target[i].email = p.email;
                 target[i].save(function(err){
