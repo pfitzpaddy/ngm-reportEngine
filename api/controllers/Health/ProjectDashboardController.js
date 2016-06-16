@@ -80,7 +80,6 @@ var ProjectDashboardController = {
         Report
           .find()
           .where( { project_id: project_ids } )
-          // .where( { report_status: 'complete' } )
           .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {
@@ -240,7 +239,6 @@ var ProjectDashboardController = {
         Report
           .find()
           .where( { project_id: project_ids } )
-          // .where( { report_status: 'complete' } )
           .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {
@@ -666,7 +664,6 @@ var ProjectDashboardController = {
         Report
           .find()
           .where( { project_id: project_ids } )
-          // .where( { report_status: 'complete' } )
           .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {
@@ -789,7 +786,6 @@ var ProjectDashboardController = {
         Report
           .find()
           .where( { project_id: project_ids } )
-          // .where( { report_status: 'complete' } )
           .where( filters.reporting_period )
           .populateAll()
           .exec( function( err, reports ) {

@@ -7,6 +7,57 @@
 
 module.exports = {
 
+  // report user
+  setReportUser: function( req, res ) {
+
+    //
+    Organization
+      .find()
+      .exec( function( err, organization ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        //
+        var counter = 0,
+            length = organization.length;
+
+        // each org
+        organization.forEach( function( org, i ){
+
+          // report
+          Report
+            .find( { organization_id: org.id } )
+            .exec( function( err, report ){         
+
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // update
+              report.forEach( function( r, i ){
+
+                report[i].username = org.username;
+                report[i].email = org.email;
+                report[i].save(function(err){
+                  
+                  //
+                  counter++;
+                  if ( counter === length ) {
+                    // else
+                    return res.json( 200, { 'msg': 'complete!' } );
+                  }
+
+                });
+              });             
+
+            });
+
+        });
+
+      });
+
+  },
+
   // get all reports by project id
   getReportsList: function( req, res ) {
 
