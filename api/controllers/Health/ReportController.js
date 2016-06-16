@@ -11,23 +11,23 @@ module.exports = {
   setReportUser: function( req, res ) {
 
     //
-    Organization
+    Project
       .find()
-      .exec( function( err, organization ){
+      .exec( function( err, project ){
 
         // return error
         if ( err ) return res.negotiate( err );
 
         //
         var counter = 0,
-            length = organization.length;
+            length = project.length;
 
         // each org
-        organization.forEach( function( org, i ){
+        project.forEach( function( p, i ){
 
           // report
           Report
-            .find( { organization_id: org.id } )
+            .find( { project_id: p.id } )
             .exec( function( err, report ){         
 
               // return error
@@ -36,8 +36,8 @@ module.exports = {
               // update
               report.forEach( function( r, i ){
 
-                report[i].username = org.username;
-                report[i].email = org.email;
+                report[i].username = p.username;
+                report[i].email = p.email;
                 report[i].save(function(err){
                   
                   //
@@ -62,23 +62,23 @@ module.exports = {
   setTargetBeneficiariesUser: function( req, res ) {
 
     //
-    Organization
+    Project
       .find()
-      .exec( function( err, organization ){
+      .exec( function( err, project ){
 
         // return error
         if ( err ) return res.negotiate( err );
 
         //
         var counter = 0,
-            length = organization.length;
+            length = project.length;
 
-        // each org
-        organization.forEach( function( org, i ){
+        // each p
+        project.forEach( function( p, i ){
 
           // target
           TargetBeneficiaries
-            .find( { organization_id: org.id } )
+            .find( { project_id: p.id } )
             .exec( function( err, target ){         
 
               // return error
@@ -87,8 +87,8 @@ module.exports = {
               // update
               target.forEach( function( r, i ){
 
-                target[i].username = org.username;
-                target[i].email = org.email;
+                target[i].username = p.username;
+                target[i].email = p.email;
                 target[i].save(function(err){
                   
                   //
@@ -113,23 +113,23 @@ module.exports = {
   setTargetLocationsUser: function( req, res ) {
 
     //
-    Organization
+    Project
       .find()
-      .exec( function( err, organization ){
+      .exec( function( err, project ){
 
         // return error
         if ( err ) return res.negotiate( err );
 
         //
         var counter = 0,
-            length = organization.length;
+            length = project.length;
 
-        // each org
-        organization.forEach( function( org, i ){
+        // each p
+        project.forEach( function( p, i ){
 
           // target
           TargetLocation
-            .find( { organization_id: org.id } )
+            .find( { project_id: p.id } )
             .exec( function( err, target ){         
 
               // return error
@@ -140,10 +140,10 @@ module.exports = {
 
                 console.log( 'new' );
                 console.log( target[i].username );
-                console.log( org );
+                console.log( p.username );
 
-                target[i].username = org.username;
-                target[i].email = org.email;
+                target[i].username = p.username;
+                target[i].email = p.email;
                 target[i].save(function(err){
                   
                   //
