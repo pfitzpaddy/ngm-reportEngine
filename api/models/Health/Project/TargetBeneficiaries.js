@@ -30,7 +30,11 @@ module.exports = {
 		username: {
 			type: 'string',
 			required: true
-		},	
+		},
+		email: {
+			type: 'string',
+			required: true
+		},
 		beneficiary_name: {
 			type: 'string',
 			required: true
