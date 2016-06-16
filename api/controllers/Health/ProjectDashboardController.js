@@ -697,7 +697,6 @@ var ProjectDashboardController = {
               .where( filters.beneficiaries_filter )
               .where( filters.prov_code_filter )
               .where( filters.dist_code_filter )
-              .where( { organization: { '!': 'iMMAP' } } )
               .exec( function( err, beneficiaries ){
 
                 // return error
@@ -821,7 +820,6 @@ var ProjectDashboardController = {
               .where( filters.beneficiaries_filter )
               .where( filters.prov_code_filter )
               .where( filters.dist_code_filter )
-              .where( { organization: { '!': 'iMMAP' } } )
               .exec( function( err, beneficiaries ){
 
                 // return error
