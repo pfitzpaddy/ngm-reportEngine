@@ -499,15 +499,19 @@ var ProjectDashboardController = {
       case 'partners':
 
         // organization_ids
-        var organization_ids = [];
+        var filter = {},
+            organization_ids = [];
         
         // filter by $projects
         projects.forEach( function( d, i ){
           organization_ids.push( d.organization_id );
         });
 
+        // params
+        filter = params.project_status ? { id: organization_ids } : {};
+
         // no. of organizations
-        Organization.count( { id: organization_ids } ).exec( function( err, value ){
+        Organization.count( filter ).exec( function( err, value ){
 
           // return error
           if ( err ) return res.negotiate( err );
