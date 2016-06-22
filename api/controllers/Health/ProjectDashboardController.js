@@ -613,7 +613,7 @@ var ProjectDashboardController = {
                 if (err) return res.negotiate( err );
 
                 //
-                console.log( user );
+                console.log( d.username );
 
                 // popup message
                 var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
