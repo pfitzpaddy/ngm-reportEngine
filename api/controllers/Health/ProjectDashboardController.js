@@ -130,11 +130,11 @@ var ProjectDashboardController = {
                 beneficiaries.forEach( function( b, i ){
 
                   // u5
-                  locationStore[ b.dist_code ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated / 4 );
-                  locationStore[ b.dist_code ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated / 4 );
+                  locationStore[ b.dist_code ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+                  locationStore[ b.dist_code ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
                   // o5
-                  locationStore[ b.dist_code ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated / 4 );
-                  locationStore[ b.dist_code ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated / 4 );
+                  locationStore[ b.dist_code ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+                  locationStore[ b.dist_code ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
                   // total
                   locationStore[ b.dist_code ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
 
@@ -292,10 +292,10 @@ var ProjectDashboardController = {
                   }
 
                   // summary
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated / 4 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated / 4 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated / 4 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated / 4 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
                   projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
 
                 });
@@ -709,10 +709,10 @@ var ProjectDashboardController = {
                 // beneficiaries
                 beneficiaries.forEach( function( b, i ){
                   // summary
-                  $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated / 4 );
-                  $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated / 4 );
-                  $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated / 4 );
-                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated / 4 );
+                  $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+                  $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
+                  $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
                   $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
 
                 });
@@ -831,12 +831,12 @@ var ProjectDashboardController = {
                 // beneficiaries
                 beneficiaries.forEach( function( b, i ){
                   // u5
-                  $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated / 4 );
-                  $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated / 4 );
+                  $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+                  $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
                   $beneficiaries.under5Total = $beneficiaries.under5male + $beneficiaries.under5female;
                   // o5
-                  $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated / 4 );
-                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated / 4 );
+                  $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
                   $beneficiaries.over5Total = $beneficiaries.over5male + $beneficiaries.over5female;
                   // total
                   $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
