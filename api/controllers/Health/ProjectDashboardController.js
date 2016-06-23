@@ -634,6 +634,7 @@ var ProjectDashboardController = {
                             + '<div style="text-align:center"> in ' + d.prov_name + ', ' + d.dist_name + '</div>'
                             + '<div style="text-align:center">' + d.fac_type + '</div>'
                             + '<div style="text-align:center">' + d.fac_name + '</div>'
+                            + '<div style="text-align:center">' + d.fac_type_name + '</div>'
                             + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
                             + '<div style="text-align:center">' + user.name + '</div>'
                             + '<div style="text-align:center">' + user.position + '</div>'
