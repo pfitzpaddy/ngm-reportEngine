@@ -73,8 +73,8 @@ var ProjectDashboardController = {
         var locationStore = {};
         
         // json2csv
-        fields = [ 'prov_name', 'prov_code', 'dist_name', 'dist_code', 'under5male', 'under5female', 'over5male', 'over5female', 'total', 'lng', 'lat' ],
-        fieldNames = [ 'Province Name', 'Province Code', 'District Name', 'District Code', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Total', 'lng', 'lat' ];
+        fields = [ 'prov_name', 'prov_code', 'dist_name', 'dist_code', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fieldNames = [ 'Province Name', 'Province Code', 'District Name', 'District Code', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // get reports
         Report
@@ -104,9 +104,17 @@ var ProjectDashboardController = {
                 locationStore[ l.dist_code ].dist_name = l.dist_name;
                 // beneficairies
                 locationStore[ l.dist_code ].under5male = 0;
+                locationStore[ l.dist_code ].penta3_vacc_male_under1 = 0;
                 locationStore[ l.dist_code ].under5female = 0;
+                locationStore[ l.dist_code ].penta3_vacc_female_under1 = 0;
                 locationStore[ l.dist_code ].over5male = 0;
                 locationStore[ l.dist_code ].over5female = 0;
+                locationStore[ l.dist_code ].skilled_birth_attendant = 0;
+                locationStore[ l.dist_code ].conflict_trauma_treated = 0;
+                locationStore[ l.dist_code ].education_male = 0;
+                locationStore[ l.dist_code ].education_female = 0;
+                locationStore[ l.dist_code ].capacity_building_male = 0;
+                locationStore[ l.dist_code ].capacity_building_female = 0;
                 locationStore[ l.dist_code ].total = 0;
                 // location lat, lng
                 locationStore[ l.dist_code ].lat = l.dist_lat;
@@ -130,13 +138,22 @@ var ProjectDashboardController = {
                 beneficiaries.forEach( function( b, i ){
 
                   // u5
-                  locationStore[ b.dist_code ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-                  locationStore[ b.dist_code ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+                  locationStore[ b.dist_code ].under5male += b.under5male;
+                  locationStore[ b.dist_code ].under5female += b.under5female;
+                  locationStore[ b.dist_code ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
+                  locationStore[ b.dist_code ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
                   // o5
-                  locationStore[ b.dist_code ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-                  locationStore[ b.dist_code ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+                  locationStore[ b.dist_code ].over5male += b.over5male;
+                  locationStore[ b.dist_code ].over5female += b.over5female;
+                  locationStore[ b.dist_code ].skilled_birth_attendant += b.skilled_birth_attendant;
+                  locationStore[ b.dist_code ].conflict_trauma_treated += b.conflict_trauma_treated;
+                  locationStore[ b.dist_code ].education_male += b.education_male;
+                  locationStore[ b.dist_code ].education_female += b.education_female;
+                  locationStore[ b.dist_code ].capacity_building_male += b.capacity_building_male;
+                  locationStore[ b.dist_code ].capacity_building_female += b.capacity_building_female;
+
                   // total
-                  locationStore[ b.dist_code ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
+                  locationStore[ b.dist_code ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
 
                 });
 
@@ -295,8 +312,8 @@ var ProjectDashboardController = {
                   projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
                   projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
                   projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
 
                 });
 
@@ -712,8 +729,8 @@ var ProjectDashboardController = {
                   $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
                   $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
                   $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-                  $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
+                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+                  $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
 
                 });
 
@@ -836,10 +853,10 @@ var ProjectDashboardController = {
                   $beneficiaries.under5Total = $beneficiaries.under5male + $beneficiaries.under5female;
                   // o5
                   $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
                   $beneficiaries.over5Total = $beneficiaries.over5male + $beneficiaries.over5female;
                   // total
-                  $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_male + b.capacity_building_female + b.conflict_trauma_treated;
+                  $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
 
                 });
 
