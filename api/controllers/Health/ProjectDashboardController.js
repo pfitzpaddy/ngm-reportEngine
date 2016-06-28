@@ -340,6 +340,7 @@ var ProjectDashboardController = {
 
                           // empty project
                           data.push({
+                            id: p.id,
                             organization: p.organization,
                             project_code: p.project_code,
                             project_title: p.project_title,
@@ -373,6 +374,7 @@ var ProjectDashboardController = {
 
                         // active project
                         data.push({
+                          id: p.id,
                           organization: p.organization,
                           project_code: p.project_code,
                           project_title: p.project_title,
