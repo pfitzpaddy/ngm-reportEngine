@@ -97,7 +97,7 @@ var ProjectDashboardController = {
                 // locations
                 location_ids.push( l.id );
                 // location details
-                locationStore[ l.dist_code ] = {}
+                locationStore[ l.dist_code ] = {};
                 locationStore[ l.dist_code ].prov_code = l.prov_code;
                 locationStore[ l.dist_code ].prov_name = l.prov_name;
                 locationStore[ l.dist_code ].dist_code = l.dist_code;
@@ -181,13 +181,14 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'organization', 'project_code', 'project_title', 'project_budget', 'project_budget_currency', 'project_donor', 'project_budget_date_recieved', 'project_budget_amount_recieved' ],
-        fieldNames = [ 'Partner', 'Project Code', 'Project Title', 'Total Project Budget', 'Project Budget Currency', 'Donor', 'Date Funds Recieved', 'Amount Recieved' ];
+        fields = [ 'id', 'organization', 'project_code', 'project_title', 'project_budget', 'project_budget_currency', 'project_donor', 'project_budget_date_recieved', 'project_budget_amount_recieved' ],
+        fieldNames = [ 'ReportHub ID', 'Partner', 'Project Code', 'Project Title', 'Total Project Budget', 'Project Budget Currency', 'Donor', 'Date Funds Recieved', 'Amount Recieved' ];
 
         // projects
         projects.forEach( function( p, i ){
           // project details
           projectStore[ p.id ] = {}
+          projectStore[ p.id ].id = p.id;
           projectStore[ p.id ].organization = p.organization;
           projectStore[ p.id ].project_code = p.project_code;
           projectStore[ p.id ].project_title = p.project_title;
@@ -237,13 +238,14 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'organization', 'project_code', 'project_title', 'project_start_date', 'project_end_date', 'prov_code', 'prov_name', 'beneficiary_type', 'under5male', 'over5male', 'under5female', 'over5female', 'total', 'lat', 'lng' ],
-        fieldNames = [ 'Partner', 'Project Code', 'Project Title', 'Project Start Date', 'Project End Date', 'Province Code', 'Province Name', 'Beneficiary Category', 'under5male', 'over5male', 'under5female', 'over5female', 'Total', 'lat', 'lng' ];
+        fields = [ 'id', 'organization', 'project_code', 'project_title', 'project_start_date', 'project_end_date', 'prov_code', 'prov_name', 'beneficiary_type', 'under5male', 'over5male', 'under5female', 'over5female', 'total', 'lat', 'lng' ],
+        fieldNames = [ 'ReportHub ID', 'Partner', 'Project Code', 'Project Title', 'Project Start Date', 'Project End Date', 'Province Code', 'Province Name', 'Beneficiary Category', 'under5male', 'over5male', 'under5female', 'over5female', 'Total', 'lat', 'lng' ];
 
         // projects
         projects.forEach( function( p, i ){
           // project details
           projectStore[ p.id ] = {}
+          projectStore[ p.id ].id = p.id;
           projectStore[ p.id ].organization = p.organization;
           projectStore[ p.id ].project_code = p.project_code;
           projectStore[ p.id ].project_title = p.project_title;
