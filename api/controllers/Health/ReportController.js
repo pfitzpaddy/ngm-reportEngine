@@ -34,13 +34,26 @@ module.exports = {
               // return error
               if ( err ) return res.negotiate( err );
 
-              // beneficiaries
-              beneficiaries[i].prov_lng = location.prov_lng;
-              beneficiaries[i].prov_lat = location.prov_lat;
-              beneficiaries[i].dist_lng = location.dist_lng;
-              beneficiaries[i].dist_lat = location.dist_lat;              
-              beneficiaries[i].save(function(err){
+              if ( location ){
                 
+                // beneficiaries
+                beneficiaries[i].prov_lng = location.prov_lng;
+                beneficiaries[i].prov_lat = location.prov_lat;
+                beneficiaries[i].dist_lng = location.dist_lng;
+                beneficiaries[i].dist_lat = location.dist_lat;              
+                beneficiaries[i].save(function(err){
+                  
+                  //
+                  counter++;
+                  if ( counter === length ) {
+                    // else
+                    return res.json( 200, { 'msg': 'complete!' } );
+                  }
+
+                });
+
+              } else {
+
                 //
                 counter++;
                 if ( counter === length ) {
@@ -48,7 +61,7 @@ module.exports = {
                   return res.json( 200, { 'msg': 'complete!' } );
                 }
 
-              });
+              }
 
             });
 
