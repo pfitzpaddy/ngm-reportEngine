@@ -7,6 +7,73 @@
 
 module.exports = {
 
+  // set beneficiaries report details
+  setBeneficiariesReportDetails: function( req, res ) {
+
+    // beneficiaries
+    Beneficiaries
+      .find()
+      .exec( function( err, beneficiaries ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // 
+        var counter=0,
+            length=beneficiaries.length;
+
+        // beneficiaries
+        beneficiaries.forEach( function( b, i ){
+          
+          // get reports
+          Report
+            .findOne()
+            .where( { id: b.report_id } )
+            .exec( function( err, report ){
+
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // beneficiaries
+              beneficiaries[i].report_year = report.report_year;
+              beneficiaries[i].reporting_period = report.reporting_period;
+              beneficiaries[i].save(function(err){
+                
+                //
+                counter++;
+                if ( counter === length ) {
+                  // else
+                  return res.json( 200, { 'msg': 'complete!' } );
+                }
+
+              });
+
+            });
+
+        });
+
+      });
+
+        //   // beneficiaries update
+        //   Beneficiaries
+        //     .update( { id: b.id }, { report_month: b.report_month, report_year: b.report_year, reporting_period: b.reporting_period  } )
+        //     .exec( function( err, report ){
+
+        //       // return error
+        //       if ( err ) return res.negotiate( err );
+
+        //         // counter
+        //         counter++;
+
+        //         if ( counter === length ) {
+        //           // else
+        //           return res.json( 200, { 'msg': 'complete!' } );
+        //         }
+
+        //     });
+
+  },
+
   // report user
   setReportUser: function( req, res ) {
 
@@ -48,6 +115,7 @@ module.exports = {
                   }
 
                 });
+
               });             
 
             });

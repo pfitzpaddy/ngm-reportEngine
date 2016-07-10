@@ -83,6 +83,14 @@ module.exports.routes = {
   'GET /health/report/setReportsOpen': 'Health/ReportController.setReportsOpen',
   'GET /health/report/setReportsReminder': 'Health/ReportController.setReportsReminder',
 
+
+  
+  // report update details
+  'GET /health/report/setBeneficiariesReportDetails': 'Health/ReportController.setBeneficiariesReportDetails',
+
+
+
+
   // get project financials
   'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',
   // Health Dashboard & Data

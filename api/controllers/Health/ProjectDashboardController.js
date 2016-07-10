@@ -80,7 +80,8 @@ var ProjectDashboardController = {
         Report
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_period )
+          .where( filters.reporting_filter_s )
+          .where( filters.reporting_filter_e )
           .populateAll()
           .exec( function( err, reports ) {
 
@@ -127,6 +128,7 @@ var ProjectDashboardController = {
             Beneficiaries
               .find()
               .where( { location_id: location_ids } )
+              .where( filters.beneficiaries_filter )
               .where( filters.prov_code_filter )
               .where( filters.dist_code_filter )
               .exec( function( err, beneficiaries ){
@@ -253,165 +255,145 @@ var ProjectDashboardController = {
           projectStore[ p.id ].project_end_date = moment( p.project_end_date ).format( 'YYYY-MM-DD' );
 
         });
-        
-        // get reports
-        Report
+
+        // beneficiaires
+        Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_period )
-          .populateAll()
-          .exec( function( err, reports ) {
-
+          .where( filters.beneficiaries_filter )
+          .where( filters.reporting_filter_s )
+          .where( filters.reporting_filter_e )
+          .where( filters.prov_code_filter )
+          .where( filters.dist_code_filter )
+          .exec( function( err, beneficiaries ){
+            
             // return error
             if ( err ) return res.negotiate( err );
 
-            // each location
-            var location_ids = [];
+            // beneficiaries
+            beneficiaries.forEach( function( b, i ){
 
-            // for each report/location
-            reports.forEach( function( r, i ){
-              r.locations.forEach( function( l, j ){
-
-                // locations
-                location_ids.push( l.id );
+              // project location
+              if ( !projectStore[ b.project_id ][ b.prov_code ] ) {
                 // project location
-                projectStore[ l.project_id ][ l.prov_code ] = {}
-                projectStore[ l.project_id ][ l.prov_code ].prov_code = l.prov_code;
-                projectStore[ l.project_id ][ l.prov_code ].prov_name = l.prov_name;
-                projectStore[ l.project_id ][ l.prov_code ].lat = l.prov_lat;
-                projectStore[ l.project_id ][ l.prov_code ].lng = l.prov_lng;
+                projectStore[ b.project_id ][ b.prov_code ] = {}
+                projectStore[ b.project_id ][ b.prov_code ].prov_code = b.prov_code;
+                projectStore[ b.project_id ][ b.prov_code ].prov_name = b.prov_name;
+                projectStore[ b.project_id ][ b.prov_code ].lat = b.prov_lat;
+                projectStore[ b.project_id ][ b.prov_code ].lng = b.prov_lng;                    
 
-              });
+              }
+              // beneficiaries
+              if ( !projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] ) {
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] = {};
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male = 0;
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male = 0;
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female = 0;
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female = 0;
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total = 0;
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
+                projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
+              }
+
+              // summary
+              projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+              projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+              projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
+
             });
 
-            // beneficiaires
-            Beneficiaries
-              .find()
-              .where( { location_id: location_ids } )
-              .where( filters.prov_code_filter )
-              .where( filters.dist_code_filter )
-              .exec( function( err, beneficiaries ){
-                
-                // return error
-                if ( err ) return res.negotiate( err );
+            // flatten by project
+            var projectArray = flatten( projectStore );
+            projectArray.forEach( function( p, i ) {
 
-                // beneficiaries
-                beneficiaries.forEach( function( b, i ){
+              // flatten location
+              var locationArray = flatten( p );
 
-                  // project location
-                  if ( !projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] ) {
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ] = {};
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male = 0;
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male = 0;
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female = 0;
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female = 0;
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total = 0;
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
-                    projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
-                  }
+              // no reports, provide basic info
+              if( !locationArray.length ){ 
 
-                  // summary
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-                  projectStore[ b.project_id ][ b.prov_code ][ b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
+                // list project target locations
+                projects[i].prov_code.forEach( function( p_code, j ) {
 
-                });
+                  // if beneficiaries exist
+                  if ( projects[i].beneficiary_type ) {
 
-                // flatten by project
-                var projectArray = flatten( projectStore );
-                projectArray.forEach( function( p, i ) {
+                    // list project target beneficairies
+                    projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
 
-                  // flatten location
-                  var locationArray = flatten( p );
-
-                  // no reports, provide basic info
-                  if( !locationArray.length ){ 
-
-                    // list project target locations
-                    projects[i].prov_code.forEach( function( p_code, j ) {
-
-                      // if beneficiaries exist
-                      if ( projects[i].beneficiary_type ) {
-
-                        // list project target beneficairies
-                        projects[i].beneficiary_type.forEach( function( beneficiaries, k ) {
-
-                          // empty project
-                          data.push({
-                            id: p.id,
-                            organization: p.organization,
-                            project_code: p.project_code,
-                            project_title: p.project_title,
-                            project_start_date: p.project_start_date,
-                            project_end_date: p.project_end_date,
-                            prov_code: p_code,
-                            prov_name: '',
-                            beneficiary_type: beneficiaries,
-                            under5male: 0,
-                            over5male: 0,
-                            under5female: 0,
-                            over5female: 0,
-                            total: 0,
-                            lat: 0,
-                            lng: 0
-                          });
-
-                        });
-                      }
-
-                    });
-
-                  } else {
-
-                    // each location
-                    locationArray.forEach( function( l, j ) {
-
-                      // beneficiaries
-                      var beneficiariesArray = flatten( l );
-                      beneficiariesArray.forEach( function( b, k ) {
-
-                        // active project
-                        data.push({
-                          id: p.id,
-                          organization: p.organization,
-                          project_code: p.project_code,
-                          project_title: p.project_title,
-                          project_start_date: p.project_start_date,
-                          project_end_date: p.project_end_date,
-                          prov_code: l.prov_code,
-                          prov_name: l.prov_name,
-                          beneficiary_type: b.beneficiary_name,
-                          under5male: b.under5male,
-                          over5male: b.over5male,
-                          under5female: b.under5female,
-                          over5female: b.over5female,
-                          total: b.total,
-                          lat: l.lat,
-                          lng: l.lng
-                        });
+                      // empty project
+                      data.push({
+                        id: p.id,
+                        organization: p.organization,
+                        project_code: p.project_code,
+                        project_title: p.project_title,
+                        project_start_date: p.project_start_date,
+                        project_end_date: p.project_end_date,
+                        prov_code: p_code,
+                        prov_name: '',
+                        beneficiary_type: beneficiaries,
+                        under5male: 0,
+                        over5male: 0,
+                        under5female: 0,
+                        over5female: 0,
+                        total: 0,
+                        lat: 0,
+                        lng: 0
                       });
 
                     });
-
                   }
 
                 });
 
-                // return csv
-                json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-                  
-                  // error
-                  if ( err ) return res.negotiate( err );
+              } else {
 
-                  // success
-                  return res.json( 200, { data: csv } );
+                // each location
+                locationArray.forEach( function( l, j ) {
+
+                  // beneficiaries
+                  var beneficiariesArray = flatten( l );
+                  beneficiariesArray.forEach( function( b, k ) {
+
+                    // active project
+                    data.push({
+                      id: p.id,
+                      organization: p.organization,
+                      project_code: p.project_code,
+                      project_title: p.project_title,
+                      project_start_date: p.project_start_date,
+                      project_end_date: p.project_end_date,
+                      prov_code: l.prov_code,
+                      prov_name: l.prov_name,
+                      beneficiary_type: b.beneficiary_name,
+                      under5male: b.under5male,
+                      over5male: b.over5male,
+                      under5female: b.under5female,
+                      over5female: b.over5female,
+                      total: b.total,
+                      lat: l.lat,
+                      lng: l.lng
+                    });
+                  });
 
                 });
 
-              });
+              }
 
+            });
+
+            // return csv
+            json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              return res.json( 200, { data: csv } );
+
+            });
 
           });
         
@@ -452,7 +434,8 @@ var ProjectDashboardController = {
       date_filter_s: { project_start_date: { '<=': new Date( params.end_date ) } },
       date_filter_e: { project_end_date: { '>=': new Date( params.start_date ) } },
       // beneficiaries report_month
-      reporting_period: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
+      reporting_filter_s: { reporting_period: { '>=': new Date( params.start_date ) } },
+      reporting_filter_e: { reporting_period: { '<=': new Date( params.end_date ) } },
       // project_status
       project_status_filter: params.project_status ? { project_status: params.project_status } : {},
       // project_type
@@ -685,63 +668,36 @@ var ProjectDashboardController = {
           total: 0
         };
 
-        // get reports
-        Report
+        // beneficiaires
+        Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_period )
-          .populateAll()
-          .exec( function( err, reports ) {
+          .where( filters.beneficiaries_filter )
+          .where( filters.reporting_filter_s )
+          .where( filters.reporting_filter_e )
+          .where( filters.prov_code_filter )
+          .where( filters.dist_code_filter )
+          .exec( function( err, beneficiaries ){
 
             // return error
             if ( err ) return res.negotiate( err );
 
-            // if no reports
-            if ( !reports.length ) return res.json(200, { 'value': 0 } );
+            // if no length
+            if ( !beneficiaries.length ) return res.json(200, { 'value': 0 } );     
+            
+            // beneficiaries
+            beneficiaries.forEach( function( b, i ){
+              // summary
+              $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
+              $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
 
-            // each location
-            var location_ids = [];
-
-            // for each report/location
-            reports.forEach( function( r, i ){
-              r.locations.forEach( function( l, j ){
-
-                // locations
-                location_ids.push( l.id );
-
-              });
             });
 
-            // beneficiaires
-            Beneficiaries
-              .find()
-              .where( { location_id: location_ids } )   
-              .where( filters.beneficiaries_filter )
-              .where( filters.prov_code_filter )
-              .where( filters.dist_code_filter )
-              .exec( function( err, beneficiaries ){
-
-                // return error
-                if ( err ) return res.negotiate( err );
-
-                // if no length
-                if ( !beneficiaries.length ) return res.json(200, { 'value': 0 } );     
-                
-                // beneficiaries
-                beneficiaries.forEach( function( b, i ){
-                  // summary
-                  $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-                  $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
-                  $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-                  $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
-
-                });
-
-                // res
-                return res.json(200, { 'value': $beneficiaries.total } ); 
-
-              });
+            // res
+            return res.json(200, { 'value': $beneficiaries.total } ); 
 
           });
 
@@ -807,126 +763,100 @@ var ProjectDashboardController = {
           total: 0
         };
 
-        // get reports
-        Report
+        // beneficiaires
+        Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_period )
-          .populateAll()
-          .exec( function( err, reports ) {
+          .where( filters.beneficiaries_filter )
+          .where( filters.reporting_filter_s )
+          .where( filters.reporting_filter_e )
+          .where( filters.prov_code_filter )
+          .where( filters.dist_code_filter )
+          .exec( function( err, beneficiaries ){
 
             // return error
             if ( err ) return res.negotiate( err );
 
             // if no length
-            if ( !reports.length ) return res.json(200, { 'value': 0 } );
+            if ( !beneficiaries.length ) return res.json(200, { 'value': 0 } );
+            
+            // beneficiaries
+            beneficiaries.forEach( function( b, i ){
+              // u5
+              $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.under5Total = $beneficiaries.under5male + $beneficiaries.under5female;
+              // o5
+              $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.over5Total = $beneficiaries.over5male + $beneficiaries.over5female;
+              // total
+              $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
 
-            // each location
-            var location_ids = [];
-
-            // for each report/location
-            reports.forEach( function( r, i ){
-              r.locations.forEach( function( l, j ){
-
-                // locations
-                location_ids.push( l.id );
-
-              });
             });
 
-            // beneficiaires
-            Beneficiaries
-              .find()
-              .where( { location_id: location_ids } )
-              .where( filters.beneficiaries_filter )
-              .where( filters.prov_code_filter )
-              .where( filters.dist_code_filter )
-              .exec( function( err, beneficiaries ){
+            // breakdown
+            switch( params.indicator ){
 
-                // return error
-                if ( err ) return res.negotiate( err );
+              // indicator
+              case 'under5':
 
-                // if no length
-                if ( !beneficiaries.length ) return res.json(200, { 'value': 0 } );
+                // calc %
+                var malePerCent = ( $beneficiaries.under5male / ( $beneficiaries.under5male + $beneficiaries.under5female ) ) * 100;
+                var femalePerCent = ( $beneficiaries.under5female / ( $beneficiaries.under5male + $beneficiaries.under5female ) ) * 100;
+                var totalPerCent = ( $beneficiaries.under5Total / ( $beneficiaries.under5Total + $beneficiaries.over5Total ) ) * 100;
                 
-                // beneficiaries
-                beneficiaries.forEach( function( b, i ){
-                  // u5
-                  $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-                  $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
-                  $beneficiaries.under5Total = $beneficiaries.under5male + $beneficiaries.under5female;
-                  // o5
-                  $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-                  $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-                  $beneficiaries.over5Total = $beneficiaries.over5male + $beneficiaries.over5female;
-                  // total
-                  $beneficiaries.total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
+                // assign data left
+                result.label.left.label.label = malePerCent;
+                result.label.left.subLabel.label = $beneficiaries.under5male;
+                // assign data center
+                result.label.center.label.label = totalPerCent;
+                result.label.center.subLabel.label = $beneficiaries.under5Total;
+                // assign data right
+                result.label.right.label.label = femalePerCent;
+                result.label.right.subLabel.label = $beneficiaries.under5female;
 
-                });
+                // highcharts female
+                result.data[0].y = femalePerCent;
+                result.data[0].label = $beneficiaries.under5Total;
+                // highcharts male
+                result.data[1].y = malePerCent;
+                result.data[1].label = $beneficiaries.under5Total;
+                
+                break;
 
-                // breakdown
-                switch( params.indicator ){
+              case 'over5':
+                
+                // calc %
+                var malePerCent = ( $beneficiaries.over5male / ( $beneficiaries.over5male + $beneficiaries.over5female ) ) * 100;
+                var femalePerCent = ( $beneficiaries.over5female / ( $beneficiaries.over5female + $beneficiaries.over5male ) ) * 100;
+                var totalPerCent = ( $beneficiaries.over5Total / ( $beneficiaries.under5Total + $beneficiaries.over5Total ) ) * 100;
+                
+                // assign data left
+                result.label.left.label.label = malePerCent;
+                result.label.left.subLabel.label = $beneficiaries.over5male;
+                // assign data center
+                result.label.center.label.label = totalPerCent;
+                result.label.center.subLabel.label = $beneficiaries.over5Total;
+                // assign data right
+                result.label.right.label.label = femalePerCent;
+                result.label.right.subLabel.label = $beneficiaries.over5female;
 
-                  // indicator
-                  case 'under5':
+                // highcharts female
+                result.data[0].y = femalePerCent;
+                result.data[0].label = $beneficiaries.over5Total;
+                // highcharts male
+                result.data[1].y = malePerCent;
+                result.data[1].label = $beneficiaries.over5Total;
 
-                    // calc %
-                    var malePerCent = ( $beneficiaries.under5male / ( $beneficiaries.under5male + $beneficiaries.under5female ) ) * 100;
-                    var femalePerCent = ( $beneficiaries.under5female / ( $beneficiaries.under5male + $beneficiaries.under5female ) ) * 100;
-                    var totalPerCent = ( $beneficiaries.under5Total / ( $beneficiaries.under5Total + $beneficiaries.over5Total ) ) * 100;
-                    
-                    // assign data left
-                    result.label.left.label.label = malePerCent;
-                    result.label.left.subLabel.label = $beneficiaries.under5male;
-                    // assign data center
-                    result.label.center.label.label = totalPerCent;
-                    result.label.center.subLabel.label = $beneficiaries.under5Total;
-                    // assign data right
-                    result.label.right.label.label = femalePerCent;
-                    result.label.right.subLabel.label = $beneficiaries.under5female;
+                break;
+            }
 
-                    // highcharts female
-                    result.data[0].y = femalePerCent;
-                    result.data[0].label = $beneficiaries.under5Total;
-                    // highcharts male
-                    result.data[1].y = malePerCent;
-                    result.data[1].label = $beneficiaries.under5Total;
-                    
-                    break;
-
-                  case 'over5':
-                    
-                    // calc %
-                    var malePerCent = ( $beneficiaries.over5male / ( $beneficiaries.over5male + $beneficiaries.over5female ) ) * 100;
-                    var femalePerCent = ( $beneficiaries.over5female / ( $beneficiaries.over5female + $beneficiaries.over5male ) ) * 100;
-                    var totalPerCent = ( $beneficiaries.over5Total / ( $beneficiaries.under5Total + $beneficiaries.over5Total ) ) * 100;
-                    
-                    // assign data left
-                    result.label.left.label.label = malePerCent;
-                    result.label.left.subLabel.label = $beneficiaries.over5male;
-                    // assign data center
-                    result.label.center.label.label = totalPerCent;
-                    result.label.center.subLabel.label = $beneficiaries.over5Total;
-                    // assign data right
-                    result.label.right.label.label = femalePerCent;
-                    result.label.right.subLabel.label = $beneficiaries.over5female;
-
-                    // highcharts female
-                    result.data[0].y = femalePerCent;
-                    result.data[0].label = $beneficiaries.over5Total;
-                    // highcharts male
-                    result.data[1].y = malePerCent;
-                    result.data[1].label = $beneficiaries.over5Total;
-
-                    break;
-                }
-
-                // return new Project
-                return res.json( 200, result );
-
-              });
+            // return new Project
+            return res.json( 200, result );
 
           });
+
 
         break;
 

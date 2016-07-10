@@ -51,6 +51,9 @@ module.exports = {
 			type: 'integer',
 			required: true
 		},
+		report_submitted: {
+			type: 'date'
+		},
 		reporting_period: {
 			type: 'date',
 			required: true
@@ -58,9 +61,6 @@ module.exports = {
 		reporting_due_date: {
 			type: 'date',
 			required: true
-		},
-		report_submitted: {
-			type: 'date'
 		},
 		project_title: {
 			type: 'string',

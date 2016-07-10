@@ -35,6 +35,14 @@ module.exports = {
 			type: 'integer',
 			required: true
 		},
+		report_year: {
+			type: 'integer',
+			required: true
+		},
+		reporting_period: {
+			type: 'date',
+			required: true
+		},
 		// add a reference to Location
     location_id: {
       model: 'location'
