@@ -26,17 +26,19 @@ module.exports = {
         beneficiaries.forEach( function( b, i ){
           
           // get reports
-          Report
+          Location
             .findOne()
-            .where( { id: b.report_id } )
-            .exec( function( err, report ){
+            .where( { id: b.location_id } )
+            .exec( function( err, location ){
 
               // return error
               if ( err ) return res.negotiate( err );
 
               // beneficiaries
-              beneficiaries[i].report_year = report.report_year;
-              beneficiaries[i].reporting_period = report.reporting_period;
+              beneficiaries[i].prov_lng = location.prov_lng;
+              beneficiaries[i].prov_lat = location.prov_lat;
+              beneficiaries[i].dist_lng = location.dist_lng;
+              beneficiaries[i].dist_lat = location.dist_lat;              
               beneficiaries[i].save(function(err){
                 
                 //

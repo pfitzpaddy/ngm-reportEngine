@@ -92,7 +92,23 @@ module.exports = {
 		fac_name: {
 			type: 'string',
 			required: true
-		},	
+		},
+		prov_lng: {
+			type: 'float',
+			required: true
+		},
+		prov_lat: {
+			type: 'float',
+			required: true
+		},
+		dist_lng: {
+			type: 'float',
+			required: true
+		},
+		dist_lat: {
+			type: 'float',
+			required: true
+		},
 		beneficiary_name: {
 			type: 'string',
 			required: true

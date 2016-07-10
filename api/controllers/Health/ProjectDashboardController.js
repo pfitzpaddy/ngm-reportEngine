@@ -201,6 +201,8 @@ var ProjectDashboardController = {
         BudgetProgress
           .find()
           .where( { project_id: project_ids } )
+          .where( filters.financial_filter_s )
+          .where( filters.financial_filter_e )
           .exec( function( err, budget ) {
 
             // error
@@ -436,6 +438,9 @@ var ProjectDashboardController = {
       // beneficiaries report_month
       reporting_filter_s: { reporting_period: { '>=': new Date( params.start_date ) } },
       reporting_filter_e: { reporting_period: { '<=': new Date( params.end_date ) } },
+      // financial payment month
+      financial_filter_s: { project_budget_date_recieved: { '>=': new Date( params.start_date ) } },
+      financial_filter_e: { project_budget_date_recieved: { '<=': new Date( params.end_date ) } },      
       // project_status
       project_status_filter: params.project_status ? { project_status: params.project_status } : {},
       // project_type
