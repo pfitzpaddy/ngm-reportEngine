@@ -72,10 +72,6 @@ module.exports.routes = {
   'GET /health/project/delete': 'Health/ProjectController.deleteProjectById',
   
   // get project reports
-  'GET /health/report/setReportUser': 'Health/ReportController.setReportUser',
-  'GET /health/report/setTargetBeneficiariesUser': 'Health/ReportController.setTargetBeneficiariesUser',
-  'GET /health/report/setTargetLocationsUser': 'Health/ReportController.setTargetLocationsUser',
-
   'POST /health/report/getReportsList': 'Health/ReportController.getReportsList',
   'POST /health/report/getReport': 'Health/ReportController.getReportById',
   'POST /health/report/setReport': 'Health/ReportController.setReportById',
@@ -83,12 +79,8 @@ module.exports.routes = {
   'GET /health/report/setReportsOpen': 'Health/ReportController.setReportsOpen',
   'GET /health/report/setReportsReminder': 'Health/ReportController.setReportsReminder',
 
-
-  
   // report update details
-  'GET /health/report/setBeneficiariesReportDetails': 'Health/ReportController.setBeneficiariesReportDetails',
-
-
+  // 'GET /health/report/setBeneficiariesReportDetails': 'Health/ReportController.setBeneficiariesReportDetails',
 
 
   // get project financials

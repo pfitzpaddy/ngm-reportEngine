@@ -8,240 +8,68 @@
 module.exports = {
 
   // set beneficiaries report details
-  setBeneficiariesReportDetails: function( req, res ) {
+  // setBeneficiariesReportDetails: function( req, res ) {
 
-    // beneficiaries
-    Beneficiaries
-      .find()
-      .exec( function( err, beneficiaries ){
+  //   // beneficiaries
+  //   Beneficiaries
+  //     .find()
+  //     .exec( function( err, beneficiaries ){
 
-        // return error
-        if ( err ) return res.negotiate( err );
+  //       // return error
+  //       if ( err ) return res.negotiate( err );
 
-        // 
-        var counter=0,
-            length=beneficiaries.length;
+  //       // 
+  //       var counter=0,
+  //           length=beneficiaries.length;
 
-        // beneficiaries
-        beneficiaries.forEach( function( b, i ){
+  //       // beneficiaries
+  //       beneficiaries.forEach( function( b, i ){
           
-          // get reports
-          Location
-            .findOne()
-            .where( { id: b.location_id } )
-            .exec( function( err, location ){
+  //         // get reports
+  //         Location
+  //           .findOne()
+  //           .where( { id: b.location_id } )
+  //           .exec( function( err, location ){
 
-              // return error
-              if ( err ) return res.negotiate( err );
+  //             // return error
+  //             if ( err ) return res.negotiate( err );
 
-              if ( location ){
+  //             if ( location ){
                 
-                // beneficiaries
-                beneficiaries[i].prov_lng = location.prov_lng;
-                beneficiaries[i].prov_lat = location.prov_lat;
-                beneficiaries[i].dist_lng = location.dist_lng;
-                beneficiaries[i].dist_lat = location.dist_lat;              
-                beneficiaries[i].save(function(err){
+  //               // beneficiaries
+  //               beneficiaries[i].prov_lng = location.prov_lng;
+  //               beneficiaries[i].prov_lat = location.prov_lat;
+  //               beneficiaries[i].dist_lng = location.dist_lng;
+  //               beneficiaries[i].dist_lat = location.dist_lat;              
+  //               beneficiaries[i].save(function(err){
                   
-                  //
-                  counter++;
-                  if ( counter === length ) {
-                    // else
-                    return res.json( 200, { 'msg': 'complete!' } );
-                  }
+  //                 //
+  //                 counter++;
+  //                 if ( counter === length ) {
+  //                   // else
+  //                   return res.json( 200, { 'msg': 'complete!' } );
+  //                 }
 
-                });
+  //               });
 
-              } else {
+  //             } else {
 
-                //
-                counter++;
-                if ( counter === length ) {
-                  // else
-                  return res.json( 200, { 'msg': 'complete!' } );
-                }
+  //               //
+  //               counter++;
+  //               if ( counter === length ) {
+  //                 // else
+  //                 return res.json( 200, { 'msg': 'complete!' } );
+  //               }
 
-              }
+  //             }
 
-            });
+  //           });
 
-        });
+  //       });
 
-      });
+  //     });
 
-        //   // beneficiaries update
-        //   Beneficiaries
-        //     .update( { id: b.id }, { report_month: b.report_month, report_year: b.report_year, reporting_period: b.reporting_period  } )
-        //     .exec( function( err, report ){
-
-        //       // return error
-        //       if ( err ) return res.negotiate( err );
-
-        //         // counter
-        //         counter++;
-
-        //         if ( counter === length ) {
-        //           // else
-        //           return res.json( 200, { 'msg': 'complete!' } );
-        //         }
-
-        //     });
-
-  },
-
-  // report user
-  setReportUser: function( req, res ) {
-
-    //
-    Project
-      .find()
-      .exec( function( err, project ){
-
-        // return error
-        if ( err ) return res.negotiate( err );
-
-        //
-        var counter = 0,
-            length = project.length;
-
-        // each org
-        project.forEach( function( p, i ){
-
-          // report
-          Report
-            .find( { project_id: p.id } )
-            .exec( function( err, report ){         
-
-              // return error
-              if ( err ) return res.negotiate( err );
-
-              // update
-              report.forEach( function( r, i ){
-
-                report[i].username = p.username;
-                report[i].email = p.email;
-                report[i].save(function(err){
-                  
-                  //
-                  counter++;
-                  if ( counter === length ) {
-                    // else
-                    return res.json( 200, { 'msg': 'complete!' } );
-                  }
-
-                });
-
-              });             
-
-            });
-
-        });
-
-      });
-
-  },
-
-  // beneficiaries user
-  setTargetBeneficiariesUser: function( req, res ) {
-
-    //
-    Project
-      .find()
-      .exec( function( err, project ){
-
-        // return error
-        if ( err ) return res.negotiate( err );
-
-        //
-        var counter = 0,
-            length = project.length;
-
-        // each p
-        project.forEach( function( p, i ){
-
-          // target
-          TargetBeneficiaries
-            .find( { project_id: p.id } )
-            .exec( function( err, target ){         
-
-              // return error
-              if ( err ) return res.negotiate( err );
-
-              // update
-              target.forEach( function( r, i ){
-
-                target[i].username = p.username;
-                target[i].email = p.email;
-                target[i].save(function(err){
-                  
-                  //
-                  counter++;
-                  if ( counter === length ) {
-                    // else
-                    return res.json( 200, { 'msg': 'complete!' } );
-                  }
-
-                });
-              });             
-
-            });
-
-        });
-
-      });
-
-  }, 
-
-  // locations user
-  setTargetLocationsUser: function( req, res ) {
-
-    //
-    Project
-      .find()
-      .exec( function( err, project ){
-
-        // return error
-        if ( err ) return res.negotiate( err );
-
-        //
-        var counter = 0,
-            length = project.length;
-
-        // each p
-        project.forEach( function( p, i ){
-
-          // target
-          TargetLocation
-            .find( { project_id: p.id } )
-            .exec( function( err, target ){         
-
-              // return error
-              if ( err ) return res.negotiate( err );
-
-              // update
-              target.forEach( function( r, i ){
-
-                target[i].username = p.username;
-                target[i].email = p.email;
-                target[i].save(function(err){
-                  
-                  //
-                  counter++;
-                  if ( counter === length ) {
-                    // else
-                    return res.json( 200, { 'msg': 'complete!' } );
-                  }
-
-                });
-              });             
-
-            });
-
-        });
-
-      });
-
-  },
+  // },
 
   // get all reports by project id
   getReportsList: function( req, res ) {
@@ -335,10 +163,12 @@ module.exports = {
         project_ids = [];
 
     // only run if date is above monthly reporting period
-    if ( moment().date() >= 15 ) {
+    if ( moment().date() === 1 ) {
   
       // find active projects
-      Project.find( { project_status: 'active' } )
+      Project
+        .find()
+        .where( { project_status: 'active' } )
         .exec( function( err, projects ){
 
           // return error
@@ -350,11 +180,11 @@ module.exports = {
             // get project_id
             project_ids.push( project.id );
 
-          });
+          });        
 
           // find active reports for the next reporting period
           Report
-            .update( { project_id: project_ids, report_month: moment().add( 1, 'M' ).month() },
+            .update( { project_id: project_ids, report_month: moment().subtract( 1, 'M' ).month() },
                      { report_active: true, report_status: 'todo' } )
             .exec( function( err, reports ){
 
@@ -387,10 +217,12 @@ module.exports = {
         counter = 0;
 
     // only run if date is above monthly reporting period
-    if ( moment().date() >= 15 ) {
+    if ( moment().date() === 1 ) {
       
       // find active projects
-      Project.find( { project_status: 'active' } )
+      Project
+        .find()
+        .where( { project_status: 'active' } )
         .exec( function( err, projects ){
 
           // return error
@@ -408,10 +240,10 @@ module.exports = {
             // chaining reads easier!
           Report
             .find()
-            .where({ project_id: project_ids })
-            .where({ report_month: moment().add( 1, 'M' ).month() })
-            .where({ report_active: true })
-            .where({ report_status: 'todo' })
+            .where( { project_id: project_ids } )
+            .where( { report_month: moment().subtract( 1, 'M' ).month() } )
+            .where( { report_active: true } )
+            .where( { report_status: 'todo' } )
             .exec( function( err, reports ){
 
               // return error
@@ -430,7 +262,7 @@ module.exports = {
                   notification[ report.username ] = {
                     username: report.username,
                     email: report.email,
-                    report_month: moment().add( 1, 'M' ).format( 'MMMM' ),
+                    report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
                     reports: []
                   };
                 }
@@ -446,9 +278,6 @@ module.exports = {
               // each user, send only one email!
               for ( var user in notification ) {
 
-                // add to counter
-                counter++;
-
                 // send email
                 sails.hooks.email.send( 'notification-open', {
                     username: notification[ user ].username,
@@ -458,11 +287,14 @@ module.exports = {
                     sendername: 'ReportHub'
                   }, {
                     to: notification[ user ].email,
-                    subject: 'ReportHub - Reporting Period for ' + moment().add( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
+                    subject: 'ReportHub - Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
                   }, function(err) {
                     
                     // return error
                     if (err) return res.negotiate( err );
+
+                    // add to counter
+                    counter++;
 
                     // return 
                     if ( counter === Object.keys( notification ).length ) {
@@ -500,7 +332,8 @@ module.exports = {
     if ( moment().date() >= 10 ) {
       
       // find active projects
-      Project.find( { project_status: 'active' } )
+      Project
+        .find( { project_status: 'active' } )
         .exec( function( err, projects ){
 
           // return error
@@ -518,10 +351,10 @@ module.exports = {
             // chaining reads easier!
           Report
             .find()
-            .where({ project_id: project_ids })
-            .where({ report_month: { '<=': moment().subtract( 1, 'M' ).month() } })
-            .where({ report_active: true })
-            .where({ report_status: 'todo' })
+            .where( { project_id: project_ids } )
+            .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
+            .where( { report_active: true } )
+            .where( { report_status: 'todo' } )
             .exec( function( err, reports ){
 
               // return error
@@ -558,9 +391,6 @@ module.exports = {
               // each user, send only one email!
               for ( var user in notification ) {
 
-                // add to counter
-                counter++;
-
                 // send email
                 sails.hooks.email.send( 'notification-due', {
                     username: notification[ user ].username,
@@ -577,6 +407,9 @@ module.exports = {
                     // return error
                     if (err) return res.negotiate( err );
 
+                    // add to counter
+                    counter++;
+                    
                     // return 
                     if ( counter === Object.keys( notification ).length ) {
                       
