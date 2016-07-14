@@ -39,11 +39,11 @@ module.exports = {
 
   },
 
-  // get Provinces
+  // get Provinces for dashboard
   getProvinceMenu: function(req, res) {
 
     var $provinces = {
-      'afghanistan': { prov_code: '*', prov_name:'Afghanistan', lat:34.5, lng:66, zoom:6 }
+      'afghanistan': { prov_code: 'all', prov_name:'Afghanistan', lat:34.5, lng:66, zoom:6 }
     };
 
     // create Project with organization_id

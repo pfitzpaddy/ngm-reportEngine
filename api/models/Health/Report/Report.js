@@ -15,6 +15,23 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		// region/country id
+    adminRpcode: {
+			type: 'string',
+			required: true
+    },
+    adminRname: {
+			type: 'string',
+			required: true
+    },
+    admin0pcode: {
+			type: 'string',
+			required: true
+    },
+    admin0name: {
+			type: 'string',
+			required: true
+    },
 		project_id: {
 			type: 'string',
 			required: true

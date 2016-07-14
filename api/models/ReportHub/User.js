@@ -12,6 +12,23 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		// region/country id
+    adminRpcode: {
+			type: 'string',
+			required: true
+    },
+    adminRname: {
+			type: 'string',
+			required: true
+    },
+    admin0pcode: {
+			type: 'string',
+			required: true
+    },
+    admin0name: {
+			type: 'string',
+			required: true
+    },
 		organization_id: {
 			type: 'string'
 		},
@@ -51,21 +68,21 @@ module.exports = {
 		},
 		roles: {
 			type: 'array',
-			defaultsTo: ["USER"]
+			defaultsTo: [ "USER" ]
 		},
 		app_home: {
 			type: 'string',
-			defaultsTo: 'health'
+			defaultsTo: '/health/project/'
 		},
 		menu: {
 			type: 'array',
 			defaultsTo: [{
-        icon: "zoom_in",
-        liClass: "teal z-depth-2",
-        aClass: "white-text",
-        iClass: "medium material-icons",
-        href: "#/health/project",
-        title: "PROJECTS"
+        icon: 'zoom_in',
+        liClass: 'teal z-depth-2',
+        aClass: 'white-text',
+        iClass: 'medium material-icons',
+        href: '#/health/project/',
+        title: 'PROJECTS'
        }]
 		},
 		visits: {
@@ -93,43 +110,50 @@ module.exports = {
 			var org_name = user.organization.replace(/ /g, '_').toLowerCase();
 
 			// check if org exists
-	    Organization.find( { organization_name: org_name } ).exec(function ( err, organization ){
+	    Organization
+	    	.find()
+	    	.where( { admin0pcode: user.admin0pcode, organization_name: org_name } )
+	    	.exec(function ( err, organization ){
 			  	
-			  // error
-			  if ( err ) return next( err );
+				  // error
+				  if ( err ) return next( err );
 
-			  // if org dosnt exist, create
-			  if( !organization.length ){
-			  	
-			  	// create org_id
-			  	Organization.create({
-			  		organization_name: org_name,
-			  		organization_display_name: user.organization,
-			  	}).exec(function (err, created){
-						
-						// return error
-						if ( err ) return next( err );
-					
-						// organization_id
-						user.organization_id = created.id;
+				  // if org dosnt exist, create
+				  if( organization.length ){
+
+				  	// organization_id
+				  	user.organization_id = organization[0].id;
 
 						// next!
-						next();						
+						next();
 
-					});
+						// exists
+				  } else{
 
-					// exists
-			  } else{
-			  	
-			  	// organization_id
-			  	user.organization_id = organization[0].id;
+				  	// create org_id
+				  	Organization.create({
+				  		adminRpcode: user.adminRpcode,
+				  		adminRname: user.adminRname,
+				  		admin0pcode: user.admin0pcode,
+				  		admin0name: user.admin0name,
+				  		organization_name: org_name,
+				  		organization_display_name: user.organization,
+				  	}).exec(function (err, created){
+							
+							// return error
+							if ( err ) return next( err );
+						
+							// organization_id
+							user.organization_id = created.id;
 
-					// next!
-					next();
+							// next!
+							next();						
 
-			  }
-			  
-			});
+						});
+
+				  }
+				  
+				});
 
 		});			
 
@@ -141,7 +165,7 @@ module.exports = {
     // get user by email
     User
     	.find()
-    	.where({ organization_id: user.organization_id })
+    	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id })
     	.sort('createdAt ASC')
     	.exec( function( err, admin ){
 

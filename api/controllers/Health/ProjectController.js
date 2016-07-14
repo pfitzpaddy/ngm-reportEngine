@@ -7,6 +7,100 @@
 
 module.exports = {
 
+  // update database
+  updateDatabaseAdmin: function( req, res ){
+
+    // update
+    var admin = { adminRpcode: 'EMRO', adminRname: 'EMRO', admin0pcode: 'AF', admin0name: 'Afghanistan' };
+
+    // begin
+    User
+      .update({}, admin )
+      .exec( function( err, user ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        Organization
+          .update({}, admin )
+          .exec( function( err, user ){
+            
+            // return error
+            if ( err ) return res.negotiate( err );
+
+            Project
+              .update({}, admin )
+              .exec( function( err, user ){
+                
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                TargetBeneficiaries
+                  .update({}, admin )
+                  .exec( function( err, user ){
+                    
+                    // return error
+                    if ( err ) return res.negotiate( err );
+
+                    TargetLocation
+                      .update({}, admin )
+                      .exec( function( err, user ){
+                        
+                        // return error
+                        if ( err ) return res.negotiate( err );
+
+                        Report
+                          .update({}, admin )
+                          .exec( function( err, user ){
+                            
+                            // return error
+                            if ( err ) return res.negotiate( err );
+
+                            Location
+                              .update({}, admin )
+                              .exec( function( err, user ){
+                                
+                                // return error
+                                if ( err ) return res.negotiate( err );
+
+                                Beneficiaries
+                                  .update({}, admin )
+                                  .exec( function( err, user ){
+                                    
+                                    // return error
+                                    if ( err ) return res.negotiate( err );
+
+                                    BudgetProgress
+                                      .update({}, admin )
+                                      .exec( function( err, user ){
+                                        
+                                        // return error
+                                        if ( err ) return res.negotiate( err );
+
+                                          // return
+                                          return res.json( 200, { msg: 'success!' } );
+
+                                      });                                    
+
+                                  });                                 
+
+                              });                             
+
+                          });                         
+
+                      });                    
+
+                  });                
+
+              });
+
+          });        
+
+      });
+
+
+  },
+
   // set project details
   setProjectById: function(req, res) {
 

@@ -9,6 +9,14 @@ module.exports = {
 
 	// strict schema
 	attributes: {
+    admin0pcode: {
+			type: 'string',
+			required: true
+    },
+    admin0name: {
+			type: 'string',
+			required: true
+    },
 		organisation: {
 			type: 'string',
 			required: false

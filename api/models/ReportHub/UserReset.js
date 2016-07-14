@@ -12,6 +12,14 @@ module.exports = {
 
 	// attributes
 	attributes: {
+    admin0pcode: {
+			type: 'string',
+			required: true
+    },
+    admin0name: {
+			type: 'string',
+			required: true
+    },		
 		organization_id: {
 			type: 'string'
 		},

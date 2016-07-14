@@ -24,17 +24,17 @@ module.exports = {
     }, function foundUser( err, user ) {
 
       // user exists
-      if (user) return res.json(401, { err: 'User already exists! Forgot password?' });
+      if (user) return res.json( 401, { err: 'User already exists! Forgot password?' } );
 
       // else create user
-      User.create(req.param( 'user' )).exec(function(err, user) {
+      User.create( req.param( 'user' ) ).exec( function( err, user ) {
         if (err) return res.negotiate( err );
       
         // set token
-        user.token = jwtToken.issueToken({sid: user.id});
+        user.token = jwtToken.issueToken({ sid: user.id });
 
         //  return user
-        res.json(200, user);
+        res.json( 200, user );
 
       });
 

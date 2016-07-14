@@ -15,6 +15,23 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		// region/country id
+    adminRpcode: {
+			type: 'string',
+			required: true
+    },
+    adminRname: {
+			type: 'string',
+			required: true
+    },
+    admin0pcode: {
+			type: 'string',
+			required: true
+    },
+    admin0name: {
+			type: 'string',
+			required: true
+    },
 		organization_id: {
 			type: 'string',
 			required: true
@@ -37,12 +54,7 @@ module.exports = {
 		project_budget_progress: {
       collection: 'budgetprogress',
       via: 'project_id'
-		},    
-    // add reference to financials ( if WHO associated project )
-    financials: {
-      collection: 'financial',
-      via: 'project_id'
-    },
+		},
 		username: {
 			type: 'string',
 			required: true
@@ -221,6 +233,10 @@ function getProjectReports( project, target_locations ) {
 		var report = {
 			// defaults 
 			project_id: project.id,
+			adminRpcode: project.adminRpcode,
+			adminRname: project.adminRname,
+			admin0pcode: project.admin0pcode,
+			admin0name: project.admin0name,	
 			organization_id: project.organization_id,
 			organization: project.organization,
 			username: project.username,
