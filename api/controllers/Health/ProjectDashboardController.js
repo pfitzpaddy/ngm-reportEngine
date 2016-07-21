@@ -176,6 +176,119 @@ var ProjectDashboardController = {
 
         break;
 
+      // summarise beneficiaries by health_facility
+      case 'health_facility':
+
+        // store data by project
+        var locationStore = {};
+        
+        // json2csv
+        fields = [ 'id', 'prov_code', 'prov_name', 'dist_code', 'dist_name', 'fac_type_name', 'fac_name', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fieldNames = [ 'ID', 'Province Code', 'Province Name', 'District Code', 'District Name', 'Health Facility Type', 'Health Facility Name', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
+
+        // get reports
+        Report
+          .find()
+          .where( { project_id: project_ids } )
+          .where( filters.reporting_filter_s )
+          .where( filters.reporting_filter_e )
+          .populateAll()
+          .exec( function( err, reports ) {
+
+            // return error
+            if ( err ) return res.negotiate( err );
+
+            // each location
+            var location_ids = [];
+
+            // for each report/location
+            reports.forEach( function( r, i ){
+              r.locations.forEach( function( l, j ){
+
+                // locations
+                location_ids.push( l.id );
+                // location details
+                locationStore[ l.fac_type + l.fac_name ] = {};
+                locationStore[ l.fac_type + l.fac_name ].id = l.id;
+                locationStore[ l.fac_type + l.fac_name ].prov_code = l.prov_code;
+                locationStore[ l.fac_type + l.fac_name ].prov_name = l.prov_name;
+                locationStore[ l.fac_type + l.fac_name ].dist_code = l.dist_code;
+                locationStore[ l.fac_type + l.fac_name ].dist_name = l.dist_name;
+                locationStore[ l.fac_type + l.fac_name ].fac_type_name = l.fac_type_name;
+                locationStore[ l.fac_type + l.fac_name ].fac_name = l.fac_name;
+                // beneficairies
+                locationStore[ l.fac_type + l.fac_name ].under5male = 0;
+                locationStore[ l.fac_type + l.fac_name ].penta3_vacc_male_under1 = 0;
+                locationStore[ l.fac_type + l.fac_name ].under5female = 0;
+                locationStore[ l.fac_type + l.fac_name ].penta3_vacc_female_under1 = 0;
+                locationStore[ l.fac_type + l.fac_name ].over5male = 0;
+                locationStore[ l.fac_type + l.fac_name ].over5female = 0;
+                locationStore[ l.fac_type + l.fac_name ].skilled_birth_attendant = 0;
+                locationStore[ l.fac_type + l.fac_name ].conflict_trauma_treated = 0;
+                locationStore[ l.fac_type + l.fac_name ].education_male = 0;
+                locationStore[ l.fac_type + l.fac_name ].education_female = 0;
+                locationStore[ l.fac_type + l.fac_name ].capacity_building_male = 0;
+                locationStore[ l.fac_type + l.fac_name ].capacity_building_female = 0;
+                locationStore[ l.fac_type + l.fac_name ].total = 0;
+                // location lat, lng
+                locationStore[ l.fac_type + l.fac_name ].lat = l.dist_lat;
+                locationStore[ l.fac_type + l.fac_name ].lng = l.dist_lng;                
+
+              });
+            });
+
+            // beneficiaires
+            Beneficiaries
+              .find()
+              .where( { location_id: location_ids } )
+              .where( filters.beneficiaries_filter )
+              .where( filters.prov_code_filter )
+              .where( filters.dist_code_filter )
+              .exec( function( err, beneficiaries ){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+                
+                // beneficiaries
+                beneficiaries.forEach( function( b, i ){
+
+                  // u5
+                  locationStore[ b.fac_type + b.fac_name ].under5male += b.under5male;
+                  locationStore[ b.fac_type + b.fac_name ].under5female += b.under5female;
+                  locationStore[ b.fac_type + b.fac_name ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
+                  locationStore[ b.fac_type + b.fac_name ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
+                  // o5
+                  locationStore[ b.fac_type + b.fac_name ].over5male += b.over5male;
+                  locationStore[ b.fac_type + b.fac_name ].over5female += b.over5female;
+                  locationStore[ b.fac_type + b.fac_name ].skilled_birth_attendant += b.skilled_birth_attendant;
+                  locationStore[ b.fac_type + b.fac_name ].conflict_trauma_treated += b.conflict_trauma_treated;
+                  locationStore[ b.fac_type + b.fac_name ].education_male += b.education_male;
+                  locationStore[ b.fac_type + b.fac_name ].education_female += b.education_female;
+                  locationStore[ b.fac_type + b.fac_name ].capacity_building_male += b.capacity_building_male;
+                  locationStore[ b.fac_type + b.fac_name ].capacity_building_female += b.capacity_building_female;
+
+                  // total
+                  locationStore[ b.fac_type + b.fac_name ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
+
+                });
+
+                // return csv
+                json2csv({ data: flatten( locationStore ), fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                  
+                  // error
+                  if ( err ) return res.negotiate( err );
+
+                  // success
+                  return res.json( 200, { data: csv } );
+
+                });
+
+              });
+
+          });
+
+        break;
+
       // summarise financial progress
       case 'financial':
 
