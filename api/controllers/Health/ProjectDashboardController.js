@@ -334,8 +334,11 @@ var ProjectDashboardController = {
                   locationStore[ l.dist_code + l.fac_type ].fac_name = [];
                   locationStore[ l.dist_code + l.fac_type ].fac_name.push( l.fac_name );
                 }
+
+                console.log( locationStore[ l.dist_code + l.fac_type ].fac_name.indexOf( l.fac_name ) );
+
                 // if not already on the heap
-                if ( locationStore[ l.dist_code + l.fac_type ].fac_name.indexOf( l.fac_name ) === -1 ) {
+                if ( locationStore[ l.dist_code + l.fac_type ].fac_name.indexOf( l.fac_name ) < 0 ) {
                  locationStore[ l.dist_code + l.fac_type ].fac_name.push( l.fac_name ); 
                 }
                 // push fac_name
