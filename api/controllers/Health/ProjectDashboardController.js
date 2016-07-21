@@ -328,14 +328,13 @@ var ProjectDashboardController = {
                 locationStore[ l.dist_code + l.fac_type ].dist_name = l.dist_name;
                 locationStore[ l.dist_code + l.fac_type ].fac_type_name = l.fac_type_name;
 
-                console.log( !locationStore[ l.dist_code + l.fac_type ].fac_name.length );
-
-                if ( !locationStore[ l.dist_code + l.fac_type ].fac_name.length ) {
+                if ( !locationStore[ l.dist_code + l.fac_type ].fac_name ) {
+                  console.log( l.dist_code + l.fac_type );
                   locationStore[ l.dist_code + l.fac_type ].fac_name = [];
                 }
 
                 locationStore[ l.dist_code + l.fac_type ].fac_name.push( l.fac_name );
-                
+
                 // beneficairies
                 locationStore[ l.dist_code + l.fac_type ].under5male = 0;
                 locationStore[ l.dist_code + l.fac_type ].penta3_vacc_male_under1 = 0;
