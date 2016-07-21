@@ -321,7 +321,9 @@ var ProjectDashboardController = {
                 // locations
                 location_ids.push( l.id );
                 // location details
-                locationStore[ l.dist_code + l.fac_type ] = {};
+                if ( !locationStore[ l.dist_code + l.fac_type ] ) {
+                  locationStore[ l.dist_code + l.fac_type ] = {};
+                }
                 locationStore[ l.dist_code + l.fac_type ].prov_code = l.prov_code;
                 locationStore[ l.dist_code + l.fac_type ].prov_name = l.prov_name;
                 locationStore[ l.dist_code + l.fac_type ].dist_code = l.dist_code;
