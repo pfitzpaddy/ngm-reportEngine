@@ -418,7 +418,7 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'id', 'organization', 'project_code', 'project_title', 'project_start_date', 'project_end_date', 'prov_code', 'prov_name', 'dist_code', 'dist_name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fields = [ 'id', 'organization', 'project_code', 'project_title', 'prov_code', 'prov_name', 'dist_code', 'dist_name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
         fieldNames = [ 'ReportHub ID', 'Partner', 'Project Code', 'Project Title', 'Province Code', 'Province Name', 'District Code', 'District Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
