@@ -445,7 +445,7 @@ var ProjectDashboardController = {
 
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].id = b.id;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].organization = b.organization;
-              projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].project_code = b.project_code;
+              projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].project_code = b.project_id;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].project_title = b.project_title;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].prov_code = b.prov_code;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].prov_name = b.prov_name;
