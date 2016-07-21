@@ -494,6 +494,8 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].capacity_building_male += b.capacity_building_male;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].capacity_building_female += b.capacity_building_female;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].total += b.under5male + b.penta3_vacc_male_under1 + b.over5male + b.education_male + b.capacity_building_male + b.under5female + b.penta3_vacc_female_under1 + b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + b.conflict_trauma_treated;
+              projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].lat = l.dist_lat;
+              projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].lng = l.dist_lng;
 
             });
 
