@@ -418,8 +418,8 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'project_id', 'organization', 'project_title', 'prov_code', 'prov_name', 'dist_code', 'dist_name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
-        fieldNames = [ 'Project ID', 'Partner', 'Project Title', 'Province Code', 'Province Name', 'District Code', 'District Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
+        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'prov_code', 'prov_name', 'dist_code', 'dist_name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Province Code', 'Province Name', 'District Code', 'District Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
         Beneficiaries
@@ -443,9 +443,9 @@ var ProjectDashboardController = {
                 projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ] = {};
               }
 
-              projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].id = b.id;
-              projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].organization = b.organization;
+              // projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].id = b.id;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].project_id = b.project_id;
+              projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].organization = b.organization;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].project_title = b.project_title;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].prov_code = b.prov_code;
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].prov_name = b.prov_name;
@@ -498,9 +498,28 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.dist_code + b.fac_type + b.beneficiary_type ].lng = b.dist_lng;
 
             });
+  
+            // project store to data
+            var data = flatten( projectStore );
+
+            // project data
+            data.forEach( function( pd, i ){
+
+              // projects
+              projects.forEach( function( p, j ){
+                
+                // project details
+                if ( pd.project_id === p.id ) {
+                  data[i].project_title = p.project_title;
+                  data[i].project_code = p.project_code;
+                }
+
+              });
+
+            });
 
             // return csv
-            json2csv({ data: flatten( projectStore ), fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+            json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
               
               // error
               if ( err ) return res.negotiate( err );
