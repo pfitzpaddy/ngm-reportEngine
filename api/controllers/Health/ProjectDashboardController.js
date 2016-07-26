@@ -277,8 +277,8 @@ var ProjectDashboardController = {
                 if ( pd.project_id === p.id ) {
                   data[i].project_title = p.project_title;
                   data[i].project_code = p.project_code;
-                  data[i].project_start_date = p.project_start_date;
-                  data[i].project_end_date = p.project_end_date;                  
+                  data[i].project_start_date = moment( p.project_start_date ).format( 'YYYY-MM-DD' );
+                  data[i].project_end_date = moment( p.project_end_date ).format( 'YYYY-MM-DD' );          
                 }
 
               });
