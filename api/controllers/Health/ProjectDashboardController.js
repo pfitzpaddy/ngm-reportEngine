@@ -501,25 +501,36 @@ var ProjectDashboardController = {
     var filters = {
       // project_id
       project_id: params.project_id ? { id: params.project_id } : {},
+
+      // here filter by region ( adminRpcode )
+
+      // here filter by country ( admin0pcode )
+
+      // admin1pcode locations filter
+      prov_code_filter: params.prov_code !== '*' ? { prov_code: params.prov_code } : {},
+      // admin2pcode locations filter
+      dist_code_filter: params.dist_code !== '*' ? { dist_code: params.dist_code } : {},
+
       // date_filter
       date_filter_s: { project_start_date: { '<=': new Date( params.end_date ) } },
       date_filter_e: { project_end_date: { '>=': new Date( params.start_date ) } },
+      
       // beneficiaries report_month
       reporting_filter_s: { reporting_period: { '>=': new Date( params.start_date ) } },
       reporting_filter_e: { reporting_period: { '<=': new Date( params.end_date ) } },
+      
       // financial payment month
       financial_filter_s: { project_budget_date_recieved: { '>=': new Date( params.start_date ) } },
       financial_filter_e: { project_budget_date_recieved: { '<=': new Date( params.end_date ) } },      
+      
       // project_status
       project_status_filter: params.project_status ? { project_status: params.project_status } : {},
+      
       // project_type
       project_type_filter: params.project_type[0] === 'all' ? {} : { project_type: params.project_type },
+      
       // beneficiaries_filter
-      beneficiaries_filter: params.beneficiary_type[0] === 'all' ? {} : { beneficiary_type: params.beneficiary_type },
-      // prov locations filter
-      prov_code_filter: params.prov_code !== '*' ? { prov_code: params.prov_code } : {},
-      // dist locations filter
-      dist_code_filter: params.dist_code !== '*' ? { dist_code: params.dist_code } : {},
+      beneficiaries_filter: params.beneficiary_type[0] === 'all' ? {} : { beneficiary_type: params.beneficiary_type }
 
     };
     

@@ -116,11 +116,11 @@ module.exports = {
 		beneficiary_type: {
 			type: 'array'
 		},
-		prov_code: {
+		admin1pcode: {
 			type: 'array',
 			required: true
 		},
-		dist_code: {
+		admin2pcode: {
 			type: 'array',
 			required: true
 		}

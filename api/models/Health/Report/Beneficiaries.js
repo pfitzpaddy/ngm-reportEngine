@@ -15,6 +15,33 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		// user/project
+		organization_id: {
+			type: 'string',
+			required: true
+		},
+		organization: {
+			type: 'string',
+			required: true
+		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		email: {
+			type: 'string',
+			required: true
+		},
+		project_id: {
+			type: 'string',
+			required: true
+		},
+		project_title: {
+			type: 'string'
+		},
+		project_type: {
+			type: 'string'
+		},
 		// region/country id
     adminRpcode: {
 			type: 'string',
@@ -32,15 +59,19 @@ module.exports = {
 			type: 'string',
 			required: true
     },
-		organization_id: {
+		admin1pcode: {
+			type: 'integer',
+			required: true
+		},
+		admin1name: {
 			type: 'string',
 			required: true
 		},
-		organization: {
-			type: 'string',
+		admin2pcode: {
+			type: 'integer',
 			required: true
 		},
-		project_id: {
+		admin2name: {
 			type: 'string',
 			required: true
 		},
@@ -64,36 +95,6 @@ module.exports = {
     location_id: {
       model: 'location'
     },
-		project_title: {
-			type: 'string'
-		},
-		project_type: {
-			type: 'string'
-		},
-		username: {
-			type: 'string',
-			required: true
-		},
-		email: {
-			type: 'string',
-			required: true
-		},
-		prov_code: {
-			type: 'integer',
-			required: true
-		},
-		prov_name: {
-			type: 'string',
-			required: true
-		},
-		dist_code: {
-			type: 'integer',
-			required: true
-		},
-		dist_name: {
-			type: 'string',
-			required: true
-		},
 		conflict: {
 			type: 'boolean',
 			required: true
@@ -110,19 +111,19 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		prov_lng: {
+		admin1lng: {
 			type: 'float',
 			required: true
 		},
-		prov_lat: {
+		admin1lat: {
 			type: 'float',
 			required: true
 		},
-		dist_lng: {
+		admin2lng: {
 			type: 'float',
 			required: true
 		},
-		dist_lat: {
+		admin2lat: {
 			type: 'float',
 			required: true
 		},

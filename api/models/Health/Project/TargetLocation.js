@@ -32,6 +32,22 @@ module.exports = {
 			type: 'string',
 			required: true
     },
+		admin1pcode: {
+			type: 'integer',
+			required: true
+		},
+		admin1name: {
+			type: 'string',
+			required: true
+		},
+		admin2pcode: {
+			type: 'integer',
+			required: true
+		},
+		admin2name: {
+			type: 'string',
+			required: true
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -39,10 +55,6 @@ module.exports = {
 		organization: {
 			type: 'string',
 			required: true
-		},
-		// add a reference to Project
-		project_id: {
-			model: 'project'
 		},
 		username: {
 			type: 'string',
@@ -52,27 +64,15 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		// add a reference to Project
+		project_id: {
+			model: 'project'
+		},
 		project_title: {
 			type: 'string'
 		},
 		project_type: {
 			type: 'string'
-		},
-		prov_code: {
-			type: 'integer',
-			required: true
-		},
-		prov_name: {
-			type: 'string',
-			required: true
-		},
-		dist_code: {
-			type: 'integer',
-			required: true
-		},
-		dist_name: {
-			type: 'string',
-			required: true
 		},
 		conflict: {
 			type: 'boolean',
@@ -89,19 +89,19 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		prov_lng: {
+		admin1lng: {
 			type: 'float',
 			required: true
 		},
-		prov_lat: {
+		admin1lat: {
 			type: 'float',
 			required: true
 		},
-		dist_lng: {
+		admin2lng: {
 			type: 'float',
 			required: true
 		},
-		dist_lat: {
+		admin2lat: {
 			type: 'float',
 			required: true
 		}

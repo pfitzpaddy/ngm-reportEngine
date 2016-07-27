@@ -15,7 +15,36 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		// region/country id
+		// user/project
+		organization_id: {
+			type: 'string',
+			required: true
+		},
+		organization: {
+			type: 'string',
+			required: true
+		},
+		project_id: {
+			type: 'string',
+			required: true
+		},
+		project_title: {
+			type: 'string',
+			required: true
+		},
+		project_type: {
+			type: 'string',
+			required: true
+		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		email: {
+			type: 'string',
+			required: true
+		},		
+		// region/country
     adminRpcode: {
 			type: 'string',
 			required: true
@@ -32,51 +61,19 @@ module.exports = {
 			type: 'string',
 			required: true
     },
-		// add a reference to Report
-		report_id: {
-			model: 'report'
-		},
-		organization_id: {
-			type: 'string',
-			required: true
-		},
-		project_id: {
-			type: 'string',
-			required: true
-		},
-		organization: {
-			type: 'string',
-			required: true
-		},
-		username: {
-			type: 'string',
-			required: true
-		},
-		email: {
-			type: 'string',
-			required: true
-		},
-		project_title: {
-			type: 'string',
-			required: true
-		},
-		project_type: {
-			type: 'string',
-			required: true
-		},
-		prov_code: {
+		admin1pcode: {
 			type: 'integer',
 			required: true
 		},
-		prov_name: {
+		admin1name: {
 			type: 'string',
 			required: true
 		},
-		dist_code: {
+		admin2pcode: {
 			type: 'integer',
 			required: true
 		},
-		dist_name: {
+		admin2name: {
 			type: 'string',
 			required: true
 		},
@@ -95,21 +92,25 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		prov_lng: {
+		admin1lng: {
 			type: 'float',
 			required: true
 		},
-		prov_lat: {
+		admin1lat: {
 			type: 'float',
 			required: true
 		},
-		dist_lng: {
+		admin2lng: {
 			type: 'float',
 			required: true
 		},
-		dist_lat: {
+		admin2lat: {
 			type: 'float',
 			required: true
+		},
+		// add a reference to Report
+		report_id: {
+			model: 'report'
 		},
     // add reference to Beneficiaries
     beneficiaries: {

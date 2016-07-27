@@ -40,10 +40,6 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		// add a reference to Project
-		project_id: {
-			model: 'project'
-		},
 		username: {
 			type: 'string',
 			required: true
@@ -51,6 +47,16 @@ module.exports = {
 		email: {
 			type: 'string',
 			required: true
+		},
+		// add a reference to Project
+		project_id: {
+			model: 'project'
+		},
+		project_title: {
+			type: 'string'
+		},
+		project_type: {
+			type: 'string'
 		},
 		beneficiary_name: {
 			type: 'string',
