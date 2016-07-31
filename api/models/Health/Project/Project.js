@@ -127,77 +127,77 @@ module.exports = {
 	},
 
 	// add reports to project with project locations
-	afterCreate: function( project, next ) {
+	// afterCreate: function( project, next ) {
 		
-		// for each project target locations
-		TargetLocation
-			.find()
-			.where( { project_id: project.id } )
-			.exec( function( err, target_locations ) {
+	// 	// for each project target locations
+	// 	TargetLocation
+	// 		.find()
+	// 		.where( { project_id: project.id } )
+	// 		.exec( function( err, target_locations ) {
 
-				// return error
-				if ( err ) return next( err );
+	// 			// return error
+	// 			if ( err ) return next( err );
 
-				// generate an array of reports
-				var reports = getProjectReports( project, target_locations );
+	// 			// generate an array of reports
+	// 			var reports = getProjectReports( project, target_locations );
 
-				// create
-				Report
-					.create( reports )
-					.exec( function( err, reports ) {
+	// 			// create
+	// 			Report
+	// 				.create( reports )
+	// 				.exec( function( err, reports ) {
 
-						// return error
-						if ( err ) return next( err );
+	// 					// return error
+	// 					if ( err ) return next( err );
 
-						// next!
-						next();
+	// 					// next!
+	// 					next();
 						
-					});
+	// 				});
 
-			});
+	// 		});
 
-	},
+	// },
 
-	// add reports to project with project locations
-	afterUpdate: function( project, next ) {
+	// // add reports to project with project locations
+	// afterUpdate: function( project, next ) {
 
-		// for each project target locations
-		TargetLocation
-			.find()
-			.where( { project_id: project.id } )
-			.exec( function( err, target_locations ) {
+	// 	// for each project target locations
+	// 	TargetLocation
+	// 		.find()
+	// 		.where( { project_id: project.id } )
+	// 		.exec( function( err, target_locations ) {
 
-				// set all reports_active to false
-				Report
-					.update( { project_id: project.id }, { report_active: false } )
-					.exec( function( err, updated_reports ) {
+	// 			// set all reports_active to false
+	// 			Report
+	// 				.update( { project_id: project.id }, { report_active: false } )
+	// 				.exec( function( err, updated_reports ) {
 
-						// return error
-						if ( err ) return next( err );						
+	// 					// return error
+	// 					if ( err ) return next( err );						
 
-						// no reports
-						if ( !updated_reports.length ) {
+	// 					// no reports
+	// 					if ( !updated_reports.length ) {
 							
-							next();
+	// 						next();
 
-						}	else {
+	// 					}	else {
 							
-							// generate an array of reports
-							var reports = getProjectReports( project, target_locations );
+	// 						// generate an array of reports
+	// 						var reports = getProjectReports( project, target_locations );
 
-							// if no locations, next
-							if ( !reports[0].locations.length ) return next();
+	// 						// if no locations, next
+	// 						if ( !reports[0].locations.length ) return next();
 
-							// update reports
-							updateProjectReports( reports, next );
+	// 						// update reports
+	// 						updateProjectReports( reports, next );
 
-						}
+	// 					}
 
-					});
+	// 				});
 				
 
-			});
-	}
+	// 		});
+	// }
 
 };
 
