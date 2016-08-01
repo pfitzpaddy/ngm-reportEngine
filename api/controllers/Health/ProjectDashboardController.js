@@ -518,8 +518,8 @@ var ProjectDashboardController = {
       // 
       adminRpcode: req.param('admin1pcode') !== 'hq' ? req.param('adminRpcode').toUpperCase() : '*',
       admin0pcode: req.param('admin2pcode') !== 'all' ? req.param('admin0pcode').toUpperCase() : '*',
-      admin1pcode: req.param('admin1pcode') !== 'all' ? req.param('admin1pcode').toUpperCase() : '*',
-      admin2pcode: req.param('admin2pcode') !== 'all' ? req.param('admin2pcode').toUpperCase() : '*',
+      admin1pcode: req.param('admin1pcode') !== 'all' ? req.param('admin1pcode') : '*',
+      admin2pcode: req.param('admin2pcode') !== 'all' ? req.param('admin2pcode') : '*',
 
       //
       conflict: req.param('conflict') ? req.param('conflict') : false
@@ -561,6 +561,12 @@ var ProjectDashboardController = {
       beneficiaries_filter: params.beneficiary_type[0] === 'all' ? {} : { beneficiary_type: params.beneficiary_type }
 
     };
+
+    console.log( filters.adminRpcode_filter );
+    console.log( filters.admin0pcode_filter );
+    console.log( filters.admin2pcode_filter );
+    console.log( filters.admin3pcode_filter );
+    console.log( 3244444 );
     
     // get projects by organization_id
     Project.find()
