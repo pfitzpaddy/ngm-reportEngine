@@ -561,8 +561,6 @@ var ProjectDashboardController = {
       beneficiaries_filter: params.beneficiary_type[0] === 'all' ? {} : { beneficiary_type: params.beneficiary_type }
 
     };
-
-    console.log( filters );
     
     // get projects by organization_id
     Project.find()
