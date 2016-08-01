@@ -516,7 +516,7 @@ var ProjectDashboardController = {
       beneficiary_type: req.param('beneficiary_type') ? req.param('beneficiary_type') : ['all'],
 
       // 
-      adminRpcode: req.param('admin1pcode') !== 'hq' ? req.param('adminRpcode').toUpperCase() : '*',
+      adminRpcode: req.param('adminRpcode') !== 'hq' ? req.param('adminRpcode').toUpperCase() : '*',
       admin0pcode: req.param('admin0pcode') !== 'all' ? req.param('admin0pcode').toUpperCase() : '*',
       admin1pcode: req.param('admin1pcode') !== 'all' ? req.param('admin1pcode') : '*',
       admin2pcode: req.param('admin2pcode') !== 'all' ? req.param('admin2pcode') : '*',
