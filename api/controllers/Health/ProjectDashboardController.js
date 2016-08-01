@@ -561,11 +561,6 @@ var ProjectDashboardController = {
       beneficiaries_filter: params.beneficiary_type[0] === 'all' ? {} : { beneficiary_type: params.beneficiary_type }
 
     };
-
-    console.log(filters.adminRpcode_filter)
-    console.log(filters.admin0pcode_filter)
-    console.log(filters.admin1pcode_filter)
-    console.log(filters.admin2pcode_filter)
     
     // get projects by organization_id
     Project.find()

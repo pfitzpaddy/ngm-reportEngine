@@ -25,9 +25,23 @@ module.exports = {
         // each project
         projects.forEach( function( p, i ) {
 
+          // int to string
+          var admin1pcodes = [],
+              admin2pcodes = [];
+
+          // int to string
+          p.prov_code.forEach( function( d, j ){
+            admin1pcodes.push( d )
+          });
+
+          // int to string
+          p.dist_code.forEach( function( d, j ){
+            admin2pcodes.push( d )
+          });
+
           // update
           Project
-            .update( { id: p.id }, { admin1pcode: p.prov_code, admin2pcode: p.dist_code } )
+            .update( { id: p.id }, { admin1pcode: admin1pcodes, admin2pcode: admin2pcodes } )
             .exec( function( err, t ){
               
               // return error
