@@ -562,11 +562,7 @@ var ProjectDashboardController = {
 
     };
 
-    // console.log( filters.adminRpcode_filter );
-    // console.log( filters.admin0pcode_filter );
-    // console.log( filters.admin2pcode_filter );
-    // console.log( filters.admin3pcode_filter );
-    // console.log( 3244444 );
+    console.log( filters );
     
     // get projects by organization_id
     Project.find()
