@@ -525,6 +525,9 @@ var ProjectDashboardController = {
       conflict: req.param('conflict') ? req.param('conflict') : false
     }
 
+    console.log( req.param('admin0pcode') )
+    console.log( params.admin0pcode )
+
     // filters
     var filters = {
       // project_id
@@ -562,11 +565,11 @@ var ProjectDashboardController = {
 
     };
 
-    console.log( filters.adminRpcode_filter );
-    console.log( filters.admin0pcode_filter );
-    console.log( filters.admin2pcode_filter );
-    console.log( filters.admin3pcode_filter );
-    console.log( 3244444 );
+    // console.log( filters.adminRpcode_filter );
+    // console.log( filters.admin0pcode_filter );
+    // console.log( filters.admin2pcode_filter );
+    // console.log( filters.admin3pcode_filter );
+    // console.log( 3244444 );
     
     // get projects by organization_id
     Project.find()
