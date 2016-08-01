@@ -517,16 +517,13 @@ var ProjectDashboardController = {
 
       // 
       adminRpcode: req.param('admin1pcode') !== 'hq' ? req.param('adminRpcode').toUpperCase() : '*',
-      admin0pcode: req.param('admin2pcode') !== 'all' ? req.param('admin0pcode').toUpperCase() : '*',
+      admin0pcode: req.param('admin0pcode') !== 'all' ? req.param('admin0pcode').toUpperCase() : '*',
       admin1pcode: req.param('admin1pcode') !== 'all' ? req.param('admin1pcode') : '*',
       admin2pcode: req.param('admin2pcode') !== 'all' ? req.param('admin2pcode') : '*',
 
       //
       conflict: req.param('conflict') ? req.param('conflict') : false
     }
-
-    console.log( req.param('admin0pcode') )
-    console.log( params.admin0pcode )
 
     // filters
     var filters = {
