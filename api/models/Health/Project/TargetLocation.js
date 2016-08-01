@@ -33,7 +33,7 @@ module.exports = {
 			required: true
     },
 		admin1pcode: {
-			type: 'integer',
+			type: 'string',
 			required: true
 		},
 		admin1name: {
@@ -41,7 +41,7 @@ module.exports = {
 			required: true
 		},
 		admin2pcode: {
-			type: 'integer',
+			type: 'string',
 			required: true
 		},
 		admin2name: {
