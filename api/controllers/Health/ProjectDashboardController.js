@@ -583,7 +583,10 @@ var ProjectDashboardController = {
         if (err) return res.negotiate( err );
 
         // if no projects
-        if ( !projects.length ) return res.json( 200, { 'value': 0 } );
+        if ( !projects.length && params.indicator !== 'markers' ) return res.json( 200, { 'value': 0 } );
+
+        // if no markers
+        if ( !projects.length && params.indicator === 'markers' ) return res.json( 200, { 'data': { 'marker0': { layer: 'health', lat:34.5, lng:66.0, message: 'H4W' } } } );
 
         // get project ids
         var project_ids = [];        
@@ -727,7 +730,7 @@ var ProjectDashboardController = {
             if (err) return res.negotiate( err );
 
             // return no locations
-            if (!locations.length) return res.json(200, { 'data': {} });
+            if ( !locations.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'health', lat:34.5, lng:66.0, message: 'H4W' } } } );
 
             // length
             length = locations.length;
@@ -743,8 +746,8 @@ var ProjectDashboardController = {
 
                 // popup message
                 var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
-                            + '<div style="text-align:center"> in ' + d.admin0name + '</div>'
-                            + '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>'
+                            + '<div style="text-align:center">' + d.admin0name + '</div>'
+                            + '<div style="text-align:center">' + d.admin1name + ' ' + d.admin1type_name + ', ' + d.admin2name + ' ' + d.admin1type_name + '</div>'
                             + '<div style="text-align:center">' + d.fac_type_name + '</div>'
                             + '<div style="text-align:center">' + d.fac_name + '</div>'
                             + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
