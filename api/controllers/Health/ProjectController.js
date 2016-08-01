@@ -31,12 +31,12 @@ module.exports = {
 
           // int to string
           p.prov_code.forEach( function( d, j ){
-            admin1pcodes.push( d )
+            admin1pcodes.push( d.toString() )
           });
 
           // int to string
           p.dist_code.forEach( function( d, j ){
-            admin2pcodes.push( d )
+            admin2pcodes.push( d.toString() )
           });
 
           // update
