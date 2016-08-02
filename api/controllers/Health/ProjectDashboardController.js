@@ -388,8 +388,8 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'beneficiary_type', 'under5male', 'over5male', 'under5female', 'over5female', 'total', 'lat', 'lng' ],
-        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Beneficiary Category', 'under5male', 'over5male', 'under5female', 'over5female', 'Total', 'lat', 'lng' ];
+        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'total', 'lat', 'lng' ],
+        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Beneficiary Category', 'under5male', 'under5female', 'over5male', 'over5female', 'Total', 'lat', 'lng' ];
 
         // beneficiaires
         Beneficiaries

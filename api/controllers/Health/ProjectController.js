@@ -374,19 +374,27 @@ module.exports = {
 
         });
 
-        // update
-        Beneficiaries
-          .find()
-          .where( { location_id: location_ids } )
-          .exec( function( err, b ){
-            
-            // return error
-            if ( err ) return res.negotiate( err );
+        // locations
+        if ( location_ids.length ) {
+          // update
+          Beneficiaries
+            // .find()
+            // .where( { location_id: location_ids } )
+            .destroy( { location_id: location_ids } )
+            .exec( function( err, b ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
 
+              // return
+              return res.json( 200, { msg: 'Success!' } ); 
+
+            });
+
+        } else {
             // return
-            return res.json( 200, { data: b } ); 
-
-          });            
+            return res.json( 200, { msg: 'No records to delete!' } );
+        }      
 
       });
 
