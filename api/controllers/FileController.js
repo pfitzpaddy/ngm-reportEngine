@@ -294,6 +294,9 @@ module.exports = {
   //
   getBeneficiairiesCsv: function( req, res ) {
 
+  	//
+  	var json2csv = require( 'json2csv' );
+
     //
     Beneficiaries
       .find()
