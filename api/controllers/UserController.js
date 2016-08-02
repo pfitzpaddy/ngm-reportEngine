@@ -83,16 +83,20 @@ module.exports = {
           // update visit information
           user.visits = user.visits + 1;
 
+          // add token
+          user.token = jwtToken.issueToken({ sid: user.id });
+
           // save updates
-          user.save(function(err) {
-            if(err) return res.negotiate( err );
+          user.save( function( err ) {
+              
+            // err
+            if( err ) return res.negotiate( err );
+            
+            // Send back user with token
+            return res.json( 200, user );
+
           });
 
-          // add token
-          user.token = jwtToken.issueToken({sid: user.id});
-
-          // Send back user with token
-          return res.json(200, user);
         }
       });
     });
@@ -114,18 +118,21 @@ module.exports = {
       if (err) return res.negotiate( err );
 
       // return error
-      if (!user) return res.json(401, { err: 'User not found!' });
+      if (!user) return res.json( 401, { err: 'User not found!' } );
 
       // update visit information
       user.visits = user.visits + 1;
 
       // save updates
       user.save(function(err) {
+        
+        // err
         if(err) return res.negotiate( err );
-      });
 
-      // return updated user
-      return res.json(200, user);     
+        // return updated user
+        return res.json( 200, user );
+
+      });
 
     });
 
@@ -156,7 +163,7 @@ module.exports = {
         name: user.name,
         username: user.username,
         email: user.email,
-        token: jwtToken.issueToken({sid: user.id})
+        token: jwtToken.issueToken({ sid: user.id })
       }
 
       UserReset.create(userReset).exec(function(err, reset) {
@@ -214,20 +221,24 @@ module.exports = {
         // update newPassword
         require( 'bcrypt' ).hash( req.param( 'reset' ).newPassword, 10, function passwordEncrypted( err, encryptedPassword ) {
 
-          if ( err ) return res.json(401, { err: 'Reset password error' });
+          // err
+          if ( err ) return res.json( 401, { err: 'Reset password error' } );
 
           // new password
           user.password = encryptedPassword;
           // add new token
-          user.token = jwtToken.issueToken({sid: user.id});
+          user.token = jwtToken.issueToken( { sid: user.id } );
 
           // save updates
-          user.save(function(err) {
-            if(err) return res.negotiate( err );
-          });
+          user.save( function( err ) {
 
-          // return updated user
-          return res.json(200, user);
+            // err
+            if ( err ) return res.negotiate( err );
+
+            // return updated user
+            return res.json( 200, user );
+
+          });
 
         });
 

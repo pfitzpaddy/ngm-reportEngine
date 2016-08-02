@@ -155,10 +155,9 @@ module.exports = {
 	// 				});
 
 	// 		});
-
 	// },
 
-	// // add reports to project with project locations
+	// add reports to project with project locations
 	// afterUpdate: function( project, next ) {
 
 	// 	// for each project target locations
@@ -227,7 +226,7 @@ function getProjectReports( project, target_locations ) {
 		}
 
 		// report_status 'todo' open from 15th of every month
-		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf( 'month' ).add( 15, 'd' ) ) >= 0 ? 'todo' : 'pending';
+		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf( 'month' ).add( 1, 'd' ) ) >= 0 ? 'todo' : 'pending';
 
 		// create report
 		var report = {
