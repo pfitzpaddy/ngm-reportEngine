@@ -76,6 +76,7 @@ module.exports.routes = {
   'GET /health/project/updateTargetLocations': 'Health/ProjectController.updateTargetLocations',
   'GET /health/project/updateLocations': 'Health/ProjectController.updateLocations',
   'GET /health/project/updateBeneficiaries': 'Health/ProjectController.updateBeneficiaries',
+  'GET /health/project/updateNullBeneficiaries': 'Health/ProjectController.updateNullBeneficiaries',
 
   // collection updates ( pcodes )
   'GET /health/project/updateProjectPcodes': 'Health/ProjectController.updateProjectPcodes',

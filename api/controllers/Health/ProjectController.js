@@ -352,6 +352,47 @@ module.exports = {
   },
 
   // update database
+  updateNullBeneficiaries: function( req, res ){
+
+    // begin
+    Location
+      .find()
+      .where({ report_id: null })
+      .exec( function( err, locations ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var location_ids = [];
+
+        // each project
+        locations.forEach( function( l, i ) {
+
+          //
+          location_ids.push( l.id )
+
+        });
+
+        // update
+        Beneficiaries
+          .find()
+          .where( { location_id: location_ids } )
+          .exec( function( err, b ){
+            
+            // return error
+            if ( err ) return res.negotiate( err );
+
+            // return
+            return res.json( 200, { data: b } ); 
+
+          });            
+
+      });
+
+  },  
+
+  // update database
   updateDatabaseAdmin: function( req, res ){
 
     // update
