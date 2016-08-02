@@ -308,11 +308,13 @@ module.exports = {
         // return csv
         json2csv({ data: b }, function( err, csv ) {
           
-          // error
-          if ( err ) return res.negotiate( err );
+		        // error
+		        if ( err ) return res.negotiate( err );
 
-          // success
-          return res.json( 200, { data: csv } );
+		        // stream csv
+					  res.setHeader('Content-disposition', 'attachment; filename=beneficiaries.csv');
+					  res.set('Content-Type', 'text/csv');
+					  res.status( 200 ).send( csv );
 
         });        
 
