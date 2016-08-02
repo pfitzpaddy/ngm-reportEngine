@@ -398,6 +398,24 @@ module.exports = {
 
       });
 
+  }, 
+
+  // update database
+  updateNullLocations: function( req, res ){
+
+    // 
+    Location
+      .destroy({ report_id: null })
+      .exec( function( err, l ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // return
+        return res.json( 200, { msg: 'Success!' } );
+
+      });   
+
   },  
 
   // update database
