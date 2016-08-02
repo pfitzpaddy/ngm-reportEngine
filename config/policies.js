@@ -43,7 +43,8 @@ module.exports.policies = {
   'FileController': {
     'print': true,
     'proxy': true,
-    'export': true
+    'export': true,
+    'getBeneficiairiesCsv': true
   },
 
   // public

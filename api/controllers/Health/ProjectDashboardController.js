@@ -269,8 +269,8 @@ var ProjectDashboardController = {
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5male = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5female = 0;
                 //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_male_under1 = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].skilled_birth_attendant = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].conflict_trauma_treated = 0;
                 //
@@ -436,7 +436,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.beneficiaries_filter )          
+          .where( filters.beneficiaries_filter )
           .exec( function( err, beneficiaries ){
             
             // return error

@@ -289,7 +289,33 @@ module.exports = {
 
 		});
 
-	}	
+	},
+
+  //
+  getBeneficiairiesCsv: function( req, res ) {
+
+    //
+    Beneficiaries
+      .find()
+      .exec( function( err, b ){
+        
+        // error
+        if ( err ) return res.negotiate( err );
+
+        // return csv
+        json2csv({ data: b }, function( err, csv ) {
+          
+          // error
+          if ( err ) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        });        
+
+      });
+
+  }
 
 };
 
