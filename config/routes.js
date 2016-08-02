@@ -49,7 +49,7 @@ module.exports.routes = {
   'POST /print': 'FileController.print',
   'POST /proxy': 'FileController.proxy',
   'GET /export': 'FileController.export',
-  'GET /health/project/getBeneficiairiesCsv': 'FileController.getBeneficiairiesCsv',
+  'GET /getBeneficiairiesCsv': 'FileController.getBeneficiairiesCsv',
 
   // Locaiton lists
   'POST /location/getAdmin1List': 'LocationController.getAdmin1List',
