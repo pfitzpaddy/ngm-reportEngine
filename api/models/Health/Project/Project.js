@@ -185,7 +185,7 @@ module.exports = {
 							var reports = getProjectReports( project, target_locations );
 
 							// if no locations, next
-							if ( !reports[0].locations.length ) return next();
+							// if ( !reports[0].locations.length ) return next();
 
 							// update reports
 							updateProjectReports( reports, next );
@@ -225,8 +225,8 @@ function getProjectReports( project, target_locations ) {
 			report_active = false;
 		}
 
-		// report_status 'todo' open from 15th of every month
-		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).startOf( 'month' ).add( 1, 'd' ) ) >= 0 ? 'todo' : 'pending';
+		// report_status 'todo' open from 1st of next month
+		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).endOf( 'month' ) ) >= 0 ? 'todo' : 'pending';
 
 		// create report
 		var report = {

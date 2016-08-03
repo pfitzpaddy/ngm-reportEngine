@@ -242,6 +242,7 @@ module.exports = {
             .find()
             .where( { project_id: project_ids } )
             .where( { report_month: moment().subtract( 1, 'M' ).month() } )
+            .where( { report_year: moment().subtract( 1, 'M' ).year() } )
             .where( { report_active: true } )
             .where( { report_status: 'todo' } )
             .exec( function( err, reports ){
