@@ -12,7 +12,7 @@ module.exports = {
     
     // find active reports for the next reporting period
     Report
-      .update( { report_year: 2015 },
+      .update( { report_year: { '<': 2016 } },
                { report_status: 'pending' } )
       .exec( function( err, reports ){
 
