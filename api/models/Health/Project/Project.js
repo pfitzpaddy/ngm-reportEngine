@@ -175,22 +175,22 @@ module.exports = {
 						if ( err ) return next( err );						
 
 						// no reports
-						if ( !updated_reports.length ) {
+						// if ( !updated_reports.length ) {
 							
-							next();
+						// 	next();
 
-						}	else {
+						// }	else {
 							
 							// generate an array of reports
 							var reports = getProjectReports( project, target_locations );
 
 							// if no locations, next
-							// if ( !reports[0].locations.length ) return next();
+							if ( !reports[0].locations.length ) return next();
 
 							// update reports
 							updateProjectReports( reports, next );
 
-						}
+						// }
 
 					});
 				

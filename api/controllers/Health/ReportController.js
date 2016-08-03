@@ -184,7 +184,7 @@ module.exports = {
 
           // find active reports for the next reporting period
           Report
-            .update( { project_id: project_ids, report_month: moment().subtract( 1, 'M' ).month() },
+            .update( { project_id: project_ids, report_month: moment().subtract( 1, 'M' ).month(), report_year: moment().subtract( 1, 'M' ).year() },
                      { report_active: true, report_status: 'todo' } )
             .exec( function( err, reports ){
 
