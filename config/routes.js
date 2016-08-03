@@ -101,6 +101,9 @@ module.exports.routes = {
   'GET /health/report/setReportsToDo': 'Health/ReportController.setReportsToDo',
   'GET /health/report/setReportsOpen': 'Health/ReportController.setReportsOpen',
   'GET /health/report/setReportsReminder': 'Health/ReportController.setReportsReminder',
+  'GET /health/report/setReports2015': 'Health/ReportController.setReports2015',
+  'GET /health/report/setReports2016': 'Health/ReportController.setReports2016',
+  'GET /health/report/setReports2017': 'Health/ReportController.setReports2017',
 
   // report update details
   // 'GET /health/report/setBeneficiariesReportDetails': 'Health/ReportController.setBeneficiariesReportDetails',
