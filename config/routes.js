@@ -51,41 +51,14 @@ module.exports.routes = {
   'GET /export': 'FileController.export',
   'GET /getBeneficiairiesCsv': 'FileController.getBeneficiairiesCsv',
 
+
+  // HEALTH
+
   // Locaiton lists
   'POST /location/getAdmin1List': 'LocationController.getAdmin1List',
   'POST /location/getAdmin2List': 'LocationController.getAdmin2List',
 
-  'GET /location/getProvinceList': 'LocationController.getProvinceList',
-  'GET /location/getProvinceMenu': 'LocationController.getProvinceMenu',
-  'GET /location/getDistriceList': 'LocationController.getDistrictList',
-
-
-  // HEALTH
-
-  // workshop
-  'GET /health/workshop/create': 'Health/WorkshopController.create',
-  'GET /health/workshop/get': 'Health/WorkshopController.getWorkshop',
-  'POST /health/workshop/set': 'Health/WorkshopController.setWorkshop',
-
   // Health Projects
-
-  // update to global schema
-  'GET /health/project/updateDatabaseAdmin': 'Health/ProjectController.updateDatabaseAdmin',
-
-  // collection updates ( general )
-  'GET /health/project/updateTargetBeneficiaries': 'Health/ProjectController.updateTargetBeneficiaries',
-  'GET /health/project/updateTargetLocations': 'Health/ProjectController.updateTargetLocations',
-  'GET /health/project/updateLocations': 'Health/ProjectController.updateLocations',
-  'GET /health/project/updateBeneficiaries': 'Health/ProjectController.updateBeneficiaries',
-  'GET /health/project/updateNullBeneficiaries': 'Health/ProjectController.updateNullBeneficiaries',
-  'GET /health/project/updateNullLocations': 'Health/ProjectController.updateNullLocations',
-
-  // collection updates ( pcodes )
-  'GET /health/project/updateProjectPcodes': 'Health/ProjectController.updateProjectPcodes',
-  'GET /health/project/updateTargetLocationPcodes': 'Health/ProjectController.updateTargetLocationPcodes',
-  'GET /health/project/updateLocationPcodes': 'Health/ProjectController.updateLocationPcodes',
-  'GET /health/project/updateBeneficiariesPcodes': 'Health/ProjectController.updateBeneficiariesPcodes',
-
   'POST /health/project/getProjectsList': 'Health/ProjectController.getProjectsList',
   
   // get project details, locations, beneficiaries
@@ -101,24 +74,16 @@ module.exports.routes = {
   'GET /health/report/setReportsToDo': 'Health/ReportController.setReportsToDo',
   'GET /health/report/setReportsOpen': 'Health/ReportController.setReportsOpen',
   'GET /health/report/setReportsReminder': 'Health/ReportController.setReportsReminder',
-  'GET /health/report/setReports2015': 'Health/ReportController.setReports2015',
-  'GET /health/report/setReports2016': 'Health/ReportController.setReports2016',
-  'GET /health/report/setReports2017': 'Health/ReportController.setReports2017',
 
-  // report update details
-  // 'GET /health/report/setBeneficiariesReportDetails': 'Health/ReportController.setBeneficiariesReportDetails',
+  // Admin Dashboard
+  'POST /health/admin/indicator': 'Health/AdminDashboardController.getHealthAdminIndicator',
 
-
-  // get project financials
-  'POST /health/project/getProjectFinancials': 'Health/ProjectController.getProjectFinancialsById',
-  // Health Dashboard & Data
+  // 4W Dashboard
   'POST /health/indicator': 'Health/ProjectDashboardController.getHealthDetails',
-  // data 
   'POST /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
-  // 'POST /health/data/financials': 'Health/ProjectDashboardController.getFinancialListCsv',
 
 
-  // Dews 
+  // DEWS 
   'POST /dews/indicator': 'Dews/DewsController.getIndicator',
   'POST /dews/chart': 'Dews/DewsController.getChart',
   'POST /dews/calendar': 'Dews/DewsController.getCalendar',
@@ -127,7 +92,7 @@ module.exports.routes = {
   'POST /dews/markers': 'Dews/DewsController.getMarkers',
   'POST /dews/map': 'Dews/DewsController.getMap',
 
-  // Watchkeeper
+  // WATCHKEEPER
   'POST /wk/calendar': 'Watchkeeper/WatchkeeperController.getCalendar',
   'POST /wk/indicator': 'Watchkeeper/WatchkeeperController.getIndicator',
   'POST /wk/difference': 'Watchkeeper/WatchkeeperController.getDifference',

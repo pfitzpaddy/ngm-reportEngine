@@ -62,71 +62,7 @@ module.exports = {
 
     });
 
-  },  
-
-  // set beneficiaries report details
-  // setBeneficiariesReportDetails: function( req, res ) {
-
-  //   // beneficiaries
-  //   Beneficiaries
-  //     .find()
-  //     .exec( function( err, beneficiaries ){
-
-  //       // return error
-  //       if ( err ) return res.negotiate( err );
-
-  //       // 
-  //       var counter=0,
-  //           length=beneficiaries.length;
-
-  //       // beneficiaries
-  //       beneficiaries.forEach( function( b, i ){
-          
-  //         // get reports
-  //         Location
-  //           .findOne()
-  //           .where( { id: b.location_id } )
-  //           .exec( function( err, location ){
-
-  //             // return error
-  //             if ( err ) return res.negotiate( err );
-
-  //             if ( location ){
-                
-  //               // beneficiaries
-  //               beneficiaries[i].prov_lng = location.prov_lng;
-  //               beneficiaries[i].prov_lat = location.prov_lat;
-  //               beneficiaries[i].dist_lng = location.dist_lng;
-  //               beneficiaries[i].dist_lat = location.dist_lat;              
-  //               beneficiaries[i].save(function(err){
-                  
-  //                 //
-  //                 counter++;
-  //                 if ( counter === length ) {
-  //                   // else
-  //                   return res.json( 200, { 'msg': 'complete!' } );
-  //                 }
-
-  //               });
-
-  //             } else {
-
-  //               //
-  //               counter++;
-  //               if ( counter === length ) {
-  //                 // else
-  //                 return res.json( 200, { 'msg': 'complete!' } );
-  //               }
-
-  //             }
-
-  //           });
-
-  //       });
-
-  //     });
-
-  // },
+  },
 
   // get all reports by project id
   getReportsList: function( req, res ) {
