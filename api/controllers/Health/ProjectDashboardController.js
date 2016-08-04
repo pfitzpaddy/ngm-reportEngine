@@ -161,34 +161,34 @@ var ProjectDashboardController = {
             beneficiaries.forEach( function( b, i ){
 
               // if nothing
-              if ( !locationStore[ l.admin2pcode ] ) {
-                locationStore[ l.admin2pcode ] = {};
-                locationStore[ l.admin2pcode ].admin0pcode = l.admin0pcode;
-                locationStore[ l.admin2pcode ].admin0name = l.admin0name;
-                locationStore[ l.admin2pcode ].admin1pcode = l.admin1pcode;
-                locationStore[ l.admin2pcode ].admin1name = l.admin1name;
-                locationStore[ l.admin2pcode ].admin2pcode = l.admin2pcode;
-                locationStore[ l.admin2pcode ].admin2name = l.admin2name;
+              if ( !locationStore[ b.admin2pcode ] ) {
+                locationStore[ b.admin2pcode ] = {};
+                locationStore[ b.admin2pcode ].admin0pcode = b.admin0pcode;
+                locationStore[ b.admin2pcode ].admin0name = b.admin0name;
+                locationStore[ b.admin2pcode ].admin1pcode = b.admin1pcode;
+                locationStore[ b.admin2pcode ].admin1name = b.admin1name;
+                locationStore[ b.admin2pcode ].admin2pcode = b.admin2pcode;
+                locationStore[ b.admin2pcode ].admin2name = b.admin2name;
                 // beneficairies standard row 1
-                locationStore[ l.admin2pcode ].under5male = 0;
-                locationStore[ l.admin2pcode ].under5female = 0;
-                locationStore[ l.admin2pcode ].over5male = 0;
-                locationStore[ l.admin2pcode ].over5female = 0;
+                locationStore[ b.admin2pcode ].under5male = 0;
+                locationStore[ b.admin2pcode ].under5female = 0;
+                locationStore[ b.admin2pcode ].over5male = 0;
+                locationStore[ b.admin2pcode ].over5female = 0;
                 // beneficairies standard row 2
-                locationStore[ l.admin2pcode ].penta3_vacc_male_under1 = 0;
-                locationStore[ l.admin2pcode ].penta3_vacc_female_under1 = 0;
-                locationStore[ l.admin2pcode ].skilled_birth_attendant = 0;
-                locationStore[ l.admin2pcode ].conflict_trauma_treated = 0;
+                locationStore[ b.admin2pcode ].penta3_vacc_male_under1 = 0;
+                locationStore[ b.admin2pcode ].penta3_vacc_female_under1 = 0;
+                locationStore[ b.admin2pcode ].skilled_birth_attendant = 0;
+                locationStore[ b.admin2pcode ].conflict_trauma_treated = 0;
                 // beneficairies training/education
-                locationStore[ l.admin2pcode ].education_male = 0;
-                locationStore[ l.admin2pcode ].education_female = 0;
-                locationStore[ l.admin2pcode ].capacity_building_male = 0;
-                locationStore[ l.admin2pcode ].capacity_building_female = 0;
+                locationStore[ b.admin2pcode ].education_male = 0;
+                locationStore[ b.admin2pcode ].education_female = 0;
+                locationStore[ b.admin2pcode ].capacity_building_male = 0;
+                locationStore[ b.admin2pcode ].capacity_building_female = 0;
                 // beneficairies total
-                locationStore[ l.admin2pcode ].total = 0;
+                locationStore[ b.admin2pcode ].total = 0;
                 // location lat, lng
-                locationStore[ l.admin2pcode ].lat = l.admin2lat;
-                locationStore[ l.admin2pcode ].lng = l.admin2lng;                   
+                locationStore[ b.admin2pcode ].lat = b.admin2lat;
+                locationStore[ b.admin2pcode ].lng = b.admin2lng;                   
               }
 
               // beneficairies standard row 1
