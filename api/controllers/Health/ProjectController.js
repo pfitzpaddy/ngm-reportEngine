@@ -129,12 +129,12 @@ module.exports = {
               // return error
               if ( err ) return res.negotiate( err );
 
-              // return
-              counter++;
-              if ( counter === length ) {
-                // return
-                return res.json( 200, { msg: 'success!' } );
-              }
+              // // return
+              // counter++;
+              // if ( counter === length ) {
+              //   // return
+              //   return res.json( 200, { msg: 'success!' } );
+              // }
 
             });            
 
