@@ -82,6 +82,7 @@ var ProjectDashboardController = {
           .where( { project_id: project_ids } )
           .where( filters.reporting_filter_s )
           .where( filters.reporting_filter_e )
+          .where( { organization: { '!': 'iMMAP' } } )
           .populateAll()
           .exec( function( err, reports ) {
 
@@ -140,6 +141,7 @@ var ProjectDashboardController = {
               .where( filters.admin1pcode_filter )
               .where( filters.admin2pcode_filter )
               .where( filters.beneficiaries_filter )
+              .where( { organization: { '!': 'iMMAP' } } )
               .exec( function( err, beneficiaries ){
 
                 // return error
@@ -221,6 +223,7 @@ var ProjectDashboardController = {
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
           .where( filters.beneficiaries_filter )
+          .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
             
             // return error
@@ -382,6 +385,7 @@ var ProjectDashboardController = {
           .where( { project_id: project_ids } )
           .where( filters.financial_filter_s )
           .where( filters.financial_filter_e )
+          .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, budget ) {
 
             // error
@@ -437,6 +441,7 @@ var ProjectDashboardController = {
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
           .where( filters.beneficiaries_filter )
+          .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
             
             // return error
@@ -716,6 +721,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
+          .where( { organization: { '!': 'iMMAP' } } )
           .where( conflict )
           .exec( function( err, target_locations ) {
 
@@ -770,6 +776,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
+          .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, locations ){
 
             // return error
@@ -854,6 +861,7 @@ var ProjectDashboardController = {
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
           .where( filters.beneficiaries_filter )
+          .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -962,6 +970,7 @@ var ProjectDashboardController = {
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
           .where( filters.beneficiaries_filter )
+          .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
 
             // return error
