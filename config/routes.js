@@ -54,6 +54,19 @@ module.exports.routes = {
 
   // HEALTH
 
+  // collection updates ( general )
+  'GET /health/project/updateTargetBeneficiaries': 'Health/ProjectController.updateTargetBeneficiaries',
+  'GET /health/project/updateTargetLocations': 'Health/ProjectController.updateTargetLocations',
+  'GET /health/project/updateLocations': 'Health/ProjectController.updateLocations',
+  'GET /health/project/updateBeneficiaries': 'Health/ProjectController.updateBeneficiaries',
+
+  // collection updates ( pcodes )
+  'GET /health/project/updateProjectPcodes': 'Health/ProjectController.updateProjectPcodes',
+  'GET /health/project/updateTargetLocationPcodes': 'Health/ProjectController.updateTargetLocationPcodes',
+  'GET /health/project/updateLocationPcodes': 'Health/ProjectController.updateLocationPcodes',
+  'GET /health/project/updateBeneficiariesPcodes': 'Health/ProjectController.updateBeneficiariesPcodes',
+
+
   // Locaiton lists
   'POST /location/getAdmin1List': 'LocationController.getAdmin1List',
   'POST /location/getAdmin2List': 'LocationController.getAdmin2List',

@@ -7,6 +7,350 @@
 
 module.exports = {
 
+ // update database
+  updateProjectPcodes: function( req, res ){
+
+    // begin
+    Project
+      .find({})
+      .exec( function( err, projects ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = projects.length;
+
+        // each project
+        projects.forEach( function( p, i ) {
+
+          // int to string
+          var admin1pcodes = [],
+              admin2pcodes = [];
+
+          // int to string
+          p.prov_code.forEach( function( d, j ){
+            admin1pcodes.push( d.toString() )
+          });
+
+          // int to string
+          p.dist_code.forEach( function( d, j ){
+            admin2pcodes.push( d.toString() )
+          });
+
+          // update
+          Project
+            .update( { id: p.id }, { admin1pcode: admin1pcodes, admin2pcode: admin2pcodes } )
+            .exec( function( err, t ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  },
+
+  // update database
+  updateTargetLocationPcodes: function( req, res ){
+
+    // begin
+    TargetLocation
+      .find()
+      .exec( function( err, target ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = target.length;
+
+        // each project
+        target.forEach( function( t, i ) {
+          
+          // update
+          TargetLocation
+            .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name, admin1lng: t.prov_lng, admin1lat: t.prov_lat, admin2lng: t.dist_lng, admin2lat: t.dist_lat } )
+            .exec( function( err, result ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  },
+
+  // update database
+  updateLocationPcodes: function( req, res ){
+
+    // begin
+    Location
+      .find()
+      .exec( function( err, target ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = target.length;
+
+        // each project
+        target.forEach( function( t, i ) {
+          
+          // update
+          Location
+            .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name, admin1lng: t.prov_lng, admin1lat: t.prov_lat, admin2lng: t.dist_lng, admin2lat: t.dist_lat } )
+            .exec( function( err, result ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  },
+
+  // update database
+  updateBeneficiariesPcodes: function( req, res ){
+
+    // begin
+    Beneficiaries
+      .find()
+      .exec( function( err, target ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = target.length;
+
+        // each project
+        target.forEach( function( t, i ) {
+          
+          // update
+          Beneficiaries
+            .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name, admin1lng: t.prov_lng, admin1lat: t.prov_lat, admin2lng: t.dist_lng, admin2lat: t.dist_lat } )
+            .exec( function( err, result ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  },
+
+  
+
+  // update database
+  updateTargetBeneficiaries: function( req, res ){
+
+    // begin
+    Project
+      .find({})
+      .exec( function( err, projects ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = projects.length;
+
+        // each project
+        projects.forEach( function( p, i ) {
+
+          // update
+          TargetBeneficiaries
+            .update( { project_id: p.id }, { project_title: p.project_title, project_type: p.project_type } )
+            .exec( function( err, t ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  },
+
+  // update database
+  updateTargetLocations: function( req, res ){
+
+    // begin
+    Project
+      .find({})
+      .exec( function( err, projects ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = projects.length;
+
+        // each project
+        projects.forEach( function( p, i ) {
+
+          // update
+          TargetLocation
+            .update( { project_id: p.id }, { project_title: p.project_title, project_type: p.project_type } )
+            .exec( function( err, t ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  },
+
+  // update database
+  updateLocations: function( req, res ){
+
+    // begin
+    Project
+      .find({})
+      .exec( function( err, projects ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = projects.length;
+
+        // each project
+        projects.forEach( function( p, i ) {
+
+          // update
+          Location
+            .update( { project_id: p.id }, { project_title: p.project_title, project_type: p.project_type } )
+            .exec( function( err, t ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  }, 
+
+  // update database
+  updateBeneficiaries: function( req, res ){
+
+    // begin
+    Project
+      .find({})
+      .exec( function( err, projects ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // counter
+        var counter = 0,
+            length = projects.length;
+
+        // each project
+        projects.forEach( function( p, i ) {
+
+          // update
+          Beneficiaries
+            .update( { project_id: p.id }, { project_title: p.project_title, project_type: p.project_type } )
+            .exec( function( err, t ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
+
+              // return
+              counter++;
+              if ( counter === length ) {
+                // return
+                return res.json( 200, { msg: 'success!' } );
+              }
+
+            });            
+
+        });
+
+      });
+
+  },
+
   // set project details
   setProjectById: function(req, res) {
 
