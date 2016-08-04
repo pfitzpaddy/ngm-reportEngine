@@ -38,13 +38,55 @@ var AdminDashboardController = {
           .where( { admin0pcode: admin0pcode } )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
             // return error
             if (err) return res.negotiate( err );            
 
             // return
-            return res.json( 200, { 'value': reports.length });
+            if ( table ) {
+
+              // counter
+              var counter=0,
+                  length=reports.length;
+
+              // reports
+              reports.forEach( function( d, i ){
+
+                // check if form has been edited
+                Beneficiaries
+                  .count( { report_id: d.id } )
+                  .exec(function( err, b){
+                    
+                    // return error
+                    if (err) return res.negotiate( err );
+
+                    // add status
+                    reports[i].status = '#e57373';
+
+                    // if benficiaries
+                    if ( b ) {
+                      // add status
+                      reports[i].status = reports[i].report_status === 'complete' ? '#4db6ac' : '#fff176'
+                    }
+
+                    // reutrn
+                    counter++;
+                    if ( counter === length ) {
+                      // table
+                      return res.json( 200, reports );
+                    }
+
+                  });
+
+              });
+
+            } else {
+
+              // return indicator
+              return res.json( 200, { 'value': reports.length });
+            }
 
           });
 
@@ -61,6 +103,7 @@ var AdminDashboardController = {
           .where( { admin0pcode: admin0pcode } )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
             // return error
@@ -100,6 +143,7 @@ var AdminDashboardController = {
           .where( { admin0pcode: admin0pcode } )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
             // return error
