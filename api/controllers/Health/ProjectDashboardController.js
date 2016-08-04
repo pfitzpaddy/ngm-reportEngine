@@ -235,6 +235,23 @@ var ProjectDashboardController = {
               // beneficiaries
               if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ] ) {
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ] = {};
+                //
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5female = 0;
+                //
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_male_under1 = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].skilled_birth_attendant = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].conflict_trauma_treated = 0;
+                //
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_female = 0;
+                //
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].total = 0;                
               }
 
               // attributes
@@ -264,26 +281,6 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
               
-              // beneficairies numbers
-              if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5male ) {
-                //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5female = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5female = 0;
-                //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_male_under1 = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].skilled_birth_attendant = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].conflict_trauma_treated = 0;
-                //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_female = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_female = 0;
-                //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].total = 0;
-              }
               // sum
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5male += b.under5male;
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5female += b.under5female;
@@ -453,6 +450,11 @@ var ProjectDashboardController = {
               // beneficiaries
               if ( !projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ] ) {
                 projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ] = {};
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5male = 0;
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5female = 0;
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5male = 0;                
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5female = 0;
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].total = 0;                
               }
 
               // attributes
@@ -467,15 +469,6 @@ var ProjectDashboardController = {
               // beneficairies types
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
-              
-              // beneficairies numbers
-              if ( !projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5male ) {
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5male = 0;
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5female = 0;
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5male = 0;                
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5female = 0;
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].total = 0;
-              };
               
               // summary
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );

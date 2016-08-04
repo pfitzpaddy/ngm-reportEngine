@@ -82,7 +82,7 @@ module.exports = {
         aClass: 'white-text',
         iClass: 'medium material-icons',
         href: '#/health/project/',
-        title: 'PROJECTS'
+        title: 'MY PROJECTS'
        }]
 		},
 		visits: {
