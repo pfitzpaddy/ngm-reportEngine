@@ -140,29 +140,28 @@ var ProjectDashboardController = {
         fields = [ 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
         fieldNames = [  'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
-        // get reports
-        Report
+        // beneficiaires
+        Beneficiaries
           .find()
           .where( { project_id: project_ids } )
           .where( filters.reporting_filter_s )
-          .where( filters.reporting_filter_e )
+          .where( filters.reporting_filter_e )              
+          .where( filters.adminRpcode_filter )
+          .where( filters.admin0pcode_filter )
+          .where( filters.admin1pcode_filter )
+          .where( filters.admin2pcode_filter )
+          .where( filters.beneficiaries_filter )
           .where( { organization: { '!': 'iMMAP' } } )
-          .populateAll()
-          .exec( function( err, reports ) {
+          .exec( function( err, beneficiaries ){
 
             // return error
             if ( err ) return res.negotiate( err );
+            
+            // beneficiaries
+            beneficiaries.forEach( function( b, i ){
 
-            // each location
-            var location_ids = [];
-
-            // for each report/location
-            reports.forEach( function( r, i ){
-              r.locations.forEach( function( l, j ){
-
-                // locations
-                location_ids.push( l.id );
-                // location details
+              // if nothing
+              if ( !locationStore[ l.admin2pcode ] ) {
                 locationStore[ l.admin2pcode ] = {};
                 locationStore[ l.admin2pcode ].admin0pcode = l.admin0pcode;
                 locationStore[ l.admin2pcode ].admin0name = l.admin0name;
@@ -189,78 +188,54 @@ var ProjectDashboardController = {
                 locationStore[ l.admin2pcode ].total = 0;
                 // location lat, lng
                 locationStore[ l.admin2pcode ].lat = l.admin2lat;
-                locationStore[ l.admin2pcode ].lng = l.admin2lng;                
+                locationStore[ l.admin2pcode ].lng = l.admin2lng;                   
+              }
 
-              });
+              // beneficairies standard row 1
+              locationStore[ b.admin2pcode ].under5male += b.under5male;
+              locationStore[ b.admin2pcode ].under5female += b.under5female;
+              locationStore[ b.admin2pcode ].over5male += b.over5male;
+              locationStore[ b.admin2pcode ].over5female += b.over5female;
+              // beneficairies standard row 2
+              locationStore[ b.admin2pcode ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
+              locationStore[ b.admin2pcode ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
+              locationStore[ b.admin2pcode ].skilled_birth_attendant += b.skilled_birth_attendant;
+              locationStore[ b.admin2pcode ].conflict_trauma_treated += b.conflict_trauma_treated;
+              // beneficairies training/education
+              locationStore[ b.admin2pcode ].education_male += b.education_male;
+              locationStore[ b.admin2pcode ].education_female += b.education_female;
+              locationStore[ b.admin2pcode ].capacity_building_male += b.capacity_building_male;
+              locationStore[ b.admin2pcode ].capacity_building_female += b.capacity_building_female;
+
+              // total
+              locationStore[ b.admin2pcode ].total += b.under5male + 
+                                                      b.under5female +
+                                                      b.over5male +
+                                                      b.over5female +
+                                                      b.penta3_vacc_male_under1 + 
+                                                      b.penta3_vacc_female_under1 +
+                                                      b.skilled_birth_attendant +
+                                                      b.conflict_trauma_treated +
+                                                      b.education_male + 
+                                                      b.education_female + 
+                                                      b.capacity_building_male + 
+                                                      b.capacity_building_female;
+
             });
 
-            // beneficiaires
-            Beneficiaries
-              .find()
-              .where( { location_id: location_ids } )
-              .where( filters.reporting_filter_s )
-              .where( filters.reporting_filter_e )              
-              .where( filters.adminRpcode_filter )
-              .where( filters.admin0pcode_filter )
-              .where( filters.admin1pcode_filter )
-              .where( filters.admin2pcode_filter )
-              .where( filters.beneficiaries_filter )
-              .where( { organization: { '!': 'iMMAP' } } )
-              .exec( function( err, beneficiaries ){
+            // flatten
+            var data = flatten( locationStore );
 
-                // return error
-                if ( err ) return res.negotiate( err );
-                
-                // beneficiaries
-                beneficiaries.forEach( function( b, i ){
+            // return csv
+            json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
 
-                  // beneficairies standard row 1
-                  locationStore[ b.admin2pcode ].under5male += b.under5male;
-                  locationStore[ b.admin2pcode ].under5female += b.under5female;
-                  locationStore[ b.admin2pcode ].over5male += b.over5male;
-                  locationStore[ b.admin2pcode ].over5female += b.over5female;
-                  // beneficairies standard row 2
-                  locationStore[ b.admin2pcode ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
-                  locationStore[ b.admin2pcode ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
-                  locationStore[ b.admin2pcode ].skilled_birth_attendant += b.skilled_birth_attendant;
-                  locationStore[ b.admin2pcode ].conflict_trauma_treated += b.conflict_trauma_treated;
-                  // beneficairies training/education
-                  locationStore[ b.admin2pcode ].education_male += b.education_male;
-                  locationStore[ b.admin2pcode ].education_female += b.education_female;
-                  locationStore[ b.admin2pcode ].capacity_building_male += b.capacity_building_male;
-                  locationStore[ b.admin2pcode ].capacity_building_female += b.capacity_building_female;
+              // success
+              return res.json( 200, { data: csv } );
 
-                  // total
-                  locationStore[ b.admin2pcode ].total += b.under5male + 
-                                                          b.under5female +
-                                                          b.over5male +
-                                                          b.over5female +
-                                                          b.penta3_vacc_male_under1 + 
-                                                          b.penta3_vacc_female_under1 +
-                                                          b.skilled_birth_attendant +
-                                                          b.conflict_trauma_treated +
-                                                          b.education_male + 
-                                                          b.education_female + 
-                                                          b.capacity_building_male + 
-                                                          b.capacity_building_female;
-
-                });
-
-                // flatten
-                var data = flatten( locationStore );
-
-                // return csv
-                json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-                  
-                  // error
-                  if ( err ) return res.negotiate( err );
-
-                  // success
-                  return res.json( 200, { data: csv } );
-
-                });
-
-              });
+            });
 
           });
 
@@ -295,11 +270,6 @@ var ProjectDashboardController = {
 
             // beneficiaries
             beneficiaries.forEach( function( b, i ){
-
-              console.log('------------ PROJECT ------------');
-              console.log( b.project_id )
-              console.log( b.admin2pcode )
-              console.log('------------ xxxxxxx ------------');
 
               // beneficiaries
               if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ] ) {
