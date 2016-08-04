@@ -66,6 +66,70 @@ var ProjectDashboardController = {
     // return indicator
     switch( params.details ){
 
+      // summarise financial progress
+      case 'financial':
+
+        // store data by project
+        var projectStore = {};
+        
+        // json2csv
+        fields = [ 'id', 'organization', 'admin0pcode', 'admin0name', 'project_code', 'project_title', 'project_budget', 'project_budget_currency', 'project_donor', 'project_budget_date_recieved', 'project_budget_amount_recieved' ],
+        fieldNames = [ 'ReportHub ID', 'Partner', 'Country Pcode', 'Country', 'Project Code', 'Project Title', 'Total Project Budget', 'Project Budget Currency', 'Donor', 'Date Funds Recieved', 'Amount Recieved' ];
+
+        // projects
+        projects.forEach( function( p, i ){
+          // project details
+          projectStore[ p.id ] = {}
+          projectStore[ p.id ].id = p.id;
+          projectStore[ p.id ].organization = p.organization;
+          projectStore[ p.id ].admin0pcode = p.admin0pcode;
+          projectStore[ p.id ].admin0name = p.admin0name;
+          projectStore[ p.id ].project_code = p.project_code;
+          projectStore[ p.id ].project_title = p.project_title;
+
+        });
+
+        // get financial details
+        BudgetProgress
+          .find()
+          .where( { project_id: project_ids } )
+          .where( filters.financial_filter_s )
+          .where( filters.financial_filter_e )
+          .where( { organization: { '!': 'iMMAP' } } )
+          .exec( function( err, budget ) {
+
+            // error
+            if ( err ) return res.negotiate( err );
+
+            // budget
+            budget.forEach( function( b, i ){
+
+              // latest updated project details
+              budget[ i ].organization = projectStore[ b.project_id ].organization;
+              budget[ i ].project_code = projectStore[ b.project_id ].project_code;
+              budget[ i ].project_title = projectStore[ b.project_id ].project_title;
+              budget[ i ].admin0pcode = projectStore[ b.project_id ].admin0pcode;
+              budget[ i ].admin0name = projectStore[ b.project_id ].admin0name;
+              budget[ i ].project_budget_currency = b.project_budget_currency.toUpperCase();
+              budget[ i ].project_budget_date_recieved = moment( b.project_budget_date_recieved ).format('YYYY-MM-DD');
+
+            });
+            
+            // return csv
+            json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              return res.json( 200, { data: csv } );
+
+            });
+
+          });
+
+        break;
+
       // summarise beneficiaries by location ( admin2 )
       case 'locations':
 
@@ -232,6 +296,11 @@ var ProjectDashboardController = {
             // beneficiaries
             beneficiaries.forEach( function( b, i ){
 
+              console.log('------------ PROJECT ------------');
+              console.log( b.project_id )
+              console.log( b.admin2pcode )
+              console.log('------------ xxxxxxx ------------');
+
               // beneficiaries
               if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ] ) {
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ] = {};
@@ -350,70 +419,6 @@ var ProjectDashboardController = {
 
           });
 
-
-        break;
-
-      // summarise financial progress
-      case 'financial':
-
-        // store data by project
-        var projectStore = {};
-        
-        // json2csv
-        fields = [ 'id', 'organization', 'admin0pcode', 'admin0name', 'project_code', 'project_title', 'project_budget', 'project_budget_currency', 'project_donor', 'project_budget_date_recieved', 'project_budget_amount_recieved' ],
-        fieldNames = [ 'ReportHub ID', 'Partner', 'Country Pcode', 'Country', 'Project Code', 'Project Title', 'Total Project Budget', 'Project Budget Currency', 'Donor', 'Date Funds Recieved', 'Amount Recieved' ];
-
-        // projects
-        projects.forEach( function( p, i ){
-          // project details
-          projectStore[ p.id ] = {}
-          projectStore[ p.id ].id = p.id;
-          projectStore[ p.id ].organization = p.organization;
-          projectStore[ p.id ].admin0pcode = p.admin0pcode;
-          projectStore[ p.id ].admin0name = p.admin0name;
-          projectStore[ p.id ].project_code = p.project_code;
-          projectStore[ p.id ].project_title = p.project_title;
-
-        });
-
-        // get financial details
-        BudgetProgress
-          .find()
-          .where( { project_id: project_ids } )
-          .where( filters.financial_filter_s )
-          .where( filters.financial_filter_e )
-          .where( { organization: { '!': 'iMMAP' } } )
-          .exec( function( err, budget ) {
-
-            // error
-            if ( err ) return res.negotiate( err );
-
-            // budget
-            budget.forEach( function( b, i ){
-
-              // latest updated project details
-              budget[ i ].organization = projectStore[ b.project_id ].organization;
-              budget[ i ].project_code = projectStore[ b.project_id ].project_code;
-              budget[ i ].project_title = projectStore[ b.project_id ].project_title;
-              budget[ i ].admin0pcode = projectStore[ b.project_id ].admin0pcode;
-              budget[ i ].admin0name = projectStore[ b.project_id ].admin0name;
-              budget[ i ].project_budget_currency = b.project_budget_currency.toUpperCase();
-              budget[ i ].project_budget_date_recieved = moment( b.project_budget_date_recieved ).format('YYYY-MM-DD');
-
-            });
-            
-            // return csv
-            json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
-              // error
-              if ( err ) return res.negotiate( err );
-
-              // success
-              return res.json( 200, { data: csv } );
-
-            });
-
-          });
 
         break;
 
