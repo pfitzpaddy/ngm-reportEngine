@@ -33,6 +33,7 @@ var AdminDashboardController = {
         // reports total
         Report
           .find()
+          .where( { organization: { '!': 'iMMAP' } } )
           .where( { report_active: true } )
           .where( { adminRpcode: adminRpcode } )
           .where( { admin0pcode: admin0pcode } )
@@ -97,6 +98,7 @@ var AdminDashboardController = {
         // reports complete
         Report
           .find()
+          .where( { organization: { '!': 'iMMAP' } } )
           .where( { report_active: true } )
           .where( { report_status: 'complete' } )
           .where( { adminRpcode: adminRpcode } )
@@ -137,6 +139,7 @@ var AdminDashboardController = {
         // reports due
         Report
           .find()
+          .where( { organization: { '!': 'iMMAP' } } )
           .where( { report_active: true } )
           .where( { report_status: 'todo' } )
           .where( { adminRpcode: adminRpcode } )
