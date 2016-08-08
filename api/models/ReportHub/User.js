@@ -72,7 +72,7 @@ module.exports = {
 		},
 		app_home: {
 			type: 'string',
-			defaultsTo: '/health/project/'
+			defaultsTo: '/health/projects/'
 		},
 		menu: {
 			type: 'array',
@@ -81,7 +81,7 @@ module.exports = {
         liClass: 'teal z-depth-2',
         aClass: 'white-text',
         iClass: 'medium material-icons',
-        href: '#/health/project/',
+        href: '/health/projects/',
         title: 'MY PROJECTS'
        }]
 		},

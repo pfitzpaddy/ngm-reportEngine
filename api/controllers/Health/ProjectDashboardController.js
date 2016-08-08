@@ -145,7 +145,7 @@ var ProjectDashboardController = {
           .find()
           .where( { project_id: project_ids } )
           .where( filters.reporting_filter_s )
-          .where( filters.reporting_filter_e )              
+          .where( filters.reporting_filter_e )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
