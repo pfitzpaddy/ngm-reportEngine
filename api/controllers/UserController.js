@@ -147,51 +147,56 @@ module.exports = {
     }
     
     // get user by email
-    User.findOne({ email: req.param( 'user' ).email }).exec(function(err, user){
-
-      // return error
-      if (err) return res.negotiate( err );
-
-      // return error
-      if (!user) return res.json(401, { err: 'User not found!' });
-
-      // reset user
-      var userReset = {
-        organization_id: user.organization_id,
-        organization: user.organization,
-        user_id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        token: jwtToken.issueToken({ sid: user.id })
-      }
-
-      UserReset.create(userReset).exec(function(err, reset) {
+    User
+      .findOne()
+      .where({ email: req.param( 'user' ).email })
+      .exec(function(err, user){
 
         // return error
         if (err) return res.negotiate( err );
 
-        // send email
-        sails.hooks.email.send( 'password-reset', {
-            recipientName: reset.name,
-            senderName: 'ReportHub',
-            url: req.param( 'url' ) + reset.token,
-          }, {
-            to: reset.email,
-            subject: 'ReportHub Password Reset'
-          }, function(err) {
-            
-            // return error
-            if (err) return res.negotiate( err );
+        // return error
+        if (!user) return res.json(401, { err: 'User not found!' });
 
-            // email sent
-            return res.json(200, {'data': 'success' });
+        // reset user
+        var userReset = {
+          adminRpcode: user.adminRpcode,
+          admin0pcode: user.admin0pcode,         
+          organization_id: user.organization_id,
+          organization: user.organization,
+          user_id: user.id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          token: jwtToken.issueToken({ sid: user.id })
+        }
 
-          });
+        UserReset.create(userReset).exec(function(err, reset) {
 
-      }); 
+          // return error
+          if (err) return res.negotiate( err );
 
-    });
+          // send email
+          sails.hooks.email.send( 'password-reset', {
+              recipientName: reset.name,
+              senderName: 'ReportHub',
+              url: req.param( 'url' ) + reset.token,
+            }, {
+              to: reset.email,
+              subject: 'ReportHub Password Reset'
+            }, function(err) {
+              
+              // return error
+              if (err) return res.negotiate( err );
+
+              // email sent
+              return res.json(200, {'data': 'success' });
+
+            });
+
+        }); 
+
+      });
 
   },
 
