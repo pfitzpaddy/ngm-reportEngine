@@ -25,6 +25,7 @@ var AdminDashboardController = {
     // get organizations by project
     Project
       .find( {} )
+      .where( { organization: { '!': 'iMMAP' } } )
       .exec( function( err, projects ){
 
         // return error
