@@ -22,9 +22,24 @@ var AdminDashboardController = {
   // get organization list for menu
   getOrganizationList: function( req, res ) {
 
+    // request input
+    if ( !req.param('adminRpcode')  || !req.param('admin0pcode') || !req.param('start_date') || !req.param('end_date') ) {
+      return res.json( 401, { err: 'adminRpcode, admin0pcode, start_date, end_date required!' });
+    }    
+
+    // params
+    var adminRpcode = req.param('adminRpcode').toUpperCase(),
+        admin0pcode = req.param('admin0pcode').toUpperCase(),
+        start_date = req.param('start_date'),
+        end_date = req.param('end_date');
+
     // get organizations by project
     Project
       .find( {} )
+      .where( { adminRpcode: adminRpcode } )
+      .where( { admin0pcode: admin0pcode } )      
+      .where( { project_start_date: { '>=': new Date( end_date ) } } )
+      .where( { project_end_date: { '<=': new Date( start_date ) } } )
       .where( { organization: { '!': 'iMMAP' } } )
       .exec( function( err, projects ){
 
