@@ -16,7 +16,7 @@ module.exports = {
 			type: 'string',
 			required: true
     },
-    admin0name: {
+    admin0pcode: {
 			type: 'string',
 			required: true
     },		
