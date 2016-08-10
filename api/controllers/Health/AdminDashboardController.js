@@ -31,7 +31,7 @@ var AdminDashboardController = {
     var moment = require( 'moment' ),
         list = req.param('list'),
         indicator = req.param('indicator'),
-        organization = req.param('organization') === 'all' ? {} : { organization_id: req.param('organization') },
+        organization_filter = req.param('organization') === 'all' ? {} : { organization_id: req.param('organization') },
         adminRpcode = req.param('adminRpcode').toUpperCase(),
         admin0pcode = req.param('admin0pcode').toUpperCase(),
         start_date = req.param('start_date'),
