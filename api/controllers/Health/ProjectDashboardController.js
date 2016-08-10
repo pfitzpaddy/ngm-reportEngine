@@ -742,6 +742,7 @@ var ProjectDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
+            // chart data
             var facilities = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ]
 
             // each location
@@ -819,7 +820,7 @@ var ProjectDashboardController = {
 
             });
 
-            // return markers
+            // return highcharts data
             return res.json(200, { 'data': facilities } );
 
           });        

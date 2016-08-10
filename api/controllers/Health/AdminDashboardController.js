@@ -5,8 +5,53 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+// flatten json
+function flatten( json ) {
+  var array = [];
+  for( var i in json ) {
+    if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
+      array.push( json[ i ] );
+    }
+  }
+  return array;
+}
+
 // admin controller
 var AdminDashboardController = {
+
+  // get organization list for menu
+  getOrganizationList: function( req, res ) {
+
+    // get organizations by project
+    Project
+      .find( {} )
+      .exec( function( err, projects ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        //
+        var organizations = [];
+
+        // projects 
+        projects.forEach(function( d, i ){
+
+          // if not existing
+          if( !organizations[d.organization_id] ) {
+            // add 
+            organizations[d.organization_id] = {};
+            organizations[d.organization_id].organization_id = d.organization_id;
+            organizations[d.organization_id].organization = d.organization;
+          }
+
+        });
+
+        // return org list
+        return res.json( 200, flatten( organizations ) );
+
+      });
+
+  },
 
   //
   getHealthAdminIndicator: function( req, res ){
@@ -43,7 +88,7 @@ var AdminDashboardController = {
           .exec( function( err, reports ){
 
             // return error
-            if (err) return res.negotiate( err );            
+            if (err) return res.negotiate( err );
 
             // return
             if ( table ) {
