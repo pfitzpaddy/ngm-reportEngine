@@ -38,8 +38,8 @@ var AdminDashboardController = {
       .find( {} )
       .where( { adminRpcode: adminRpcode } )
       .where( { admin0pcode: admin0pcode } )      
-      .where( { project_start_date: { '>=': new Date( end_date ) } } )
-      .where( { project_end_date: { '<=': new Date( start_date ) } } )
+      .where( { project_start_date: { '<=': new Date( end_date ) } } )
+      .where( { project_end_date: { '>=': new Date( start_date ) } } )
       .where( { organization: { '!': 'iMMAP' } } )
       .exec( function( err, projects ){
 
