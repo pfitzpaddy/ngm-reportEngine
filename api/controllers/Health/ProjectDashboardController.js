@@ -28,28 +28,29 @@ var ProjectDashboardController = {
         fieldNames = [ 'Name', 'Organization', 'Country', 'Position', 'Phone', 'Email', 'Joined ReportHub' ];
 
     // get all projects ( not empty )
-    User.find( { app_home: 'health' } ).exec(function( err, users ){
+    User
+      .find( {} ).exec(function( err, users ){
 
-      // return error
-      if ( err ) return res.negotiate( err );
-
-      // format date
-      users.forEach( function( d, i ){
-        users[ i ].createdAt = moment( d.createdAt ).format('YYYY-MM-DD')
-      });
-
-      // return csv
-      json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-        
-        // error
+        // return error
         if ( err ) return res.negotiate( err );
 
-        // success
-        return res.json( 200, { data: csv } );
+        // format date
+        users.forEach( function( d, i ){
+          users[ i ].createdAt = moment( d.createdAt ).format('YYYY-MM-DD')
+        });
 
-      });     
+        // return csv
+        json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+          
+          // error
+          if ( err ) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        });     
       
-    }); 
+      }); 
 
   },
 
