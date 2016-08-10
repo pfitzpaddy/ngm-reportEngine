@@ -749,8 +749,7 @@ var ProjectDashboardController = {
 
               if ( !facilities[ location.fac_type ] ) {
                 facilities[ location.fac_type ] = {};
-                facilities[ location.fac_type ].fac_type = location.fac_type;
-                facilities[ location.fac_type ].name = location.fac_type_name;
+                facilities[ location.fac_type ].data = location.fac_type_name;
                 facilities[ location.fac_type ].y = 0;
               }
               // increment
