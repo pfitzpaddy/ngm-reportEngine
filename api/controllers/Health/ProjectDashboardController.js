@@ -742,23 +742,85 @@ var ProjectDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
-            var facilities = []
+            var facilities = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ]
 
             // each location
             locations.forEach( function( location, i ){
 
-              if ( !facilities[ location.fac_type ] ) {
-                facilities[ location.fac_type ] = {};
-                facilities[ location.fac_type ].data = location.fac_type_name;
-                facilities[ location.fac_type ].y = 0;
+              // switch
+              switch ( location.fac_type ) {
+
+                // cases
+                case 'RH':
+                  facilities[0]++;
+                  break;
+
+                case 'PH':
+                  facilities[1]++;
+                  break;
+
+                case 'DH':
+                  facilities[2]++;
+                  break;
+
+                case 'CHC':
+                  facilities[3]++;
+                  break;
+
+                case 'BHC':
+                  facilities[4]++;
+                  break;
+
+                case 'FHH':
+                  facilities[5]++;
+                  break;
+
+                case 'SHC':
+                  facilities[6]++;
+                  break;
+
+                case 'MHT':
+                  facilities[7]++;
+                  break;
+
+                case 'FATP':
+                  facilities[8]++;
+                  break;
+
+                case 'DATC':
+                  facilities[9]++;
+                  break;
+
+                case 'rehabilitation_center':
+                  facilities[10]++;
+                  break;
+
+                case 'special_hospital':
+                  facilities[11]++;
+                  break;
+
+                case 'BHC+FATP':
+                  facilities[12]++;
+                  break;
+
+                case 'CHC+FATP':
+                  facilities[13]++;
+                  break;
+
               }
-              // increment
-              facilities[ location.fac_type ].y++;
+
+              // if ( !facilities[ location.fac_type ] ) {
+              //   facilities[ location.fac_type ] = {};
+              //   facilities[ location.fac_type ].name = location.fac_type_name;
+              //   facilities[ location.fac_type ].y = 0;
+              // }
+              // // increment
+              // facilities[ location.fac_type ].y++;
 
             });
 
             // return markers
-            return res.json(200, { 'data': flatten( facilities ) } );
+            return res.json(200, { 'data': facilities } );
 
           });        
 
