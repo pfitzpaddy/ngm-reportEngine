@@ -42,47 +42,80 @@ var AdminDashboardController = {
 
       case 'organizations':
 
-        // get organizations by project
-        Project
-          .find( {} )
-          .where( { adminRpcode: adminRpcode } )
-          .where( { admin0pcode: admin0pcode } )
-          .where( { project_start_date: { '<=': new Date( end_date ) } } )
-          .where( { project_end_date: { '>=': new Date( start_date ) } } )
-          .where( { organization: { '!': 'iMMAP' } } )
-          .exec( function( err, projects ){
+        if ( list ) {
 
-            // return error
-            if (err) return res.negotiate( err );
+          // get organizations by project
+          Project
+            .find( {} )
+            .where( { adminRpcode: adminRpcode } )
+            .where( { admin0pcode: admin0pcode } )
+            .where( { project_start_date: { '<=': new Date( end_date ) } } )
+            .where( { project_end_date: { '>=': new Date( start_date ) } } )
+            .where( { organization: { '!': 'iMMAP' } } )
+            .exec( function( err, projects ){
 
-            //
-            var organizations = [];
+              // return error
+              if (err) return res.negotiate( err );
 
-            // projects 
-            projects.forEach(function( d, i ){
+              //
+              var organizations = [];
 
-              // if not existing
-              if( !organizations[d.organization_id] ) {
-                // add 
-                organizations[d.organization_id] = {};
-                organizations[d.organization_id].organization_id = d.organization_id;
-                organizations[d.organization_id].organization = d.organization;
-              }
+              // projects 
+              projects.forEach(function( d, i ){
 
-            });
+                // if not existing
+                if( !organizations[d.organization_id] ) {
+                  // add 
+                  organizations[d.organization_id] = {};
+                  organizations[d.organization_id].organization_id = d.organization_id;
+                  organizations[d.organization_id].organization = d.organization;
+                }
 
-            if ( list ) {
+              });
               
               // return org list
               return res.json( 200, flatten( organizations ) );
 
-            } else {
-              
-              // return indicator
-              return res.json( 200, { 'value': flatten( organizations ).length });
-            }
+            });
 
-          });
+          } else {
+
+            // get organizations by project
+            Project
+              .find( {} )
+              .where( { adminRpcode: adminRpcode } )
+              .where( { admin0pcode: admin0pcode } )
+              .where( organization_filter )
+              .where( { project_start_date: { '<=': new Date( end_date ) } } )
+              .where( { project_end_date: { '>=': new Date( start_date ) } } )
+              .where( { organization: { '!': 'iMMAP' } } )
+              .exec( function( err, projects ){
+
+                // return error
+                if (err) return res.negotiate( err );
+
+                //
+                var organizations = [];
+
+                // projects 
+                projects.forEach(function( d, i ){
+
+                  // if not existing
+                  if( !organizations[d.organization_id] ) {
+                    // add 
+                    organizations[d.organization_id] = {};
+                    organizations[d.organization_id].organization_id = d.organization_id;
+                    organizations[d.organization_id].organization = d.organization;
+                  }
+
+                });
+                
+                // return indicator
+                return res.json( 200, { 'value': flatten( organizations ).length });
+
+              });
+              
+          }
 
           break;
 
