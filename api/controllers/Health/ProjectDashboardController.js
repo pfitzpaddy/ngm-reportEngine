@@ -150,7 +150,6 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.beneficiaries_filter )
           .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
 
@@ -261,7 +260,6 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.beneficiaries_filter )
           .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
             
@@ -412,7 +410,6 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.beneficiaries_filter )
           .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
             
@@ -728,6 +725,46 @@ var ProjectDashboardController = {
 
           break;
 
+      // facilities by type
+      case 'facilities':
+
+        // target locations
+        TargetLocation
+          .find()
+          .where( { project_id: project_ids } )
+          .where( filters.adminRpcode_filter )
+          .where( filters.admin0pcode_filter )
+          .where( filters.admin1pcode_filter )
+          .where( filters.admin2pcode_filter )
+          .where( { organization: { '!': 'iMMAP' } } )
+          .exec( function( err, locations ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            var facilities = []
+
+            // each location
+            locations.forEach( function( location, i ){
+
+              if ( !facilities[ location.fac_type ] ) {
+                facilities[ location.fac_type ] = {};
+                facilities[ location.fac_type ].fac_type = location.fac_type;
+                facilities[ location.fac_type ].name = location.fac_type_name;
+                facilities[ location.fac_type ].y = 0;
+              }
+              // increment
+              facilities[ location.fac_type ].y++;
+
+            });
+
+            // return markers
+            return res.json(200, { 'data': flatten( facilities ) } );
+
+          });        
+
+        break;
+
       // markers
       case 'markers':
 
@@ -828,7 +865,6 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.beneficiaries_filter )
           .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
 
@@ -937,7 +973,6 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.beneficiaries_filter )
           .where( { organization: { '!': 'iMMAP' } } )
           .exec( function( err, beneficiaries ){
 
