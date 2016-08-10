@@ -780,7 +780,6 @@ var ProjectDashboardController = {
                   break;
 
                 case 'MHT':
-                  console.log('here');
                   facilities[7]++;
                   break;
 
