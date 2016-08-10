@@ -90,7 +90,6 @@ module.exports.routes = {
 
   // Admin Dashboard
   'POST /health/admin/indicator': 'Health/AdminDashboardController.getHealthAdminIndicator',
-  'POST /health/admin/organizations': 'Health/AdminDashboardController.getOrganizationList',
 
   // 4W Dashboard
   'POST /health/indicator': 'Health/ProjectDashboardController.getHealthDetails',
