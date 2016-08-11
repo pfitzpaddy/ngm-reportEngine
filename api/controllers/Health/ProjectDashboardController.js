@@ -520,6 +520,8 @@ var ProjectDashboardController = {
       
       details: req.param('details') ? req.param('details') : false,
 
+      unique: req.param('unique') ? req.param('unique') : false,
+
       indicator: req.param('indicator') ? req.param('indicator') : false,
       
       project_id: req.param('project_id') ? req.param('project_id') : false,
@@ -697,12 +699,23 @@ var ProjectDashboardController = {
             // if no length
             if ( !target_locations.length ) return res.json(200, { 'value': 0 } );
 
-            // for each
-            target_locations.forEach( function( location, i ){
-              //
-              locations[ location.admin2name ] = location;
+            // unique locations
+            if ( params.unique ) {
+              
+              // for each
+              target_locations.forEach( function( location, i ){
+                //
+                locations[ location.admin2name ] = location;
 
-            });
+              });
+              
+              locations = flatten( locations );
+
+            } else {
+
+              // total locations
+              locations = target_locations;
+            }
 
             // actual locations
             Admin2
@@ -718,7 +731,7 @@ var ProjectDashboardController = {
                 if (err) return res.negotiate( err );
 
                 // return new Project
-                return res.json(200, { 'value': flatten( locations ).length, 'value_total': conflict_locations.length });
+                return res.json(200, { 'value': locations.length, 'value_total': conflict_locations.length });
 
               });
 
