@@ -679,7 +679,7 @@ var ProjectDashboardController = {
 
         // locations
         var locations = {},
-            conflict = !params.conflict ? { } : { conflict: true };
+            conflict = !params.conflict ? {} : { conflict: true };
 
         // actual locations
         TargetLocation
@@ -724,7 +724,7 @@ var ProjectDashboardController = {
               .where( filters.admin0pcode_filter )
               .where( filters.admin1pcode_filter )
               .where( filters.admin2pcode_filter )              
-              .where( { conflict: true } )
+              .where( conflict )
               .exec( function( err, conflict_locations ) {    
 
                 // return error
