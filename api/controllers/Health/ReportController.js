@@ -368,7 +368,7 @@ module.exports = {
                     username: report.username,
                     email: report.email,
                     report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
-                    reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
+                    reporting_due_date: moment().startOf( 'month' ).add( 15, 'days' ).format( 'DD MMMM, YYYY' ),
                     reports: []
                   };
                 }
