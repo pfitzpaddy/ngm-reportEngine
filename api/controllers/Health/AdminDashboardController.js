@@ -27,6 +27,9 @@ var AdminDashboardController = {
       return res.json( 401, { err: 'indicator, adminRpcode, admin0pcode, start_date, end_date required!' });
     }
 
+    // organizations to excelude
+    var organizations = [ 'iMMAP', 'ARCS' ]
+
     // variables
     var moment = require( 'moment' ),
         list = req.param('list'),
@@ -197,7 +200,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( { organization: { '!': organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
@@ -239,7 +242,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( { organization: { '!': organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
