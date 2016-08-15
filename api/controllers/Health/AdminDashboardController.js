@@ -260,36 +260,46 @@ var AdminDashboardController = {
               var counter=0,
                   length=reports.length;
 
-              // reports
-              reports.forEach( function( d, i ){
+              // if no reports
+              if ( length === 0 ) {
+                
+                // return empty
+                return res.json( 200, [] );
 
-                // check if form has been edited
-                Beneficiaries
-                  .count( { report_id: d.id } )
-                  .exec(function( err, b){
-                    
-                    // return error
-                    if (err) return res.negotiate( err );
+              } else {
 
-                    // add status
-                    reports[i].status = '#e57373'
+                // reports
+                reports.forEach( function( d, i ){
 
-                    // if benficiaries
-                    if ( b ) {
+                  // check if form has been edited
+                  Beneficiaries
+                    .count( { report_id: d.id } )
+                    .exec(function( err, b){
+                      
+                      // return error
+                      if (err) return res.negotiate( err );
+
                       // add status
-                      reports[i].status = '#fff176'
-                    }
+                      reports[i].status = '#e57373'
 
-                    // reutrn
-                    counter++;
-                    if ( counter === length ) {
-                      // table
-                      return res.json( 200, reports );
-                    }
+                      // if benficiaries
+                      if ( b ) {
+                        // add status
+                        reports[i].status = '#fff176'
+                      }
 
-                  });
+                      // reutrn
+                      counter++;
+                      if ( counter === length ) {
+                        // table
+                        return res.json( 200, reports );
+                      }
 
-              });
+                    });
+
+                });
+
+              }
 
             } else {
 
