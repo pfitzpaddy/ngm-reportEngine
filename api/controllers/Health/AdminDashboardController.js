@@ -27,14 +27,17 @@ var AdminDashboardController = {
       return res.json( 401, { err: 'indicator, adminRpcode, admin0pcode, start_date, end_date required!' });
     }
 
-    // organizations to excelude
-    var organizations = [ 'iMMAP', 'ARCS' ]
+    // organizations to exclude totally
+    var $nin_organizations = [ 'iMMAP' ],
+        // organizations to exclude in calculations
+        // ARCS
+        $nin_select_organizations = [ '56ff49200c68f2c746e3f83a' ];
 
     // variables
     var moment = require( 'moment' ),
         list = req.param('list'),
         indicator = req.param('indicator'),
-        organization_filter = req.param('organization') === 'all' ? {} : { organization_id: req.param('organization') },
+        organization_filter = req.param('organization') === 'all' ? { organization_id: { '!': $nin_select_organizations } } : { organization_id: req.param('organization') },
         adminRpcode = req.param('adminRpcode').toUpperCase(),
         admin0pcode = req.param('admin0pcode').toUpperCase(),
         start_date = req.param('start_date'),
@@ -45,16 +48,17 @@ var AdminDashboardController = {
 
       case 'organizations':
 
+        // get a list of projects for side menu
         if ( list ) {
 
           // get organizations by project
           Project
-            .find( {} )
+            .find()
             .where( { adminRpcode: adminRpcode } )
             .where( { admin0pcode: admin0pcode } )
             .where( { project_start_date: { '<=': new Date( end_date ) } } )
             .where( { project_end_date: { '>=': new Date( start_date ) } } )
-            .where( { organization: { '!': 'iMMAP' } } )
+            .where( { organization: { '!': $nin_organizations } } )
             .exec( function( err, projects ){
 
               // return error
@@ -85,13 +89,13 @@ var AdminDashboardController = {
 
             // get organizations by project
             Project
-              .find( {} )
+              .find()
               .where( { adminRpcode: adminRpcode } )
               .where( { admin0pcode: admin0pcode } )
               .where( organization_filter )
               .where( { project_start_date: { '<=': new Date( end_date ) } } )
               .where( { project_end_date: { '>=': new Date( start_date ) } } )
-              .where( { organization: { '!': 'iMMAP' } } )
+              .where( { organization: { '!': $nin_organizations } } )
               .exec( function( err, projects ){
 
                 // return error
@@ -133,7 +137,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
@@ -200,7 +204,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': organizations } } )
+          .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
@@ -242,7 +246,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': organizations } } )
+          .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
