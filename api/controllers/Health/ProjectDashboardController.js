@@ -96,7 +96,7 @@ var ProjectDashboardController = {
           .where( { project_id: project_ids } )
           .where( filters.financial_filter_s )
           .where( filters.financial_filter_e )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, budget ) {
 
             // error
@@ -151,7 +151,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -261,7 +261,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, beneficiaries ){
             
             // return error
@@ -411,7 +411,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, beneficiaries ){
             
             // return error
@@ -515,8 +515,12 @@ var ProjectDashboardController = {
     //   return res.json(401, {err: 'indicator, start_date, end_date, project_status, project_type, beneficiary_type, admin1pcode, admin2pcode required!'});
     // }
 
+
     // get params
     var params = {
+
+      // organizations to ignore
+      $nin_organizations: [ 'iMMAP', 'ARCS' ],
       
       details: req.param('details') ? req.param('details') : false,
 
@@ -546,8 +550,12 @@ var ProjectDashboardController = {
 
     // filters
     var filters = {
+      
       // project_id
       project_id: params.project_id ? { id: params.project_id } : {},
+
+      // organization $nin
+      organization_filter: { organization: { '!': params.$nin_organizations } },
       
       // admin1pcode locations filter
       adminRpcode_filter: params.adminRpcode !== '*' ? { adminRpcode: params.adminRpcode } : {},
@@ -595,7 +603,7 @@ var ProjectDashboardController = {
       .where( filters.project_status_filter )
       .where( filters.project_type_filter )
       .where( filters.beneficiaries_filter )
-      .where( { organization: { '!': 'iMMAP' } } )
+      .where( filters.organization_filter )
       .exec( function( err, projects ){
       
         // return error
@@ -689,7 +697,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .where( conflict )
           .exec( function( err, target_locations ) {
 
@@ -750,7 +758,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, locations ){
 
             // return error
@@ -857,7 +865,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, locations ){
 
             // return error
@@ -941,7 +949,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -1049,7 +1057,7 @@ var ProjectDashboardController = {
           .where( filters.admin0pcode_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( { organization: { '!': 'iMMAP' } } )
+          .where( filters.organization_filter )
           .exec( function( err, beneficiaries ){
 
             // return error
