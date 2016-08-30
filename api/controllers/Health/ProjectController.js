@@ -451,20 +451,78 @@ module.exports = {
   deleteProjectById: function(req, res) {
 
     // request input
-    if (!req.param('id')) {
-      return res.json(401, {err: '  id required!'});
+    if ( !req.param( 'project_id' ) ) {
+      return res.json( 401, { err: 'project_id required!' } );
     }
+
+    // project id
+    var project_id = req.param( 'project_id' );
         
     // set project by project id
-    Project.destroy({ id: req.param('id') }).exec(function(err){
+    Project.destroy( { id: project_id } )
+      .exec( function( err ){
 
-      // return error
-      if (err) return res.negotiate( err );
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // target beneficiaries
+        TargetBeneficiaries.destroy( { project_id: project_id } )
+          .exec( function( err ){
+
+            // return error
+            if ( err ) return res.negotiate( err );       
+
+            // target locations
+            TargetLocation.destroy( { project_id: project_id } )
+              .exec( function( err ){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                // beneficiaries
+                Beneficiaries.destroy( { project_id: project_id } )
+                  .exec( function( err ){
+
+                    // return error
+                    if ( err ) return res.negotiate( err );
+
+                    // budget progress
+                    BudgetProgress.destroy( { project_id: project_id } )
+                      .exec( function( err ){
+
+                        // return error
+                        if ( err ) return res.negotiate( err ); 
+
+                        // location
+                        Location.destroy( { project_id: project_id } )
+                          .exec( function( err ){
+
+                            // return error
+                            if ( err ) return res.negotiate( err );
+
+                            // location
+                            Report.destroy( { project_id: project_id } )
+                              .exec( function( err ){
+
+                                // return error
+                                if ( err ) return res.negotiate( err );
       
-      // else
-      return res.json(200, { msg: 'Project ' + req.param('id') + ' has been deleted!'});
+                                // else
+                                return res.json( 200, { msg: 'Project ' + project_id + ' has been deleted!' } );
 
-    });
+                              });
+
+                          });
+
+                      });
+
+                  });
+                    
+              });
+                
+        });
+
+      });
   }
 
 };
