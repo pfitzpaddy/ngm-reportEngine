@@ -103,6 +103,33 @@ module.exports = {
 
   },
 
+  // get organization by id
+  getOrganization: function( req, res ){
+
+    // check params
+    if ( !req.param( 'organization_id' ) ) {
+      return res.json(401, { err: 'organization_id required' });
+    }
+
+    // id params
+    var organization_id = req.param( 'organization_id' );
+
+    // find
+    Organization
+      .findOne()
+      .where( { id: organization_id } )
+      .exec( function( err, organization ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // return updated user
+        return res.json( 200, organization );
+
+      })
+
+  },
+
   // 
   updateLogin: function(req, res){
 
