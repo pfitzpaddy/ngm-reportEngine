@@ -58,6 +58,11 @@ module.exports.policies = {
   },  
 
   // public
+  'Health/AdminDashboardController': {
+    'getHealthAdminIndicator': true
+  },
+
+  // public
   'Health/ProjectDashboardController': {
     '*': true
   },
