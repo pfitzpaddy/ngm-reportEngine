@@ -95,7 +95,7 @@ var AdminDashboardController = {
               .where( organization_filter )
               .where( { project_start_date: { '<=': new Date( end_date ) } } )
               .where( { project_end_date: { '>=': new Date( start_date ) } } )
-              .where( { organization: { '!': $nin_organizations } } )
+              // .where( { organization: { '!': $nin_organizations } } )
               .exec( function( err, projects ){
 
                 // return error
@@ -137,7 +137,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': $nin_organizations } } )
+          // .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
@@ -204,7 +204,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': $nin_organizations } } )
+          // .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
@@ -246,7 +246,7 @@ var AdminDashboardController = {
           .where( organization_filter )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
-          .where( { organization: { '!': $nin_organizations } } )
+          // .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
           .exec( function( err, reports ){
 
