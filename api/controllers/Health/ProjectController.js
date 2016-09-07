@@ -164,8 +164,7 @@ module.exports = {
           
           // update
           Beneficiaries
-            // .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name, admin1lng: t.prov_lng, admin1lat: t.prov_lat, admin2lng: t.dist_lng, admin2lat: t.dist_lat } )
-            .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name } )
+            .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name, admin1lng: t.prov_lng, admin1lat: t.prov_lat, admin2lng: t.dist_lng, admin2lat: t.dist_lat } )
             .exec( function( err, result ){
               
               // return error
@@ -187,42 +186,57 @@ module.exports = {
   },
 
   // update database
-  updateBeneficiariesPcodesByProjectId: function( req, res ){
+  getBeneficiariesLocation: function( req, res ){
 
-    // request input
-    if ( !req.param( 'project_id' ) ) {
-      return res.json(401, { err: 'project_id required!' });
-    }
+    // // request input
+    // if ( !req.param( 'project_id' ) ) {
+    //   return res.json(401, { err: 'project_id required!' });
+    // }
 
-    // project
-    var project_id = req.param( 'project_id' );
+    // // project
+    // var project_id = req.param( 'project_id' );
 
-    // begin
+    // get all beneficiaries
     Beneficiaries
-      .findOne({ project_id: project_id })
-      .exec( function( err, b ){
-        
+      .find({})
+      .exec( function( err, beneficiaries ){
+
         // return error
         if ( err ) return res.negotiate( err );
 
-        // counter
-        var prov_code = b.prov_code,
-            prov_name = b.prov_name,
-            dist_code = b.dist_code,
-            dist_name = b.dist_name;
-          
-          // update
-          Beneficiaries
-            .update( { project_id: project_id }, { admin1pcode: prov_code, admin1name: prov_name, admin2pcode: dist_code, admin2name: dist_name } )
-            .exec( function( err, result ){
-              
+        //counter
+        var ids = [],
+            counter=0,
+            length=beneficiaries.length;
+
+        // for each
+        beneficiaries.forEach( function( b, i ) {
+
+          // location
+          Location
+            .findOne({ id: b.location_id  })
+            .exec( function( err, l ){
+
               // return error
               if ( err ) return res.negotiate( err );
-                
+
+              // check if equal
+              if ( l.admin1pcode !== b.admin1pcode ) {
+
+                //
+                ids.push( { l_id: l.id, b_id: b.id } );
+
+              }
+
               // return
-              return res.json( 200, { msg: 'success!' } );
+              counter++;
+              if ( counter === length ) {
+                return res.json( 200, { data: ids } );
+              }
 
             });
+
+        });
 
       });
 
