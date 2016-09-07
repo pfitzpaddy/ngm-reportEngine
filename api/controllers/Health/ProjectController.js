@@ -214,13 +214,13 @@ module.exports = {
         // for each
         beneficiaries.forEach( function( b, i ) {
 
-          if ( b.location_id ) {
+          if ( !b.location_id ) {
 
               // return
               counter++;
               if ( counter === length ) {
                 // return
-                return res.json( 200, { msg: ids } );
+                return res.json( 200, { data: ids } );
               }
 
           } else {
