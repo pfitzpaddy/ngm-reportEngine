@@ -231,50 +231,6 @@ module.exports = {
   },
 
   // update database
-  getBeneficiariesLocation: function( req, res ){
-
-    // get all beneficiaries
-    Beneficiaries
-      .find()
-      .where( { location_id: { '!' :null } } )
-      .exec( function( err, beneficiaries ){
-
-        // return error
-        if ( err ) return res.negotiate( err );
-
-        //counter
-        var ids = [],
-            counter=0,
-            length=beneficiaries.length;
-
-        // for each
-        beneficiaries.forEach( function( b, i ) {
-
-          // location
-          Location
-            .findOne({ id: b.location_id  })
-            .exec( function( err, l ){
-
-              // return error
-              if ( err ) return res.negotiate( err );
-
-              // check if equal
-              if ( l.admin1pcode !== b.admin1pcode ) {
-
-                // 
-                console.log( b.id );
-
-              }
-
-            });
-
-        });
-
-      });
-
-  },
-
-  // update database
   updateTargetBeneficiaries: function( req, res ){
 
     // begin
