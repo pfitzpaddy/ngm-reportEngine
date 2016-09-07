@@ -439,7 +439,6 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin0pcode = b.admin0pcode;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin0name = b.admin0name;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].project_title = b.project_title;
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].project_status = b.project_status;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin1pcode = b.admin1pcode;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin1name = b.admin1name;
               
@@ -482,8 +481,9 @@ var ProjectDashboardController = {
                 
                 // project details
                 if ( pd.project_id === p.id ) {
-                  data[i].project_title = p.project_title;
                   data[i].project_code = p.project_code;
+                  data[i].project_title = p.project_title;
+                  data[i].project_status = p.project_status;
                   data[i].project_start_date = moment( p.project_start_date ).format( 'YYYY-MM-DD' );
                   data[i].project_end_date = moment( p.project_end_date ).format( 'YYYY-MM-DD' );          
                 }
