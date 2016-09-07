@@ -228,6 +228,9 @@ module.exports = {
               .find({ id: b.location_id  })
               .exec( function( err, l ){
 
+                // 
+                console.log( l.admin1pcode )
+
                 // return error
                 if ( err ) return res.negotiate( err );
 
