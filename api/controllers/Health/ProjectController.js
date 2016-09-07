@@ -231,7 +231,7 @@ module.exports = {
                 // return error
                 if ( err ) return res.negotiate( err );
 
-                console.log( l.admin1pcode )
+                console.log( l[0].admin1pcode )
                 console.log( b.admin1pcode )
 
                 // check if equal
