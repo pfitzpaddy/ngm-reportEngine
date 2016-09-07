@@ -150,8 +150,6 @@ module.exports = {
     // request input
     var filter = !req.param( 'project_id' ) ? {} : { project_id: req.param( 'project_id' ) };
 
-    console.log( filter );
-
     // begin
     Beneficiaries
       .find( filter )
@@ -177,6 +175,10 @@ module.exports = {
 
               // return
               counter++;
+              
+              console.log( counter )
+              console.log( length )
+
               if ( counter === length ) {
                 // return
                 return res.json( 200, { msg: 'success!' } );
