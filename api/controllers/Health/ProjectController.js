@@ -225,31 +225,34 @@ module.exports = {
 
             // location
             Location
-              .find({ id: b.location_id  })
+              .findOne({ id: b.location_id  })
               .exec( function( err, l ){
 
                 // return error
                 if ( err ) return res.negotiate( err );
 
+                console.log( l )
+                console.log( l.admin1pcode )
+
                 // check if equal
-                if ( l[0].admin1pcode !== b.admin1pcode ) {
+                // if ( l.admin1pcode !== b.admin1pcode ) {
 
-                  var data = {
-                    id: b.id,
-                    admin1pcode: l[0].admin1pcode,
-                    admin1name: l[0].admin1name, 
-                    admin2pcode: l[0].admin2pcode, 
-                    admin2name: l[0].admin2name, 
-                    admin1lng: l[0].admin1lng, 
-                    admin1lat: l[0].admin1lat,
-                    admin2lng: l[0].admin2lng, 
-                    admin2lat: l[0].admin2lat
-                  }                 
+                //   var data = {
+                //     id: b.id,
+                //     admin1pcode: l.admin1pcode, 
+                //     admin1name: l.admin1name, 
+                //     admin2pcode: l.admin2pcode, 
+                //     admin2name: l.admin2name, 
+                //     admin1lng: l.admin1lng, 
+                //     admin1lat: l.admin1lat,
+                //     admin2lng: l.admin2lng, 
+                //     admin2lat: l.admin2lat
+                //   }                 
 
-                  //
-                  ids.push( data );
+                //   //
+                //   ids.push( data );
 
-                }
+                // }
 
                 // return
                 counter++;
