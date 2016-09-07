@@ -215,11 +215,11 @@ module.exports = {
           if ( !b.location_id ) {
 
               // return
-              counter++;
-              if ( counter === length ) {
-                // return
-                return res.json( 200, { data: ids } );
-              }
+              // counter++;
+              // if ( counter === length ) {
+              //   // return
+              //   return res.json( 200, { data: ids } );
+              // }
 
           } else {
 
@@ -244,25 +244,27 @@ module.exports = {
                     admin1lat: l.admin1lat,
                     admin2lng: l.admin2lng, 
                     admin2lat: l.admin2lat
-                  }  
-
-                  console.log( data );
+                  }
 
                   ids.push( data );
                 }
 
                 // return
-                counter++;
-                if ( counter === length ) {
-                  // return
-                  return res.json( 200, { data: ids } );
-                }
+                // counter++;
+                // if ( counter === length ) {
+                //   // return
+                //   return res.json( 200, { data: ids } );
+                // }
 
               });
 
             }
 
         });
+  
+        setTimeout( function() {
+          return res.json( 200, { data: ids } );  
+        }, 6000);
 
       });
 
