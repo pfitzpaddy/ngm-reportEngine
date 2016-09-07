@@ -225,7 +225,7 @@ module.exports = {
 
             // location
             Location
-              .find({ id: b.location_id  })
+              .findOne({ id: b.location_id  })
               .exec( function( err, l ){
 
                 // return error
@@ -233,9 +233,6 @@ module.exports = {
 
                 // check if equal
                 if ( l.admin1pcode !== b.admin1pcode ) {
-
-                  // 
-                  console.log( l.admin2pcode )
 
                   var data = {
                     id: b.id,
