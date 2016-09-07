@@ -231,39 +231,25 @@ module.exports = {
                 // return error
                 if ( err ) return res.negotiate( err );
 
-                var data = {
-                  id: b.id,
-                  admin1pcode: l.admin1pcode, 
-                  admin1name: l.admin1name, 
-                  admin2pcode: l.admin2pcode, 
-                  admin2name: l.admin2name, 
-                  admin1lng: l.admin1lng, 
-                  admin1lat: l.admin1lat,
-                  admin2lng: l.admin2lng, 
-                  admin2lat: l.admin2lat
-                }  
-
-                console.log( data );
-
                 // check if equal
-                // if ( l.admin1pcode !== b.admin1pcode ) {
+                if ( l.admin1pcode !== b.admin1pcode ) {                
 
-                //   var data = {
-                //     id: b.id,
-                //     admin1pcode: l.admin1pcode, 
-                //     admin1name: l.admin1name, 
-                //     admin2pcode: l.admin2pcode, 
-                //     admin2name: l.admin2name, 
-                //     admin1lng: l.admin1lng, 
-                //     admin1lat: l.admin1lat,
-                //     admin2lng: l.admin2lng, 
-                //     admin2lat: l.admin2lat
-                //   }                 
+                  var data = {
+                    id: b.id,
+                    admin1pcode: l.admin1pcode, 
+                    admin1name: l.admin1name, 
+                    admin2pcode: l.admin2pcode, 
+                    admin2name: l.admin2name, 
+                    admin1lng: l.admin1lng, 
+                    admin1lat: l.admin1lat,
+                    admin2lng: l.admin2lng, 
+                    admin2lat: l.admin2lat
+                  }  
 
-                //   //
-                //   ids.push( data );
+                  console.log( data );
 
-                // }
+                  ids.push( data );
+                }
 
                 // return
                 counter++;
