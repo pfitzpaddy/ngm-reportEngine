@@ -162,6 +162,8 @@ module.exports = {
         var counter = 0,
             length = target.length;
 
+        console.log( length );
+
         // each project
         target.forEach( function( t, i ) {
           
@@ -175,10 +177,6 @@ module.exports = {
 
               // return
               counter++;
-              
-              console.log( counter )
-              console.log( length )
-
               if ( counter === length ) {
                 // return
                 return res.json( 200, { msg: 'success!' } );
