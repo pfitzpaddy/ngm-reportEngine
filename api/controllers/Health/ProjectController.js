@@ -235,11 +235,10 @@ module.exports = {
                 if ( l.admin1pcode !== b.admin1pcode ) {
 
                 // 
-                console.log( l )                  
+                console.log( l )
 
-                  //
-                  ids.push( { 
-                    b_id: b.id, 
+                  var b = {
+                    id: b.id,
                     admin1pcode: l.admin1pcode, 
                     admin1name: l.admin1name, 
                     admin2pcode: l.admin2pcode, 
@@ -248,7 +247,10 @@ module.exports = {
                     admin1lat: l.admin1lat,
                     admin2lng: l.admin2lng, 
                     admin2lat: l.admin2lat
-                  } );
+                  }                 
+
+                  //
+                  ids.push( b );
 
                 }
 
@@ -284,7 +286,7 @@ module.exports = {
 
       // update
       Beneficiaries
-        .update( { id: b.b_id }, {
+        .update( { id: b.id }, {
           admin1pcode: b.admin1pcode, 
           admin1name: b.admin1name, 
           admin2pcode: b.admin2pcode, 
