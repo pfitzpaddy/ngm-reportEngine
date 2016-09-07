@@ -225,14 +225,17 @@ module.exports = {
 
             // location
             Location
-              .find({ id: b.location_id  })
+              .findOne({ id: b.location_id  })
               .exec( function( err, l ){
 
                 // return error
                 if ( err ) return res.negotiate( err );
 
-                console.log( l[0].admin1pcode )
-                console.log( b.admin1pcode )
+                if( l.admin1pcode ){
+                  console.log( l.admin1pcode )
+                } else {
+                  console.log('not found')
+                }
 
                 // check if equal
                 // if ( l.admin1pcode !== b.admin1pcode ) {
