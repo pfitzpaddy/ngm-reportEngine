@@ -186,137 +186,43 @@ module.exports = {
   },
 
   // update database
-  getBeneficiariesLocation: function( req, res ){
+  setBeneficiariesLocation: function( req, res ){
 
-    // // request input
-    // if ( !req.param( 'project_id' ) ) {
-    //   return res.json(401, { err: 'project_id required!' });
-    // }
-
-    // // project
-    // var project_id = req.param( 'project_id' );
-
-    // get all beneficiaries
-    Beneficiaries
+    // begin
+    Location
       .find()
-      .exec( function( err, beneficiaries ){
-
+      .exec( function( err, target ){
+        
         // return error
         if ( err ) return res.negotiate( err );
 
-        //counter
-        var ids = [],
-            counter=0,
-            length=beneficiaries.length;
+        // counter
+        var counter = 0,
+            length = target.length;
 
-        // for each
-        beneficiaries.forEach( function( b, i ) {
-
-          if ( !b.location_id ) {
+        // each project
+        target.forEach( function( t, i ) {
+          
+          // update
+          Beneficiaries
+            .update( { location_id: t.id }, { admin1pcode: t.admin1pcode, admin1name: t.admin1name, admin2pcode: t.admin2pcode, admin2name: t.admin2name, admin1lng: t.admin1lng, admin1lat: t.admin1lat, admin2lng: t.admin2lng, admin2lat: t.admin2lat } )
+            .exec( function( err, result ){
+              
+              // return error
+              if ( err ) return res.negotiate( err );
 
               // return
               counter++;
               if ( counter === length ) {
                 // return
-                return res.json( 200, { data: ids } );
+                return res.json( 200, { msg: 'success!' } );
               }
 
-          } else {
-
-            // location
-            Location
-              .findOne({ id: b.location_id  })
-              .exec( function( err, l ){
-
-                // return error
-                if ( err ) return res.negotiate( err );
-
-                if( l.admin1pcode ){
-                  console.log( l.admin1pcode )
-                } else {
-                  console.log('not found')
-                }
-
-                // check if equal
-                // if ( l.admin1pcode !== b.admin1pcode ) {
-
-                //   // 
-                //   console.log( l )
-
-                //   var b = {
-                //     id: b.id,
-                //     admin1pcode: l.admin1pcode, 
-                //     admin1name: l.admin1name, 
-                //     admin2pcode: l.admin2pcode, 
-                //     admin2name: l.admin2name, 
-                //     admin1lng: l.admin1lng, 
-                //     admin1lat: l.admin1lat,
-                //     admin2lng: l.admin2lng, 
-                //     admin2lat: l.admin2lat
-                //   }                 
-
-                //   //
-                //   ids.push( b );
-
-                // }
-
-                // return
-                counter++;
-                if ( counter === length ) {
-                  // return
-                  return res.json( 200, { data: ids } );
-                }
-
-              });
-
-            }
+            });
 
         });
 
       });
-
-  },
-
-  // set beneficairies locations
-  setBeneficiariesLocation: function( req, res ){
-      
-    //
-    var locations = {}
-    
-    //
-    var counter = 0,
-        length = locaitons.data.length;
-
-    // locations
-    locations.data.forEach( function( b, i ) {
-
-      // update
-      Beneficiaries
-        .update( { id: b.id }, {
-          admin1pcode: b.admin1pcode, 
-          admin1name: b.admin1name, 
-          admin2pcode: b.admin2pcode, 
-          admin2name: b.admin2name, 
-          admin1lng: b.admin1lng, 
-          admin1lat: b.admin1lat,
-          admin2lng: b.admin2lng, 
-          admin2lat: b.admin2lat
-        } )
-        .exec( function( err, beneficiaries ){
-
-          // return error
-          if ( err ) return res.negotiate( err );
-
-          // return
-          counter++;
-          if ( counter === length ) {
-            // return
-            return res.json( 200, { msg: 'success!' } );
-          }
-
-        }); 
-
-    });
 
   },
 
