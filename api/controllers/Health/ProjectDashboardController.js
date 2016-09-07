@@ -162,54 +162,54 @@ var ProjectDashboardController = {
             beneficiaries.forEach( function( b, i ){
 
               // if nothing
-              if ( !locationStore[ b.admin2pcode ] ) {
-                locationStore[ b.admin2pcode ] = {};
-                locationStore[ b.admin2pcode ].admin0pcode = b.admin0pcode;
-                locationStore[ b.admin2pcode ].admin0name = b.admin0name;
-                locationStore[ b.admin2pcode ].admin1pcode = b.admin1pcode;
-                locationStore[ b.admin2pcode ].admin1name = b.admin1name;
-                locationStore[ b.admin2pcode ].admin2pcode = b.admin2pcode;
-                locationStore[ b.admin2pcode ].admin2name = b.admin2name;
+              if ( !locationStore[ b.admin2name ] ) {
+                locationStore[ b.admin2name ] = {};
+                locationStore[ b.admin2name ].admin0pcode = b.admin0pcode;
+                locationStore[ b.admin2name ].admin0name = b.admin0name;
+                locationStore[ b.admin2name ].admin1pcode = b.admin1pcode;
+                locationStore[ b.admin2name ].admin1name = b.admin1name;
+                locationStore[ b.admin2name ].admin2pcode = b.admin2pcode;
+                locationStore[ b.admin2name ].admin2name = b.admin2name;
                 // beneficairies standard row 1
-                locationStore[ b.admin2pcode ].under5male = 0;
-                locationStore[ b.admin2pcode ].under5female = 0;
-                locationStore[ b.admin2pcode ].over5male = 0;
-                locationStore[ b.admin2pcode ].over5female = 0;
+                locationStore[ b.admin2name ].under5male = 0;
+                locationStore[ b.admin2name ].under5female = 0;
+                locationStore[ b.admin2name ].over5male = 0;
+                locationStore[ b.admin2name ].over5female = 0;
                 // beneficairies standard row 2
-                locationStore[ b.admin2pcode ].penta3_vacc_male_under1 = 0;
-                locationStore[ b.admin2pcode ].penta3_vacc_female_under1 = 0;
-                locationStore[ b.admin2pcode ].skilled_birth_attendant = 0;
-                locationStore[ b.admin2pcode ].conflict_trauma_treated = 0;
+                locationStore[ b.admin2name ].penta3_vacc_male_under1 = 0;
+                locationStore[ b.admin2name ].penta3_vacc_female_under1 = 0;
+                locationStore[ b.admin2name ].skilled_birth_attendant = 0;
+                locationStore[ b.admin2name ].conflict_trauma_treated = 0;
                 // beneficairies training/education
-                locationStore[ b.admin2pcode ].education_male = 0;
-                locationStore[ b.admin2pcode ].education_female = 0;
-                locationStore[ b.admin2pcode ].capacity_building_male = 0;
-                locationStore[ b.admin2pcode ].capacity_building_female = 0;
+                locationStore[ b.admin2name ].education_male = 0;
+                locationStore[ b.admin2name ].education_female = 0;
+                locationStore[ b.admin2name ].capacity_building_male = 0;
+                locationStore[ b.admin2name ].capacity_building_female = 0;
                 // beneficairies total
-                locationStore[ b.admin2pcode ].total = 0;
+                locationStore[ b.admin2name ].total = 0;
                 // location lat, lng
-                locationStore[ b.admin2pcode ].lat = b.admin2lat;
-                locationStore[ b.admin2pcode ].lng = b.admin2lng;                   
+                locationStore[ b.admin2name ].lat = b.admin2lat;
+                locationStore[ b.admin2name ].lng = b.admin2lng;                   
               }
 
               // beneficairies standard row 1
-              locationStore[ b.admin2pcode ].under5male += b.under5male;
-              locationStore[ b.admin2pcode ].under5female += b.under5female;
-              locationStore[ b.admin2pcode ].over5male += b.over5male;
-              locationStore[ b.admin2pcode ].over5female += b.over5female;
+              locationStore[ b.admin2name ].under5male += b.under5male;
+              locationStore[ b.admin2name ].under5female += b.under5female;
+              locationStore[ b.admin2name ].over5male += b.over5male;
+              locationStore[ b.admin2name ].over5female += b.over5female;
               // beneficairies standard row 2
-              locationStore[ b.admin2pcode ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
-              locationStore[ b.admin2pcode ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
-              locationStore[ b.admin2pcode ].skilled_birth_attendant += b.skilled_birth_attendant;
-              locationStore[ b.admin2pcode ].conflict_trauma_treated += b.conflict_trauma_treated;
+              locationStore[ b.admin2name ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
+              locationStore[ b.admin2name ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
+              locationStore[ b.admin2name ].skilled_birth_attendant += b.skilled_birth_attendant;
+              locationStore[ b.admin2name ].conflict_trauma_treated += b.conflict_trauma_treated;
               // beneficairies training/education
-              locationStore[ b.admin2pcode ].education_male += b.education_male;
-              locationStore[ b.admin2pcode ].education_female += b.education_female;
-              locationStore[ b.admin2pcode ].capacity_building_male += b.capacity_building_male;
-              locationStore[ b.admin2pcode ].capacity_building_female += b.capacity_building_female;
+              locationStore[ b.admin2name ].education_male += b.education_male;
+              locationStore[ b.admin2name ].education_female += b.education_female;
+              locationStore[ b.admin2name ].capacity_building_male += b.capacity_building_male;
+              locationStore[ b.admin2name ].capacity_building_female += b.capacity_building_female;
 
               // total
-              locationStore[ b.admin2pcode ].total += b.under5male + 
+              locationStore[ b.admin2name ].total += b.under5male + 
                                                       b.under5female +
                                                       b.over5male +
                                                       b.over5female +
