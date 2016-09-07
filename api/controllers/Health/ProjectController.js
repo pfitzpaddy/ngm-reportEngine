@@ -235,7 +235,7 @@ module.exports = {
                 if ( l.admin1pcode !== b.admin1pcode ) {
 
                   //
-                  ids.push( { l_id: l.id, b_id: b.id } );
+                  ids.push( { l_id: b.location_id, b_id: b.id } );
 
                 }
 
