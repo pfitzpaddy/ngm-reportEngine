@@ -231,28 +231,31 @@ module.exports = {
                 // return error
                 if ( err ) return res.negotiate( err );
 
+                console.log( l.admin1pcode )
+                console.log( b.admin1pcode )
+
                 // check if equal
-                if ( l[0].admin1pcode !== b.admin1pcode ) {
+                // if ( l.admin1pcode !== b.admin1pcode ) {
 
-                  // 
-                  console.log( l )
+                //   // 
+                //   console.log( l )
 
-                  var b = {
-                    id: b.id,
-                    admin1pcode: l.admin1pcode, 
-                    admin1name: l.admin1name, 
-                    admin2pcode: l.admin2pcode, 
-                    admin2name: l.admin2name, 
-                    admin1lng: l.admin1lng, 
-                    admin1lat: l.admin1lat,
-                    admin2lng: l.admin2lng, 
-                    admin2lat: l.admin2lat
-                  }                 
+                //   var b = {
+                //     id: b.id,
+                //     admin1pcode: l.admin1pcode, 
+                //     admin1name: l.admin1name, 
+                //     admin2pcode: l.admin2pcode, 
+                //     admin2name: l.admin2name, 
+                //     admin1lng: l.admin1lng, 
+                //     admin1lat: l.admin1lat,
+                //     admin2lng: l.admin2lng, 
+                //     admin2lat: l.admin2lat
+                //   }                 
 
-                  //
-                  ids.push( b );
+                //   //
+                //   ids.push( b );
 
-                }
+                // }
 
                 // return
                 counter++;
