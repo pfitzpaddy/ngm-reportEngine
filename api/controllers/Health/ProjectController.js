@@ -188,10 +188,13 @@ module.exports = {
   // update database
   setBeneficiariesLocation: function( req, res ){
 
+    // projects
+    var projects = [ '5773848154e03b883ffa27a8', '574681d24a9929331f4b36f0', '5743fc924a9929331f4b35e9', '574e920a69203d430b3f8899', '5704ab5aeb3e39094c00d7ec', '576f50bb37aa426d5c7701a1' ]
+
     // begin
     Location
       .find()
-      .where( { report_id: { '!': null } } )
+      .where( { project_id: projects } )
       .exec( function( err, target ){
         
         // return error
