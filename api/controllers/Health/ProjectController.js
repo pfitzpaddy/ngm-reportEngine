@@ -209,12 +209,12 @@ module.exports = {
             counter=0,
             length=beneficiaries.length;
 
-            console.log(length)
-
         // for each
         beneficiaries.forEach( function( b, i ) {
 
           if ( !b.location_id ) {
+
+            console.log('here');
 
               // return
               counter++;
