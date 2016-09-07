@@ -67,7 +67,7 @@ var ProjectDashboardController = {
     // return indicator
     switch( params.details ){
 
-      // summarise financial progress
+      // OCHA financial Report
       case 'financial':
 
         // store data by project
@@ -393,15 +393,15 @@ var ProjectDashboardController = {
 
         break;
 
-      // OCHA project progress export
+      // OCHA Project Progress Report
       default: 
 
         // store data by project
         var projectStore = {};
         
         // json2csv
-        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'total', 'lat', 'lng' ],
-        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Beneficiary Category', 'under5male', 'under5female', 'over5male', 'over5female', 'Total', 'lat', 'lng' ];
+        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'total', 'lat', 'lng' ],
+        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Status', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Beneficiary Category', 'under5male', 'under5female', 'over5male', 'over5female', 'Total', 'lat', 'lng' ];
 
         // beneficiaires
         Beneficiaries
@@ -439,6 +439,7 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin0pcode = b.admin0pcode;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin0name = b.admin0name;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].project_title = b.project_title;
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].project_status = b.project_status;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin1pcode = b.admin1pcode;
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].admin1name = b.admin1name;
               
