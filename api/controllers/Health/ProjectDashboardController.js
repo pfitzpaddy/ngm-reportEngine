@@ -249,8 +249,8 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
-        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
+        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Status', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
         Beneficiaries
@@ -273,71 +273,72 @@ var ProjectDashboardController = {
             beneficiaries.forEach( function( b, i ){
 
               // beneficiaries
-              if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ] ) {
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ] = {};
+              if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] ) {
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] = {};
                 //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5female = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5female = 0;
                 //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_male_under1 = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].skilled_birth_attendant = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].conflict_trauma_treated = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_male_under1 = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].skilled_birth_attendant = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].conflict_trauma_treated = 0;
                 //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_female = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_female = 0;
                 //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].total = 0;                
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].total = 0;                
               }
 
               // attributes
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].project_id = b.project_id;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].organization = b.organization;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].project_title = b.project_title;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].admin0pcode = b.admin0pcode;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].admin0name = b.admin0name;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].admin1pcode = b.admin1pcode;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].admin1name = b.admin1name;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].admin2pcode = b.admin2pcode;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].admin2name = b.admin2name;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].fac_type_name = b.fac_type_name;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].project_id = b.project_id;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].organization = b.organization;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].project_title = b.project_title;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].admin0pcode = b.admin0pcode;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].admin0name = b.admin0name;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].admin1pcode = b.admin1pcode;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].admin1name = b.admin1name;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].admin2pcode = b.admin2pcode;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].admin2name = b.admin2name;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].fac_type_name = b.fac_type_name;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].fac_name = b.fac_name;
               
               // if no fac_name defined as yet
-              if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].fac_name ) {
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].fac_name = [];
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].fac_name.push( b.fac_name );
-              }
+              // if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].fac_name ) {
+              //   projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].fac_name = [];
+              //   projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].fac_name.push( b.fac_name );
+              // }
               
               // if not already on the heap
-              if ( projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].fac_name.indexOf( b.fac_name ) === -1 ) {
-               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].fac_name.push( b.fac_name ); 
-              }
+              // if ( projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].fac_name.indexOf( b.fac_name ) === -1 ) {
+              //  projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].fac_name.push( b.fac_name ); 
+              // }
               
               // beneficairies types
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].beneficiary_type = b.beneficiary_type;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
               
               // sum
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5male += b.under5male;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].under5female += b.under5female;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5male += b.over5male;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].over5female += b.over5female;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5male += b.under5male;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5female += b.under5female;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5male += b.over5male;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5female += b.over5female;
               //
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;              
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].skilled_birth_attendant += b.skilled_birth_attendant;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].conflict_trauma_treated += b.conflict_trauma_treated;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;              
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].skilled_birth_attendant += b.skilled_birth_attendant;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].conflict_trauma_treated += b.conflict_trauma_treated;
               //
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_male += b.education_male;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].education_female += b.education_female;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_male += b.capacity_building_male;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].capacity_building_female += b.capacity_building_female;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_male += b.education_male;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_female += b.education_female;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_male += b.capacity_building_male;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_female += b.capacity_building_female;
               //
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].total += b.under5male + 
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].total += b.under5male + 
                                                                                                       b.under5female +
                                                                                                       b.over5male +
                                                                                                       b.over5female +
@@ -351,8 +352,8 @@ var ProjectDashboardController = {
                                                                                                       b.capacity_building_female;
               
               // lat/lng
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].lat = b.admin2lat;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.beneficiary_type ].lng = b.admin2lng;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].lat = b.admin2lat;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].lng = b.admin2lng;
 
             });
   
@@ -367,8 +368,9 @@ var ProjectDashboardController = {
                 
                 // project details
                 if ( pd.project_id === p.id ) {
-                  data[i].project_title = p.project_title;
                   data[i].project_code = p.project_code;
+                  data[i].project_title = p.project_title;
+                  data[i].project_status = p.project_status;
                   data[i].project_start_date = moment( p.project_start_date ).format( 'YYYY-MM-DD' );
                   data[i].project_end_date = moment( p.project_end_date ).format( 'YYYY-MM-DD' );          
                 }
