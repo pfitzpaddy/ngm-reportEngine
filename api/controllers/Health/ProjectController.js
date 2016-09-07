@@ -234,10 +234,10 @@ module.exports = {
                 // check if equal
                 if ( l.admin1pcode !== b.admin1pcode ) {
 
-                // 
-                console.log( l )
+                  // 
+                  console.log( l.admin2pcode )
 
-                  var b = {
+                  var data = {
                     id: b.id,
                     admin1pcode: l.admin1pcode, 
                     admin1name: l.admin1name, 
@@ -250,7 +250,7 @@ module.exports = {
                   }                 
 
                   //
-                  ids.push( b );
+                  ids.push( data );
 
                 }
 
