@@ -235,7 +235,17 @@ module.exports = {
                 if ( l.admin1pcode !== b.admin1pcode ) {
 
                   //
-                  ids.push( { l_id: b.location_id, b_id: b.id } );
+                  ids.push( { 
+                    b_id: b.id, 
+                    admin1pcode: l.admin1pcode, 
+                    admin1name: t.admin1name, 
+                    admin2pcode: t.admin2pcode, 
+                    admin2name: t.admin2name, 
+                    admin1lng: t.admin1lng, 
+                    admin1lat: t.admin1lat,
+                    admin2lng: t.admin2lng, 
+                    admin2lat: t.admin2lat
+                  } );
 
                 }
 
@@ -253,6 +263,49 @@ module.exports = {
         });
 
       });
+
+  },
+
+  // set beneficairies locations
+  setBeneficiariesLocation: function( req, res ){
+      
+    //
+    var locations = {}
+    
+    //
+    var counter = 0,
+        length = locaitons.data.length;
+
+    // locations
+    locations.data.forEach( function( b, i ) {
+
+      // update
+      Beneficiaries
+        .update( { id: b.b_id }, {
+          admin1pcode: b.admin1pcode, 
+          admin1name: b.admin1name, 
+          admin2pcode: b.admin2pcode, 
+          admin2name: b.admin2name, 
+          admin1lng: b.admin1lng, 
+          admin1lat: b.admin1lat,
+          admin2lng: b.admin2lng, 
+          admin2lat: b.admin2lat
+        } )
+        .exec( function( err, beneficiaries ){
+
+          // return error
+          if ( err ) return res.negotiate( err );
+
+          // return
+          counter++;
+          if ( counter === length ) {
+            // return
+            return res.json( 200, { msg: 'success!' } );
+          }
+
+        }); 
+
+    });
 
   },
 
