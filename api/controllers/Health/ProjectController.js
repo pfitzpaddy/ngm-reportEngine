@@ -150,6 +150,8 @@ module.exports = {
     // request input
     var filter = !req.param( 'project_id' ) ? {} : { project_id: req.param( 'project_id' ) };
 
+    console.log( filter );
+
     // begin
     Beneficiaries
       .find( filter )
@@ -167,7 +169,7 @@ module.exports = {
           
           // update
           Beneficiaries
-            .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name, admin1lng: t.prov_lng, admin1lat: t.prov_lat, admin2lng: t.dist_lng, admin2lat: t.dist_lat } )
+            .update( { id: t.id }, { admin1pcode: t.prov_code, admin1name: t.prov_name, admin2pcode: t.dist_code, admin2name: t.dist_name } )//, admin1lng: t.prov_lng, admin1lat: t.prov_lat, admin2lng: t.dist_lng, admin2lat: t.dist_lat } )
             .exec( function( err, result ){
               
               // return error
