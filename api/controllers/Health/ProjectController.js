@@ -208,15 +208,17 @@ module.exports = {
         var ids = [],
             counter=0,
             length=beneficiaries.length;
-            
+
             console.log(length)
 
         // for each
         beneficiaries.forEach( function( b, i ) {
 
+          console.log(b.location_id)
+
           // location
           // Location
-          //   .findOne({ id: b.location_id  })
+          //   .find({ id: b.location_id  })
           //   .exec( function( err, l ){
 
           //     // return error
@@ -230,13 +232,18 @@ module.exports = {
 
           //     }
 
+              // console.log( '-------------RECORD----------' )
+              // console.log( l.id )
+              // console.log( l.admin1pcode )
+              // console.log( b.admin1pcode )
+
               ids.push( { b_id: b.id } );
 
               // return
               counter++;
               if ( counter === length ) {
                 // return
-                return res.json( 200, { msg: 'success!' } );
+                return res.json( 200, { msg: ids } );
               }
 
             // });
