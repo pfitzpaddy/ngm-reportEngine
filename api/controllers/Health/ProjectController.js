@@ -214,30 +214,7 @@ module.exports = {
         // for each
         beneficiaries.forEach( function( b, i ) {
 
-          console.log(b.location_id)
-
-          // location
-          // Location
-          //   .find({ id: b.location_id  })
-          //   .exec( function( err, l ){
-
-          //     // return error
-          //     if ( err ) return res.negotiate( err );
-
-          //     // check if equal
-          //     if ( l.admin1pcode !== b.admin1pcode ) {
-
-          //       //
-          //       ids.push( { l_id: l.id, b_id: b.id } );
-
-          //     }
-
-              // console.log( '-------------RECORD----------' )
-              // console.log( l.id )
-              // console.log( l.admin1pcode )
-              // console.log( b.admin1pcode )
-
-              ids.push( { b_id: b.id } );
+          if ( b.location_id ) {
 
               // return
               counter++;
@@ -246,7 +223,27 @@ module.exports = {
                 return res.json( 200, { msg: ids } );
               }
 
-            // });
+          } else {
+
+            // location
+            Location
+              .find({ id: b.location_id  })
+              .exec( function( err, l ){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                // check if equal
+                if ( l.admin1pcode !== b.admin1pcode ) {
+
+                  //
+                  ids.push( { l_id: l.id, b_id: b.id } );
+
+                }
+
+              });
+
+            }
 
         });
 
