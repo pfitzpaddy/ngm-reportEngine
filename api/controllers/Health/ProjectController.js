@@ -198,7 +198,7 @@ module.exports = {
 
     // get all beneficiaries
     Beneficiaries
-      .find({})
+      .find()
       .exec( function( err, beneficiaries ){
 
         // return error
@@ -208,33 +208,38 @@ module.exports = {
         var ids = [],
             counter=0,
             length=beneficiaries.length;
+            
+            console.log(length)
 
         // for each
         beneficiaries.forEach( function( b, i ) {
 
           // location
-          Location
-            .findOne({ id: b.location_id  })
-            .exec( function( err, l ){
+          // Location
+          //   .findOne({ id: b.location_id  })
+          //   .exec( function( err, l ){
 
-              // return error
-              if ( err ) return res.negotiate( err );
+          //     // return error
+          //     if ( err ) return res.negotiate( err );
 
-              // check if equal
-              if ( l.admin1pcode !== b.admin1pcode ) {
+          //     // check if equal
+          //     if ( l.admin1pcode !== b.admin1pcode ) {
 
-                //
-                ids.push( { l_id: l.id, b_id: b.id } );
+          //       //
+          //       ids.push( { l_id: l.id, b_id: b.id } );
 
-              }
+          //     }
+
+              ids.push( { b_id: b.id } );
 
               // return
               counter++;
               if ( counter === length ) {
-                return res.json( 200, { data: ids } );
+                // return
+                return res.json( 200, { msg: 'success!' } );
               }
 
-            });
+            // });
 
         });
 
