@@ -214,8 +214,6 @@ module.exports = {
 
           if ( !b.location_id ) {
 
-            console.log('here');
-
               // return
               counter++;
               if ( counter === length ) {
@@ -239,6 +237,13 @@ module.exports = {
                   //
                   ids.push( { l_id: l.id, b_id: b.id } );
 
+                }
+
+                // return
+                counter++;
+                if ( counter === length ) {
+                  // return
+                  return res.json( 200, { data: ids } );
                 }
 
               });
