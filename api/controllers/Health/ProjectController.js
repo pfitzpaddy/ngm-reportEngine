@@ -191,6 +191,7 @@ module.exports = {
     // begin
     Location
       .find()
+      .where( { report_id: { '!': null } } )
       .exec( function( err, target ){
         
         // return error
