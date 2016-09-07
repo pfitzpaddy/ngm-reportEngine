@@ -147,9 +147,12 @@ module.exports = {
   // update database
   updateBeneficiariesPcodes: function( req, res ){
 
+    // request input
+    var filter = !req.param( 'project_id' ) ? {} : { project_id: req.param( 'project_id' ) };
+
     // begin
     Beneficiaries
-      .find()
+      .find( filter )
       .exec( function( err, target ){
         
         // return error
@@ -350,6 +353,7 @@ module.exports = {
       });
 
   },
+
 
   // set project details
   setProjectById: function(req, res) {
