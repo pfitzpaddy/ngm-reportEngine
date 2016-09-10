@@ -19,6 +19,7 @@ sudo mongodump --out $DIR
 # zip
 # sudo zip -r $DIR/ngmReportHub.zip $DIR/ngmReportHub
 # sudo zip -r $DIR/ngmHealthCluster.zip $DIR/ngmHealthCluster
+cd $DIR
 cd ../
 sudo zip -r $STAMP.zip $STAMP
 # # copy to s3
