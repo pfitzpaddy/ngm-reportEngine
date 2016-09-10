@@ -24,4 +24,4 @@ sudo zip -r $STAMP.zip $DIR
 # aws s3 cp $DIR/ngmHealthCluster.zip s3://s3-af-geonode/ngmHealthCluster/$STAMP
 aws s3 cp $DIR/$STAMP.zip s3://s3-af-geonode/ngmHealthCluster/$STAMP
 # delete local
-sudo rm -r -f $DIR
+# sudo rm -r -f $DIR
