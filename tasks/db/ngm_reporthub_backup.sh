@@ -13,7 +13,6 @@ DIR=/home/ubuntu/data/reportHub/$STAMP
 # echo $DIR
 # mkdir
 sudo mkdir $DIR
-cd $DIR
 # dump
 sudo mongodump --out $DIR
 # zip
