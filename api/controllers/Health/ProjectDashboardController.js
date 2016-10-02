@@ -187,9 +187,6 @@ var ProjectDashboardController = {
                 locationStore[ b.admin2name ].capacity_building_female = 0;
                 // beneficairies total
                 locationStore[ b.admin2name ].total = 0;
-                // location lat, lng
-                locationStore[ b.admin2name ].lat = b.admin2lat;
-                locationStore[ b.admin2name ].lng = b.admin2lng;                   
               }
 
               // beneficairies standard row 1
@@ -221,6 +218,10 @@ var ProjectDashboardController = {
                                                       b.education_female + 
                                                       b.capacity_building_male + 
                                                       b.capacity_building_female;
+
+              // location lat, lng
+              locationStore[ b.admin2name ].lat = b.admin2lat;
+              locationStore[ b.admin2name ].lng = b.admin2lng;
 
             });
 
@@ -780,7 +781,7 @@ var ProjectDashboardController = {
             if (err) return res.negotiate( err );
 
             // chart data
-            var facilities = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ]
+            var facilities = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 
             // each location
             locations.forEach( function( location, i ){
