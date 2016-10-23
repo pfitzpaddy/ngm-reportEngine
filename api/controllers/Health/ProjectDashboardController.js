@@ -94,8 +94,9 @@ var ProjectDashboardController = {
         BudgetProgress
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.financial_filter_s )
-          .where( filters.financial_filter_e )
+          .where( filters.financial_filter )
+          // .where( filters.financial_filter_s )
+          // .where( filters.financial_filter_e )
           .where( filters.organization_$nin_filter )
           .exec( function( err, budget ) {
 
@@ -145,8 +146,9 @@ var ProjectDashboardController = {
         Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_filter_s )
-          .where( filters.reporting_filter_e )
+          .where( filters.reporting_filter )
+          // .where( filters.reporting_filter_s )
+          // .where( filters.reporting_filter_e )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -257,8 +259,9 @@ var ProjectDashboardController = {
         Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_filter_s )
-          .where( filters.reporting_filter_e )
+          .where( filters.reporting_filter )
+          // .where( filters.reporting_filter_s )
+          // .where( filters.reporting_filter_e )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -410,8 +413,9 @@ var ProjectDashboardController = {
         Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_filter_s )
-          .where( filters.reporting_filter_e )
+          .where( filters.reporting_filter )
+          // .where( filters.reporting_filter_s )
+          // .where( filters.reporting_filter_e )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -584,12 +588,14 @@ var ProjectDashboardController = {
       date_filter_e: { project_end_date: { '>=': new Date( params.start_date ) } },
       
       // beneficiaries report_month
-      reporting_filter_s: { reporting_period: { '>=': new Date( params.start_date ) } },
-      reporting_filter_e: { reporting_period: { '<=': new Date( params.end_date ) } },
+      reporting_filter: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
+      // reporting_filter_s: { reporting_period: { '>=': new Date( params.start_date ) } },
+      // reporting_filter_e: { reporting_period: { '<=': new Date( params.end_date ) } },
       
       // financial payment month
-      financial_filter_s: { project_budget_date_recieved: { '>=': new Date( params.start_date ) } },
-      financial_filter_e: { project_budget_date_recieved: { '<=': new Date( params.end_date ) } },      
+      financial_filter: { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
+      // financial_filter_s: { project_budget_date_recieved: { '>=': new Date( params.start_date ) } },
+      // financial_filter_e: { project_budget_date_recieved: { '<=': new Date( params.end_date ) } },
       
       // project_status
       project_status_filter: params.project_status ? { project_status: params.project_status } : {},
@@ -960,8 +966,9 @@ var ProjectDashboardController = {
         Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_filter_s )
-          .where( filters.reporting_filter_e )
+          .where( filters.reporting_filter )
+          // .where( filters.reporting_filter_s )
+          // .where( filters.reporting_filter_e )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -1069,8 +1076,9 @@ var ProjectDashboardController = {
         Beneficiaries
           .find()
           .where( { project_id: project_ids } )
-          .where( filters.reporting_filter_s )
-          .where( filters.reporting_filter_e )
+          .where( filters.reporting_filter )
+          // .where( filters.reporting_filter_s )
+          // .where( filters.reporting_filter_e )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
