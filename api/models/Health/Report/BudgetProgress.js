@@ -40,6 +40,14 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		email: {
+			type: 'string',
+			required: true
+		},
 		// add a reference to Project
 		project_id: {
 			model: 'project'
