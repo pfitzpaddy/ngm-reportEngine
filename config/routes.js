@@ -99,6 +99,9 @@ module.exports.routes = {
   'POST /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
 
 
+  // EPR
+  'GET /epr/getKoboData': 'Epr/EprController.getKoboData',
+
   // DEWS 
   'POST /dews/indicator': 'Dews/DewsController.getIndicator',
   'POST /dews/chart': 'Dews/DewsController.getChart',

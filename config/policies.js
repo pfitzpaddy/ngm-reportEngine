@@ -53,6 +53,11 @@ module.exports.policies = {
   },
 
   // public
+  'Epr/EprController': {
+    '*': true
+  },  
+
+  // public
   'Health/WorkshopController': {
     '*': true
   },  
