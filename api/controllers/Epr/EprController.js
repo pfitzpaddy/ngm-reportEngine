@@ -114,8 +114,13 @@ module.exports = {
 												d_obj[d_key] = alert[j];
 											}
 
-											// add disease name
+											// province/distrct/disease name
 											d_obj.alert_disease_name = disease_lookup[d_obj.alert_disease];
+											d_obj.alert_province_name = provinces[d_obj.alert_province].admin1name;
+											d_obj.alert_district_name = districts[d_obj.alert_district].admin2name;
+											// lat/lng
+											d_obj.alert_lat = districts[d_obj.alert_district].admin2lat;
+											d_obj.alert_lng = districts[d_obj.alert_district].admin2lng;											
 
 											// push as single record
 											alerts.push( d_obj );
@@ -132,6 +137,13 @@ module.exports = {
 												var d_key = j.split('/')[ j.split('/').length - 1 ];
 												d_obj[d_key] = disaster[j];
 											}
+
+											// name
+											d_obj.disaster_province_name = provinces[d_obj.disaster_province].admin1name;
+											d_obj.disaster_district_name = districts[d_obj.disaster_district].admin2name;
+											// lat/lng
+											d_obj.disaster_lat = districts[d_obj.disaster_district].admin2lat;
+											d_obj.disaster_lng = districts[d_obj.disaster_district].admin2lng;											
 
 											// push as single record
 											disasters.push( d_obj );
@@ -151,26 +163,6 @@ module.exports = {
 							// push to data
 							epr.push( obj );
 
-						});
-
-						// add province/district/lat/lng
-						alerts.forEach(function( d, i ){
-							// name
-							alerts[i].alert_province_name = provinces[d.alert_province].admin1name;
-							alerts[i].alert_district_name = districts[d.alert_district].admin2name;
-							// lat/lng
-							alerts[i].lat = districts[d.alert_district].admin2lat;
-							alerts[i].lng = districts[d.alert_district].admin2lng;
-						});
-
-						// add province/district/lat/lng
-						disasters.forEach(function( d, i ){
-							// name
-							disasters[i].disaster_province_name = provinces[d.disaster_province].admin1name;
-							disasters[i].disaster_district_name = districts[d.disaster_district].admin2name;
-							// lat/lng
-							disasters[i].lat = districts[d.disaster_district].admin2lat;
-							disasters[i].lng = districts[d.disaster_district].admin2lng;
 						});
 
 						// destroy
