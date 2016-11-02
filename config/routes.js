@@ -101,6 +101,9 @@ module.exports.routes = {
 
   // EPR
   'GET /epr/getKoboData': 'Epr/EprController.getKoboData',
+  // EPR Admin Dashboard
+  'GET /epr/admin/indicator': 'Epr/EprDashboardController.getIndicator',
+  'POST /epr/admin/indicator': 'Epr/EprDashboardController.getIndicator',
 
   // DEWS 
   'POST /dews/indicator': 'Dews/DewsController.getIndicator',

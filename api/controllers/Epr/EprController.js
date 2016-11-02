@@ -41,8 +41,9 @@ module.exports = {
 				},
 
 				// set cmd
+				moment = require( 'moment' ),
 				exec = require('child_process').exec,
-				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/96022?format=json -u pfitzpaddy:P@trick7';
+				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/96204?format=json -u pfitzpaddy:P@trick7';
 
 		// run curl command
 		exec( cmd, function( error, stdout, stderr ) {
@@ -99,6 +100,7 @@ module.exports = {
 									reporting_week: d['reporting/reporting_details/reporting_week'],
 									reporting_lat: provinces[d['reporting/reporting_details/reporting_province']].admin1lat,
 									reporting_lng: provinces[d['reporting/reporting_details/reporting_province']].admin1lng,
+									reporting_year: moment(d['_submission_time']).year(),
 									_submission_time: d['_submission_time']
 								};						
 								
@@ -154,6 +156,10 @@ module.exports = {
 									default:
 										obj[key] = d[k];
 										// format region
+										obj.reporting_year = moment(d['_submission_time']).year();
+										obj.reporting_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;
+										obj.reporting_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
+										obj.reporting_province_name = provinces[d['reporting/reporting_details/reporting_province']].admin1name;
 										obj.reporting_region_name = d['reporting/reporting_details/reporting_region'].replace(/_/g,' ').toUpperCase();
 										break;
 								}
