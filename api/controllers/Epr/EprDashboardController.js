@@ -5,6 +5,9 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+// json2csv
+var json2csv = require( 'json2csv' );
+
 module.exports = {
 
 	// get data from kobo
@@ -177,6 +180,22 @@ module.exports = {
 
         		break;
 
+        	// total reports due
+        	case 'data':
+
+            // return csv
+            json2csv({ data: results }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              return res.json( 200, { data: csv } );
+
+            });        		
+
+        		break;        		
+
         	default:
 
         		// return number of expected reports
@@ -186,6 +205,190 @@ module.exports = {
 
         }
 
+
+      });
+
+	},
+
+	getAlertData: function(req, res) {
+
+    // request input
+    if (  !req.param('indicator') || !req.param('year') || !req.param('region') || !req.param('province')  || !req.param('week') ) {
+      return res.json( 401, { err: 'year, region, province, week required!' });
+    }
+
+    // indicator
+    var indicator = req.param('indicator'),
+    		list = req.param('list') ? req.param('list') : false,
+    		year = parseInt( req.param('year') ),
+    		region = req.param('region'),
+    		province = req.param('province'),
+    		week = req.param('week'),
+    		regions = {
+					'all': {
+						name: 'All'
+					},
+					'central': {
+						name: 'Central',
+						prov: [ 8,3,4,5,2,1 ]
+					},
+					'central_highlands': {
+						name: 'Central Highlands',
+						prov: [ 10,22 ]
+					},
+					'east': {
+						name: 'East',
+						prov: [ 13,7,14,6 ]
+					},
+					'north': {
+						name: 'North',
+						prov: [ 27,28,18,19,20 ]
+					},
+					'north_east': {
+						name: 'North East',
+						prov: [ 15,9,17,16 ]
+					},
+					'south': {
+						name: 'South',
+						prov: [ 32,23,34,24,33 ]
+					},
+					'south_east': {
+						name: 'South East',
+						prov: [  26,25,12,11 ]
+					},
+					'west': {
+						name: 'West',
+						prov: [ 31,21,29,30 ]
+					}
+				};
+
+    // filters
+    var filters = {
+
+    	year: { reporting_year: year },
+
+    	region: region !== 'all' ? { reporting_region: region } : {},
+
+    	province: province !== 'all' ? { reporting_province: province } : {},
+
+    	week: week !== 'all' ? { reporting_week: week } : {}
+
+    }
+
+    // run query
+    Alerts
+    	.find()
+      .where( filters.year )
+      .where( filters.region )
+      .where( filters.province )
+      .where( filters.week )
+      .exec( function( err, results ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // return csv
+        json2csv({ data: results }, function( err, csv ) {
+          
+          // error
+          if ( err ) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        }); 
+
+      });
+
+	},
+
+	getDisasterData: function(req, res) {
+
+    // request input
+    if (  !req.param('indicator') || !req.param('year') || !req.param('region') || !req.param('province')  || !req.param('week') ) {
+      return res.json( 401, { err: 'year, region, province, week required!' });
+    }
+
+    // indicator
+    var indicator = req.param('indicator'),
+    		list = req.param('list') ? req.param('list') : false,
+    		year = parseInt( req.param('year') ),
+    		region = req.param('region'),
+    		province = req.param('province'),
+    		week = req.param('week'),
+    		regions = {
+					'all': {
+						name: 'All'
+					},
+					'central': {
+						name: 'Central',
+						prov: [ 8,3,4,5,2,1 ]
+					},
+					'central_highlands': {
+						name: 'Central Highlands',
+						prov: [ 10,22 ]
+					},
+					'east': {
+						name: 'East',
+						prov: [ 13,7,14,6 ]
+					},
+					'north': {
+						name: 'North',
+						prov: [ 27,28,18,19,20 ]
+					},
+					'north_east': {
+						name: 'North East',
+						prov: [ 15,9,17,16 ]
+					},
+					'south': {
+						name: 'South',
+						prov: [ 32,23,34,24,33 ]
+					},
+					'south_east': {
+						name: 'South East',
+						prov: [  26,25,12,11 ]
+					},
+					'west': {
+						name: 'West',
+						prov: [ 31,21,29,30 ]
+					}
+				};
+
+    // filters
+    var filters = {
+
+    	year: { reporting_year: year },
+
+    	region: region !== 'all' ? { reporting_region: region } : {},
+
+    	province: province !== 'all' ? { reporting_province: province } : {},
+
+    	week: week !== 'all' ? { reporting_week: week } : {}
+
+    }
+
+    // run query
+    Disasters
+    	.find()
+      .where( filters.year )
+      .where( filters.region )
+      .where( filters.province )
+      .where( filters.week )
+      .exec( function( err, results ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // return csv
+        json2csv({ data: results }, function( err, csv ) {
+          
+          // error
+          if ( err ) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        });
 
       });
 
