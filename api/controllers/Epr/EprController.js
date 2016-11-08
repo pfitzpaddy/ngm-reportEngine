@@ -98,6 +98,7 @@ module.exports = {
 									reporting_province: d['reporting/reporting_details/reporting_province'],
 									reporting_province_name: provinces[d['reporting/reporting_details/reporting_province']].admin1name,
 									reporting_week: d['reporting/reporting_details/reporting_week'],
+									reporting_date: moment().year( moment(d['_submission_time']).year() ).week( d['reporting/reporting_details/reporting_week'] ).toDate(),
 									reporting_lat: provinces[d['reporting/reporting_details/reporting_province']].admin1lat,
 									reporting_lng: provinces[d['reporting/reporting_details/reporting_province']].admin1lng,
 									reporting_year: moment(d['_submission_time']).year(),
@@ -154,13 +155,14 @@ module.exports = {
 										break;
 
 									default:
+										// set record
 										obj[key] = d[k];
-										// format region
+										obj.reporting_date = moment().year( moment(d['_submission_time']).year() ).week( d['reporting/reporting_details/reporting_week'] ).toDate(),
 										obj.reporting_year = moment(d['_submission_time']).year();
 										obj.reporting_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;
 										obj.reporting_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
 										obj.reporting_province_name = provinces[d['reporting/reporting_details/reporting_province']].admin1name;
-										obj.reporting_region_name = d['reporting/reporting_details/reporting_region'].replace(/_/g,' ').toUpperCase();
+										obj.reporting_region_name = d['reporting/reporting_details/reporting_region'].replace(/_/g,' ').toUpperCase();										
 										break;
 								}
 

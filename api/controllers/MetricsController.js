@@ -7,6 +7,55 @@
 
 module.exports = {
 
+  // get users
+  getUsers: function (req, res) {
+
+    // count
+    User
+      .count({})
+      .exec( function( err, result ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+ 
+        // return value
+        return res.json( 200, { value: result } );
+
+      });
+  },
+
+  getLocations: function (req, res) {
+
+    // count
+    TargetLocation
+      .count({})
+      .exec( function( err, result ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+ 
+        // return value
+        return res.json( 200, { value: result } );
+
+      });
+  },
+
+  getReports: function (req, res) {
+
+    // count
+    Report
+      .count({ report_status: 'complete' })
+      .exec( function( err, result ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+ 
+        // return value
+        return res.json( 200, { value: result } );
+
+      });
+  },
+
   // Check provided email address and password
   set: function (req, res) {
 

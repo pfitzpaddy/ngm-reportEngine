@@ -44,6 +44,9 @@ module.exports.routes = {
 
   // Metrics
   'POST /metrics/set': 'MetricsController.set',
+  'GET /metrics/getUsers': 'MetricsController.getUsers',
+  'GET /metrics/getLocations': 'MetricsController.getLocations',
+  'GET /metrics/getReports': 'MetricsController.getReports',
 
   // Upload
   'POST /upload-file': 'FileController.upload',
