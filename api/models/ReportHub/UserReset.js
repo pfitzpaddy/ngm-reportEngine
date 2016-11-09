@@ -27,6 +27,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		cluster: {
+			type: 'string',
+			required: true
+		},
 		user_id: {
 			type: 'string',
 			required: true

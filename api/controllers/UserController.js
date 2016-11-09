@@ -27,16 +27,20 @@ module.exports = {
       if (user) return res.json( 401, { err: 'User already exists! Forgot password?' } );
 
       // else create user
-      User.create( req.param( 'user' ) ).exec( function( err, user ) {
-        if (err) return res.negotiate( err );
-      
-        // set token
-        user.token = jwtToken.issueToken({ sid: user.id });
+      User
+        .create( req.param( 'user' ) )
+        .exec( function( err, user ) {
 
-        //  return user
-        res.json( 200, user );
+          // err
+          if (err) return res.negotiate( err );
+        
+          // set token
+          user.token = jwtToken.issueToken({ sid: user.id });
 
-      });
+          //  return user
+          res.json( 200, user );
+
+        });
 
     });
   
@@ -58,8 +62,12 @@ module.exports = {
           email: req.param( 'user' ).email
         }]
     }, function foundUser( err, user ) {
+      
+      // generic error
       if (err) return res.negotiate( err );
-      if (!user) return res.notFound();
+
+      // user not found
+      if (!user) return res.notFound({ msg: 'Invalid Username!' });
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
@@ -74,7 +82,7 @@ module.exports = {
 
         // password incorrect
         incorrect: function (){
-          return res.notFound();
+          return res.notFound({ msg: 'Invalid Password!' });
         },
 
         // on success
@@ -139,29 +147,31 @@ module.exports = {
     }
     
     // get user by email
-    User.findOne({ email: req.param( 'user' ).email }).exec(function(err, user){
+    User
+      .findOne({ email: req.param( 'user' ).email })
+      .exec(function(err, user){
       
-      // return error
-      if (err) return res.negotiate( err );
+        // return error
+        if (err) return res.negotiate( err );
 
-      // return error
-      if (!user) return res.json( 401, { err: 'User not found!' } );
+        // return error
+        if (!user) return res.json( 401, { err: 'User not found!' } );
 
-      // update visit information
-      user.visits = user.visits + 1;
+        // update visit information
+        user.visits = user.visits + 1;
 
-      // save updates
-      user.save(function(err) {
-        
-        // err
-        if(err) return res.negotiate( err );
+        // save updates
+        user.save(function(err) {
+          
+          // err
+          if(err) return res.negotiate( err );
 
-        // return updated user
-        return res.json( 200, user );
+          // return updated user
+          return res.json( 200, user );
+
+        });
 
       });
-
-    });
 
   },
 
@@ -183,7 +193,7 @@ module.exports = {
         if (err) return res.negotiate( err );
 
         // return error
-        if (!user) return res.json(401, { err: 'User not found!' });
+        if (!user) return res.notFound({ msg: 'Account Not Found!' });
 
         // reset user
         var userReset = {
@@ -191,6 +201,7 @@ module.exports = {
           admin0pcode: user.admin0pcode,         
           organization_id: user.organization_id,
           organization: user.organization,
+          cluster: user.cluster,
           user_id: user.id,
           name: user.name,
           username: user.username,
@@ -198,7 +209,9 @@ module.exports = {
           token: jwtToken.issueToken({ sid: user.id })
         }
 
-        UserReset.create(userReset).exec(function(err, reset) {
+        // Add record in reset
+        UserReset
+          .create( userReset ).exec( function( err, reset ) {
 
           // return error
           if (err) return res.negotiate( err );
@@ -245,36 +258,38 @@ module.exports = {
       if (!userReset) return res.json(401, { err: 'Reset token not found!' });
 
       // get user with userReset params
-      User.findOne({ email: userReset.email }).exec(function(err, user){
+      User
+        .findOne({ email: userReset.email })
+        .exec(function(err, user){
 
-        // return error
-        if (err) return res.negotiate( err );
+          // return error
+          if (err) return res.negotiate( err );
 
-        // update newPassword
-        require( 'bcrypt' ).hash( req.param( 'reset' ).newPassword, 10, function passwordEncrypted( err, encryptedPassword ) {
-
-          // err
-          if ( err ) return res.json( 401, { err: 'Reset password error' } );
-
-          // new password
-          user.password = encryptedPassword;
-          // add new token
-          user.token = jwtToken.issueToken( { sid: user.id } );
-
-          // save updates
-          user.save( function( err ) {
+          // update newPassword
+          require( 'bcrypt' ).hash( req.param( 'reset' ).newPassword, 10, function passwordEncrypted( err, encryptedPassword ) {
 
             // err
-            if ( err ) return res.negotiate( err );
+            if ( err ) return res.json( 401, { err: 'Reset password error' } );
 
-            // return updated user
-            return res.json( 200, user );
+            // new password
+            user.password = encryptedPassword;
+            // add new token
+            user.token = jwtToken.issueToken( { sid: user.id } );
+
+            // save updates
+            user.save( function( err ) {
+
+              // err
+              if ( err ) return res.negotiate( err );
+
+              // return updated user
+              return res.json( 200, user );
+
+            });
 
           });
 
         });
-
-      });
 
     });
 

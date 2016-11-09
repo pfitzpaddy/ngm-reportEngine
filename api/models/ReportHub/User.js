@@ -36,6 +36,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		cluster: {
+			type: 'string',
+			required: true
+		},
 		username: {
 			type: 'string',
 			unique: true,
@@ -112,7 +116,7 @@ module.exports = {
 			// check if org exists
 	    Organization
 	    	.find()
-	    	.where( { admin0pcode: user.admin0pcode, organization_name: org_name } )
+	    	.where( { admin0pcode: user.admin0pcode, organization_name: org_name, cluster: user.cluster } )
 	    	.exec(function ( err, organization ){
 			  	
 				  // error
@@ -138,6 +142,7 @@ module.exports = {
 				  		admin0name: user.admin0name,
 				  		organization_name: org_name,
 				  		organization_display_name: user.organization,
+				  		cluster: user.cluster
 				  	}).exec(function (err, created){
 							
 							// return error
@@ -165,7 +170,7 @@ module.exports = {
     // get user by email
     User
     	.find()
-    	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id })
+    	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id, cluster: user.cluster })
     	.sort('createdAt ASC')
     	.exec( function( err, admin ){
 
@@ -180,6 +185,7 @@ module.exports = {
 	            username: admin[0].username,
 	            newusername: user.username,
 	            name: user.name,
+	            cluster: user.cluster,
 	            position: user.position,
 	            phone: user.phone,
 	            email: user.email,
