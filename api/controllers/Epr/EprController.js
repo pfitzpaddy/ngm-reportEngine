@@ -43,7 +43,7 @@ module.exports = {
 				// set cmd
 				moment = require( 'moment' ),
 				exec = require('child_process').exec,
-				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/96204?format=json -u pfitzpaddy:P@trick7';
+				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/97441?format=json -u pfitzpaddy:P@trick7';
 
 		// run curl command
 		exec( cmd, function( error, stdout, stderr ) {
@@ -98,10 +98,10 @@ module.exports = {
 									reporting_province: d['reporting/reporting_details/reporting_province'],
 									reporting_province_name: provinces[d['reporting/reporting_details/reporting_province']].admin1name,
 									reporting_week: d['reporting/reporting_details/reporting_week'],
-									reporting_date: moment().year( moment(d['_submission_time']).year() ).week( d['reporting/reporting_details/reporting_week'] ).toDate(),
+									reporting_year: d['reporting/reporting_details/reporting_year'],
+									reporting_date: moment().year( d['reporting/reporting_details/reporting_year'] ).week( d['reporting/reporting_details/reporting_week'] ).toDate(),
 									reporting_lat: provinces[d['reporting/reporting_details/reporting_province']].admin1lat,
 									reporting_lng: provinces[d['reporting/reporting_details/reporting_province']].admin1lng,
-									reporting_year: moment(d['_submission_time']).year(),
 									_submission_time: d['_submission_time']
 								};						
 								

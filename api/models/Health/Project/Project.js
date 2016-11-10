@@ -40,6 +40,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		cluster_id: {
+			type: 'string',
+			required: true
+		},
 		cluster: {
 			type: 'string',
 			required: true
@@ -208,9 +212,11 @@ module.exports = {
 // generate an array of reports
 function getProjectReports( project, target_locations ) {
 
-	// declare variables
+	// tools
 	var moment = require('moment'),
-			reports = [],
+			_under = require("underscore");
+	// variables
+	var reports = [],
 			// set start date / end date to start and end of respective months
 			s_date = moment( project.project_start_date ).startOf( 'month' ),
 			e_date = moment( project.project_end_date ).endOf( 'month' );
@@ -234,18 +240,7 @@ function getProjectReports( project, target_locations ) {
 
 		// create report
 		var report = {
-			// defaults 
-			project_id: project.id,
-			adminRpcode: project.adminRpcode,
-			adminRname: project.adminRname,
-			admin0pcode: project.admin0pcode,
-			admin0name: project.admin0name,	
-			organization_id: project.organization_id,
-			organization: project.organization,
-			username: project.username,
-			email: project.email,
-			project_title: project.project_title,
-			project_type: project.project_type,
+			// defaults
 			report_status: report_status,
 			report_active: report_active,
 			report_month: moment( s_date ).add( m, 'M' ).month(),
@@ -254,6 +249,11 @@ function getProjectReports( project, target_locations ) {
 			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format(),
 			locations: []
 		};
+
+		// merge with project
+		report = _under.extend( {}, report, project );
+		report.project_id = project.id;
+		delete report.id;
 
 		// add report locations
 		report.locations = getProjectReportLocations( target_locations );
@@ -303,7 +303,7 @@ function updateProjectReports( reports, next ) {
 		// report is true
 		var report_active = true;
 
-		// should be reports just for 2016 period!
+		// should be reports just for 2016 period and beyond!
 		if ( reports[ r_index ].report_year < 2016  ) {
 			report_active = false;
 		}

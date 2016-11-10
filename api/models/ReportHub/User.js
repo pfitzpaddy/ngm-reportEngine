@@ -36,6 +36,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		cluster_id: {
+			type: 'string',
+			required: true
+		},
 		cluster: {
 			type: 'string',
 			required: true
@@ -142,6 +146,7 @@ module.exports = {
 				  		admin0name: user.admin0name,
 				  		organization_name: org_name,
 				  		organization_display_name: user.organization,
+				  		cluster_id: user.cluster_id,
 				  		cluster: user.cluster
 				  	}).exec(function (err, created){
 							
