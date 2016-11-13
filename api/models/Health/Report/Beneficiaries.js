@@ -143,19 +143,19 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		under5male:{
+		boys:{
 			type: 'integer',
 			defaultsTo: 0			
 		},
-		under5female:{
+		girls:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over5male:{
+		men:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		over5female:{
+		women:{
 			type: 'integer',
 			defaultsTo: 0
 		},
