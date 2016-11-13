@@ -99,7 +99,7 @@ module.exports = {
 									reporting_province_name: provinces[d['reporting/reporting_details/reporting_province']].admin1name,
 									reporting_week: d['reporting/reporting_details/reporting_week'],
 									reporting_year: d['reporting/reporting_details/reporting_year'],
-									reporting_date: moment().year( d['reporting/reporting_details/reporting_year'] ).week( d['reporting/reporting_details/reporting_week'] ).toDate(),
+									reporting_date: moment().year( d['reporting/reporting_details/reporting_year'] ).week( d['reporting/reporting_details/reporting_week'] ).add( 1, 'd' ).format( 'YYYY-MM-DD' ),
 									reporting_lat: provinces[d['reporting/reporting_details/reporting_province']].admin1lat,
 									reporting_lng: provinces[d['reporting/reporting_details/reporting_province']].admin1lng,
 									_submission_time: d['_submission_time']
@@ -157,7 +157,7 @@ module.exports = {
 									default:
 										// set record
 										obj[key] = d[k];
-										obj.reporting_date = moment().year( moment(d['_submission_time']).year() ).week( d['reporting/reporting_details/reporting_week'] ).toDate(),
+										obj.reporting_date = moment().year( moment(d['_submission_time']).year() ).week( d['reporting/reporting_details/reporting_week'] ).add( 1, 'd' ).format( 'YYYY-MM-DD' ),
 										obj.reporting_year = moment(d['_submission_time']).year();
 										obj.reporting_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;
 										obj.reporting_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
