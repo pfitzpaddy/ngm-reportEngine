@@ -91,9 +91,13 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_type: {
-			type: 'array',
-			required: true
+		activity_type: {
+			type: 'array'//,
+			// required: true
+		},
+		activity_description: {
+			type: 'array'//,
+			// required: true
 		},
     // add reference to Locations
     locations: {

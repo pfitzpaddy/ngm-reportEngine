@@ -139,7 +139,7 @@ var ProjectDashboardController = {
         var locationStore = {};
         
         // json2csv
-        fields = [ 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fields = [ 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'boys', 'girls', 'men', 'women', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
         fieldNames = [  'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
@@ -173,10 +173,10 @@ var ProjectDashboardController = {
                 locationStore[ b.admin2name ].admin2pcode = b.admin2pcode;
                 locationStore[ b.admin2name ].admin2name = b.admin2name;
                 // beneficairies standard row 1
-                locationStore[ b.admin2name ].under5male = 0;
-                locationStore[ b.admin2name ].under5female = 0;
-                locationStore[ b.admin2name ].over5male = 0;
-                locationStore[ b.admin2name ].over5female = 0;
+                locationStore[ b.admin2name ].boys = 0;
+                locationStore[ b.admin2name ].girls = 0;
+                locationStore[ b.admin2name ].men = 0;
+                locationStore[ b.admin2name ].women = 0;
                 // beneficairies standard row 2
                 locationStore[ b.admin2name ].penta3_vacc_male_under1 = 0;
                 locationStore[ b.admin2name ].penta3_vacc_female_under1 = 0;
@@ -192,10 +192,10 @@ var ProjectDashboardController = {
               }
 
               // beneficairies standard row 1
-              locationStore[ b.admin2name ].under5male += b.under5male;
-              locationStore[ b.admin2name ].under5female += b.under5female;
-              locationStore[ b.admin2name ].over5male += b.over5male;
-              locationStore[ b.admin2name ].over5female += b.over5female;
+              locationStore[ b.admin2name ].boys += b.boys;
+              locationStore[ b.admin2name ].girls += b.girls;
+              locationStore[ b.admin2name ].men += b.men;
+              locationStore[ b.admin2name ].women += b.women;
               // beneficairies standard row 2
               locationStore[ b.admin2name ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
               locationStore[ b.admin2name ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
@@ -208,10 +208,10 @@ var ProjectDashboardController = {
               locationStore[ b.admin2name ].capacity_building_female += b.capacity_building_female;
 
               // total
-              locationStore[ b.admin2name ].total += b.under5male + 
-                                                      b.under5female +
-                                                      b.over5male +
-                                                      b.over5female +
+              locationStore[ b.admin2name ].total += b.boys + 
+                                                      b.girls +
+                                                      b.men +
+                                                      b.women +
                                                       b.penta3_vacc_male_under1 + 
                                                       b.penta3_vacc_female_under1 +
                                                       b.skilled_birth_attendant +
@@ -252,7 +252,7 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'boys', 'girls', 'men', 'women', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
         fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Status', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
@@ -280,10 +280,10 @@ var ProjectDashboardController = {
               if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] ) {
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] = {};
                 //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5female = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].boys = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].girls = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].men = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].women = 0;
                 //
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_male_under1 = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
@@ -327,10 +327,10 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
               
               // sum
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5male += b.under5male;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].under5female += b.under5female;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5male += b.over5male;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].over5female += b.over5female;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].boys += b.boys;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].girls += b.girls;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].men += b.men;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].women += b.women;
               //
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;              
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
@@ -342,10 +342,10 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_male += b.capacity_building_male;
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_female += b.capacity_building_female;
               //
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].total += b.under5male + 
-                                                                                                      b.under5female +
-                                                                                                      b.over5male +
-                                                                                                      b.over5female +
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].total += b.boys + 
+                                                                                                      b.girls +
+                                                                                                      b.men +
+                                                                                                      b.women +
                                                                                                       b.penta3_vacc_male_under1 + 
                                                                                                       b.penta3_vacc_female_under1 +
                                                                                                       b.skilled_birth_attendant +
@@ -406,8 +406,8 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'beneficiary_type', 'under5male', 'under5female', 'over5male', 'over5female', 'total', 'lat', 'lng' ],
-        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Status', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Beneficiary Category', 'under5male', 'under5female', 'over5male', 'over5female', 'Total', 'lat', 'lng' ];
+        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'beneficiary_type', 'boys', 'girls', 'men', 'women', 'total', 'lat', 'lng' ],
+        fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Status', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Beneficiary Category', 'boys', 'girls', 'men', 'women', 'Total', 'lat', 'lng' ];
 
         // beneficiaires
         Beneficiaries
@@ -433,10 +433,10 @@ var ProjectDashboardController = {
               // beneficiaries
               if ( !projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ] ) {
                 projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ] = {};
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5male = 0;
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5female = 0;
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5male = 0;                
-                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5female = 0;
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].boys = 0;
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].girls = 0;
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].men = 0;                
+                projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].women = 0;
                 projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].total = 0;                
               }
 
@@ -454,14 +454,14 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
               
               // summary
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].total += b.under5male +
-                                                                                          b.under5female +
-                                                                                          b.over5male +
-                                                                                          b.over5female +
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].boys += b.boys + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].girls += b.girls + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].men += b.men + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].women += b.women + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].total += b.boys +
+                                                                                          b.girls +
+                                                                                          b.men +
+                                                                                          b.women +
                                                                                           b.penta3_vacc_male_under1 + 
                                                                                           b.penta3_vacc_female_under1 +
                                                                                           b.skilled_birth_attendant +
@@ -953,11 +953,11 @@ var ProjectDashboardController = {
 
         // beneficiaries
         var $beneficiaries = {
-          under5male: 0,
-          under5female: 0,
+          boys: 0,
+          girls: 0,
           under5total: 0,
-          over5male: 0,
-          over5female: 0,
+          men: 0,
+          women: 0,
           over5Total: 0,
           total: 0
         };
@@ -986,14 +986,14 @@ var ProjectDashboardController = {
             // beneficiaries
             beneficiaries.forEach( function( b, i ){
               // summary
-              $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-              $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
-              $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-              $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-              $beneficiaries.total += b.under5male + 
-                                      b.under5female +
-                                      b.over5male +
-                                      b.over5female +
+              $beneficiaries.boys += b.boys + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.girls += b.girls + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
+              $beneficiaries.men += b.men + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.women += b.women + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.total += b.boys + 
+                                      b.girls +
+                                      b.men +
+                                      b.women +
                                       b.penta3_vacc_male_under1 + 
                                       b.penta3_vacc_female_under1 +
                                       b.skilled_birth_attendant +
@@ -1063,11 +1063,11 @@ var ProjectDashboardController = {
 
         // beneficiaries
         var $beneficiaries = {
-          under5male: 0,
-          under5female: 0,
+          boys: 0,
+          girls: 0,
           under5total: 0,
-          over5male: 0,
-          over5female: 0,
+          men: 0,
+          women: 0,
           over5Total: 0,
           total: 0
         };
@@ -1096,18 +1096,18 @@ var ProjectDashboardController = {
             // beneficiaries
             beneficiaries.forEach( function( b, i ){
               // u5
-              $beneficiaries.under5male += b.under5male + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-              $beneficiaries.under5female += b.under5female + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
-              $beneficiaries.under5Total = $beneficiaries.under5male + $beneficiaries.under5female;
+              $beneficiaries.boys += b.boys + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.girls += b.girls + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.under5Total = $beneficiaries.boys + $beneficiaries.girls;
               // o5
-              $beneficiaries.over5male += b.over5male + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-              $beneficiaries.over5female += b.over5female + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
-              $beneficiaries.over5Total = $beneficiaries.over5male + $beneficiaries.over5female;
+              $beneficiaries.men += b.men + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.women += b.women + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.over5Total = $beneficiaries.men + $beneficiaries.women;
               // total
-              $beneficiaries.total += b.under5male + 
-                                      b.under5female +
-                                      b.over5male +
-                                      b.over5female +
+              $beneficiaries.total += b.boys + 
+                                      b.girls +
+                                      b.men +
+                                      b.women +
                                       b.penta3_vacc_male_under1 + 
                                       b.penta3_vacc_female_under1 +
                                       b.skilled_birth_attendant +
@@ -1126,19 +1126,19 @@ var ProjectDashboardController = {
               case 'under5':
 
                 // calc %
-                var malePerCent = ( $beneficiaries.under5male / ( $beneficiaries.under5male + $beneficiaries.under5female ) ) * 100;
-                var femalePerCent = ( $beneficiaries.under5female / ( $beneficiaries.under5male + $beneficiaries.under5female ) ) * 100;
+                var malePerCent = ( $beneficiaries.boys / ( $beneficiaries.boys + $beneficiaries.girls ) ) * 100;
+                var femalePerCent = ( $beneficiaries.girls / ( $beneficiaries.boys + $beneficiaries.girls ) ) * 100;
                 var totalPerCent = ( $beneficiaries.under5Total / ( $beneficiaries.under5Total + $beneficiaries.over5Total ) ) * 100;
                 
                 // assign data left
                 result.label.left.label.label = malePerCent;
-                result.label.left.subLabel.label = $beneficiaries.under5male;
+                result.label.left.subLabel.label = $beneficiaries.boys;
                 // assign data center
                 result.label.center.label.label = totalPerCent;
                 result.label.center.subLabel.label = $beneficiaries.under5Total;
                 // assign data right
                 result.label.right.label.label = femalePerCent;
-                result.label.right.subLabel.label = $beneficiaries.under5female;
+                result.label.right.subLabel.label = $beneficiaries.girls;
 
                 // highcharts female
                 result.data[0].y = femalePerCent;
@@ -1152,19 +1152,19 @@ var ProjectDashboardController = {
               case 'over5':
                 
                 // calc %
-                var malePerCent = ( $beneficiaries.over5male / ( $beneficiaries.over5male + $beneficiaries.over5female ) ) * 100;
-                var femalePerCent = ( $beneficiaries.over5female / ( $beneficiaries.over5female + $beneficiaries.over5male ) ) * 100;
+                var malePerCent = ( $beneficiaries.men / ( $beneficiaries.men + $beneficiaries.women ) ) * 100;
+                var femalePerCent = ( $beneficiaries.women / ( $beneficiaries.women + $beneficiaries.men ) ) * 100;
                 var totalPerCent = ( $beneficiaries.over5Total / ( $beneficiaries.under5Total + $beneficiaries.over5Total ) ) * 100;
                 
                 // assign data left
                 result.label.left.label.label = malePerCent;
-                result.label.left.subLabel.label = $beneficiaries.over5male;
+                result.label.left.subLabel.label = $beneficiaries.men;
                 // assign data center
                 result.label.center.label.label = totalPerCent;
                 result.label.center.subLabel.label = $beneficiaries.over5Total;
                 // assign data right
                 result.label.right.label.label = femalePerCent;
-                result.label.right.subLabel.label = $beneficiaries.over5female;
+                result.label.right.subLabel.label = $beneficiaries.women;
 
                 // highcharts female
                 result.data[0].y = femalePerCent;

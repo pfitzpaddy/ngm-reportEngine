@@ -40,9 +40,13 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_type: {
-			type: 'string',
-			required: true
+		activity_type: {
+			type: 'array'//,
+			// required: true
+		},
+		activity_description: {
+			type: 'array'//,
+			// required: true
 		},
 		username: {
 			type: 'string',

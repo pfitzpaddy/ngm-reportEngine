@@ -79,10 +79,15 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_type: {
-			type: 'array'
+		activity_type: {
+			type: 'array'//,
+			// required: true
 		},
-		project_type_other: {
+		activity_description: {
+			type: 'array'//,
+			// required: true
+		},
+		activity_description_other: {
 			type: 'string'
 		},
 		project_code: {

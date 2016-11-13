@@ -47,8 +47,13 @@ module.exports = {
 		project_title: {
 			type: 'string'
 		},
-		project_type: {
-			type: 'string'
+		activity_type: {
+			type: 'array'//,
+			// required: true
+		},
+		activity_description: {
+			type: 'array'//,
+			// required: true
 		},
 		// region/country id
     adminRpcode: {

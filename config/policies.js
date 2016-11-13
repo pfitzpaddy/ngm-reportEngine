@@ -55,32 +55,22 @@ module.exports.policies = {
   // public
   'Epr/EprController': {
     '*': true
-  },  
+  },
 
   // public
-  'Health/WorkshopController': {
-    '*': true
-  },  
-
-  // public
-  'Health/AdminDashboardController': {
+  'Cluster/AdminDashboardController': {
     'getHealthAdminIndicator': true
   },
 
   // public
-  'Health/ProjectDashboardController': {
+  'Cluster/Health/HealthDashboardController': {
     '*': true
   },
 
   // public
-  'Health/ReportController': {
+  'Cluster/ReportController': {
     '*': true
   },
-
-  // public
-  'Health/ListController': {
-    '*': true
-  }
 
   /***************************************************************************
   *                                                                          *

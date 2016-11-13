@@ -63,6 +63,14 @@ module.exports = {
 		project_code: {
 			type: 'string'
 		},
+		activity_type: {
+			type: 'array'//,
+			// required: true
+		},
+		activity_description: {
+			type: 'array'//,
+			// required: true
+		},
 		project_donor: {
 			type: 'array'
 		},	

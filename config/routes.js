@@ -57,50 +57,47 @@ module.exports.routes = {
   'GET /getBeneficiairiesCsv': 'FileController.getBeneficiairiesCsv',
 
 
-  // HEALTH
-
-  // collection updates ( general )
-  'GET /health/project/updateTargetBeneficiaries': 'Health/ProjectController.updateTargetBeneficiaries',
-  'GET /health/project/updateTargetLocations': 'Health/ProjectController.updateTargetLocations',
-  'GET /health/project/updateLocations': 'Health/ProjectController.updateLocations',
-  'GET /health/project/updateBeneficiaries': 'Health/ProjectController.updateBeneficiaries',
-
-  // collection updates ( pcodes )
-  'GET /health/project/updateProjectPcodes': 'Health/ProjectController.updateProjectPcodes',
-  'GET /health/project/updateTargetLocationPcodes': 'Health/ProjectController.updateTargetLocationPcodes',
-  'GET /health/project/updateLocationPcodes': 'Health/ProjectController.updateLocationPcodes',
-  'GET /health/project/updateBeneficiariesPcodes': 'Health/ProjectController.updateBeneficiariesPcodes',
-  'GET /health/project/setBeneficiariesLocation': 'Health/ProjectController.setBeneficiariesLocation',
-
-
+  // CLUSTER
+  
   // Locaiton lists
   'POST /location/getAdmin1List': 'LocationController.getAdmin1List',
   'POST /location/getAdmin2List': 'LocationController.getAdmin2List',
 
-  // Health Projects
-  'POST /health/project/getProjectsList': 'Health/ProjectController.getProjectsList',
-  
-  // get project details, locations, beneficiaries
-  'POST /health/project/getProject': 'Health/ProjectController.getProjectById',
-  'POST /health/project/setProject': 'Health/ProjectController.setProjectById',
-  'POST /health/project/delete': 'Health/ProjectController.deleteProjectById',
-  'GET /health/project/delete': 'Health/ProjectController.deleteProjectById',
-  
-  // get project reports
-  'POST /health/report/getReportsList': 'Health/ReportController.getReportsList',
-  'POST /health/report/getReport': 'Health/ReportController.getReportById',
-  'POST /health/report/setReport': 'Health/ReportController.setReportById',
-  'GET /health/report/setReportsToDo': 'Health/ReportController.setReportsToDo',
-  'GET /health/report/setReportsOpen': 'Health/ReportController.setReportsOpen',
-  'GET /health/report/setReportsReminder': 'Health/ReportController.setReportsReminder',
+  // collection updates ( general )
+  'GET /cluster/project/updateTargetBeneficiaries': 'Cluster/ProjectController.updateTargetBeneficiaries',
+  'GET /cluster/project/updateTargetLocations': 'Cluster/ProjectController.updateTargetLocations',
+  'GET /cluster/project/updateLocations': 'Cluster/ProjectController.updateLocations',
+  'GET /cluster/project/updateBeneficiaries': 'Cluster/ProjectController.updateBeneficiaries',
+  // collection updates ( pcodes )
+  'GET /cluster/project/updateProjectPcodes': 'Cluster/ProjectController.updateProjectPcodes',
+  'GET /cluster/project/updateTargetLocationPcodes': 'Cluster/ProjectController.updateTargetLocationPcodes',
+  'GET /cluster/project/updateLocationPcodes': 'Cluster/ProjectController.updateLocationPcodes',
+  'GET /cluster/project/updateBeneficiariesPcodes': 'Cluster/ProjectController.updateBeneficiariesPcodes',
+  'GET /cluster/project/setBeneficiariesLocation': 'Cluster/ProjectController.setBeneficiariesLocation',
 
   // Admin Dashboard
-  'POST /health/admin/indicator': 'Health/AdminDashboardController.getHealthAdminIndicator',
+  'POST /cluster/admin/indicator': 'Cluster/AdminDashboardController.getHealthAdminIndicator',
 
+  // Projects
+  'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
+  // get project details, locations, beneficiaries
+  'POST /cluster/project/getProject': 'Cluster/ProjectController.getProjectById',
+  'POST /cluster/project/setProject': 'Cluster/ProjectController.setProjectById',
+  'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
+  'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
+  // get project reports
+  'POST /cluster/report/getReportsList': 'Cluster/ReportController.getReportsList',
+  'POST /cluster/report/getReport': 'Cluster/ReportController.getReportById',
+  'POST /cluster/report/setReport': 'Cluster/ReportController.setReportById',
+  'GET /cluster/report/setReportsToDo': 'Cluster/ReportController.setReportsToDo',
+  'GET /cluster/report/setReportsOpen': 'Cluster/ReportController.setReportsOpen',
+  'GET /cluster/report/setReportsReminder': 'Cluster/ReportController.setReportsReminder',
+
+
+  // HEALTH
   // 4W Dashboard
-  'POST /health/indicator': 'Health/ProjectDashboardController.getHealthDetails',
-  'POST /health/data/contacts': 'Health/ProjectDashboardController.getContactListCsv',
-
+  'POST /health/indicator': 'Cluster/Health/HealthDashboardController.getHealthDetails',
+  'POST /health/data/contacts': 'Cluster/Health/HealthDashboardController.getContactListCsv',
 
   // EPR
   'GET /epr/getKoboData': 'Epr/EprController.getKoboData',

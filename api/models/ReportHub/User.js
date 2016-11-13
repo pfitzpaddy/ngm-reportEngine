@@ -80,7 +80,7 @@ module.exports = {
 		},
 		app_home: {
 			type: 'string',
-			defaultsTo: '/health/projects/'
+			defaultsTo: '/cluster/projects/'
 		},
 		menu: {
 			type: 'array',
