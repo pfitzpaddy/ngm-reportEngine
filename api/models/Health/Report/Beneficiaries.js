@@ -113,12 +113,10 @@ module.exports = {
 			required: true
 		},
 		fac_type: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		fac_type_name: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		fac_name: {
 			type: 'string',
@@ -172,11 +170,27 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		skilled_birth_attendant:{
+		male_referrals:{
 			type: 'integer',
 			defaultsTo: 0
 		},
+		female_referrals:{
+			type: 'integer',
+			defaultsTo: 0
+		},		
 		conflict_trauma_treated:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		antenatal_care:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		postnatal_care:{
+			type: 'integer',
+			defaultsTo: 0
+		},		
+		skilled_birth_attendant:{
 			type: 'integer',
 			defaultsTo: 0
 		},

@@ -92,8 +92,7 @@ module.exports = {
 			required: true
 		},
 		fac_type: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		fac_type_name: {
 			type: 'string'
