@@ -264,7 +264,7 @@ module.exports = {
                 // add report urls
                 notification[ report.username ].reports.push({
                   project_title: report.project_title,
-                  report_url: req.protocol + '://' + req.host + '/#/health/projects/report/' + report.project_id + '/' + report.id
+                  report_url: req.protocol + '://' + req.host + '/#/cluster/projects/report/' + report.project_id + '/' + report.id
                 });
 
               });
@@ -377,7 +377,7 @@ module.exports = {
                 notification[ report.username ].reports.push({
                   project_title: report.project_title,
                   report_month: moment().month( report.report_month ).format( 'MMMM' ),
-                  report_url: req.protocol + '://' + req.host + '/#/health/projects/report/' + report.project_id + '/' + report.id
+                  report_url: req.protocol + '://' + req.host + '/#/cluster/projects/report/' + report.project_id + '/' + report.id
                 });
 
               });

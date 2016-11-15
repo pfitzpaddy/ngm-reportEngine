@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl http://reporthub.immap.org/api/health/report/setReportsOpen
+curl http://reporthub.immap.org/api/cluster/report/setReportsOpen

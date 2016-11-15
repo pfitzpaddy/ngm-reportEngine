@@ -89,7 +89,7 @@ module.exports = {
         liClass: 'teal z-depth-2',
         aClass: 'white-text',
         iClass: 'medium material-icons',
-        href: '/health/projects/',
+        href: '/cluster/projects/',
         title: 'MY PROJECTS'
        }]
 		},
