@@ -92,8 +92,8 @@ module.exports = {
 			required: true
 		},
 		activity_type: {
-			type: 'array'//,
-			// required: true
+			type: 'string',
+			required: true
 		},
 		activity_description: {
 			type: 'array'//,

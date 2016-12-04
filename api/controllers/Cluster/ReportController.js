@@ -78,8 +78,57 @@ module.exports = {
       // return error
       if ( err ) return res.negotiate( err );
 
-      // else
-      return res.json( 200, reports );
+      // counter
+      var moment=require('moment'),
+          counter=0,
+          length=reports.length;
+
+      // no reports
+      if ( !length ) {
+        return res.json( 200, reports );
+      }
+
+      // determine status
+      if ( length )  {
+  
+        // reports
+        reports.forEach( function( d, i ){
+
+          // check if form has been edited
+          Beneficiaries
+            .count( { report_id: d.id } )
+            .exec(function( err, b ){
+              
+              // return error
+              if (err) return res.negotiate( err );
+
+              // add status as green
+              reports[i].status = '#4db6ac';
+
+              // if report is 'todo' and past due date!
+              if ( reports[i].report_status === 'todo' && moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
+                      
+                // set to red (overdue!)
+                reports[i].status = '#e57373'
+
+                // if beneficiaries ( report has been updated )
+                if ( b ) {
+                  reports[i].status = '#fff176'
+                }
+              }
+
+              // reutrn
+              counter++;
+              if ( counter === length ) {
+                // table
+                return res.json( 200, reports );
+              }
+
+            });
+
+        });
+
+      }
 
     });
 

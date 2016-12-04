@@ -80,8 +80,8 @@ module.exports = {
 			required: true
 		},
 		activity_type: {
-			type: 'array'//,
-			// required: true
+			type: 'string',
+			required: true
 		},
 		activity_description: {
 			type: 'array'//,
@@ -127,7 +127,8 @@ module.exports = {
 			required: true
 		},
 		beneficiary_type: {
-			type: 'array'
+			type: 'array',
+			required: true
 		},
 		admin1pcode: {
 			type: 'array',

@@ -157,7 +157,7 @@ var AdminDashboardController = {
                 // check if form has been edited
                 Beneficiaries
                   .count( { report_id: d.id } )
-                  .exec(function( err, b){
+                  .exec(function( err, b ){
                     
                     // return error
                     if (err) return res.negotiate( err );

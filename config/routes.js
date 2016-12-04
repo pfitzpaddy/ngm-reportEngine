@@ -78,6 +78,9 @@ module.exports.routes = {
   // Admin Dashboard
   'POST /cluster/admin/indicator': 'Cluster/AdminDashboardController.getHealthAdminIndicator',
 
+  // Cluster Activities
+  'GET /cluster/getActivities': 'Cluster/ProjectController.getActivities',
+
   // Projects
   'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
   // get project details, locations, beneficiaries

@@ -79,13 +79,25 @@ module.exports = {
 		project_title: {
 			type: 'string'
 		},
+		project_start_date: {
+			type: 'date',
+			required: true
+		},
+		project_end_date: {
+			type: 'date',
+			required: true
+		},
 		activity_type: {
-			type: 'array'//,
-			// required: true
+			type: 'string',
+			required: true
 		},
 		activity_description: {
 			type: 'array'//,
 			// required: true
+		},
+		beneficiary_type: {
+			type: 'array',
+			required: true
 		},
 		conflict: {
 			type: 'boolean',
@@ -120,21 +132,21 @@ module.exports = {
 	},
 
 	// add project_id from locations 
-	beforeCreate: function( $location, next ) {
+	// beforeCreate: function( $location, next ) {
 
-		// get location
-		Project.findOne().where( { id: $location.project_id } ).exec(function(err, project){
+	// 	// get location
+	// 	Project.findOne().where( { id: $location.project_id } ).exec(function(err, project){
 
-			// add project details
-			$location.project_title = project.project_title;
-			$location.project_type = project.project_type;
+	// 		// add project details
+	// 		$location.project_title = project.project_title;
+	// 		$location.project_type = project.project_type;
 
-			// 'next!'
-			next();
+	// 		// 'next!'
+	// 		next();
 
-		});
+	// 	});
 
-	}
+	// }
 
 };
 
