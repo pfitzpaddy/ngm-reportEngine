@@ -11,7 +11,7 @@ module.exports = {
 
     // check params
     if (!req.param( 'user' )) {
-      return res.json(401, { err: 'user required!' });
+      return res.json(401, { msg: 'user required!' });
     }
 
     // try to look up user using the provided username/email address
@@ -24,7 +24,7 @@ module.exports = {
     }, function foundUser( err, user ) {
 
       // user exists
-      if (user) return res.json( 401, { err: 'User already exists! Forgot password?' } );
+      if (user) return res.json( 401, { msg: 'User already exists! Forgot password?' } );
 
       // else create user
       User
@@ -51,7 +51,7 @@ module.exports = {
 
     // check params
     if (!req.param( 'user' )) {
-      return res.json(401, { err: 'user required' });
+      return res.json(401, { msg: 'user required' });
     }
 
     // try to look up user using the provided username/email address
@@ -116,7 +116,7 @@ module.exports = {
 
     // check params
     if ( !req.param( 'organization_id' ) ) {
-      return res.json(401, { err: 'organization_id required' });
+      return res.json(401, { msg: 'organization_id required' });
     }
 
     // id params
@@ -143,7 +143,7 @@ module.exports = {
 
     // check params
     if ( !req.param( 'user' ) ) {
-      return res.json(401, { err: 'user required' });
+      return res.json(401, { msg: 'user required' });
     }
     
     // get user by email
@@ -155,7 +155,7 @@ module.exports = {
         if (err) return res.negotiate( err );
 
         // return error
-        if (!user) return res.json( 401, { err: 'User not found!' } );
+        if (!user) return res.json( 401, { msg: 'User not found!' } );
 
         // update visit information
         user.visits = user.visits + 1;
@@ -180,7 +180,7 @@ module.exports = {
 
     // check params
     if ( !req.param( 'user' ) || !req.param( 'url' ) ) {
-      return res.json(401, { err: 'user, url required' });
+      return res.json(401, { msg: 'user, url required' });
     }
     
     // get user by email
@@ -245,7 +245,7 @@ module.exports = {
 
     // check params
     if ( !req.param( 'reset' ) || !req.param( 'token' ) ) {
-      return res.json(401, { err: 'user, token required' });
+      return res.json(401, { msg: 'user, token required' });
     }
 
     // get reser user by username
@@ -255,7 +255,7 @@ module.exports = {
       if (err) return res.negotiate( err );
 
       // return error
-      if (!userReset) return res.json(401, { err: 'Reset token not found!' });
+      if (!userReset) return res.json(401, { msg: 'Reset token not found!' });
 
       // get user with userReset params
       User
@@ -269,7 +269,7 @@ module.exports = {
           require( 'bcrypt' ).hash( req.param( 'reset' ).newPassword, 10, function passwordEncrypted( err, encryptedPassword ) {
 
             // err
-            if ( err ) return res.json( 401, { err: 'Reset password error' } );
+            if ( err ) return res.json( 401, { msg: 'Reset password error' } );
 
             // new password
             user.password = encryptedPassword;
