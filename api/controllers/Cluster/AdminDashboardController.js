@@ -162,8 +162,9 @@ var AdminDashboardController = {
                     // return error
                     if (err) return res.negotiate( err );
 
-                    // add status
+                    // add status / icon
                     reports[i].status = '#e57373';
+                    reports[i].icon = 'fiber_manual_record';
 
                     // if benficiaries
                     if ( b ) {
@@ -218,6 +219,7 @@ var AdminDashboardController = {
               reports.forEach( function( d, i ){
                 // add status
                 reports[i].status = '#4db6ac'
+                reports[i].icon = 'check_circle';
 
               });
 
@@ -281,6 +283,7 @@ var AdminDashboardController = {
 
                       // add status
                       reports[i].status = '#e57373'
+                      reports[i].icon = 'watch_later';
 
                       // if benficiaries
                       if ( b ) {
