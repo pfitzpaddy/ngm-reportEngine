@@ -63,6 +63,17 @@ module.exports = {
 		project_title: {
 			type: 'string'
 		},
+		// 2016
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
+		},
+		project_description: {
+			type: 'string'
+		},
+		// 2017
 		activity_type: {
 			type: 'string',
 			required: true
@@ -92,22 +103,6 @@ module.exports = {
 			defaultsTo: 0
 		},
 		women:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		penta3_vacc_male_under1:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		penta3_vacc_female_under1:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		skilled_birth_attendant:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		conflict_trauma_treated:{
 			type: 'integer',
 			defaultsTo: 0
 		},

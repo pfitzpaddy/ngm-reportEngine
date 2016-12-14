@@ -63,6 +63,17 @@ module.exports = {
 		project_code: {
 			type: 'string'
 		},
+		// 2016
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
+		},
+		project_description: {
+			type: 'string'
+		},
+		// 2017
 		activity_type: {
 			type: 'string',
 			required: true

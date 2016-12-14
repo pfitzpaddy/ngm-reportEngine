@@ -47,6 +47,17 @@ module.exports = {
 		project_title: {
 			type: 'string'
 		},
+		// 2016
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
+		},
+		project_description: {
+			type: 'string'
+		},
+		// 2017
 		activity_type: {
 			type: 'string',
 			required: true
@@ -146,6 +157,7 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		// default
 		boys:{
 			type: 'integer',
 			defaultsTo: 0			
@@ -162,6 +174,60 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		// referral
+		// 2016
+		male_referrals:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		female_referrals:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		// 2017		
+		boys_referral:{
+			type: 'integer',
+			defaultsTo: 0			
+		},
+		girls_referral:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		men_referral:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		women_referral:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+		// conflict
+		first_aid_stabalization:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		physical_rehabilitation: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		minor_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		major_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+		// is this not the above
+		conflict_trauma_treated:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+		// vacinations
+		// 2016
 		penta3_vacc_male_under1:{
 			type: 'integer',
 			defaultsTo: 0
@@ -170,18 +236,17 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		male_referrals:{
+		// 2017
+		vacc_male_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		female_referrals:{
-			type: 'integer',
-			defaultsTo: 0
-		},		
-		conflict_trauma_treated:{
+		vacc_female_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
+
+		// mch
 		antenatal_care:{
 			type: 'integer',
 			defaultsTo: 0
@@ -194,21 +259,9 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		capacity_building_topic: {
-			type: 'string'
-		},		
-		capacity_building_sessions:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		capacity_building_male:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		capacity_building_female:{
-			type: 'integer',
-			defaultsTo: 0
-		},
+
+		// training/capacity building
+		// 2017
 		education_topic: {
 			type: 'string'
 		},		
@@ -221,6 +274,22 @@ module.exports = {
 			defaultsTo: 0
 		},
 		education_female:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		// 2017
+		training_topic: {
+			type: 'string'
+		},		
+		training_sessions:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		training_male:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		training_female:{
 			type: 'integer',
 			defaultsTo: 0
 		}
