@@ -173,6 +173,11 @@ module.exports = {
 
 						});
 
+						// finOrCreate might be a more suitable option ( based on province, epr week  )
+						// http://sailsjs.com/documentation/reference/waterline-orm/models/find-or-create
+
+						// either that or drop the whole schema
+
 						// destroy
 						Epr.destroy({}).exec(function (err) {
 							// err

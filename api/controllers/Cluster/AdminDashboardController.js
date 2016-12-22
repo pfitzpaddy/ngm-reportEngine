@@ -23,8 +23,8 @@ var AdminDashboardController = {
   getHealthAdminIndicator: function( req, res ){
 
     // request input
-    if ( !req.param('indicator') || !req.param('organization') || !req.param('adminRpcode')  || !req.param('admin0pcode') || !req.param('start_date') || !req.param('end_date') ) {
-      return res.json( 401, { err: 'indicator, adminRpcode, admin0pcode, start_date, end_date required!' });
+    if ( !req.param( 'indicator' ) || !req.param( 'cluster_id' ) || !req.param( 'organization' ) || !req.param( 'adminRpcode' )  || !req.param( 'admin0pcode' ) || !req.param( 'start_date' ) || !req.param( 'end_date' ) ) {
+      return res.json( 401, { err: 'indicator, cluster_id, adminRpcode, admin0pcode, start_date, end_date required!' });
     }
 
     // organizations to exclude totally
@@ -35,13 +35,14 @@ var AdminDashboardController = {
 
     // variables
     var moment = require( 'moment' ),
-        list = req.param('list'),
-        indicator = req.param('indicator'),
-        organization_filter = req.param('organization') === 'all' ? { organization_id: { '!': $nin_select_organizations } } : { organization_id: req.param('organization') },
-        adminRpcode = req.param('adminRpcode').toUpperCase(),
-        admin0pcode = req.param('admin0pcode').toUpperCase(),
-        start_date = req.param('start_date'),
-        end_date = req.param('end_date');
+        list = req.param( 'list' ),
+        indicator = req.param( 'indicator' ),
+        cluster_id = req.param( 'cluster_id' ),
+        organization_filter = req.param( 'organization' ) === 'all' ? { organization_id: { '!': $nin_select_organizations } } : { organization_id: req.param( 'organization' ) },
+        adminRpcode = req.param( 'adminRpcode' ).toUpperCase(),
+        admin0pcode = req.param( 'admin0pcode' ).toUpperCase(),
+        start_date = req.param( 'start_date' ),
+        end_date = req.param( 'end_date' );
 
     // switch on indicator
     switch( indicator ) {
@@ -54,6 +55,7 @@ var AdminDashboardController = {
           // get organizations by project
           Project
             .find()
+            .where( { cluster_id: cluster_id } )
             .where( { adminRpcode: adminRpcode } )
             .where( { admin0pcode: admin0pcode } )
             .where( { project_start_date: { '<=': new Date( end_date ) } } )
@@ -90,6 +92,7 @@ var AdminDashboardController = {
             // get organizations by project
             Project
               .find()
+              .where( { cluster_id: cluster_id } )
               .where( { adminRpcode: adminRpcode } )
               .where( { admin0pcode: admin0pcode } )
               .where( { project_start_date: { '<=': new Date( end_date ) } } )
@@ -131,9 +134,10 @@ var AdminDashboardController = {
         // reports total
         Report
           .find()
-          .where( { report_active: true } )
+          .where( { cluster_id: cluster_id } )
           .where( { adminRpcode: adminRpcode } )
           .where( { admin0pcode: admin0pcode } )
+          .where( { report_active: true } )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
           .where( organization_filter )
@@ -198,10 +202,11 @@ var AdminDashboardController = {
         // reports complete
         Report
           .find()
-          .where( { report_active: true } )
-          .where( { report_status: 'complete' } )
+          .where( { cluster_id: cluster_id } )
           .where( { adminRpcode: adminRpcode } )
           .where( { admin0pcode: admin0pcode } )
+          .where( { report_active: true } )
+          .where( { report_status: 'complete' } )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
           .where( organization_filter )
@@ -241,10 +246,11 @@ var AdminDashboardController = {
         // reports due
         Report
           .find()
-          .where( { report_active: true } )
-          .where( { report_status: 'todo' } )
+          .where( { cluster_id: cluster_id } )
           .where( { adminRpcode: adminRpcode } )
           .where( { admin0pcode: admin0pcode } )
+          .where( { report_active: true } )
+          .where( { report_status: 'todo' } )
           .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
           .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
           .where( organization_filter )

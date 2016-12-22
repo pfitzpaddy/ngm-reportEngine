@@ -201,27 +201,83 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-
-		// conflict
-		first_aid_stabalization:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		physical_rehabilitation: {
-			type: 'integer',
-			defaultsTo: 0
-		},
-		minor_surgeries:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		major_surgeries:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-
-		// is this not the above
+		
+		// 2016
 		conflict_trauma_treated:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+		// 2017
+
+		// fatp
+    boys_first_aid_stabalization:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    girls_first_aid_stabalization:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    men_first_aid_stabalization:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    women_first_aid_stabalization:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+    // tcu
+    boys_physical_rehabilitation:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    girls_physical_rehabilitation:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    men_physical_rehabilitation:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    women_physical_rehabilitation:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+    // tcu minor
+    boys_minor_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    girls_minor_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    men_minor_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    women_minor_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+    // tcu major
+    boys_major_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    girls_major_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    men_major_surgeries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+    women_major_surgeries:{
 			type: 'integer',
 			defaultsTo: 0
 		},
@@ -237,11 +293,11 @@ module.exports = {
 			defaultsTo: 0
 		},
 		// 2017
-		vacc_male_under1:{
+		measles_vacc_male_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		vacc_female_under1:{
+		measles_vacc_female_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
@@ -260,7 +316,7 @@ module.exports = {
 			defaultsTo: 0
 		},
 
-		// training/capacity building
+		// education
 		// 2017
 		education_topic: {
 			type: 'string'
@@ -277,7 +333,8 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		// 2017
+		
+		// 2017 capacity_building -> training
 		training_topic: {
 			type: 'string'
 		},		

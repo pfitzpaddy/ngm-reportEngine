@@ -139,7 +139,7 @@ var ProjectDashboardController = {
         var locationStore = {};
         
         // json2csv
-        fields = [ 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'boys', 'girls', 'men', 'women', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fields = [ 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'boys', 'girls', 'men', 'women', 'vacc_male_under1', 'vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'training_male', 'training_female', 'total', 'lng', 'lat' ],
         fieldNames = [  'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
@@ -149,6 +149,7 @@ var ProjectDashboardController = {
           .where( filters.reporting_filter )
           // .where( filters.reporting_filter_s )
           // .where( filters.reporting_filter_e )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -178,15 +179,15 @@ var ProjectDashboardController = {
                 locationStore[ b.admin2name ].men = 0;
                 locationStore[ b.admin2name ].women = 0;
                 // beneficairies standard row 2
-                locationStore[ b.admin2name ].penta3_vacc_male_under1 = 0;
-                locationStore[ b.admin2name ].penta3_vacc_female_under1 = 0;
+                locationStore[ b.admin2name ].vacc_male_under1 = 0;
+                locationStore[ b.admin2name ].vacc_female_under1 = 0;
                 locationStore[ b.admin2name ].skilled_birth_attendant = 0;
                 locationStore[ b.admin2name ].conflict_trauma_treated = 0;
                 // beneficairies training/education
                 locationStore[ b.admin2name ].education_male = 0;
                 locationStore[ b.admin2name ].education_female = 0;
-                locationStore[ b.admin2name ].capacity_building_male = 0;
-                locationStore[ b.admin2name ].capacity_building_female = 0;
+                locationStore[ b.admin2name ].training_male = 0;
+                locationStore[ b.admin2name ].training_female = 0;
                 // beneficairies total
                 locationStore[ b.admin2name ].total = 0;
               }
@@ -197,29 +198,29 @@ var ProjectDashboardController = {
               locationStore[ b.admin2name ].men += b.men;
               locationStore[ b.admin2name ].women += b.women;
               // beneficairies standard row 2
-              locationStore[ b.admin2name ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;
-              locationStore[ b.admin2name ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
+              locationStore[ b.admin2name ].vacc_male_under1 += b.vacc_male_under1;
+              locationStore[ b.admin2name ].vacc_female_under1 += b.vacc_female_under1;
               locationStore[ b.admin2name ].skilled_birth_attendant += b.skilled_birth_attendant;
               locationStore[ b.admin2name ].conflict_trauma_treated += b.conflict_trauma_treated;
               // beneficairies training/education
               locationStore[ b.admin2name ].education_male += b.education_male;
               locationStore[ b.admin2name ].education_female += b.education_female;
-              locationStore[ b.admin2name ].capacity_building_male += b.capacity_building_male;
-              locationStore[ b.admin2name ].capacity_building_female += b.capacity_building_female;
+              locationStore[ b.admin2name ].training_male += b.training_male;
+              locationStore[ b.admin2name ].training_female += b.training_female;
 
               // total
               locationStore[ b.admin2name ].total += b.boys + 
                                                       b.girls +
                                                       b.men +
                                                       b.women +
-                                                      b.penta3_vacc_male_under1 + 
-                                                      b.penta3_vacc_female_under1 +
+                                                      b.vacc_male_under1 + 
+                                                      b.vacc_female_under1 +
                                                       b.skilled_birth_attendant +
                                                       b.conflict_trauma_treated +
                                                       b.education_male + 
                                                       b.education_female + 
-                                                      b.capacity_building_male + 
-                                                      b.capacity_building_female;
+                                                      b.training_male + 
+                                                      b.training_female;
 
               // location lat, lng
               locationStore[ b.admin2name ].lat = b.admin2lat;
@@ -252,7 +253,7 @@ var ProjectDashboardController = {
         var projectStore = {};
         
         // json2csv
-        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'boys', 'girls', 'men', 'women', 'penta3_vacc_male_under1', 'penta3_vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'capacity_building_male', 'capacity_building_female', 'total', 'lng', 'lat' ],
+        fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'boys', 'girls', 'men', 'women', 'vacc_male_under1', 'vacc_female_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'training_male', 'training_female', 'total', 'lng', 'lat' ],
         fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Status', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
@@ -262,6 +263,7 @@ var ProjectDashboardController = {
           .where( filters.reporting_filter )
           // .where( filters.reporting_filter_s )
           // .where( filters.reporting_filter_e )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -285,15 +287,15 @@ var ProjectDashboardController = {
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].men = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].women = 0;
                 //
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_male_under1 = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_female_under1 = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].vacc_male_under1 = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].vacc_female_under1 = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].skilled_birth_attendant = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].conflict_trauma_treated = 0;
                 //
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_male = 0;
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_female = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_male = 0;
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_female = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].training_male = 0;
+                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].training_female = 0;
                 //
                 projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].total = 0;                
               }
@@ -332,28 +334,28 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].men += b.men;
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].women += b.women;
               //
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_male_under1 += b.penta3_vacc_male_under1;              
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].penta3_vacc_female_under1 += b.penta3_vacc_female_under1;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].vacc_male_under1 += b.vacc_male_under1;              
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].vacc_female_under1 += b.vacc_female_under1;
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].skilled_birth_attendant += b.skilled_birth_attendant;
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].conflict_trauma_treated += b.conflict_trauma_treated;
               //
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_male += b.education_male;
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].education_female += b.education_female;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_male += b.capacity_building_male;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].capacity_building_female += b.capacity_building_female;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].training_male += b.training_male;
+              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].training_female += b.training_female;
               //
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].total += b.boys + 
                                                                                                       b.girls +
                                                                                                       b.men +
                                                                                                       b.women +
-                                                                                                      b.penta3_vacc_male_under1 + 
-                                                                                                      b.penta3_vacc_female_under1 +
+                                                                                                      b.vacc_male_under1 + 
+                                                                                                      b.vacc_female_under1 +
                                                                                                       b.skilled_birth_attendant +
                                                                                                       b.conflict_trauma_treated +
                                                                                                       b.education_male + 
                                                                                                       b.education_female + 
-                                                                                                      b.capacity_building_male + 
-                                                                                                      b.capacity_building_female;
+                                                                                                      b.training_male + 
+                                                                                                      b.training_female;
               
               // lat/lng
               projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].lat = b.admin2lat;
@@ -416,6 +418,7 @@ var ProjectDashboardController = {
           .where( filters.reporting_filter )
           // .where( filters.reporting_filter_s )
           // .where( filters.reporting_filter_e )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -454,22 +457,22 @@ var ProjectDashboardController = {
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].beneficiary_name = b.beneficiary_name;
               
               // summary
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].boys += b.boys + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].girls += b.girls + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].men += b.men + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].women += b.women + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].boys += b.boys + b.vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].girls += b.girls + b.vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].men += b.men + b.education_male + b.training_male + ( b.conflict_trauma_treated * 0.4 );
+              projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].women += b.women + b.skilled_birth_attendant + b.education_female + b.training_female + ( b.conflict_trauma_treated * 0.4 );
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].total += b.boys +
                                                                                           b.girls +
                                                                                           b.men +
                                                                                           b.women +
-                                                                                          b.penta3_vacc_male_under1 + 
-                                                                                          b.penta3_vacc_female_under1 +
+                                                                                          b.vacc_male_under1 + 
+                                                                                          b.vacc_female_under1 +
                                                                                           b.skilled_birth_attendant +
                                                                                           b.conflict_trauma_treated +
                                                                                           b.education_male + 
                                                                                           b.education_female + 
-                                                                                          b.capacity_building_male + 
-                                                                                          b.capacity_building_female;
+                                                                                          b.training_male + 
+                                                                                          b.training_female;
 
               // lat/ng
               projectStore[ b.project_id + b.admin1pcode + b.beneficiary_type ].lat = b.admin1lat;
@@ -552,7 +555,9 @@ var ProjectDashboardController = {
       // organization
       organization_id: req.param('organization_id') ? req.param('organization_id') : false,
 
-      // 
+      //
+      // cluster_id
+      cluster_id: req.param('adminRpcode') !== 'all' ? req.param('cluster_id') : '*',
       adminRpcode: req.param('adminRpcode') !== 'hq' ? req.param('adminRpcode').toUpperCase() : '*',
       admin0pcode: req.param('admin0pcode') !== 'all' ? req.param('admin0pcode').toUpperCase() : '*',
       admin1pcode: req.param('admin1pcode') !== 'all' ? req.param('admin1pcode') : '*',
@@ -573,7 +578,9 @@ var ProjectDashboardController = {
 
       // organization $nin
       organization_$nin_filter: { organization: { '!': params.$nin_organizations } },
-      
+
+      // admin1pcode locations filter
+      cluster_id_filter: params.cluster_id !== '*' ? { cluster_id: params.cluster_id } : {},      
       // admin1pcode locations filter
       adminRpcode_filter: params.adminRpcode !== '*' ? { adminRpcode: params.adminRpcode } : {},
       // admin2pcode locations filter
@@ -614,6 +621,7 @@ var ProjectDashboardController = {
       .where( filters.date_filter_s )
       .where( filters.date_filter_e )
       
+      .where( filters.cluster_id_filter )
       .where( filters.adminRpcode_filter )
       .where( filters.admin0pcode_filter )
       .where( filters.organization_filter )
@@ -713,6 +721,7 @@ var ProjectDashboardController = {
         TargetLocation
           .find()
           .where( { project_id: project_ids } )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -775,6 +784,7 @@ var ProjectDashboardController = {
         TargetLocation
           .find()
           .where( { project_id: project_ids } )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -883,6 +893,7 @@ var ProjectDashboardController = {
         TargetLocation
           .find()
           .where( { project_id: project_ids } )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -969,6 +980,7 @@ var ProjectDashboardController = {
           .where( filters.reporting_filter )
           // .where( filters.reporting_filter_s )
           // .where( filters.reporting_filter_e )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -986,22 +998,22 @@ var ProjectDashboardController = {
             // beneficiaries
             beneficiaries.forEach( function( b, i ){
               // summary
-              $beneficiaries.boys += b.boys + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-              $beneficiaries.girls += b.girls + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
-              $beneficiaries.men += b.men + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-              $beneficiaries.women += b.women + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.boys += b.boys + b.vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.girls += b.girls + b.vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );                  
+              $beneficiaries.men += b.men + b.education_male + b.training_male + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.women += b.women + b.skilled_birth_attendant + b.education_female + b.training_female + ( b.conflict_trauma_treated * 0.4 );
               $beneficiaries.total += b.boys + 
                                       b.girls +
                                       b.men +
                                       b.women +
-                                      b.penta3_vacc_male_under1 + 
-                                      b.penta3_vacc_female_under1 +
+                                      b.vacc_male_under1 + 
+                                      b.vacc_female_under1 +
                                       b.skilled_birth_attendant +
                                       b.conflict_trauma_treated +
                                       b.education_male + 
                                       b.education_female + 
-                                      b.capacity_building_male + 
-                                      b.capacity_building_female;
+                                      b.training_male + 
+                                      b.training_female;
 
             });
 
@@ -1079,6 +1091,7 @@ var ProjectDashboardController = {
           .where( filters.reporting_filter )
           // .where( filters.reporting_filter_s )
           // .where( filters.reporting_filter_e )
+          .where( filters.cluster_id_filter )
           .where( filters.adminRpcode_filter )
           .where( filters.admin0pcode_filter )
           .where( filters.organization_filter )
@@ -1096,26 +1109,26 @@ var ProjectDashboardController = {
             // beneficiaries
             beneficiaries.forEach( function( b, i ){
               // u5
-              $beneficiaries.boys += b.boys + b.penta3_vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
-              $beneficiaries.girls += b.girls + b.penta3_vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.boys += b.boys + b.vacc_male_under1 + ( b.conflict_trauma_treated * 0.1 );
+              $beneficiaries.girls += b.girls + b.vacc_female_under1 + ( b.conflict_trauma_treated * 0.1 );
               $beneficiaries.under5Total = $beneficiaries.boys + $beneficiaries.girls;
               // o5
-              $beneficiaries.men += b.men + b.education_male + b.capacity_building_male + ( b.conflict_trauma_treated * 0.4 );
-              $beneficiaries.women += b.women + b.skilled_birth_attendant + b.education_female + b.capacity_building_female + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.men += b.men + b.education_male + b.training_male + ( b.conflict_trauma_treated * 0.4 );
+              $beneficiaries.women += b.women + b.skilled_birth_attendant + b.education_female + b.training_female + ( b.conflict_trauma_treated * 0.4 );
               $beneficiaries.over5Total = $beneficiaries.men + $beneficiaries.women;
               // total
               $beneficiaries.total += b.boys + 
                                       b.girls +
                                       b.men +
                                       b.women +
-                                      b.penta3_vacc_male_under1 + 
-                                      b.penta3_vacc_female_under1 +
+                                      b.vacc_male_under1 + 
+                                      b.vacc_female_under1 +
                                       b.skilled_birth_attendant +
                                       b.conflict_trauma_treated +
                                       b.education_male + 
                                       b.education_female + 
-                                      b.capacity_building_male + 
-                                      b.capacity_building_female;
+                                      b.training_male + 
+                                      b.training_female;
 
             });
 
