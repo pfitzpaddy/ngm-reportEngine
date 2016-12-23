@@ -81,6 +81,9 @@ module.exports.routes = {
   // Cluster Activities
   'GET /cluster/getActivities': 'Cluster/ProjectController.getActivities',
 
+  // Cluster Indicators
+  'GET /cluster/getIndicators': 'Cluster/IndicatorsController.getIndicators',  
+
   // Projects
   'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
   // get project details, locations, beneficiaries
