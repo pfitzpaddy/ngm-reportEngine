@@ -11,14 +11,14 @@ module.exports = {
   getAdmin1List: function( req, res ) {
 
     // !admin0pcode
-    if ( !req.param( 'admin0pcode' ) ) {
-       return res.json( 401, { msg: 'admin0pcode required and must be string' });
-    }
+    // if ( !req.param( 'admin0pcode' ) ) {
+    //    return res.json( 401, { msg: 'admin0pcode required and must be string' });
+    // }
 
     // get list
     Admin1
       .find()
-      .where({ admin0pcode: req.param( 'admin0pcode' ) })
+      // .where({ admin0pcode: req.param( 'admin0pcode' ) })
       .sort('admin1name ASC')
       .exec( function( err, admin1 ){
 
@@ -36,14 +36,14 @@ module.exports = {
   getAdmin2List: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
-    if ( !req.param( 'admin0pcode' ) ) {
-       return res.json( 401, { msg: 'admin0pcode required and must be string' });
-    }
+    // if ( !req.param( 'admin0pcode' ) ) {
+    //    return res.json( 401, { msg: 'admin0pcode required and must be string' });
+    // }
 
     // get list
     Admin2
       .find()
-      .where({ admin0pcode: req.param( 'admin0pcode' ) })
+      // .where({ admin0pcode: req.param( 'admin0pcode' ) })
       .sort('admin2name ASC')
       .exec( function( err, admin2 ){
 

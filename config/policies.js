@@ -68,6 +68,16 @@ module.exports.policies = {
   },
 
   // public
+  'Cluster/ProjectController': {
+    'getActivities': true
+  },
+
+  // public
+  'Cluster/IndicatorsController': {
+    '*': true
+  },
+
+  // public
   'Cluster/ReportController': {
     '*': true
   },

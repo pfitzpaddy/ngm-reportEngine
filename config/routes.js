@@ -60,8 +60,8 @@ module.exports.routes = {
   // CLUSTER
   
   // Locaiton lists
-  'POST /location/getAdmin1List': 'LocationController.getAdmin1List',
-  'POST /location/getAdmin2List': 'LocationController.getAdmin2List',
+  'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
+  'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
 
   // collection updates ( general )
   'GET /cluster/project/updateTargetBeneficiaries': 'Cluster/ProjectController.updateTargetBeneficiaries',
