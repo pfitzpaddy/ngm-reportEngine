@@ -5,76 +5,90 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-// json2csv
+// require
+var moment = require( 'moment' );
 var json2csv = require( 'json2csv' );
 
-module.exports = {
+var EprDashboard = {
 
-	// get data from kobo
-	getIndicator: function(req, res) {
-
-    // request input
-    if (  !req.param('indicator') || !req.param('year') || !req.param('region') || !req.param('province')  || !req.param('week') ) {
-      return res.json( 401, { err: 'year, region, province, week required!' });
+  // get params from req
+  getParams: function( req ){
+    // check req
+    if (  !req.param('indicator') || !req.param('year') || !req.param('region') || !req.param('province')  || !req.param('week') || !req.param('start_date') || !req.param('end_date') ) {
+      return res.json( 401, { err: 'year, region, province, week, start_date, end_date required!' });
+    }
+    // return params
+    return {
+      indicator: req.param('indicator'),
+      list: req.param('list') ? req.param('list') : false,
+      year: parseInt( req.param('year') ),
+      region: req.param('region'),
+      province: req.param('province'),
+      week: req.param('week'),
+      start_date: req.param('start_date'),
+      end_date: req.param('end_date'),
+      current_week: ( parseInt( req.param('year') ) === moment().year() ) ? moment().week() : 53,
+      regions: {
+        'all': {
+          name: 'All'
+        },
+        'central': {
+          name: 'Central',
+          prov: [ 8,3,4,5,2,1 ]
+        },
+        'central_highlands': {
+          name: 'Central Highlands',
+          prov: [ 10,22 ]
+        },
+        'east': {
+          name: 'East',
+          prov: [ 13,7,14,6 ]
+        },
+        'north': {
+          name: 'North',
+          prov: [ 27,28,18,19,20 ]
+        },
+        'north_east': {
+          name: 'North East',
+          prov: [ 15,9,17,16 ]
+        },
+        'south': {
+          name: 'South',
+          prov: [ 32,23,34,24,33 ]
+        },
+        'south_east': {
+          name: 'South East',
+          prov: [  26,25,12,11 ]
+        },
+        'west': {
+          name: 'West',
+          prov: [ 31,21,29,30 ]
+        }
+      }
     }
 
-    // indicator
-    var indicator = req.param('indicator'),
-    		list = req.param('list') ? req.param('list') : false,
-    		year = parseInt( req.param('year') ),
-    		region = req.param('region'),
-    		province = req.param('province'),
-    		week = req.param('week'),
-    		regions = {
-					'all': {
-						name: 'All'
-					},
-					'central': {
-						name: 'Central',
-						prov: [ 8,3,4,5,2,1 ]
-					},
-					'central_highlands': {
-						name: 'Central Highlands',
-						prov: [ 10,22 ]
-					},
-					'east': {
-						name: 'East',
-						prov: [ 13,7,14,6 ]
-					},
-					'north': {
-						name: 'North',
-						prov: [ 27,28,18,19,20 ]
-					},
-					'north_east': {
-						name: 'North East',
-						prov: [ 15,9,17,16 ]
-					},
-					'south': {
-						name: 'South',
-						prov: [ 32,23,34,24,33 ]
-					},
-					'south_east': {
-						name: 'South East',
-						prov: [  26,25,12,11 ]
-					},
-					'west': {
-						name: 'West',
-						prov: [ 31,21,29,30 ]
-					}
-				};
+  },
+
+  // return filters
+  getFilters: function( params ){
+    // filters
+    return {
+      year: { reporting_year: params.year },
+      region: params.region !== 'all' ? { reporting_region: params.region } : {},
+      province: params.province !== 'all' ? { reporting_province: params.province } : {},
+      week: params.week !== 'all' ? { reporting_week: parseInt(params.week) } : {},
+      date: params.week === 'all' ? { reporting_date: { '>=': params.start_date, '<=': params.end_date } } : {}
+    }
+  },
+
+	// get epr indicators
+	getEprIndicator: function(req, res) {
+
+    // params
+    var params = EprDashboard.getParams( req );
 
     // filters
-    var filters = {
-
-    	year: { reporting_year: year },
-
-    	region: region !== 'all' ? { reporting_region: region } : {},
-
-    	province: province !== 'all' ? { reporting_province: province } : {},
-
-    	week: week !== 'all' ? { reporting_week: week } : {}
-
-    }
+    var filters = EprDashboard.getFilters( params );
 
     // run query
     Epr
@@ -83,34 +97,16 @@ module.exports = {
       .where( filters.region )
       .where( filters.province )
       .where( filters.week )
+      .where( filters.date )
       .exec( function( err, results ){
 
         // return error
         if (err) return res.negotiate( err );
 
         // indicator
-        switch( indicator ){
+        switch( params.indicator ){
 
-        	// total reports due
-        	case 'total':
-
-        		// province/weeks
-        		var reports = province === 'all' ? 34 : 1,
-        				weeks = week === 'all' ? 53 : 1;
-
-        		// if reports for a region
-        		if ( region !== 'all' ) {
-        			// region
-        			reports = regions[region].prov.length;
-
-        		}
-
-        		// return number of expected reports
-          	return res.json( 200, { 'value': reports * weeks } );
-
-        		break;
-
-        	// total reports due
+        	// total reports submitted
         	case 'submitted_reports':
 
         		// return number of expected reports
@@ -118,17 +114,17 @@ module.exports = {
 
         		break;
 
-        	// total reports due
+        	// total reports outstanding
         	case 'outstanding_reports':
 
         		// 
-        		var reports = province === 'all' ? 34 : 1,
-        				weeks = week === 'all' ? 53 : 1;
+        		var reports = params.province === 'all' ? 34 : 1,
+        				weeks = params.week === 'all' ? params.current_week : 1;
 
         		// if reports for a region
-        		if ( region !== 'all' ) {
+        		if ( params.region !== 'all' ) {
 
-        			reports = regions[region].prov.length;
+        			reports = params.regions[params.region].prov.length;
 
         		}
 
@@ -137,6 +133,24 @@ module.exports = {
 
         		break;
 
+          // total reports due
+          case 'expected_reports':
+
+            // province/weeks
+            var reports = params.province === 'all' ? 34 : 1,
+                weeks = params.week === 'all' ? params.current_week : 1;
+
+            // if reports for a region
+            if ( params.region !== 'all' ) {
+              // region
+              reports = params.regions[params.region].prov.length;
+
+            }
+
+            // return number of expected reports
+            return res.json( 200, { 'value': reports * weeks } );
+
+            break;
 
         	// total reports due
         	case 'duplicate_reports':
@@ -171,7 +185,7 @@ module.exports = {
         		}
 	        		
 	        	// if list
-	        	if ( list ) {
+	        	if ( params.list ) {
 	        		// return table
 	          	return res.json( 200, reports );
 	        	} else {
@@ -198,7 +212,7 @@ module.exports = {
 
         	default:
 
-        		// return number of expected reports
+        		// return number of reports
           	return res.json( 200, results );
 
         		break;
@@ -210,70 +224,107 @@ module.exports = {
 
 	},
 
-	getAlertData: function(req, res) {
+  // get alert indicator
+  getAlertIndicator: function(req, res) {
 
-    // request input
-    if (  !req.param('indicator') || !req.param('year') || !req.param('region') || !req.param('province')  || !req.param('week') ) {
-      return res.json( 401, { err: 'year, region, province, week required!' });
-    }
-
-    // indicator
-    var indicator = req.param('indicator'),
-    		list = req.param('list') ? req.param('list') : false,
-    		year = parseInt( req.param('year') ),
-    		region = req.param('region'),
-    		province = req.param('province'),
-    		week = req.param('week'),
-    		regions = {
-					'all': {
-						name: 'All'
-					},
-					'central': {
-						name: 'Central',
-						prov: [ 8,3,4,5,2,1 ]
-					},
-					'central_highlands': {
-						name: 'Central Highlands',
-						prov: [ 10,22 ]
-					},
-					'east': {
-						name: 'East',
-						prov: [ 13,7,14,6 ]
-					},
-					'north': {
-						name: 'North',
-						prov: [ 27,28,18,19,20 ]
-					},
-					'north_east': {
-						name: 'North East',
-						prov: [ 15,9,17,16 ]
-					},
-					'south': {
-						name: 'South',
-						prov: [ 32,23,34,24,33 ]
-					},
-					'south_east': {
-						name: 'South East',
-						prov: [  26,25,12,11 ]
-					},
-					'west': {
-						name: 'West',
-						prov: [ 31,21,29,30 ]
-					}
-				};
+    // params
+    var params = EprDashboard.getParams( req );
 
     // filters
-    var filters = {
+    var filters = EprDashboard.getFilters( params );
 
-    	year: { reporting_year: year },
+    // run query
+    Alerts
+      .find()
+      .where( filters.year )
+      .where( filters.region )
+      .where( filters.province )
+      .where( filters.week )
+      .where( filters.date )
+      .exec( function( err, results ){
 
-    	region: region !== 'all' ? { reporting_region: region } : {},
+        // return error
+        if (err) return res.negotiate( err );
 
-    	province: province !== 'all' ? { reporting_province: province } : {},
+        // indicator
+        switch( params.indicator ){
 
-    	week: week !== 'all' ? { reporting_week: week } : {}
+          // total reports due
+          case 'total':
 
-    }
+            // return number of expected reports
+            return res.json( 200, { 'value': results.length } );
+
+            break;          
+
+          default:
+
+            // return number of expected reports
+            return res.json( 200, results );
+
+            break;
+
+        }
+
+
+      });
+
+  },
+
+  // get disaster indicators
+  getDisasterIndicator: function(req, res) {
+
+    // params
+    var params = EprDashboard.getParams( req );
+
+    // filters
+    var filters = EprDashboard.getFilters( params );
+
+    // run query
+    Disasters
+      .find()
+      .where( filters.year )
+      .where( filters.region )
+      .where( filters.province )
+      .where( filters.week )
+      .where( filters.date )
+      .exec( function( err, results ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // indicator
+        switch( params.indicator ){
+
+          // total reports due
+          case 'total':
+
+            // return number of expected reports
+            return res.json( 200, { 'value': results.length } );
+
+            break;          
+
+          default:
+
+            // return number of expected reports
+            return res.json( 200, results );
+
+            break;
+
+        }
+
+
+      });
+
+  },  
+
+	getAlertData: function(req, res) {
+
+    // params
+    var params = EprDashboard.getParams( req );
+
+    // filters
+    var filters = EprDashboard.getFilters( params );
 
     // run query
     Alerts
@@ -282,6 +333,7 @@ module.exports = {
       .where( filters.region )
       .where( filters.province )
       .where( filters.week )
+      .where( filters.date )
       .exec( function( err, results ){
 
         // return error
@@ -304,68 +356,11 @@ module.exports = {
 
 	getDisasterData: function(req, res) {
 
-    // request input
-    if (  !req.param('indicator') || !req.param('year') || !req.param('region') || !req.param('province')  || !req.param('week') ) {
-      return res.json( 401, { err: 'year, region, province, week required!' });
-    }
-
-    // indicator
-    var indicator = req.param('indicator'),
-    		list = req.param('list') ? req.param('list') : false,
-    		year = parseInt( req.param('year') ),
-    		region = req.param('region'),
-    		province = req.param('province'),
-    		week = req.param('week'),
-    		regions = {
-					'all': {
-						name: 'All'
-					},
-					'central': {
-						name: 'Central',
-						prov: [ 8,3,4,5,2,1 ]
-					},
-					'central_highlands': {
-						name: 'Central Highlands',
-						prov: [ 10,22 ]
-					},
-					'east': {
-						name: 'East',
-						prov: [ 13,7,14,6 ]
-					},
-					'north': {
-						name: 'North',
-						prov: [ 27,28,18,19,20 ]
-					},
-					'north_east': {
-						name: 'North East',
-						prov: [ 15,9,17,16 ]
-					},
-					'south': {
-						name: 'South',
-						prov: [ 32,23,34,24,33 ]
-					},
-					'south_east': {
-						name: 'South East',
-						prov: [  26,25,12,11 ]
-					},
-					'west': {
-						name: 'West',
-						prov: [ 31,21,29,30 ]
-					}
-				};
+    // params
+    var params = EprDashboard.getParams( req );
 
     // filters
-    var filters = {
-
-    	year: { reporting_year: year },
-
-    	region: region !== 'all' ? { reporting_region: region } : {},
-
-    	province: province !== 'all' ? { reporting_province: province } : {},
-
-    	week: week !== 'all' ? { reporting_week: week } : {}
-
-    }
+    var filters = EprDashboard.getFilters( params );
 
     // run query
     Disasters
@@ -374,6 +369,7 @@ module.exports = {
       .where( filters.region )
       .where( filters.province )
       .where( filters.week )
+      .where( filters.date )
       .exec( function( err, results ){
 
         // return error
@@ -396,3 +392,4 @@ module.exports = {
 
 };
 
+module.exports = EprDashboard;

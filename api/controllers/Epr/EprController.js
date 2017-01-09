@@ -43,7 +43,10 @@ module.exports = {
 				// set cmd
 				moment = require( 'moment' ),
 				exec = require('child_process').exec,
-				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/97441?format=json -u pfitzpaddy:P@trick7';
+				// account form ids
+				// 105600
+				// 106227
+				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/106227?format=json -u eha:ehaTeam1234';
 
 		// run curl command
 		exec( cmd, function( error, stdout, stderr ) {
@@ -97,7 +100,7 @@ module.exports = {
 									reporting_region_name: d['reporting/reporting_details/reporting_region'].replace(/_/g,' ').toUpperCase(),
 									reporting_province: d['reporting/reporting_details/reporting_province'],
 									reporting_province_name: provinces[d['reporting/reporting_details/reporting_province']].admin1name,
-									reporting_week: d['reporting/reporting_details/reporting_week'],
+									reporting_week: parseInt(d['reporting/reporting_details/reporting_week']),
 									reporting_year: d['reporting/reporting_details/reporting_year'],
 									reporting_date: moment().year( d['reporting/reporting_details/reporting_year'] ).week( d['reporting/reporting_details/reporting_week'] ).add( 1, 'd' ).format( 'YYYY-MM-DD' ),
 									reporting_lat: provinces[d['reporting/reporting_details/reporting_province']].admin1lat,
@@ -117,16 +120,33 @@ module.exports = {
 												d_obj[d_key] = alert[j];
 											}
 
-											// province/distrct/disease name
+											// admin
+											d_obj.alert_province_name = d_obj.alert_province ? provinces[d_obj.alert_province].admin1name : '';
+											d_obj.alert_district_name = d_obj.alert_district ? districts[d_obj.alert_district].admin2name : '';
+											// reporting_year
+											d_obj.reporting_year = parseInt(d_obj.reporting_year);
+											// disease name
 											d_obj.alert_disease_name = disease_lookup[d_obj.alert_disease];
-											d_obj.alert_province_name = provinces[d_obj.alert_province].admin1name;
-											d_obj.alert_district_name = districts[d_obj.alert_district].admin2name;
+											// numbers female
+											d_obj.cases_female_under5 = parseInt(d_obj.cases_female_under5);
+											d_obj.cases_female_over5 = parseInt(d_obj.cases_female_over5);
+											d_obj.deaths_female_under5 = parseInt(d_obj.deaths_female_under5);
+											d_obj.deaths_female_over5 = parseInt(d_obj.deaths_female_over5);
+											// numbers male
+											d_obj.cases_male_under5 = parseInt(d_obj.cases_male_under5);
+											d_obj.cases_male_over5 = parseInt(d_obj.cases_male_over5);
+											d_obj.deaths_male_under5 = parseInt(d_obj.deaths_male_under5);
+											d_obj.deaths_male_over5 = parseInt(d_obj.deaths_male_over5);
 											// lat/lng
-											d_obj.alert_lat = districts[d_obj.alert_district].admin2lat;
-											d_obj.alert_lng = districts[d_obj.alert_district].admin2lng;											
+											if (d_obj.alert_district) {
+												d_obj.alert_lat = districts[d_obj.alert_district].admin2lat;
+												d_obj.alert_lng = districts[d_obj.alert_district].admin2lng;
+											}
 
 											// push as single record
-											alerts.push( d_obj );
+											if( d_obj.alert_categories ){
+												alerts.push( d_obj );
+											}
 
 										});
 										break;
@@ -141,15 +161,36 @@ module.exports = {
 												d_obj[d_key] = disaster[j];
 											}
 
-											// name
-											d_obj.disaster_province_name = provinces[d_obj.disaster_province].admin1name;
-											d_obj.disaster_district_name = districts[d_obj.disaster_district].admin2name;
+											// admin
+											d_obj.disaster_province_name = d_obj.disaster_province ? provinces[d_obj.disaster_province].admin1name : '';
+											d_obj.disaster_district_name = d_obj.disaster_district ? districts[d_obj.disaster_district].admin2name : '';
+											// reporting_year
+											d_obj.reporting_year = parseInt(d_obj.reporting_year);
+											// numbers female
+											d_obj.casualties_female_under5 = parseInt(d_obj.casualties_female_under5);
+											d_obj.casualties_female_over5 = parseInt(d_obj.casualties_female_over5);
+											d_obj.deaths_female_under5 = parseInt(d_obj.deaths_female_under5_001);
+											d_obj.deaths_female_over5 = parseInt(d_obj.deaths_female_over5_001);
+											// numbers male
+											d_obj.casualties_male_under5 = parseInt(d_obj.casualties_male_under5);
+											d_obj.casualties_male_over5 = parseInt(d_obj.casualties_male_over5);
+											d_obj.deaths_male_under5 = parseInt(d_obj.deaths_male_under5_001);
+											d_obj.deaths_male_over5 = parseInt(d_obj.deaths_male_over5_001);
+											// remove 
+											delete d_obj.deaths_female_under5_001;
+											delete d_obj.deaths_female_over5_001;
+											delete d_obj.deaths_male_under5_001;
+											delete d_obj.deaths_male_over5_001;
 											// lat/lng
-											d_obj.disaster_lat = districts[d_obj.disaster_district].admin2lat;
-											d_obj.disaster_lng = districts[d_obj.disaster_district].admin2lng;											
+											if (d_obj.disaster_district) {
+												d_obj.disaster_lat = districts[d_obj.disaster_district].admin2lat;
+												d_obj.disaster_lng = districts[d_obj.disaster_district].admin2lng;
+											}
 
 											// push as single record
-											disasters.push( d_obj );
+											if( d_obj.disaster_type ){
+												disasters.push( d_obj );
+											}
 
 										});
 										break;
@@ -158,7 +199,7 @@ module.exports = {
 										// set record
 										obj[key] = d[k];
 										obj.reporting_date = moment().year( moment(d['_submission_time']).year() ).week( d['reporting/reporting_details/reporting_week'] ).add( 1, 'd' ).format( 'YYYY-MM-DD' ),
-										obj.reporting_year = moment(d['_submission_time']).year();
+										obj.reporting_year = parseInt(moment(d['_submission_time']).year());
 										obj.reporting_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;
 										obj.reporting_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
 										obj.reporting_province_name = provinces[d['reporting/reporting_details/reporting_province']].admin1name;

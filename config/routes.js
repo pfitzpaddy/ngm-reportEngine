@@ -108,12 +108,16 @@ module.exports.routes = {
   // EPR
   'GET /epr/getKoboData': 'Epr/EprController.getKoboData',
   // EPR Dashboard
-  'GET /epr/indicator': 'Epr/EprDashboardController.getIndicator',
-  'POST /epr/indicator': 'Epr/EprDashboardController.getIndicator',
+  'GET /epr/indicator': 'Epr/EprDashboardController.getEprIndicator',
+  'POST /epr/indicator': 'Epr/EprDashboardController.getEprIndicator',
   // alerts
+  'GET /epr/alerts/indicator': 'Epr/EprDashboardController.getAlertIndicator',
+  'POST /epr/alerts/indicator': 'Epr/EprDashboardController.getAlertIndicator',
   'GET /epr/alerts/data': 'Epr/EprDashboardController.getAlertData',
   'POST /epr/alerts/data': 'Epr/EprDashboardController.getAlertData',
   // disasters
+  'GET /epr/disasters/indicator': 'Epr/EprDashboardController.getDisasterIndicator',
+  'POST /epr/disasters/indicator': 'Epr/EprDashboardController.getDisasterIndicator',
   'GET /epr/disasters/data': 'Epr/EprDashboardController.getDisasterData',
   'POST /epr/disasters/data': 'Epr/EprDashboardController.getDisasterData',
 
