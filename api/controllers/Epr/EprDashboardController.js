@@ -255,7 +255,33 @@ var EprDashboard = {
             // return number of expected reports
             return res.json( 200, { 'value': results.length } );
 
-            break;          
+            break;
+
+          case 'markers':
+
+            // markers
+            var markers = {};
+
+            // for each
+            results.forEach(function(d,i){
+              // cases
+              var cases = 0;
+              // if (d.cases_female_under5 && d.cases_female_over5 && d.cases_male_under5 && d.cases_male_over5) {
+                cases = d.cases_female_under5 + d.cases_female_over5 + d.cases_male_under5 + d.cases_male_over5;
+              // }
+              // message
+              var message = '<div class="count" style="text-align:center">' + cases + '</div> cases in ' + d.alert_province_name + ', ' + d.alert_district_name;
+              // create markers
+              markers['marker' + i] = {
+                layer: 'alerts',
+                lat: d.alert_lat,
+                lng: d.alert_lng,
+                message: message
+              };
+            });
+
+            // return markers
+            return res.json( { status:200, data: markers } );
 
           default:
 
@@ -302,7 +328,33 @@ var EprDashboard = {
             // return number of expected reports
             return res.json( 200, { 'value': results.length } );
 
-            break;          
+            break;
+
+          case 'markers':
+
+            // markers
+            var markers = {};
+
+            // for each
+            results.forEach(function(d,i){
+              // cases
+              var cases = 0;
+              // if (d.cases_female_under5 && d.cases_female_over5 && d.cases_male_under5 && d.cases_male_over5) {
+                cases = d.cases_female_under5 + d.cases_female_over5 + d.cases_male_under5 + d.cases_male_over5;
+              // }
+              // message
+              var message = '<div class="count" style="text-align:center">' + cases + '</div> cases in ' + d.disaster_province_name + ', ' + d.disaster_district_name;
+              // create markers
+              markers['marker' + i] = {
+                layer: 'disasters',
+                lat: d.disaster_lat,
+                lng: d.disaster_lng,
+                message: message
+              };
+            });
+
+            // return markers
+            return res.json( { status:200, data: markers } );
 
           default:
 
