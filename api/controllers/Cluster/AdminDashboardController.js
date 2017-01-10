@@ -321,6 +321,52 @@ var AdminDashboardController = {
 
         break;
 
+      case 'reports_complete_total':
+
+        // reports total
+        Report
+          .find()
+          .where( { cluster_id: cluster_id } )
+          .where( { adminRpcode: adminRpcode } )
+          .where( { admin0pcode: admin0pcode } )
+          .where( { report_active: true } )
+          .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
+          .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          .where( organization_filter )
+          .where( { organization: { '!': $nin_organizations } } )
+          .sort('updatedAt DESC')
+          .exec( function( err, total_reports ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // reports complete
+            Report
+              .find()
+              .where( { cluster_id: cluster_id } )
+              .where( { adminRpcode: adminRpcode } )
+              .where( { admin0pcode: admin0pcode } )
+              .where( { report_active: true } )
+              .where( { report_status: 'complete' } )
+              .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
+              .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+              .where( organization_filter )
+              .where( { organization: { '!': $nin_organizations } } )
+              .sort('updatedAt DESC')
+              .exec( function( err, reports ){
+
+                // return error
+                if (err) return res.negotiate( err );
+
+                // return new Project
+                return res.json(200, { 'value': reports.length, 'value_total': total_reports.length });                
+
+              });
+
+            });
+
+            break;
+
     }
 
   }
