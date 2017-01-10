@@ -264,13 +264,21 @@ var EprDashboard = {
 
             // for each
             results.forEach(function(d,i){
-              // cases
-              var cases = 0;
-              // if (d.cases_female_under5 && d.cases_female_over5 && d.cases_male_under5 && d.cases_male_over5) {
+              // cases, deaths
+              var cases = 0,
+                  deaths = 0;
+              if (d.cases_female_under5 && d.cases_female_over5 && d.cases_male_under5 && d.cases_male_over5) {
                 cases = d.cases_female_under5 + d.cases_female_over5 + d.cases_male_under5 + d.cases_male_over5;
-              // }
+              }
+              if (d.deaths_female_under5 && d.deaths_female_over5 && d.deaths_male_under5 && d.deaths_male_over5) {
+                deaths = d.deaths_female_under5 + d.deaths_female_over5 + d.deaths_male_under5 + d.deaths_male_over5;
+              }
               // message
-              var message = '<div class="count" style="text-align:center">' + cases + '</div> cases in ' + d.alert_province_name + ', ' + d.alert_district_name;
+              var message = '<div class="center">' +
+                              '<div class="count" style="text-align:center">' + cases + '</div> cases <br/>' + 
+                              '<div class="count" style="text-align:center">' + deaths + '</div> deaths <br/>' + 
+                               'in ' + d.alert_province_name + ', ' + d.alert_district_name +
+                            '</div>';
               // create markers
               markers['marker' + i] = {
                 layer: 'alerts',
@@ -337,13 +345,21 @@ var EprDashboard = {
 
             // for each
             results.forEach(function(d,i){
-              // cases
-              var cases = 0;
-              // if (d.cases_female_under5 && d.cases_female_over5 && d.cases_male_under5 && d.cases_male_over5) {
-                cases = d.cases_female_under5 + d.cases_female_over5 + d.cases_male_under5 + d.cases_male_over5;
-              // }
+              // cases, deaths
+              var cases = 0,
+                  deaths = 0;
+              if (d.casualties_female_under5 + d.casualties_female_over5 + d.casualties_male_under5 + d.casualties_male_over5) {
+                casualties = d.casualties_female_under5 + d.casualties_female_over5 + d.casualties_male_under5 + d.casualties_male_over5;
+              }
+              if (d.deaths_female_under5 && d.deaths_female_over5 && d.deaths_male_under5 && d.deaths_male_over5) {
+                deaths = d.deaths_female_under5 + d.deaths_female_over5 + d.deaths_male_under5 + d.deaths_male_over5;
+              }
               // message
-              var message = '<div class="count" style="text-align:center">' + cases + '</div> cases in ' + d.disaster_province_name + ', ' + d.disaster_district_name;
+              var message = '<div class="center">' +
+                              '<div class="count" style="text-align:center">' + casualties + '</div> casualties <br/>' + 
+                              '<div class="count" style="text-align:center">' + deaths + '</div> deaths <br/>' + 
+                              'in ' + d.disaster_province_name + ', ' + d.disaster_district_name +
+                            '</div>';
               // create markers
               markers['marker' + i] = {
                 layer: 'disasters',
