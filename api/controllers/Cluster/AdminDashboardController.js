@@ -138,8 +138,9 @@ var AdminDashboardController = {
           .where( { adminRpcode: adminRpcode } )
           .where( { admin0pcode: admin0pcode } )
           .where( { report_active: true } )
-          .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
-          .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          // .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
+          // .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          .where( { reporting_period: { '>=': moment( start_date ).format('YYYY-MM-DD'), '<=': moment( end_date ).format('YYYY-MM-DD') } } )
           .where( organization_filter )
           .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
@@ -207,8 +208,9 @@ var AdminDashboardController = {
           .where( { admin0pcode: admin0pcode } )
           .where( { report_active: true } )
           .where( { report_status: 'complete' } )
-          .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
-          .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          // .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
+          // .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          .where( { reporting_period: { '>=': moment( start_date ).format('YYYY-MM-DD'), '<=': moment( end_date ).format('YYYY-MM-DD') } } )
           .where( organization_filter )
           .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
@@ -323,6 +325,13 @@ var AdminDashboardController = {
 
       case 'reports_complete_total':
 
+        console.log('start_date');
+        console.log(moment( start_date ).month())
+        console.log(moment( start_date ).year());
+        console.log('end_date');
+        console.log(moment( end_date ).month());
+        console.log(moment( end_date ).year());
+
         // reports total
         Report
           .find()
@@ -330,8 +339,9 @@ var AdminDashboardController = {
           .where( { adminRpcode: adminRpcode } )
           .where( { admin0pcode: admin0pcode } )
           .where( { report_active: true } )
-          .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
-          .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          // .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
+          // .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+          .where( { reporting_period: { '>=': moment( start_date ).format('YYYY-MM-DD'), '<=': moment( end_date ).format('YYYY-MM-DD') } } )
           .where( organization_filter )
           .where( { organization: { '!': $nin_organizations } } )
           .sort('updatedAt DESC')
@@ -348,8 +358,9 @@ var AdminDashboardController = {
               .where( { admin0pcode: admin0pcode } )
               .where( { report_active: true } )
               .where( { report_status: 'complete' } )
-              .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
-              .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+              // .where( { report_month: { '>=': moment( start_date ).month(), '<=': moment( end_date ).month() } } )
+              // .where( { report_year: { '>=': moment( start_date ).year(), '<=': moment( end_date ).year() } } )
+              .where( { reporting_period: { '>=': moment( start_date ).format('YYYY-MM-DD'), '<=': moment( end_date ).format('YYYY-MM-DD') } } )
               .where( organization_filter )
               .where( { organization: { '!': $nin_organizations } } )
               .sort('updatedAt DESC')
