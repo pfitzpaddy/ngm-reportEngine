@@ -106,6 +106,12 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		// 2017 
+		// esnfi
+		families: {
+			type: 'integer',
+			defaultsTo: 0
+		},
 		capacity_building_topic: {
 			type: 'string'
 		},		
