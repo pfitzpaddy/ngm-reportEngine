@@ -127,16 +127,34 @@ module.exports = {
 											d_obj.reporting_year = parseInt(d_obj.reporting_year);
 											// disease name
 											d_obj.alert_disease_name = disease_lookup[d_obj.alert_disease];
-											// numbers female
+											// cases
 											d_obj.cases_female_under5 = parseInt(d_obj.cases_female_under5);
 											d_obj.cases_female_over5 = parseInt(d_obj.cases_female_over5);
-											d_obj.deaths_female_under5 = parseInt(d_obj.deaths_female_under5);
-											d_obj.deaths_female_over5 = parseInt(d_obj.deaths_female_over5);
-											// numbers male
 											d_obj.cases_male_under5 = parseInt(d_obj.cases_male_under5);
 											d_obj.cases_male_over5 = parseInt(d_obj.cases_male_over5);
+											// total cases
+											if(!d_obj.cases){
+												d_obj.cases = 0;
+											}
+											d_obj.cases += d_obj.cases_female_under5;
+											d_obj.cases += d_obj.cases_female_over5;
+											d_obj.cases += d_obj.cases_male_under5;
+											d_obj.cases += d_obj.cases_male_over5;
+											
+											// deaths
+											d_obj.deaths_female_under5 = parseInt(d_obj.deaths_female_under5);
+											d_obj.deaths_female_over5 = parseInt(d_obj.deaths_female_over5);
 											d_obj.deaths_male_under5 = parseInt(d_obj.deaths_male_under5);
 											d_obj.deaths_male_over5 = parseInt(d_obj.deaths_male_over5);
+											// total cases
+											if(!d_obj.deaths){
+												d_obj.deaths = 0;
+											}
+											d_obj.deaths += d_obj.deaths_female_under5;
+											d_obj.deaths += d_obj.deaths_female_over5;
+											d_obj.deaths += d_obj.deaths_male_under5;
+											d_obj.deaths += d_obj.deaths_male_over5;
+
 											// lat/lng
 											if (d_obj.alert_district) {
 												d_obj.alert_lat = districts[d_obj.alert_district].admin2lat;
@@ -166,16 +184,34 @@ module.exports = {
 											d_obj.disaster_district_name = d_obj.disaster_district ? districts[d_obj.disaster_district].admin2name : '';
 											// reporting_year
 											d_obj.reporting_year = parseInt(d_obj.reporting_year);
-											// numbers female
+											// casualties
 											d_obj.casualties_female_under5 = parseInt(d_obj.casualties_female_under5);
 											d_obj.casualties_female_over5 = parseInt(d_obj.casualties_female_over5);
+											d_obj.casualties_male_under5 = parseInt(d_obj.casualties_male_under5);
+											d_obj.casualties_male_over5 = parseInt(d_obj.casualties_male_over5);											
+											// total casualties
+											if(!d_obj.casualties){
+												d_obj.casualties = 0;
+											}
+											d_obj.casualties += d_obj.casualties_female_under5;
+											d_obj.casualties += d_obj.casualties_female_over5;
+											d_obj.casualties += d_obj.casualties_male_under5;
+											d_obj.casualties += d_obj.casualties_male_over5;
+											
+											// deaths
 											d_obj.deaths_female_under5 = parseInt(d_obj.deaths_female_under5_001);
 											d_obj.deaths_female_over5 = parseInt(d_obj.deaths_female_over5_001);
-											// numbers male
-											d_obj.casualties_male_under5 = parseInt(d_obj.casualties_male_under5);
-											d_obj.casualties_male_over5 = parseInt(d_obj.casualties_male_over5);
 											d_obj.deaths_male_under5 = parseInt(d_obj.deaths_male_under5_001);
 											d_obj.deaths_male_over5 = parseInt(d_obj.deaths_male_over5_001);
+											// total cases
+											if(!d_obj.deaths){
+												d_obj.deaths = 0;
+											}
+											d_obj.deaths += d_obj.deaths_female_under5;
+											d_obj.deaths += d_obj.deaths_female_over5;
+											d_obj.deaths += d_obj.deaths_male_under5;
+											d_obj.deaths += d_obj.deaths_male_over5;
+
 											// remove 
 											delete d_obj.deaths_female_under5_001;
 											delete d_obj.deaths_female_over5_001;

@@ -11,6 +11,22 @@ var json2csv = require( 'json2csv' );
 
 var EprDashboard = {
 
+  // get sum by key
+  getSum: function( key, records ){
+
+    var value=0;
+
+    records.forEach(function(d,i){
+      for (var d_key in d) {
+        if( key === d_key && !isNaN(d[d_key]) && typeof(d[d_key]) === 'number' ){
+          value += d[d_key];
+        }
+      }
+    });
+
+    return value;
+  },
+
   // get params from req
   getParams: function( req ){
     // check req
@@ -257,6 +273,16 @@ var EprDashboard = {
 
             break;
 
+          case 'cases':
+
+            var value = EprDashboard.getSum( 'cases', results );
+            return res.json( 200, { 'value': value } );
+
+          case 'deaths':
+
+            var value = EprDashboard.getSum( 'deaths', results );
+            return res.json( 200, { 'value': value } );
+
           case 'markers':
 
             // markers
@@ -264,20 +290,21 @@ var EprDashboard = {
 
             // for each
             results.forEach(function(d,i){
-              // cases, deaths
-              var cases = 0,
-                  deaths = 0;
-              if (d.cases_female_under5 && d.cases_female_over5 && d.cases_male_under5 && d.cases_male_over5) {
-                cases = d.cases_female_under5 + d.cases_female_over5 + d.cases_male_under5 + d.cases_male_over5;
-              }
-              if (d.deaths_female_under5 && d.deaths_female_over5 && d.deaths_male_under5 && d.deaths_male_over5) {
-                deaths = d.deaths_female_under5 + d.deaths_female_over5 + d.deaths_male_under5 + d.deaths_male_over5;
-              }
+
               // message
-              var message = '<div class="center">' +
-                              '<div class="count" style="text-align:center">' + cases + '</div> cases <br/>' + 
-                              '<div class="count" style="text-align:center">' + deaths + '</div> deaths <br/>' + 
-                               'in ' + d.alert_province_name + ', ' + d.alert_district_name +
+              var message = '<div class="center card-panel" style="width:300px">' +
+                              '<div>' +
+                                '<div class="count" style="text-align:center">' + d.deaths + '</div> deaths <br/><br/>' + 
+                              '</div>' +
+                              '<div>' +
+                                '<div style="text-align:center"> with <span class="count">' + d.cases + '</span> cases from ' + d.alert_categories.replace(/_/g, ' ').toUpperCase() +
+                              '</div>' + 
+                              '<div>' +
+                                '<div style="text-align:center">Alert Verification: ' + d.alert_verification.replace(/_/g, ' ').toUpperCase()
+                              '</div>' + 
+                              '<div>' +
+                                'in ' + d.alert_province_name + ', ' + d.alert_district_name +
+                              '</div>' +
                             '</div>';
               // create markers
               markers['marker' + i] = {
@@ -338,6 +365,16 @@ var EprDashboard = {
 
             break;
 
+          case 'casualties':
+
+            var value = EprDashboard.getSum( 'casualties', results );
+            return res.json( 200, { 'value': value } );
+
+          case 'deaths':
+
+            var value = EprDashboard.getSum( 'deaths', results );
+            return res.json( 200, { 'value': value } );
+
           case 'markers':
 
             // markers
@@ -345,21 +382,23 @@ var EprDashboard = {
 
             // for each
             results.forEach(function(d,i){
-              // cases, deaths
-              var cases = 0,
-                  deaths = 0;
-              if (d.casualties_female_under5 + d.casualties_female_over5 + d.casualties_male_under5 + d.casualties_male_over5) {
-                casualties = d.casualties_female_under5 + d.casualties_female_over5 + d.casualties_male_under5 + d.casualties_male_over5;
-              }
-              if (d.deaths_female_under5 && d.deaths_female_over5 && d.deaths_male_under5 && d.deaths_male_over5) {
-                deaths = d.deaths_female_under5 + d.deaths_female_over5 + d.deaths_male_under5 + d.deaths_male_over5;
-              }
+
               // message
-              var message = '<div class="center">' +
-                              '<div class="count" style="text-align:center">' + casualties + '</div> casualties <br/>' + 
-                              '<div class="count" style="text-align:center">' + deaths + '</div> deaths <br/>' + 
-                              'in ' + d.disaster_province_name + ', ' + d.disaster_district_name +
+              var message = '<div class="center card-panel" style="width:300px">' +
+                              '<div>' +
+                                '<div class="count" style="text-align:center">' + d.deaths + '</div> deaths <br/><br/>' + 
+                              '</div>' +
+                              '<div>' +
+                                '<div style="text-align:center"> with <span class="count">' + d.casualties + '</span> casualties from ' + d.disaster_type.replace(/_/g, ' ').toUpperCase() + ' disaster' +
+                              '</div>' +  
+                              '<div>' +
+                                '<div style="text-align:center">Disaster Category: ' + d['disaster_' + d.disaster_type + '_categories'].replace(/_/g, ' ').toUpperCase() +
+                              '</div>' + 
+                              '<div>' +
+                                'in ' + d.disaster_province_name + ', ' + d.disaster_district_name +
+                              '</div>' +
                             '</div>';
+
               // create markers
               markers['marker' + i] = {
                 layer: 'disasters',
