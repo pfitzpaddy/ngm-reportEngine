@@ -36,11 +36,15 @@ module.exports.routes = {
   'GET /login': 'UserController.login',
   'POST /login': 'UserController.login',
   'POST /create': 'UserController.create',
-  'GET /getOrganization': 'UserController.getOrganization',
-  'POST /getOrganization': 'UserController.getOrganization',
   'POST /update': 'UserController.updateLogin',
   'POST /send-email': 'UserController.passwordResetEmail',
   'POST /password-reset': 'UserController.passwordReset',
+
+  // org
+  'GET /getOrganization': 'OrganizationController.getOrganization',
+  'POST /getOrganization': 'OrganizationController.getOrganization',
+  'GET /setOrganization': 'OrganizationController.setOrganization',
+  'POST /setOrganization': 'OrganizationController.setOrganization',
 
   // Metrics
   'POST /metrics/set': 'MetricsController.set',
@@ -62,18 +66,6 @@ module.exports.routes = {
   // Locaiton lists
   'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
   'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
-
-  // collection updates ( general )
-  'GET /cluster/project/updateTargetBeneficiaries': 'Cluster/ProjectController.updateTargetBeneficiaries',
-  'GET /cluster/project/updateTargetLocations': 'Cluster/ProjectController.updateTargetLocations',
-  'GET /cluster/project/updateLocations': 'Cluster/ProjectController.updateLocations',
-  'GET /cluster/project/updateBeneficiaries': 'Cluster/ProjectController.updateBeneficiaries',
-  // collection updates ( pcodes )
-  'GET /cluster/project/updateProjectPcodes': 'Cluster/ProjectController.updateProjectPcodes',
-  'GET /cluster/project/updateTargetLocationPcodes': 'Cluster/ProjectController.updateTargetLocationPcodes',
-  'GET /cluster/project/updateLocationPcodes': 'Cluster/ProjectController.updateLocationPcodes',
-  'GET /cluster/project/updateBeneficiariesPcodes': 'Cluster/ProjectController.updateBeneficiariesPcodes',
-  'GET /cluster/project/setBeneficiariesLocation': 'Cluster/ProjectController.setBeneficiariesLocation',
 
   // Admin Dashboard
   'POST /cluster/admin/indicator': 'Cluster/AdminDashboardController.getHealthAdminIndicator',

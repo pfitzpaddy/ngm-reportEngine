@@ -44,7 +44,12 @@ module.exports = {
 		cluster: {
 			type: 'string',
 			required: true
-		}
+		},
+    // add reference to Warehouse
+    warehouses: {
+      collection: 'warehouse',
+      via: 'organization_id'
+    }
 	}
 
 };

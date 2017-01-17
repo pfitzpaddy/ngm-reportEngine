@@ -7,63 +7,6 @@
 
 module.exports = {
 
-  //
-  setReports2015: function( req, res ) {
-    
-    // find active reports for the next reporting period
-    Report
-      .update( { report_year: { '<': 2016 } },
-               { report_status: 'pending' } )
-      .exec( function( err, reports ){
-
-        // return error
-        if ( err ) return res.negotiate( err );               
-
-        // return reports
-        return res.json( 200, { msg: 'success' } );
-
-    });
-
-  },
-
-  //
-  setReports2016: function( req, res ) {
-    
-    // find active reports for the next reporting period
-    Report
-      .update( { report_month: { '>=': 7 }, report_year: { '>=': 2016 } },
-               { report_status: 'pending' } )
-      .exec( function( err, reports ){
-
-        // return error
-        if ( err ) return res.negotiate( err );               
-
-        // return reports
-        return res.json( 200, { msg: 'success' } );
-
-    });
-
-  },  
-
-  //
-  setReports2017: function( req, res ) {
-    
-    // find active reports for the next reporting period
-    Report
-      .update( { report_year: { '>': 2016 } },
-               { report_status: 'pending' } )
-      .exec( function( err, reports ){
-
-        // return error
-        if ( err ) return res.negotiate( err );               
-
-        // return reports
-        return res.json( 200, { msg: 'success' } );
-
-    });
-
-  },
-
   // get all reports by project id
   getReportsList: function( req, res ) {
 

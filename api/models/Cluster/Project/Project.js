@@ -52,7 +52,7 @@ module.exports = {
 		target_beneficiaries: {
       collection: 'targetbeneficiaries',
       via: 'project_id'
-		},		
+		},	
     // add reference to Target Locations
     target_locations: {
       collection: 'targetlocation',
