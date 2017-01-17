@@ -292,20 +292,20 @@ module.exports = {
 
 		// vacinations
 		// 2016
-		penta3_vacc_male_under1:{
+		penta3_vacc_boys_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		penta3_vacc_female_under1:{
+		penta3_vacc_girls_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
 		// 2017
-		measles_vacc_male_under1:{
+		measles_vacc_boys_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
-		measles_vacc_female_under1:{
+		measles_vacc_girls_under1:{
 			type: 'integer',
 			defaultsTo: 0
 		},
