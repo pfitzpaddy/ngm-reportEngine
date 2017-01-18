@@ -45,24 +45,7 @@ module.exports = {
     // id params
     var organization = req.param( 'organization' );
 
-    console.log('from UI');
-    console.log(organization);
-
-    // find
-    // Warehouse
-    //   .create( organization.warehouses )    
-    //   .exec( function( err, update ){
-
-    //     // return error
-    //     if ( err ) return res.negotiate( err );
-
-
-    //     // return updated user
-    //     return res.json( 200, update );
-
-    //   })
-
-    // find
+    // update
     Organization
       .update( { id: organization.id }, organization )
       .exec( function( err, update ){
@@ -70,8 +53,18 @@ module.exports = {
         // return error
         if ( err ) return res.negotiate( err );
 
-        // return updated user
-        return res.json( 200, update );
+        Organization
+          .findOne({ id: organization.id })
+          .populate('warehouses')
+          .exec( function(err, result){
+            
+            // return error
+            if ( err ) return res.negotiate( err );
+
+            // return
+            return res.json( 200, result );
+
+          });
 
       });
 

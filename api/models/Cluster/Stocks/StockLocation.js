@@ -8,16 +8,33 @@
 module.exports = {
 
 	// connection
-	// connection: 'ngmHealthClusterServer',
+	connection: 'ngmHealthClusterServer',
 
 	// strict schema
 	schema: true,
 
 	// attributes
 	attributes: {
-		// relation
+		// add a reference to Report
+		report_id: {
+			model: 'stockreport'
+		},
+		report_month: {
+			type: 'integer',
+			required: true
+		},
+		report_year: {
+			type: 'integer',
+			required: true
+		},
+		stock_warehouse_id: {
+			type: 'string',
+			required: true
+		},
+		// user/project
 		organization_id: {
-			model: 'organization'
+			type: 'string',
+			required: true
 		},
 		organization: {
 			type: 'string',
@@ -38,8 +55,8 @@ module.exports = {
 		email: {
 			type: 'string',
 			required: true
-		},
-		// region/country id
+		},		
+		// region/country
     adminRpcode: {
 			type: 'string',
 			required: true
@@ -75,13 +92,7 @@ module.exports = {
 		conflict: {
 			type: 'boolean',
 			required: true
-		},
-		// fac_type: {
-		// 	type: 'string'
-		// },
-		// fac_type_name: {
-		// 	type: 'string'
-		// },
+		},	
 		fac_name: {
 			type: 'string',
 			required: true
@@ -101,7 +112,12 @@ module.exports = {
 		admin2lat: {
 			type: 'float',
 			required: true
-		}
+		},
+    // add reference to Beneficiaries
+    stocks: {
+      collection: 'stock',
+      via: 'location_id'
+    }
 	}
 
 };
