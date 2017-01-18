@@ -150,6 +150,32 @@ module.exports = {
 
   },
 
+  // removes reports with stock_warehouse_id
+  removeReportLocation: function( req, res ) {
+    
+    // request input
+    if ( !req.param( 'stock_warehouse_id' ) ) {
+      return res.json(401, { err: 'stock_warehouse_id required!' });
+    }
+
+    // stock_warehouse_id
+    var stock_warehouse_id = req.param( 'stock_warehouse_id' );
+
+    // update report
+    StockLocation
+      .update( { stock_warehouse_id: stock_warehouse_id }, { report_id: null } )
+      .exec( function( err, stocklocations ){
+
+        // return error
+        if ( err ) return res.negotiate( err );    
+
+        // return Report
+        return res.json( 200, stocklocations );
+
+      });
+
+  },
+
   // updates reports required for completion
     // run this 11 day of the month
   setReportsToDo: function( req, res ) {

@@ -126,37 +126,6 @@ module.exports = {
 
   				});
   		});
-  },
-
-  // after update
-  afterUpdate: function (values, cb) {
-
-  	// linked 
-  	if(values.organization_id){
-			cb();
-		}
-
-  	// un-linked 
-  	if(!values.organization_id){
-
-  		// remove primary key to reports
-  		StockLocation
-  			// .update({ stock_warehouse_id: values.id }, { report_id: null })
-  			.find({ stock_warehouse_id: values.id });
-  			.exec(function(err, stocklocations){
-
-					// return error
-					if ( err ) return cb( err );
-
-					console.log(stocklocations);
-
-					// 
-					cb();
-
-  			})
-
-  	}
-
   }
 
 };

@@ -83,6 +83,7 @@ module.exports.routes = {
   'POST /cluster/stock/getReportsList': 'Cluster/Stocks/StockReportController.getReportsList',
   'POST /cluster/stock/getReport': 'Cluster/Stocks/StockReportController.getReportById',
   'POST /cluster/stock/setReport': 'Cluster/Stocks/StockReportController.setReportById',
+  'POST /cluster/stock/removeStockLocation': 'Cluster/Stocks/StockReportController.removeReportLocation',
 
   // REPORTS
   'POST /cluster/report/getReportsList': 'Cluster/ReportController.getReportsList',
