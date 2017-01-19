@@ -18,7 +18,7 @@ module.exports = {
       return res.json( 401, { err: 'filter required!' });
     }
     
-    // get project by organization_id & status
+    // get by organization_id & status
     StockReport
       .find( req.param( 'filter' ) )
       .sort( 'report_month ASC' )
@@ -101,7 +101,7 @@ module.exports = {
         // return error
         if (err) return res.negotiate( err );
         
-        // clone project to update
+        // clone to update
         $report = report.toObject();
 
         // get report by organization_id
@@ -181,9 +181,6 @@ module.exports = {
   // opens reports
     // run this 1st day of the month
   setReportsToDo: function( req, res ) {
-
-    // active projects ids
-    var project_ids = [];
 
     // only run if date is above monthly reporting period
     if ( moment().date() === 1 ) {

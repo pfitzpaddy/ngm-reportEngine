@@ -121,8 +121,18 @@ module.exports = {
 						// return error
 						if ( err ) return cb( err );
 
+						if(!projects.length){
+
+							// add 2017
+							projects = [{
+								project_start_date: '2017-01-01',
+								project_end_date: '2017-12-31'
+							}];
+
+						}
+
 						// set
-						generateStockReports( values.organization_id, projects[0], warehouses, cb );
+						generateStockReports( values, projects[0], warehouses, cb );
 
   				});
   		});
@@ -131,7 +141,7 @@ module.exports = {
 };
 
 // 
-function generateStockReports( organization_id, project, target_locations, cb ){
+function generateStockReports( stockwarehouse, project, target_locations, cb ){
 
 	// tools
 	var moment = require('moment');
@@ -170,8 +180,8 @@ function generateStockReports( organization_id, project, target_locations, cb ){
 			stocklocations: []
 		};
 
-		// merge with project
-		report = _.merge( {}, report, project );
+		// merge with values
+		report = _.merge( {}, report, stockwarehouse );
 		delete report.id;
 
 		// add report to reports
@@ -180,12 +190,12 @@ function generateStockReports( organization_id, project, target_locations, cb ){
 	}
 
 	// get reportlocations
-	getStockReportLocations(organization_id, reports, target_locations, cb );
+	getStockReportLocations( stockwarehouse, reports, target_locations, cb );
 
 };
 
 // generate an array of reports
-function getStockReportLocations( organization_id, reports, target_locations, cb ) {
+function getStockReportLocations( stockwarehouse, reports, target_locations, cb ) {
 
 	// number of reports to update
 	var report_counter = 0,
@@ -198,12 +208,12 @@ function getStockReportLocations( organization_id, reports, target_locations, cb
 		var target_counter = 0,
 				target_length = target_locations.length;
 
-		// for project target_locations
+		// for target_locations
 		target_locations.forEach( function( target_location, t_index ) {
 
 			// existing stocklocation?
 			StockLocation
-				.find({ organization_id: organization_id,
+				.find({ organization_id: stockwarehouse.organization_id,
 										stock_warehouse_id: target_location.id,
 										report_month: report.report_month,
 										report_year: report.report_year })
