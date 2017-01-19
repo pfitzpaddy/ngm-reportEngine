@@ -398,6 +398,7 @@ module.exports = {
       // return reports
       return res.json( 200, { msg: 'Reporting not open for ' + moment().format( 'MMMM' ) + '!' } );
     }
+  }
 
 };
 
