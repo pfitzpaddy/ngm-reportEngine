@@ -5,6 +5,9 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+// set moment
+var moment = require('moment');
+
 module.exports = {
 
   // get all reports
@@ -25,8 +28,7 @@ module.exports = {
         if ( err ) return res.negotiate( err );
 
         // counter
-        var moment=require('moment'),
-            counter=0,
+        var counter=0,
             length=reports.length;
 
         // no reports
@@ -176,49 +178,75 @@ module.exports = {
 
   },
 
-  // updates reports required for completion
-    // run this 11 day of the month
+  // opens reports
+    // run this 1st day of the month
   setReportsToDo: function( req, res ) {
 
     // active projects ids
-    var moment = require('moment'),
-        project_ids = [];
+    var project_ids = [];
 
     // only run if date is above monthly reporting period
     if ( moment().date() === 1 ) {
-  
-      // find active projects
-      Project
+
+      // Perform update on all stock reports
+      Organization
         .find()
-        .where( { project_status: 'active' } )
-        .exec( function( err, projects ){
+        .populate('warehouses')
+        .exec(function(err, organizations){
 
           // return error
-          if ( err ) return res.negotiate( err );            
+          if ( err ) return res.negotiate( err );
 
-          // for each project
-          projects.forEach( function( project, i ){
+          var counter=0,
+              length=organizations.length;
 
-            // get project_id
-            project_ids.push( project.id );
+          // organization
+          organizations.forEach(function(organization,i){
+            if(organization.warehouses.length) {
+              var warehouse = organization.warehouses[organization.warehouses.length-1];
+              delete warehouse.id
 
-          });        
+              // create/delete - to run open/todo function on reports
+              StockWarehouse
+                .create( warehouse )
+                .exec( function( err, warehouse_created ) {
 
-          // find active reports for the next reporting period
-          Report
-            .update( { project_id: project_ids, report_month: moment().subtract( 1, 'M' ).month(), report_year: moment().subtract( 1, 'M' ).year() },
-                     { report_active: true, report_status: 'todo' } )
-            .exec( function( err, reports ){
+                  // return error
+                  if ( err ) return res.negotiate( err );
 
-              // return error
-              if ( err ) return res.negotiate( err );               
+                  StockWarehouse
+                    .destroy( { id: warehouse_created.id } )
+                    .exec( function( err, warehouse_deleted ) {
+                      
+                      // return error
+                      if ( err ) return res.negotiate( err );
 
-              // return reports
-              return res.json( 200, { msg: 'success' } );
+                      // remove stocklocations of warehouse
+                      StockLocation
+                        .destroy( { stock_warehouse_id: warehouse_created.id } )
+                        .exec( function( err, stocklocation_deleted ) {
+                          
+                          // return error
+                          if ( err ) return res.negotiate( err );
 
+                          counter++
+                          if(counter===length){
+                            return res.json( 200, { msg: 'success' } );
+                          }
+                        });
+                    });
+
+                });
+
+            } else {
+              counter++
+              if(counter===length){
+                return res.json( 200, { msg: 'success' } );
+              }
+            }
           });
 
-      });
+        });
 
     } else {
 
@@ -232,107 +260,58 @@ module.exports = {
     // run this on return of above method on 11 day of the month
   setReportsOpen: function( req, res ) {
 
-    // active projects ids
-    var moment = require('moment'),
-        project_ids = [],
-        notification = {},
-        counter = 0;
-
     // only run if date is above monthly reporting period
     if ( moment().date() === 1 ) {
-      
-      // find active projects
-      Project
-        .find()
-        .where( { project_status: 'active' } )
-        .exec( function( err, projects ){
+
+      // find active reports for the next reporting period
+      StockReport
+        .update( { report_month: moment().subtract( 1, 'M' ).month(), 
+                    report_year: moment().subtract( 1, 'M' ).year() },
+                { report_active: true, report_status: 'todo' } )
+        .exec( function( err, reports ){
 
           // return error
           if ( err ) return res.negotiate( err );
 
-          // for each project
-          projects.forEach( function( project, i ) {
+          // track 
+          var counter=0,
+              length=reports.length;
 
-            // get project_id
-            project_ids.push( project.id );
+          // each report (only one stock report per org)
+          reports.forEach(function(report,i){
 
-          });
+            // send email
+            sails.hooks.email.send( 'notification-open', {
+                type: 'Stock',
+                username: report.username,
+                email: report.email,
+                report_month:  moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase(),
+                reports: [{
+                  project_title: report.organization,
+                  report_url: req.protocol + '://' + req.host + '/desk/#/cluster/stocks/report/' + report.organization_id + '/' + report.id
+                }],
+                sendername: 'ReportHub'
+              }, {
+                to: report.email,
+                subject: 'ReportHub - Stock Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
+              }, function(err) {
+                
+                // return error
+                if (err) return res.negotiate( err );
 
-          // find active reports for the next reporting period
-            // chaining reads easier!
-          Report
-            .find()
-            .where( { project_id: project_ids } )
-            .where( { report_month: moment().subtract( 1, 'M' ).month() } )
-            .where( { report_year: moment().subtract( 1, 'M' ).year() } )
-            .where( { report_active: true } )
-            .where( { report_status: 'todo' } )
-            .exec( function( err, reports ){
-
-              // return error
-              if ( err ) return res.negotiate( err );
-
-              // no reports return
-              if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );              
-
-              // for each report, group by username
-              reports.forEach( function( report, i ) {
-
-                // if username dosnt exist
-                if ( !notification[ report.username ] ) {
-
-                  // add for notification email template
-                  notification[ report.username ] = {
-                    username: report.username,
-                    email: report.email,
-                    report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
-                    reports: []
-                  };
+                // add to counter
+                counter++;
+                // return 
+                if ( counter === length ) {
+                  // email sent
+                  return res.json(200, { 'data': 'success' });
                 }
 
-                // add report urls
-                notification[ report.username ].reports.push({
-                  project_title: report.project_title,
-                  report_url: req.protocol + '://' + req.host + '/#/cluster/projects/report/' + report.project_id + '/' + report.id
-                });
-
-              });
-
-              // each user, send only one email!
-              for ( var user in notification ) {
-
-                // send email
-                sails.hooks.email.send( 'notification-open', {
-                    username: notification[ user ].username,
-                    email: notification[ user ].email,
-                    report_month: notification[ user ].report_month,
-                    reports: notification[ user ].reports,
-                    sendername: 'ReportHub'
-                  }, {
-                    to: notification[ user ].email,
-                    subject: 'ReportHub - Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
-                  }, function(err) {
-                    
-                    // return error
-                    if (err) return res.negotiate( err );
-
-                    // add to counter
-                    counter++;
-
-                    // return 
-                    if ( counter === Object.keys( notification ).length ) {
-                      
-                      // email sent
-                      return res.json(200, { 'data': 'success' });
-                    }
-
-                  });
-
-              }
+              });            
 
           });
 
-      });
+      });   
 
     } else {
 
@@ -345,116 +324,80 @@ module.exports = {
   // sends reminder for active reports not yet submitted
   setReportsReminder: function( req, res ) {
 
-    // active projects ids
-    var moment = require('moment'),
-        project_ids = [],
-        notification = {},
-        counter = 0;
+    // 
+    var reportToDoList = {}
 
-    // only run if date is 1 week before monthly reporting period required
+    // only run if date is above monthly reporting period
     if ( moment().date() >= 10 ) {
-      
-      // find active projects
-      Project
-        .find( { project_status: 'active' } )
-        .exec( function( err, projects ){
+
+      // find active reports for the next reporting period
+      StockReport
+        .find( { report_month: { '<=': moment().subtract( 1, 'M' ).month() }, 
+                    report_year: moment().subtract( 1, 'M' ).year(),
+                    report_active: true, 
+                    report_status: 'todo' } )
+        .exec( function( err, reports ){
 
           // return error
           if ( err ) return res.negotiate( err );
 
-          // for each project
-          projects.forEach( function( project, i ) {
+          // track 
+          var counter=0,
+              length=reports.length;
 
-            // get project_id
-            project_ids.push( project.id );
-
+          // gather outstanding stock reports
+          reports.forEach(function(report,i){
+            if(!reportToDoList[report.organization]){
+              reportToDoList[report.organization] = [];
+            }
+            // push
+            reportToDoList[report.organization].push({
+              project_title: report.organization,
+              report_month: moment().month( report.report_month ).format( 'MMMM' ),
+              report_url: req.protocol + '://' + req.host + '/desk/#/cluster/stocks/report/' + report.organization_id + '/' + report.id
+            })
           });
 
-          // find active reports for the next reporting period
-            // chaining reads easier!
-          Report
-            .find()
-            .where( { project_id: project_ids } )
-            .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
-            .where( { report_active: true } )
-            .where( { report_status: 'todo' } )
-            .exec( function( err, reports ){
 
-              // return error
-              if ( err ) return res.negotiate( err );
+          // each report (only one stock report per org)
+          reports.forEach(function(report,i){
 
-              // no reports return
-              if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+            // send email
+            sails.hooks.email.send( 'notification-due', {
+                type: 'Stock',
+                username: report.username,
+                email: report.email,
+                report_month:  moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase(),
+                reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
+                reports: reportToDoList[report.organization],
+                sendername: 'ReportHub'
+              }, {
+                to: report.email,
+                subject: 'ReportHub - Stock Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
+              }, function(err) {
+                
+                // return error
+                if (err) return res.negotiate( err );
 
-              // for each report, group by username
-              reports.forEach( function( report, i ) {
-
-                // if username dosnt exist
-                if ( !notification[ report.username ] ) {
-
-                  // add for notification email template
-                  notification[ report.username ] = {
-                    username: report.username,
-                    email: report.email,
-                    report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
-                    reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
-                    reports: []
-                  };
+                // add to counter
+                counter++;
+                // return 
+                if ( counter === length ) {
+                  // email sent
+                  return res.json(200, { 'data': 'success' });
                 }
 
-                // add report urls
-                notification[ report.username ].reports.push({
-                  project_title: report.project_title,
-                  report_month: moment().month( report.report_month ).format( 'MMMM' ),
-                  report_url: req.protocol + '://' + req.host + '/#/cluster/projects/report/' + report.project_id + '/' + report.id
-                });
-
-              });
-
-              // each user, send only one email!
-              for ( var user in notification ) {
-
-                // send email
-                sails.hooks.email.send( 'notification-due', {
-                    username: notification[ user ].username,
-                    email: notification[ user ].email,
-                    report_month: notification[ user ].report_month,
-                    reporting_due_date: notification[ user ].reporting_due_date,
-                    reports: notification[ user ].reports,
-                    sendername: 'ReportHub'
-                  }, {
-                    to: notification[ user ].email,
-                    subject: 'ReportHub - Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + ' is Due Soon!'
-                  }, function(err) {
-                    
-                    // return error
-                    if (err) return res.negotiate( err );
-
-                    // add to counter
-                    counter++;
-                    
-                    // return 
-                    if ( counter === Object.keys( notification ).length ) {
-                      
-                      // email sent
-                      return res.json( 200, { 'data': 'success' });
-                    }
-
-                  });
-
-              }
-
-            });
+              });            
 
           });
 
-      } else {
+      });
 
-        // return reports
-        return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
-      }
+    } else {
 
-  }
+      // return reports
+      return res.json( 200, { msg: 'Reporting not open for ' + moment().format( 'MMMM' ) + '!' } );
+    }
 
 };
 

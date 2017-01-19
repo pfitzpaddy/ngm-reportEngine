@@ -8,13 +8,13 @@
 	<body>
 		<p>Hi <%= username %>,</p>
 		<p>
-			The reporting period for <b><%= report_month %></b> is now open! Follow the links below to complete the report
+			The <%= type %> reporting period for <b><%= report_month %></b> is now open! Follow the links below to complete the report
 			<ul>
 			<% for(var i=0; i < reports.length; i++) { %>
 				<li><%= reports[i].project_title %></li>
 				<ul>
 					<li>
-						<a title="<%= report_month %> Report" href="<%= reports[i].report_url %>"><%= report_month %> Report</a>
+						<a title="<%= report_month %> <%= type %> Report" href="<%= reports[i].report_url %>"><%= report_month %> <%= type %> Report</a>
 					</li>
 				</ul>
 				<br/>

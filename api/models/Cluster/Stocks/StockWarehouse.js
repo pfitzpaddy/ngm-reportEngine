@@ -174,16 +174,10 @@ function generateStockReports( organization_id, project, target_locations, cb ){
 		report = _.merge( {}, report, project );
 		delete report.id;
 
-		// add report stocklocations
-		// report.stocklocations = getStockReportLocations( target_locations );
-
 		// add report to reports
 		reports.push( report );
 
 	}
-
-	// return the reports for the project period
-	// return reports;
 
 	// get reportlocations
 	getStockReportLocations(organization_id, reports, target_locations, cb );
@@ -200,7 +194,7 @@ function getStockReportLocations( organization_id, reports, target_locations, cb
 	// reports
 	reports.forEach(function(report, r_index){
 
-		//
+		// set
 		var target_counter = 0,
 				target_length = target_locations.length;
 
