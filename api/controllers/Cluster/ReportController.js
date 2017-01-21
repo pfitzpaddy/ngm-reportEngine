@@ -7,63 +7,6 @@
 
 module.exports = {
 
-  //
-  setReports2015: function( req, res ) {
-    
-    // find active reports for the next reporting period
-    Report
-      .update( { report_year: { '<': 2016 } },
-               { report_status: 'pending' } )
-      .exec( function( err, reports ){
-
-        // return error
-        if ( err ) return res.negotiate( err );               
-
-        // return reports
-        return res.json( 200, { msg: 'success' } );
-
-    });
-
-  },
-
-  //
-  setReports2016: function( req, res ) {
-    
-    // find active reports for the next reporting period
-    Report
-      .update( { report_month: { '>=': 7 }, report_year: { '>=': 2016 } },
-               { report_status: 'pending' } )
-      .exec( function( err, reports ){
-
-        // return error
-        if ( err ) return res.negotiate( err );               
-
-        // return reports
-        return res.json( 200, { msg: 'success' } );
-
-    });
-
-  },  
-
-  //
-  setReports2017: function( req, res ) {
-    
-    // find active reports for the next reporting period
-    Report
-      .update( { report_year: { '>': 2016 } },
-               { report_status: 'pending' } )
-      .exec( function( err, reports ){
-
-        // return error
-        if ( err ) return res.negotiate( err );               
-
-        // return reports
-        return res.json( 200, { msg: 'success' } );
-
-    });
-
-  },
-
   // get all reports by project id
   getReportsList: function( req, res ) {
 
@@ -320,7 +263,7 @@ module.exports = {
                 // add report urls
                 notification[ report.username ].reports.push({
                   project_title: report.project_title,
-                  report_url: req.protocol + '://' + req.host + '/#/cluster/projects/report/' + report.project_id + '/' + report.id
+                  report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + report.project_id + '/' + report.id
                 });
 
               });
@@ -330,14 +273,15 @@ module.exports = {
 
                 // send email
                 sails.hooks.email.send( 'notification-open', {
+                    type: 'Project',
                     username: notification[ user ].username,
                     email: notification[ user ].email,
-                    report_month: notification[ user ].report_month,
+                    report_month: notification[ user ].report_month.toUpperCase(),
                     reports: notification[ user ].reports,
                     sendername: 'ReportHub'
                   }, {
                     to: notification[ user ].email,
-                    subject: 'ReportHub - Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + ' Now Open!'
+                    subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
                   }, function(err) {
                     
                     // return error
@@ -433,7 +377,7 @@ module.exports = {
                 notification[ report.username ].reports.push({
                   project_title: report.project_title,
                   report_month: moment().month( report.report_month ).format( 'MMMM' ),
-                  report_url: req.protocol + '://' + req.host + '/#/cluster/projects/report/' + report.project_id + '/' + report.id
+                  report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + report.project_id + '/' + report.id
                 });
 
               });
@@ -443,15 +387,16 @@ module.exports = {
 
                 // send email
                 sails.hooks.email.send( 'notification-due', {
+                    type: 'Project',
                     username: notification[ user ].username,
                     email: notification[ user ].email,
-                    report_month: notification[ user ].report_month,
+                    report_month: notification[ user ].report_month.toUpperCase(),
                     reporting_due_date: notification[ user ].reporting_due_date,
                     reports: notification[ user ].reports,
                     sendername: 'ReportHub'
                   }, {
                     to: notification[ user ].email,
-                    subject: 'ReportHub - Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + ' is Due Soon!'
+                    subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' is Due Soon!'
                   }, function(err) {
                     
                     // return error

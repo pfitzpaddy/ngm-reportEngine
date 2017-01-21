@@ -82,6 +82,11 @@ module.exports.policies = {
     '*': true
   },
 
+    // public
+  'Cluster/Stocks/StockReportController': {
+    '*': true
+  },
+
   /***************************************************************************
   *                                                                          *
   * Here's an example of mapping some policies to run before a controller    *

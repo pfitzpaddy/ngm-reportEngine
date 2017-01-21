@@ -36,11 +36,15 @@ module.exports.routes = {
   'GET /login': 'UserController.login',
   'POST /login': 'UserController.login',
   'POST /create': 'UserController.create',
-  'GET /getOrganization': 'UserController.getOrganization',
-  'POST /getOrganization': 'UserController.getOrganization',
   'POST /update': 'UserController.updateLogin',
   'POST /send-email': 'UserController.passwordResetEmail',
   'POST /password-reset': 'UserController.passwordReset',
+
+  // org
+  'GET /getOrganization': 'OrganizationController.getOrganization',
+  'POST /getOrganization': 'OrganizationController.getOrganization',
+  'GET /setOrganization': 'OrganizationController.setOrganization',
+  'POST /setOrganization': 'OrganizationController.setOrganization',
 
   // Metrics
   'POST /metrics/set': 'MetricsController.set',
@@ -58,40 +62,33 @@ module.exports.routes = {
 
 
   // CLUSTER
-  
   // Locaiton lists
   'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
   'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
-
-  // collection updates ( general )
-  'GET /cluster/project/updateTargetBeneficiaries': 'Cluster/ProjectController.updateTargetBeneficiaries',
-  'GET /cluster/project/updateTargetLocations': 'Cluster/ProjectController.updateTargetLocations',
-  'GET /cluster/project/updateLocations': 'Cluster/ProjectController.updateLocations',
-  'GET /cluster/project/updateBeneficiaries': 'Cluster/ProjectController.updateBeneficiaries',
-  // collection updates ( pcodes )
-  'GET /cluster/project/updateProjectPcodes': 'Cluster/ProjectController.updateProjectPcodes',
-  'GET /cluster/project/updateTargetLocationPcodes': 'Cluster/ProjectController.updateTargetLocationPcodes',
-  'GET /cluster/project/updateLocationPcodes': 'Cluster/ProjectController.updateLocationPcodes',
-  'GET /cluster/project/updateBeneficiariesPcodes': 'Cluster/ProjectController.updateBeneficiariesPcodes',
-  'GET /cluster/project/setBeneficiariesLocation': 'Cluster/ProjectController.setBeneficiariesLocation',
-
   // Admin Dashboard
   'POST /cluster/admin/indicator': 'Cluster/AdminDashboardController.getHealthAdminIndicator',
-
   // Cluster Activities
   'GET /cluster/getActivities': 'Cluster/ProjectController.getActivities',
-
   // Cluster Indicators
   'GET /cluster/getIndicators': 'Cluster/IndicatorsController.getIndicators',  
 
-  // Projects
+  // PROJECTS
   'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
-  // get project details, locations, beneficiaries
   'POST /cluster/project/getProject': 'Cluster/ProjectController.getProjectById',
   'POST /cluster/project/setProject': 'Cluster/ProjectController.setProjectById',
   'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
-  // get project reports
+
+  // STOCK REPORTS
+  'POST /cluster/stock/getReportsList': 'Cluster/Stocks/StockReportController.getReportsList',
+  'POST /cluster/stock/getReport': 'Cluster/Stocks/StockReportController.getReportById',
+  'POST /cluster/stock/setReport': 'Cluster/Stocks/StockReportController.setReportById',
+  'POST /cluster/stock/removeStockLocation': 'Cluster/Stocks/StockReportController.removeReportLocation',
+  'GET /cluster/stock/setReportsToDo': 'Cluster/Stocks/StockReportController.setReportsToDo',
+  'GET /cluster/stock/setReportsOpen': 'Cluster/Stocks/StockReportController.setReportsOpen',
+  'GET /cluster/stock/setReportsReminder': 'Cluster/Stocks/StockReportController.setReportsReminder',
+
+  // REPORTS
   'POST /cluster/report/getReportsList': 'Cluster/ReportController.getReportsList',
   'POST /cluster/report/getReport': 'Cluster/ReportController.getReportById',
   'POST /cluster/report/setReport': 'Cluster/ReportController.setReportById',
