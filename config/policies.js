@@ -58,6 +58,11 @@ module.exports.policies = {
   },
 
   // public
+  'Epr/EprDashboardController': {
+    '*': true
+  },
+
+  // public
   'Cluster/AdminDashboardController': {
     'getHealthAdminIndicator': true
   },
