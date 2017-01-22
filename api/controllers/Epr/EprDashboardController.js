@@ -389,7 +389,7 @@ var EprDashboard = {
                                 '<div class="count" style="text-align:center">' + d.deaths + '</div> deaths <br/><br/>' + 
                               '</div>' +
                               '<div>' +
-                                '<div style="text-align:center"> with <span class="count">' + d.casualties + '</span> casualties from ' + d.disaster_type.replace(/_/g, ' ').toUpperCase() + ' disaster' +
+                                '<div style="text-align:center"> with <span class="count">' + d.casualties + '</span> casualties from ' + d.disaster_type.replace(/_/g, ' ').toUpperCase() + ' incident' +
                               '</div>' +  
                               '<div>' +
                                 '<div style="text-align:center">Incident Category: ' + d['disaster_' + d.disaster_type + '_categories'].replace(/_/g, ' ').toUpperCase() +
