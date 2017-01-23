@@ -29,7 +29,7 @@ module.exports = {
 					'5': 'AWD and Dehydration',
 					'6': 'Cough and Cold',
 					'7': 'Diphtheria',
-					'8': 'Hemorrhagic Fever',
+					'8': 'Haemorrhagic Fever',
 					'9': 'Malaria',
 					'10': 'Measles',
 					'11': 'Meningitis',
@@ -37,7 +37,7 @@ module.exports = {
 					'13': 'Pertussis',
 					'14': 'Pneumonia',
 					'15': 'Tetanus',
-					'16': 'Tyhoid Fever'
+					'16': 'Typhoid Fever'
 				},
 
 				// set cmd
