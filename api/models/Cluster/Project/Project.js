@@ -91,7 +91,7 @@ module.exports = {
 		},
 		// 2017
 		activity_type: {
-			type: 'string',
+			type: 'array',
 			required: true
 		},
 		activity_description: {

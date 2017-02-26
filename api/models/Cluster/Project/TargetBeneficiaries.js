@@ -63,32 +63,40 @@ module.exports = {
 		project_title: {
 			type: 'string'
 		},
-		// 2016
-		project_type: {
-			type: 'array'
-		},
-		project_type_other: {
-			type: 'string'
-		},
-		project_description: {
-			type: 'string'
-		},
-		// 2017
-		activity_type: {
+		
+		// activity_type
+		activity_type_id: {
 			type: 'string',
 			required: true
 		},
-		activity_description: {
-			type: 'array'//,
-			// required: true
-		},
-		beneficiary_name: {
+		activity_type_name: {
 			type: 'string',
 			required: true
 		},
-		beneficiary_type: {
+
+		// indicator -> activity_description
+		activity_description_id: {
 			type: 'string',
 			required: true
+		},
+		activity_description_name: {
+			type: 'string',
+			required: true
+		},
+				
+		// beneficiary
+		beneficiary_type_id: {
+			type: 'string',
+			required: true
+		},
+		beneficiary_type_name: {
+			type: 'string',
+			required: true
+		},
+
+		families:{
+			type: 'integer',
+			defaultsTo: 0			
 		},
 		boys:{
 			type: 'integer',
@@ -106,11 +114,37 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		// 2017 
-		// esnfi
-		families: {
-			type: 'integer',
-			defaultsTo: 0
+
+
+		/*********** Update for 2017 *************/ 
+		// 2017
+		activity_type: {
+			type: 'string'
+		},
+		activity_description: {
+			type: 'array'//,
+			// required: true
+		},
+		beneficiary_name: {
+			type: 'string',
+			required: true
+		},
+		beneficiary_type: {
+			type: 'string',
+			required: true
+		},
+
+
+		/*********** 2016 - Not default *************/ 
+		// 2016
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
+		},
+		project_description: {
+			type: 'string'
 		},
 		capacity_building_topic: {
 			type: 'string'

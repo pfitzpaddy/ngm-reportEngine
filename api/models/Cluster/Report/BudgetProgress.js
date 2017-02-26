@@ -75,16 +75,20 @@ module.exports = {
 		},
 		// 2017
 		activity_type: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		activity_description: {
-			type: 'array'//,
-			// required: true
+			type: 'array'
 		},
 		project_donor: {
 			type: 'array'
 		},	
+		project_donor_id: {
+			type: 'string'
+		},
+		project_donor_name: {
+			type: 'string'
+		},
 		project_title: {
 			type: 'string',
 			required: true
