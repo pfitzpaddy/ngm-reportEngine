@@ -83,7 +83,7 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-				
+
 		// beneficiary
 		beneficiary_type_id: {
 			type: 'string',
@@ -126,12 +126,10 @@ module.exports = {
 			// required: true
 		},
 		beneficiary_name: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		beneficiary_type: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 
 

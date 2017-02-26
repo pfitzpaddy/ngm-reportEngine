@@ -99,12 +99,10 @@ module.exports = {
 		},
 		// 2017
 		activity_type: {
-			type: 'string',
-			required: true
+			type: 'array'
 		},
 		activity_description: {
-			type: 'array'//,
-			// required: true
+			type: 'array'
 		},
 		beneficiary_type: {
 			type: 'array',
@@ -114,7 +112,7 @@ module.exports = {
 			type: 'boolean',
 			required: true
 		},
-		fac_type: {
+		fac_type_id: {
 			type: 'string'
 		},
 		fac_type_name: {
@@ -140,24 +138,7 @@ module.exports = {
 			type: 'float',
 			required: true
 		}
-	},
-
-	// add project_id from locations 
-	// beforeCreate: function( $location, next ) {
-
-	// 	// get location
-	// 	Project.findOne().where( { id: $location.project_id } ).exec(function(err, project){
-
-	// 		// add project details
-	// 		$location.project_title = project.project_title;
-	// 		$location.project_type = project.project_type;
-
-	// 		// 'next!'
-	// 		next();
-
-	// 	});
-
-	// }
+	}
 
 };
 

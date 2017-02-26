@@ -160,18 +160,13 @@ function generateStockReports( stockwarehouse, project, target_locations, cb ){
 		// report is true
 		var report_active = true;
 
-		// should be reports just for 2016 period!
+		// should be reports just for 2017 period!
 		if ( moment( s_date ).add( m, 'M' ).year() < 2017  ) {
 			report_active = false;
 		}
 
 		// report_status 'todo' open from 1st of next month
 		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).endOf( 'month' ) ) >= 0 ? 'todo' : 'pending';
-
-		// temp check to get Jan displaying ahead of time!
-		if ( moment( s_date ).add( m, 'M' ).month() === 0 && moment( s_date ).add( m, 'M' ).year() === 2017  ) {
-			report_status = 'todo';
-		}		
 
 		// create report
 		var report = {

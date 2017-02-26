@@ -247,8 +247,8 @@ function getProjectReports( project, target_locations ) {
 		// report is true
 		var report_active = true;
 
-		// should be reports just for 2016 period!
-		if ( moment( s_date ).add( m, 'M' ).year() < 2016  ) {
+		// should be reports just for 2017 period!
+		if ( moment( s_date ).add( m, 'M' ).year() < 2017 ) {
 			report_active = false;
 		}
 

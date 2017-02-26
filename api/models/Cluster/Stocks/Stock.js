@@ -123,11 +123,11 @@ module.exports = {
 		},
 
 		// stocks
-		stock_item_name: {
+		stock_item_type: {
 			type: 'string',
 			required: true
 		},
-		stock_item_type: {
+		stock_item_name: {
 			type: 'string',
 			required: true
 		},
