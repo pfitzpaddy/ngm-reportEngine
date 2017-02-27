@@ -376,6 +376,9 @@ function updateProjectReports( reports, next ) {
 
 								// add beneficiaries if existing
 								if ( location.beneficiaries.length ) {
+									if( !reports[ r_index ].locations[ l_index ] ){
+										reports[ r_index ].locations[ l_index ].beneficiaries = [];
+									}
 									reports[ r_index ].locations[ l_index ].beneficiaries = location.beneficiaries;
 								}
 								
