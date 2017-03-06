@@ -15,8 +15,23 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		
-		// user/project
+		// region/country
+    adminRpcode: {
+			type: 'string',
+			required: true
+    },
+    adminRname: {
+			type: 'string',
+			required: true
+    },
+    admin0pcode: {
+			type: 'string',
+			required: true
+    },
+    admin0name: {
+			type: 'string',
+			required: true
+    },
 		organization_id: {
 			type: 'string',
 			required: true
@@ -47,29 +62,45 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		project_status: {
+			type: 'string',
+			defaultsTo: 'new'
+		},
 		project_title: {
 			type: 'string',
 			required: true
 		},
+		project_description: {
+			type: 'string',
+			required: true
+		},
+		project_start_date: {
+			type: 'date',
+			required: true
+		},
+		project_end_date: {
+			type: 'date',
+			required: true
+		},
+		project_budget: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_rnr_chapter: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		project_donor: {
+			type: 'array'
+		},
 
-		// activity_type
-		activity_type_id: {
-			type: 'string',
-			required: true
-		},
-		activity_type_name: {
-			type: 'string',
-			required: true
-		},
-
-		// indicator -> activity_description
-		activity_description_id: {
-			type: 'string',
-			required: true
-		},
-		activity_description_name: {
-			type: 'string',
-			required: true
+		// SOs
+		strategic_objectives: {
+			type: 'array'
 		},
 
 		// report
@@ -90,12 +121,42 @@ module.exports = {
 			required: true
 		},
 
+		// category
+		category_type_id: {
+			type: 'string',
+			required: true
+		},
+		category_type_name: {
+			type: 'string',
+			required: true
+		},
+
 		// beneficiary
 		beneficiary_type_id: {
 			type: 'string',
 			required: true
 		},
 		beneficiary_type_name: {
+			type: 'string',
+			required: true
+		},		
+
+		// activity_type
+		activity_type_id: {
+			type: 'string',
+			required: true
+		},
+		activity_type_name: {
+			type: 'string',
+			required: true
+		},
+
+		// activity_description
+		activity_description_id: {
+			type: 'string',
+			required: true
+		},
+		activity_description_name: {
 			type: 'string',
 			required: true
 		},
@@ -110,7 +171,11 @@ module.exports = {
 			required: true
 		},
 
-		// activity_description -> indicator
+		// indicator
+		households:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 		families: {
 			type: 'integer',
 			defaultsTo: 0
@@ -131,7 +196,14 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-		// education/training
+		elderly_men:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		elderly_women:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 		sessions:{
 			type: 'integer',
 			defaultsTo: 0
@@ -142,23 +214,7 @@ module.exports = {
       model: 'location'
     },
 		
-		// location -> region/country/admin1/admin2
-    adminRpcode: {
-			type: 'string',
-			required: true
-    },
-    adminRname: {
-			type: 'string',
-			required: true
-    },
-    admin0pcode: {
-			type: 'string',
-			required: true
-    },
-    admin0name: {
-			type: 'string',
-			required: true
-    },
+		// location
 		admin1pcode: {
 			type: 'string',
 			required: true
@@ -211,16 +267,12 @@ module.exports = {
 
 
 
-		/*********** 2016 - Not default *************/ 
-		
+		/*********** 2016 *************/
 		// Project details
 		project_type: {
 			type: 'array'
 		},
 		project_type_other: {
-			type: 'string'
-		},
-		project_description: {
 			type: 'string'
 		},
 		activity_type: {

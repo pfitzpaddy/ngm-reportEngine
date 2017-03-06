@@ -72,12 +72,24 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		
 		// add a reference to Project
 		project_id: {
 			model: 'project'
 		},
+
+		// project
+		project_status: {
+			type: 'string',
+			defaultsTo: 'new'
+		},
 		project_title: {
-			type: 'string'
+			type: 'string',
+			required: true
+		},
+		project_description: {
+			type: 'string',
+			required: true
 		},
 		project_start_date: {
 			type: 'date',
@@ -87,27 +99,35 @@ module.exports = {
 			type: 'date',
 			required: true
 		},
-		// 2016
-		project_type: {
+		project_budget: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_rnr_chapter: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		project_donor: {
 			type: 'array'
 		},
-		project_type_other: {
-			type: 'string'
-		},
-		project_description: {
-			type: 'string'
-		},
-		// 2017
 		activity_type: {
-			type: 'array'
+			type: 'array',
+			required: true
 		},
 		activity_description: {
 			type: 'array'
 		},
-		beneficiary_type: {
-			type: 'array',
-			required: true
+
+		// SOs
+		strategic_objectives: {
+			type: 'array'
 		},
+
+		// target location
 		conflict: {
 			type: 'boolean',
 			required: true
@@ -137,8 +157,19 @@ module.exports = {
 		admin2lat: {
 			type: 'float',
 			required: true
+		},
+
+
+		
+
+		/*********** 2016 *************/
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
 		}
+
 	}
 
 };
-

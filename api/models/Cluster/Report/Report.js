@@ -15,7 +15,7 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		// region/country id
+		// region/country
     adminRpcode: {
 			type: 'string',
 			required: true
@@ -32,10 +32,6 @@ module.exports = {
 			type: 'string',
 			required: true
     },
-		project_id: {
-			type: 'string',
-			required: true
-		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -60,6 +56,80 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
+		// project
+		project_id: {
+			type: 'string',
+			required: true
+		},
+		project_status: {
+			type: 'string',
+			defaultsTo: 'new'
+		},
+		project_title: {
+			type: 'string',
+			required: true
+		},
+		project_description: {
+			type: 'string',
+			required: true
+		},
+		project_start_date: {
+			type: 'date',
+			required: true
+		},
+		project_end_date: {
+			type: 'date',
+			required: true
+		},
+		project_budget: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_rnr_chapter: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		project_donor: {
+			type: 'array'
+		},
+		activity_type: {
+			type: 'array',
+			required: true
+		},
+		activity_description: {
+			type: 'array'
+		},
+
+		// SOs
+		strategic_objectives: {
+			type: 'array'
+		},
+
+		// target beneficiaries
+		category_type: {
+			type: 'array'
+		},
+		beneficiary_type: {
+			type: 'array',
+			required: true
+		},
+
+		// target locations
+		admin1pcode: {
+			type: 'array',
+			required: true
+		},
+		admin2pcode: {
+			type: 'array',
+			required: true
+		},
+
+		// report
 		report_active: {
 			type: 'boolean',
 			defaultsTo: true
@@ -87,29 +157,7 @@ module.exports = {
 			type: 'date',
 			required: true
 		},
-		project_title: {
-			type: 'string',
-			required: true
-		},
-		// 2016
-		project_type: {
-			type: 'array'
-		},
-		project_type_other: {
-			type: 'string'
-		},
-		project_description: {
-			type: 'string'
-		},
-		// 2017
-		activity_type: {
-			type: 'string',
-			required: true
-		},
-		activity_description: {
-			type: 'array'//,
-			// required: true
-		},
+
     // add reference to Locations
     locations: {
       collection: 'location',
@@ -117,8 +165,18 @@ module.exports = {
     },
     notes: {
     	type: 'string'
-    }
-	
+    },
+
+
+
+		/*********** 2016 *************/
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
+		}
+
 	}
 
 };

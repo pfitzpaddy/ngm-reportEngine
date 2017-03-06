@@ -48,6 +48,15 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		email: {
+			type: 'string',
+			required: true
+		},
+
 		// add reference to Target beneficiaries
 		target_beneficiaries: {
       collection: 'targetbeneficiaries',
@@ -63,14 +72,8 @@ module.exports = {
       collection: 'budgetprogress',
       via: 'project_id'
 		},
-		username: {
-			type: 'string',
-			required: true
-		},
-		email: {
-			type: 'string',
-			required: true
-		},
+
+		// project
 		project_status: {
 			type: 'string',
 			defaultsTo: 'new'
@@ -79,42 +82,7 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		// 2016
-		project_type: {
-			type: 'array'
-		},
-		project_type_other: {
-			type: 'string'
-		},
 		project_description: {
-			type: 'string'
-		},
-		// 2017
-		activity_type: {
-			type: 'array',
-			required: true
-		},
-		activity_description: {
-			type: 'array'//,
-			// required: true
-		},
-		activity_description_other: {
-			type: 'string'
-		},
-		project_code: {
-			type: 'string'
-		},
-		project_donor: {
-			type: 'array'
-		},
-		project_donor_other: {
-			type: 'string'
-		},
-		project_budget: {
-			type: 'integer',
-			required: true
-		},
-		project_budget_currency: {
 			type: 'string',
 			required: true
 		},
@@ -126,21 +94,44 @@ module.exports = {
 			type: 'date',
 			required: true
 		},
-		implementing_partners_checked: {
+		project_budget: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_rnr_chapter: {
 			type: 'boolean',
 			defaultsTo: false
 		},
-		implementing_partners: {
-			type: 'string'
+		project_donor: {
+			type: 'array'
 		},
-		project_description: {
-			type: 'string',
+		activity_type: {
+			type: 'array',
 			required: true
+		},
+		activity_description: {
+			type: 'array'
+		},
+
+		// SOs
+		strategic_objectives: {
+			type: 'array'
+		},
+
+		// target beneficiaries
+		category_type: {
+			type: 'array'
 		},
 		beneficiary_type: {
 			type: 'array',
 			required: true
 		},
+
+		// target locations
 		admin1pcode: {
 			type: 'array',
 			required: true
@@ -148,7 +139,36 @@ module.exports = {
 		admin2pcode: {
 			type: 'array',
 			required: true
+		},
+
+
+
+
+
+		/*********** 2016 *************/ 
+		project_code: {
+			type: 'string'
+		},
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
+		},
+		project_donor_other: {
+			type: 'string'
+		},
+		activity_description_other: {
+			type: 'string'
+		},
+		implementing_partners_checked: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		implementing_partners: {
+			type: 'string'
 		}
+
 	},
 
 	// add reports to project with project locations
@@ -231,7 +251,7 @@ function getProjectReports( project, target_locations ) {
 
 	// tools
 	var moment = require('moment'),
-			_under = require("underscore");
+			_under = require('underscore');
 	// variables
 	var reports = [],
 			// set start date / end date to start and end of respective months
@@ -273,7 +293,7 @@ function getProjectReports( project, target_locations ) {
 		delete report.id;
 
 		// add report locations
-		report.locations = getProjectReportLocations( target_locations );
+		report.locations = getProjectReportLocations( report, target_locations );
 
 		// add report to reports
 		reports.push( report );
@@ -286,10 +306,11 @@ function getProjectReports( project, target_locations ) {
 };
 
 // generate an array of reports
-function getProjectReportLocations( target_locations ) {
+function getProjectReportLocations( report, target_locations ) {
 
 	// variables
-	var locations = [];
+	var locations = [],
+			_under = require('underscore');
 
 	// for project target_locations
 	target_locations.forEach( function( target_location, t_index ) {
@@ -298,9 +319,11 @@ function getProjectReportLocations( target_locations ) {
 		var l = target_location.toObject();
 				delete l.id;
 
-		locations.push( l );
+		locations.push( _under.extend( {}, l, report) );
 		
 	});
+
+	console.log(locations);
 
 	// return locations array
 	return locations;

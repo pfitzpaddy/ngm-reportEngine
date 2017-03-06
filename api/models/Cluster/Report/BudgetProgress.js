@@ -56,46 +56,82 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
 		// add a reference to Project
 		project_id: {
 			model: 'project'
 		},
-		project_code: {
-			type: 'string'
-		},
-		// 2016
-		project_type: {
-			type: 'array'
-		},
-		project_type_other: {
-			type: 'string'
-		},
-		project_description: {
-			type: 'string'
-		},
-		// 2017
-		activity_type: {
-			type: 'string'
-		},
-		activity_description: {
-			type: 'array'
-		},
-		project_donor: {
-			type: 'array'
-		},	
-		project_donor_id: {
-			type: 'string'
-		},
-		project_donor_name: {
+
+		// project
+		project_status: {
 			type: 'string'
 		},
 		project_title: {
 			type: 'string',
 			required: true
 		},
+		project_description: {
+			type: 'string',
+			required: true
+		},
+		project_start_date: {
+			type: 'date',
+			required: true
+		},
+		project_end_date: {
+			type: 'date',
+			required: true
+		},
 		project_budget: {
 			type: 'integer',
 			required: true
+		},
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_rnr_chapter: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		activity_type: {
+			type: 'array',
+			required: true
+		},
+		activity_description: {
+			type: 'array'
+		},
+
+		// SOs
+		strategic_objectives: {
+			type: 'array'
+		},
+
+		// target beneficiaries
+		category_type: {
+			type: 'array'
+		},
+		beneficiary_type: {
+			type: 'array',
+			required: true
+		},
+
+		// target locations
+		admin1pcode: {
+			type: 'array',
+			required: true
+		},
+		admin2pcode: {
+			type: 'array',
+			required: true
+		},
+
+		// budget item
+		project_donor_id: {
+			type: 'string'
+		},
+		project_donor_name: {
+			type: 'string'
 		},
 		project_budget_currency: {
 			type: 'string',
@@ -108,7 +144,22 @@ module.exports = {
 		project_budget_date_recieved: {
 			type: 'date',
 			required: true
+		},
+
+
+
+
+		/*********** 2016 *************/
+		project_code: {
+			type: 'string'
+		},
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
 		}
+
 	}
 
 };

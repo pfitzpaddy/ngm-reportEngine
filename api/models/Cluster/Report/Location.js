@@ -15,58 +15,6 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		// user/project
-		organization_id: {
-			type: 'string',
-			required: true
-		},
-		organization: {
-			type: 'string',
-			required: true
-		},
-		cluster_id: {
-			type: 'string',
-			required: true
-		},
-		cluster: {
-			type: 'string',
-			required: true
-		},
-		project_id: {
-			type: 'string',
-			required: true
-		},
-		project_title: {
-			type: 'string',
-			required: true
-		},
-		// 2016
-		project_type: {
-			type: 'array'
-		},
-		project_type_other: {
-			type: 'string'
-		},
-		project_description: {
-			type: 'string'
-		},
-		// 2017
-		activity_type: {
-			type: 'string',
-			required: true
-		},
-		activity_description: {
-			type: 'array'//,
-			// required: true
-		},
-		username: {
-			type: 'string',
-			required: true
-		},
-		email: {
-			type: 'string',
-			required: true
-		},		
 		// region/country
     adminRpcode: {
 			type: 'string',
@@ -84,6 +32,111 @@ module.exports = {
 			type: 'string',
 			required: true
     },
+		organization_id: {
+			type: 'string',
+			required: true
+		},
+		organization: {
+			type: 'string',
+			required: true
+		},
+		cluster_id: {
+			type: 'string',
+			required: true
+		},
+		cluster: {
+			type: 'string',
+			required: true
+		},
+		username: {
+			type: 'string',
+			required: true
+		},
+		email: {
+			type: 'string',
+			required: true
+		},
+
+		// project
+		project_id: {
+			type: 'string',
+			required: true
+		},
+		project_status: {
+			type: 'string',
+			defaultsTo: 'new'
+		},
+		project_title: {
+			type: 'string',
+			required: true
+		},
+		project_description: {
+			type: 'string',
+			required: true
+		},
+		project_start_date: {
+			type: 'date',
+			required: true
+		},
+		project_end_date: {
+			type: 'date',
+			required: true
+		},
+		project_budget: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_rnr_chapter: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		project_donor: {
+			type: 'array'
+		},
+		activity_type: {
+			type: 'array',
+			required: true
+		},
+		activity_description: {
+			type: 'array'
+		},
+
+		// SOs
+		strategic_objectives: {
+			type: 'array'
+		},
+
+		// target beneficiaries
+		category_type: {
+			type: 'array'
+		},
+		beneficiary_type: {
+			type: 'array',
+			required: true
+		},
+
+		// report
+		report_id: {
+			model: 'report'
+		},
+		report_month: {
+			type: 'integer',
+			required: true
+		},
+		report_year: {
+			type: 'integer',
+			required: true
+		},
+		reporting_period: {
+			type: 'date',
+			required: true
+		},
+
+		// location
 		admin1pcode: {
 			type: 'string',
 			required: true
@@ -130,15 +183,26 @@ module.exports = {
 			type: 'float',
 			required: true
 		},
-		// add a reference to Report
-		report_id: {
-			model: 'report'
-		},
+
     // add reference to Beneficiaries
     beneficiaries: {
       collection: 'beneficiaries',
       via: 'location_id'
-    }
+    },
+
+
+
+
+
+
+		/*********** 2016 *************/
+		project_type: {
+			type: 'array'
+		},
+		project_type_other: {
+			type: 'string'
+		}
+
 	}
 
 };

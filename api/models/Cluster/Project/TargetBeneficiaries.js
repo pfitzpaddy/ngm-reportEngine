@@ -56,30 +56,59 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
 		// add a reference to Project
 		project_id: {
 			model: 'project'
 		},
-		project_title: {
+
+		// project
+		project_status: {
 			type: 'string'
 		},
-		
-		// activity_type
-		activity_type_id: {
+		project_title: {
 			type: 'string',
 			required: true
 		},
-		activity_type_name: {
+		project_description: {
 			type: 'string',
 			required: true
+		},
+		project_start_date: {
+			type: 'date',
+			required: true
+		},
+		project_end_date: {
+			type: 'date',
+			required: true
+		},
+		project_budget: {
+			type: 'integer',
+			required: true
+		},
+		project_budget_currency: {
+			type: 'string',
+			required: true
+		},
+		project_rnr_chapter: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		project_donor: {
+			type: 'array'
 		},
 
-		// indicator -> activity_description
-		activity_description_id: {
+		// SOs
+		strategic_objectives: {
+			type: 'array'
+		},
+
+		// category
+		category_type_id: {
 			type: 'string',
 			required: true
 		},
-		activity_description_name: {
+		category_type_name: {
 			type: 'string',
 			required: true
 		},
@@ -93,10 +122,35 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		
+		// activity_type
+		activity_type_id: {
+			type: 'string',
+			required: true
+		},
+		activity_type_name: {
+			type: 'string',
+			required: true
+		},
 
+		// activity description
+		activity_description_id: {
+			type: 'string',
+			required: true
+		},
+		activity_description_name: {
+			type: 'string',
+			required: true
+		},
+
+		// indicator
+		households:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 		families:{
 			type: 'integer',
-			defaultsTo: 0			
+			defaultsTo: 0
 		},
 		boys:{
 			type: 'integer',
@@ -114,16 +168,34 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		elderly_men:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		elderly_women:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+		// target locations
+		admin1pcode: {
+			type: 'array',
+			required: true
+		},
+		admin2pcode: {
+			type: 'array',
+			required: true
+		},
 
 
-		/*********** Update for 2017 *************/ 
-		// 2017
+
+
+		/*********** 2017 *************/ 
 		activity_type: {
 			type: 'string'
 		},
 		activity_description: {
-			type: 'array'//,
-			// required: true
+			type: 'array'
 		},
 		beneficiary_name: {
 			type: 'string'
@@ -132,16 +204,11 @@ module.exports = {
 			type: 'string'
 		},
 
-
-		/*********** 2016 - Not default *************/ 
-		// 2016
+		/*********** 2016 *************/
 		project_type: {
 			type: 'array'
 		},
 		project_type_other: {
-			type: 'string'
-		},
-		project_description: {
 			type: 'string'
 		},
 		capacity_building_topic: {
