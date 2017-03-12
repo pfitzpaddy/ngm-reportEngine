@@ -62,6 +62,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		project_hrp_code: {
+			type: 'string',
+			required: true
+		},
 		project_status: {
 			type: 'string',
 			defaultsTo: 'new'
@@ -108,6 +112,14 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		report_active: {
+			type: 'boolean',
+			defaultsTo: true
+		},
+		report_status: {
+			type: 'string',
+			defaultsTo: 'todo'
+		},
 		report_month: {
 			type: 'integer',
 			required: true
@@ -116,7 +128,14 @@ module.exports = {
 			type: 'integer',
 			required: true
 		},
+		report_submitted: {
+			type: 'date'
+		},
 		reporting_period: {
+			type: 'date',
+			required: true
+		},
+		reporting_due_date: {
 			type: 'date',
 			required: true
 		},
@@ -276,10 +295,10 @@ module.exports = {
 			type: 'string'
 		},
 		activity_type: {
-			type: 'string'
+			type: 'array'
 		},
 		activity_description: {
-			type: 'string'
+			type: 'array'
 		},
 		beneficiary_name: {
 			type: 'string'

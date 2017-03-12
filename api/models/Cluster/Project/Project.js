@@ -73,7 +73,17 @@ module.exports = {
       via: 'project_id'
 		},
 
+		// flag to manage location updates
+		locations_updated: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+
 		// project
+		project_hrp_code: {
+			type: 'string',
+			required: true
+		},
 		project_status: {
 			type: 'string',
 			defaultsTo: 'new'
@@ -204,43 +214,50 @@ module.exports = {
 
 	// add reports to project with project locations
 	afterUpdate: function( project, next ) {
+		
+		if( project.locations_updated ){
 
-		// for each project target locations
-		TargetLocation
-			.find()
-			.where( { project_id: project.id } )
-			.exec( function( err, target_locations ) {
+			// for each project target locations
+			TargetLocation
+				.find()
+				.where( { project_id: project.id } )
+				.exec( function( err, target_locations ) {
 
-				// set all reports_active to false
-				Report
-					.update( { project_id: project.id }, { report_active: false } )
-					.exec( function( err, updated_reports ) {
+					// set all reports_active to false
+					Report
+						.update( { project_id: project.id }, { report_active: false } )
+						.exec( function( err, updated_reports ) {
 
-						// return error
-						if ( err ) return next( err );						
+							// return error
+							if ( err ) return next( err );
 
-						// no reports
-						if ( !updated_reports.length ) {
-							
-							next();
+							// no reports
+							if ( !updated_reports.length ) {
+								
+								next();
 
-						}	else {
-							
-							// generate an array of reports
-							var reports = getProjectReports( project, target_locations );
+							}	else {
+								
+								// generate an array of reports
+								var reports = getProjectReports( project, target_locations );
 
-							// if no locations, next
-							if ( !reports[0].locations.length ) return next();
+								// if no locations, next
+								if ( !reports[0].locations.length ) return next();
 
-							// update reports
-							updateProjectReports( reports, next );
+								// update reports
+								updateProjectReports( reports, next );
 
-						}
+							}
 
-					});
-				
+						});
+					
 
-			});
+				});
+		
+		} else {
+			next();
+		}
+
 	}
 
 };
@@ -283,16 +300,19 @@ function getProjectReports( project, target_locations ) {
 			report_month: moment( s_date ).add( m, 'M' ).month(),
 			report_year: moment( s_date ).add( m, 'M' ).year(),
 			reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
-			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format(),
-			locations: []
+			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format()//,
+			// locations: []
 		};
 
-		// merge with project
-		report = _under.extend( {}, report, project );
-		report.project_id = project.id;
+		// clone project
+		var p = _under.clone( project );
+		// merge with report
+		report = _under.extend( {}, report, p );
+		report.project_id = p.id;
+		// remove id for new object
 		delete report.id;
 
-		// add report locations
+		// merge report with target_locations
 		report.locations = getProjectReportLocations( report, target_locations );
 
 		// add report to reports
@@ -311,6 +331,13 @@ function getProjectReportLocations( report, target_locations ) {
 	// variables
 	var locations = [],
 			_under = require('underscore');
+	
+	// clone report
+	var r = _under.clone( report );
+	delete r.admin1pcode;
+	delete r.admin1name;
+	delete r.admin2pcode;
+	delete r.admin2name;
 
 	// for project target_locations
 	target_locations.forEach( function( target_location, t_index ) {
@@ -319,11 +346,9 @@ function getProjectReportLocations( report, target_locations ) {
 		var l = target_location.toObject();
 				delete l.id;
 
-		locations.push( _under.extend( {}, l, report) );
+		locations.push( _under.extend( {}, l, r ) );
 		
 	});
-
-	console.log(locations);
 
 	// return locations array
 	return locations;
@@ -400,7 +425,9 @@ function updateProjectReports( reports, next ) {
 								// add beneficiaries if existing
 								if ( location.beneficiaries.length ) {
 									if( !reports[ r_index ].locations[ l_index ] ){
-										reports[ r_index ].locations[ l_index ].beneficiaries = [];
+										reports[ r_index ].locations[ l_index ] = {
+											beneficiaries: []
+										}
 									}
 									reports[ r_index ].locations[ l_index ].beneficiaries = location.beneficiaries;
 								}

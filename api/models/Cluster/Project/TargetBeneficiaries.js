@@ -63,6 +63,10 @@ module.exports = {
 		},
 
 		// project
+		project_hrp_code: {
+			type: 'string',
+			required: true
+		},
 		project_status: {
 			type: 'string'
 		},
@@ -192,7 +196,7 @@ module.exports = {
 
 		/*********** 2017 *************/ 
 		activity_type: {
-			type: 'string'
+			type: 'array'
 		},
 		activity_description: {
 			type: 'array'

@@ -79,6 +79,10 @@ module.exports = {
 		},
 
 		// project
+		project_hrp_code: {
+			type: 'string',
+			required: true
+		},
 		project_status: {
 			type: 'string',
 			defaultsTo: 'new'
@@ -171,5 +175,5 @@ module.exports = {
 		}
 
 	}
-
+	
 };

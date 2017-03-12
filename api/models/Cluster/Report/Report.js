@@ -58,6 +58,10 @@ module.exports = {
 		},
 
 		// project
+		project_hrp_code: {
+			type: 'string',
+			required: true
+		},
 		project_id: {
 			type: 'string',
 			required: true
