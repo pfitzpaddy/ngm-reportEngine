@@ -74,7 +74,7 @@ module.exports = {
 		},
 
 		// flag to manage location updates
-		locations_updated: {
+		update_locations: {
 			type: 'boolean',
 			defaultsTo: false
 		},
@@ -215,7 +215,7 @@ module.exports = {
 	// add reports to project with project locations
 	afterUpdate: function( project, next ) {
 		
-		if( project.locations_updated ){
+		if( project.update_locations ){
 
 			// for each project target locations
 			TargetLocation
