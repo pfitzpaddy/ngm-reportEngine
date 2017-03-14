@@ -181,7 +181,7 @@ module.exports = {
 
 	},
 
-	// add reports to project with project locations
+	// afterCreate
 	afterCreate: function( project, next ) {
 		
 		// for each project target locations
@@ -193,28 +193,39 @@ module.exports = {
 				// return error
 				if ( err ) return next( err );
 
-				// generate an array of reports
-				var reports = getProjectReports( project, target_locations );
+				// if none
+				if ( !target_locations || !target_locations.length ) return next();
 
-				// create
-				Report
-					.create( reports )
-					.exec( function( err, reports ) {
+				// if target_locations
+				if ( target_locations && target_locations.length ) {
 
-						// return error
-						if ( err ) return next( err );
+					// generate an array of reports
+					var reports = getProjectReports( project, target_locations );
 
-						// next!
-						next();
-						
-					});
+					// create reports
+					Report
+						.create( reports )
+						.exec( function( err, reports ) {
+
+							// return error
+							if ( err ) return next( err );
+
+							// next!
+							next();
+							
+						});
+				}
 
 			});
 	},
 
-	// add reports to project with project locations
+	// update report locations
 	afterUpdate: function( project, next ) {
+
+		// if no updates
+		if ( !project.update_locations ) return next();
 		
+		// if update required
 		if( project.update_locations ){
 
 			// for each project target locations
@@ -223,43 +234,28 @@ module.exports = {
 				.where( { project_id: project.id } )
 				.exec( function( err, target_locations ) {
 
-					// set all reports_active to false
-					Report
-						.update( { project_id: project.id }, { report_active: false } )
-						.exec( function( err, updated_reports ) {
+					// return error
+					if ( err ) return next( err );
 
-							// return error
-							if ( err ) return next( err );
+					// if none
+					if ( !target_locations || !target_locations.length ) return next();
 
-							// no reports
-							if ( !updated_reports.length ) {
-								
-								next();
+					// if target_locations
+					if ( target_locations && target_locations.length ) {
 
-							}	else {
-								
-								// generate an array of reports
-								var reports = getProjectReports( project, target_locations );
+						// generate an array of reports
+						var generated_reports = getProjectReports( project, target_locations );				
 
-								// if no locations, next
-								if ( !reports[0].locations.length ) return next();
+						// could make this a new func
+						updateProjectReports( project, target_locations, generated_reports, next );
 
-								// update reports
-								updateProjectReports( reports, next );
+					}
 
-							}
+			});
 
-						});
-					
-
-				});
-		
-		} else {
-			next();
 		}
 
 	}
-
 };
 
 
@@ -344,9 +340,10 @@ function getProjectReportLocations( report, target_locations ) {
 
 		// clone target_location
 		var l = target_location.toObject();
+				l.target_location_reference_id = l.id;
 				delete l.id;
 
-		locations.push( _under.extend( {}, l, r ) );
+		locations.push( _under.extend( l, r ) );
 		
 	});
 
@@ -355,41 +352,34 @@ function getProjectReportLocations( report, target_locations ) {
 
 };
 
-// update existing project reports
-function updateProjectReports( reports, next ) {
+function updateProjectReports( project, target_locations, generated_reports, next ){
 
-	// number of reports to update
+	// counter
 	var counter = 0,
-			length = reports.length;
+			length = generated_reports.length,
+			deepAssign = require( 'deep-assign' );
 
-	// for each report
-	reports.forEach( function( report, r_index ) {
+	// loop
+	generated_reports.forEach(function( skeleton_report, r_index ){
 
-		// report is true
-		var report_active = true;
-
-		// should be reports just for 2016 period and beyond!
-		if ( reports[ r_index ].report_year < 2016  ) {
-			report_active = false;
-		}
-
-		// updateOrCreate (returns array)
+		// find
 		Report
-			.update( { 	project_id: reports[ r_index ].project_id,
-									report_month: reports[ r_index ].report_month, 
-									report_year: reports[ r_index ].report_year
-								}, { report_active: report_active } )
-			.exec( function( err, report ) {
+			.find( { 	project_id: skeleton_report.project_id,
+								report_month: skeleton_report.report_month, 
+								report_year: skeleton_report.report_year
+							})
+			.populateAll()
+			.exec( function( err, reports ) {
 
 				// return error
 				if ( err ) return next( err );
 
 				// if no report - create
-				if ( !report.length ) {
+				if ( !reports.length ) {
 
 					// create with association
 					Report
-						.create( reports[ r_index ] )
+						.create( skeleton_report )
 						.exec( function( err, report ) {
 
 							// return error
@@ -405,65 +395,179 @@ function updateProjectReports( reports, next ) {
 
 							}
 							
-						});
+					});
 
-				} else {
+				}
 
-					// get locations
-					Location
-						.find()
-						.where( { report_id: report[0].id } )
-						.populateAll()
-						.exec( function( err, locations ){
+				// if report loop and update!
+				if ( reports.length ) {
 
-							// return error
-							if ( err ) return next( err );
+					// for each
+					reports.forEach(function( r, i ){
 
-							// for each location
-							locations.forEach( function( location, l_index){
+						// if report removed
+						if( reports[i].locations.length > skeleton_report.locations.length ){
 
-								// add beneficiaries if existing
-								if ( location.beneficiaries.length ) {
-									if( !reports[ r_index ].locations[ l_index ] ){
-										reports[ r_index ].locations[ l_index ] = {
-											beneficiaries: []
-										}
-									}
-									reports[ r_index ].locations[ l_index ].beneficiaries = location.beneficiaries;
-								}
-								
+							// target array
+							var locations = [],
+									target_location_reference_ids = '';
+
+							// pick out target_location_reference_id
+							skeleton_report.locations.forEach(function( d, k ){
+								target_location_reference_ids += d.target_location_reference_id + ',';
 							});
 
-							// updates locations association
-							Report
-								.update( { 	project_id: reports[ r_index ].project_id,
-														report_month: reports[ r_index ].report_month, 
-														report_year: reports[ r_index ].report_year
-													}, { locations: reports[ r_index ].locations } )
-								.exec( function( err, report ) {
+							// filter locations
+							reports[i].locations.forEach(function( d, k ){
+								if( target_location_reference_ids.indexOf(d.target_location_reference_id) !== -1 ){
+									locations.push(d);
+								}
+							});
 
-									// return error
-									if ( err ) return next( err );
+							// 
+							reports[i].locations = locations;
 
-									// counter
-									counter++;							
-									
-									// final update ?
-									if ( counter === length ) {
-										
-										// next!
-										next();
-									}
+						}
 
-								});
+						// merge location changes
+						reports[i] = deepAssign( reports[i], skeleton_report );
 
-						
+						// update
+						Report
+							.update( { id: r.id }, reports[i] )
+							.exec( function( err, report ) {
+
+								// return error
+								if ( err ) return next( err );
+
+								// counter
+								counter++;
+
+								// final update ?
+								if ( counter === length ) {
+									next();
+								}
+
 						});
+
+					});
 
 				}
 
 			});
-
 	});
 
 }
+
+// update existing project reports
+// function updateProjectReports( reports, next ) {
+
+// 	// number of reports to update
+// 	var counter = 0,
+// 			length = reports.length;
+
+// 	// for each report
+// 	reports.forEach( function( report, r_index ) {
+
+// 		// report is true
+// 		var report_active = true;
+
+// 		// should be reports just for 2016 period and beyond!
+// 		if ( reports[ r_index ].report_year < 2016  ) {
+// 			report_active = false;
+// 		}
+
+// 		// updateOrCreate (returns array)
+// 		Report
+// 			.update( { 	project_id: reports[ r_index ].project_id,
+// 									report_month: reports[ r_index ].report_month, 
+// 									report_year: reports[ r_index ].report_year
+// 								}, { report_active: report_active } )
+// 			.exec( function( err, report ) {
+
+// 				// return error
+// 				if ( err ) return next( err );
+
+// 				// if no report - create
+// 				if ( !report.length ) {
+
+// 					// create with association
+// 					Report
+// 						.create( reports[ r_index ] )
+// 						.exec( function( err, report ) {
+
+// 							// return error
+// 							if ( err ) return next( err );
+
+// 							// counter
+// 							counter++;							
+
+// 							// final update
+// 							if ( counter === length ) {
+// 								// next!
+// 								next();
+
+// 							}
+							
+// 						});
+
+// 				} else {
+
+// 					// get locations
+// 					Location
+// 						.find()
+// 						.where( { report_id: report[0].id } )
+// 						.populateAll()
+// 						.exec( function( err, locations ){
+
+// 							// return error
+// 							if ( err ) return next( err );
+
+// 							// for each location
+// 							locations.forEach( function( location, l_index){
+
+// 								// add beneficiaries if existing
+// 								if ( location.beneficiaries.length ) {
+// 									if( !reports[ r_index ].locations[ l_index ] ){
+// 										reports[ r_index ].locations[ l_index ] = {
+// 											beneficiaries: []
+// 										}
+// 									}
+// 									reports[ r_index ].locations[ l_index ].beneficiaries = location.beneficiaries;
+// 								}
+								
+// 							});
+
+// 							// updates locations association
+// 							Report
+// 								.update( { 	project_id: reports[ r_index ].project_id,
+// 														report_month: reports[ r_index ].report_month, 
+// 														report_year: reports[ r_index ].report_year
+// 													}, { locations: reports[ r_index ].locations } )
+// 								.exec( function( err, report ) {
+
+// 									// return error
+// 									if ( err ) return next( err );
+
+// 									// counter
+// 									counter++;							
+									
+// 									// final update ?
+// 									if ( counter === length ) {
+										
+// 										// next!
+// 										next();
+// 									}
+
+// 								});
+
+						
+// 						});
+
+// 				}
+
+// 			});
+
+// 	});
+
+// }

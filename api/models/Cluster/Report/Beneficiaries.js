@@ -57,6 +57,12 @@ module.exports = {
 			required: true
 		},
 
+		// reference to location
+			// this avoids unlinking when updating Report->Location 
+		location_reference_id: {
+			type: 'string'
+		},
+
 		// project
 		project_id: {
 			type: 'string',
@@ -343,6 +349,15 @@ module.exports = {
 			type: 'integer'
 		}
 		
+	},
+
+	// encrypt password before create, assign org_id
+	beforeCreate: function ( b, next ) {
+
+		// add reference for unlinked issue
+		b.location_reference_id = b.location_id;
+		next();
+
 	}
 
 };

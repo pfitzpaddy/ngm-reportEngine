@@ -57,6 +57,11 @@ module.exports = {
 			required: true
 		},
 
+		// target_location_reference
+		target_location_reference_id: {
+			type: 'string'
+		},
+
 		// project
 		project_id: {
 			type: 'string',
@@ -221,6 +226,23 @@ module.exports = {
 		project_type_other: {
 			type: 'string'
 		}
+
+	},
+	
+	// re-link beneficiaries
+	afterUpdate: function( l, next ){
+
+		// get beneficiaries
+		Beneficiaries
+			.update({ location_reference_id: l.id }, { location_id: l.id } )
+			.exec(function( err, b ){
+
+				// return error
+				if ( err ) return next( err );
+
+				next();
+
+		});
 
 	}
 
