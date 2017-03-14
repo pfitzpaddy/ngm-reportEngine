@@ -355,7 +355,7 @@ module.exports = {
 	beforeCreate: function ( b, next ) {
 
 		// add reference for unlinked issue
-		b.location_reference_id = b.location_id;
+		b.location_reference_id = b.location_id.valueOf();
 		next();
 
 	}
