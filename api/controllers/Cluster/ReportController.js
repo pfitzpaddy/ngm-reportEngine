@@ -129,7 +129,8 @@ module.exports = {
     }
     
     // get report
-    var $report = req.param( 'report' );
+    var $report = req.param( 'report' ),
+        $locations = req.param( 'report' ).locations;
 
     // update report
     Report
@@ -137,10 +138,54 @@ module.exports = {
       .exec( function( err, report ){
 
         // return error
-        if ( err ) return res.negotiate( err );    
+        if ( err ) return res.negotiate( err );
 
-        // return Report
-        return res.json( 200, report[0] );
+        // set updated
+        $report = report[0].toObject();
+        
+        // get report by organization_id
+        Location
+          .find( { report_id: $report.id } )
+          .populateAll()
+          .exec( function( err, locations ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // add locations ( associations included )
+            $report.locations = locations;
+
+            // return report
+            return res.json( 200, $report );
+
+        });
+
+    });
+
+  },
+
+  // remove
+  removeBeneficiary: function( req, res ){
+    
+    // request input
+    if ( !req.param( 'beneficiary' ) ) {
+      return res.json(401, { err: 'beneficiary required!' });
+    }
+    
+    // get report
+    var $beneficiary = req.param( 'beneficiary' );
+
+    // location_reference_id 're-links' association after any updates 
+       // when updating target locations in project details (this affects monthly report)
+    Beneficiaries
+      .update({ id: $beneficiary.id }, { location_reference_id: null })
+      .exec(function( err, b){
+
+        // return error
+        if ( err ) return res.negotiate( err );           
+
+        // return reports
+        return res.json( 200, { msg: 'success' } );
 
       });
 
