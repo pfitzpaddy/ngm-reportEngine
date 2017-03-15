@@ -52,7 +52,7 @@ module.exports = {
         if (err) return res.negotiate( err );       
 
         Project
-          .findOne({ id: project[0].id })
+          .findOne({ id: project.id })
           .populateAll()
           .exec( function( err, p ){
 
