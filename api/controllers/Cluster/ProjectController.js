@@ -49,10 +49,20 @@ module.exports = {
       Project.create( $project ).exec( function( err, project ){
 
         // return error
-        if ( err ) return res.negotiate( err );
+        if (err) return res.negotiate( err );       
 
-        // return project
-        return res.json( 200, project );
+        Project
+          .findOne({ id: project[0].id })
+          .populateAll()
+          .exec( function( err, p ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return Project
+            return res.json( 200, p );
+
+        });
 
       });
 
@@ -62,10 +72,20 @@ module.exports = {
       Project.update( { id: $project.id }, $project ).exec(function(err, project){
 
         // return error
-        if (err) return res.negotiate( err );    
+        if (err) return res.negotiate( err );
 
-        // return Project
-        return res.json(200, project[0]);
+        Project
+          .findOne({ id: project[0].id })
+          .populateAll()
+          .exec( function( err, p ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return Project
+            return res.json( 200, p );
+
+        });
 
       });
 
