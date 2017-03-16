@@ -234,7 +234,7 @@ module.exports = {
 
 		// get beneficiaries
 		Beneficiaries
-			.update({ location_reference_id: l.id }, { location_id: l.id } )
+			.update({ location_reference_id: l.id.valueOf() }, { location_id: l.id } )
 			.exec(function( err, b ){
 
 				// return error

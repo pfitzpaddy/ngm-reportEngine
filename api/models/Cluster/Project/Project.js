@@ -340,7 +340,7 @@ function getProjectReportLocations( report, target_locations ) {
 
 		// clone target_location
 		var l = target_location.toObject();
-				l.target_location_reference_id = l.id;
+				l.target_location_reference_id = l.id.valueOf();
 				delete l.id;
 
 		locations.push( _under.extend( l, r ) );
