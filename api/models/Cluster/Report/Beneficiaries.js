@@ -197,6 +197,11 @@ module.exports = {
 		},
 
 		// indicator
+			// units -> eiewg
+		units: {
+			type: 'integer',
+			defaultsTo: 0
+		},
 		households:{
 			type: 'integer',
 			defaultsTo: 0
@@ -229,6 +234,7 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+			// sessions -> training
 		sessions:{
 			type: 'integer',
 			defaultsTo: 0
