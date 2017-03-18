@@ -197,6 +197,11 @@ module.exports = {
 		},
 
 		// indicator
+			// sessions -> training
+		sessions:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 			// units -> eiewg
 		units: {
 			type: 'integer',
@@ -231,11 +236,6 @@ module.exports = {
 			defaultsTo: 0
 		},
 		elderly_women:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-			// sessions -> training
-		sessions:{
 			type: 'integer',
 			defaultsTo: 0
 		},

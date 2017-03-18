@@ -148,6 +148,11 @@ module.exports = {
 		},
 
 		// indicator
+			// units -> eiewg
+		units: {
+			type: 'integer',
+			defaultsTo: 0
+		},
 		households:{
 			type: 'integer',
 			defaultsTo: 0
