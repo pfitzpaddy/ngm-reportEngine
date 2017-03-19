@@ -7,24 +7,6 @@
 
 module.exports = {
 
-  // get list of cluster activities
-  getActivities: function( req, res ) {
-
-    //
-    Activities
-      .find()
-      .exec( function( err, activities ){
-        
-        // return error
-        if ( err ) return res.negotiate( err );
-
-        // return project
-        return res.json( 200, activities );
-
-      })
-
-  },
-
   // set project details
   setProjectById: function(req, res) {
 

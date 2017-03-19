@@ -63,22 +63,17 @@ module.exports.policies = {
   },
 
   // public
+  'Cluster/Lists/ListController': {
+    '*': true
+  },
+
+  // public
   'Cluster/AdminDashboardController': {
     'getHealthAdminIndicator': true
   },
 
   // public
   'Cluster/Health/HealthDashboardController': {
-    '*': true
-  },
-
-  // public
-  'Cluster/ProjectController': {
-    'getActivities': true
-  },
-
-  // public
-  'Cluster/IndicatorsController': {
     '*': true
   },
 
