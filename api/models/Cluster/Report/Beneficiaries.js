@@ -207,6 +207,11 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+			// conditional/unconditional
+		cash_amount: {
+			type: 'integer',
+			defaultsTo: 0
+		},
 		households:{
 			type: 'integer',
 			defaultsTo: 0
