@@ -62,6 +62,24 @@ module.exports = {
 
   },
 
+  // get list of stockitems
+  getStockItems: function( req, res ) {
+
+    // get stockitems list
+    StockItems
+      .find()
+      .exec( function( err, stockitems ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // return stockitems
+        return res.json( 200, stockitems );
+
+      })
+
+  },
+
   // get list of organizations
   getOrganizations: function( req, res ) {
 
