@@ -33,6 +33,14 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		elderly_men:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		elderly_women:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 		conflict_trauma_treated:{
 			type: 'integer',
 			defaultsTo: 0
