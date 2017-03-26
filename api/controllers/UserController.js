@@ -16,11 +16,12 @@ module.exports = {
 
     // try to look up user using the provided username/email address
     User.findOne({
-      or: [{
-          username: req.param( 'user' ).username
-        },{
-          email: req.param( 'user' ).email
-        }]
+      // or: [{
+      //     username: req.param( 'user' ).username
+      //   },{
+      //     email: req.param( 'user' ).email
+      //   }]
+      username: req.param( 'user' ).username
     }, function foundUser( err, user ) {
 
       // user exists

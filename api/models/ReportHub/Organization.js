@@ -29,11 +29,15 @@ module.exports = {
 			type: 'string',
 			required: true
     },
+		organization_type: {
+			type: 'string',
+			required: true
+		},
 		organization_name: {
 			type: 'string',
 			required: true
 		},
-		organization_display_name: {
+		organization: {
 			type: 'string',
 			required: true
 		},

@@ -30,7 +30,16 @@ module.exports = {
 			required: true
     },
 		organization_id: {
-			type: 'string'
+			type: 'string',
+			required: true
+		},
+		organization_type: {
+			type: 'string',
+			required: true
+		},
+		organization_name: {
+			type: 'string',
+			required: true
 		},
 		organization: {
 			type: 'string',
@@ -115,12 +124,12 @@ module.exports = {
 			user.password = encryptedPassword;
 
 			// org id by name
-			var org_name = user.organization.replace(/ /g, '_').toLowerCase();
+			// var org_name = user.organization.replace(/ /g, '_').toLowerCase();
 
 			// check if org exists
 	    Organization
 	    	.find()
-	    	.where( { admin0pcode: user.admin0pcode, organization_name: org_name, cluster: user.cluster } )
+	    	.where( { admin0pcode: user.admin0pcode, cluster: user.cluster, organization: user.organization } )
 	    	.exec(function ( err, organization ){
 			  	
 				  // error
@@ -144,8 +153,9 @@ module.exports = {
 				  		adminRname: user.adminRname,
 				  		admin0pcode: user.admin0pcode,
 				  		admin0name: user.admin0name,
-				  		organization_name: org_name,
-				  		organization_display_name: user.organization,
+				  		organization_type: user.organization_type,
+				  		organization_name: user.organization_name,
+				  		organization: user.organization,
 				  		cluster_id: user.cluster_id,
 				  		cluster: user.cluster
 				  	}).exec(function (err, created){
@@ -175,7 +185,7 @@ module.exports = {
     // get user by email
     User
     	.find()
-    	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id, cluster: user.cluster })
+    	.where({ admin0pcode: user.admin0pcode, cluster: user.cluster, organization_id: user.organization_id })
     	.sort('createdAt ASC')
     	.exec( function( err, admin ){
 
