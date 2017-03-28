@@ -30,8 +30,7 @@ module.exports = {
 			required: true
     },
 		organization_id: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		organization_type: {
 			type: 'string',
@@ -123,13 +122,10 @@ module.exports = {
 			// encrypt password
 			user.password = encryptedPassword;
 
-			// org id by name
-			// var org_name = user.organization.replace(/ /g, '_').toLowerCase();
-
 			// check if org exists
 	    Organization
 	    	.find()
-	    	.where( { admin0pcode: user.admin0pcode, cluster: user.cluster, organization: user.organization } )
+	    	.where( { admin0pcode: user.admin0pcode, cluster_id: user.cluster_id, organization: user.organization } )
 	    	.exec(function ( err, organization ){
 			  	
 				  // error

@@ -25,7 +25,7 @@ module.exports = {
     }, function foundUser( err, user ) {
 
       // user exists
-      if (user) return res.json( 401, { msg: 'User already exists! Forgot password?' } );
+      if ( user ) return res.json( 401, { msg: 'User already exists! Forgot password?' } );
 
       // else create user
       User
