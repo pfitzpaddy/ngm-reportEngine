@@ -99,9 +99,8 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_rnr_chapter: {
-			type: 'boolean',
-			defaultsTo: false
+		inter_cluster_activities: {
+			type: 'array'
 		},
 		project_donor: {
 			type: 'array'

@@ -29,26 +29,26 @@ module.exports = {
 			type: 'string',
 			required: true
     },
-		organization_type: {
-			type: 'string',
-			required: true
-		},
-		organization_name: {
-			type: 'string',
-			required: true
-		},
-		organization: {
-			type: 'string',
-			required: true
-		},
-		cluster_id: {
-			type: 'string',
-			required: true
-		},
-		cluster: {
-			type: 'string',
-			required: true
-		},		
+	organization_type: {
+		type: 'string',
+		required: true
+	},
+	organization_name: {
+		type: 'string',
+		required: true
+	},
+	organization: {
+		type: 'string',
+		required: true
+	},
+	cluster_id: {
+		type: 'string',
+		required: true
+	},
+	cluster: {
+		type: 'string',
+		required: true
+	},		
     // add reference to Warehouse
     warehouses: {
       collection: 'stockwarehouse',

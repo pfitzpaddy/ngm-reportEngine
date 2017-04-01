@@ -16,22 +16,22 @@ module.exports = {
 	// attributes
 	attributes: {
 		// region/country id
-    adminRpcode: {
+	    adminRpcode: {
 			type: 'string',
 			required: true
-    },
-    adminRname: {
+	    },
+	    adminRname: {
 			type: 'string',
 			required: true
-    },
-    admin0pcode: {
+	    },
+	    admin0pcode: {
 			type: 'string',
 			required: true
-    },
-    admin0name: {
+	    },
+	    admin0name: {
 			type: 'string',
 			required: true
-    },
+	    },
 		organization_id: {
 			type: 'string',
 			required: true
@@ -59,18 +59,18 @@ module.exports = {
 
 		// add reference to Target beneficiaries
 		target_beneficiaries: {
-      collection: 'targetbeneficiaries',
-      via: 'project_id'
+			collection: 'targetbeneficiaries',
+			via: 'project_id'
 		},	
-    // add reference to Target Locations
-    target_locations: {
-      collection: 'targetlocation',
-      via: 'project_id'
-    },
+		// add reference to Target Locations
+		target_locations: {
+			collection: 'targetlocation',
+			via: 'project_id'
+    	},
 		// add reference to Budget Progress
 		project_budget_progress: {
-      collection: 'budgetprogress',
-      via: 'project_id'
+			collection: 'budgetprogress',
+			via: 'project_id'
 		},
 
 		// flag to manage location updates
@@ -112,9 +112,8 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_rnr_chapter: {
-			type: 'boolean',
-			defaultsTo: false
+		inter_cluster_activities: {
+			type: 'array'
 		},
 		project_donor: {
 			type: 'array'
