@@ -252,7 +252,7 @@ module.exports = {
 
       // get user with userReset params
       User
-        .findOne({ email: userReset.email })
+        .findOne({ username: userReset.username })
         .exec(function(err, user){
 
           // return error
