@@ -16,12 +16,13 @@ module.exports = {
 
     // try to look up user using the provided username/email address
     User.findOne({
+      username: req.param( 'user' ).username
       // or: [{
       //     username: req.param( 'user' ).username
       //   },{
       //     email: req.param( 'user' ).email
       //   }]
-      username: req.param( 'user' ).username
+      // username: req.param( 'user' ).username
     }, function foundUser( err, user ) {
 
       // user exists
@@ -57,18 +58,19 @@ module.exports = {
 
     // try to look up user using the provided username/email address
     User.findOne({
-      or: [{
-          username: req.param( 'user' ).username
-        },{
-          email: req.param( 'user' ).email
-        }]
+      username: req.param( 'user' ).username
+      // or: [{
+      //     username: req.param( 'user' ).username
+      //   },{
+      //     email: req.param( 'user' ).email
+      //   }]
     }, function foundUser( err, user ) {
       
       // generic error
       if (err) return res.negotiate( err );
 
       // user not found
-      if (!user) return res.notFound({ msg: 'Invalid Username!' });
+      if (!user) return res.notFound({ msg: 'Invalid Username! User exists?' });
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
@@ -120,19 +122,19 @@ module.exports = {
       return res.json(401, { msg: 'user required' });
     }
     
-    // get user by email
+    // get user by username
     User
-      .findOne({ email: req.param( 'user' ).email })
+      .findOne({ username: req.param( 'user' ).username })
       .exec(function(err, user){
       
         // return error
         if (err) return res.negotiate( err );
 
         // return error
-        if (!user) return res.json( 401, { msg: 'User not found!' } );
+        // if (!user) return res.json( 401, { msg: 'User not found!' } );
 
         // update visit information
-        user.visits = user.visits + 1;
+        user.visits++;
 
         // save updates
         user.save(function(err) {
@@ -159,59 +161,75 @@ module.exports = {
     
     // get user by email
     User
-      .findOne()
-      .where({ email: req.param( 'user' ).email })
+      .find({ email: req.param( 'user' ).email })
       .exec(function(err, user){
-
-        // return error
-        if (err) return res.negotiate( err );
-
-        // return error
-        if (!user) return res.notFound({ msg: 'Account Not Found!' });
-
-        // reset user
-        var userReset = {
-          adminRpcode: user.adminRpcode,
-          admin0pcode: user.admin0pcode,         
-          organization_id: user.organization_id,
-          organization: user.organization,
-          cluster_id: user.cluster_id,
-          cluster: user.cluster,
-          user_id: user.id,
-          name: user.name,
-          username: user.username,
-          email: user.email,
-          token: jwtToken.issueToken({ sid: user.id })
-        }
-
-        // Add record in reset
-        UserReset
-          .create( userReset ).exec( function( err, reset ) {
 
           // return error
           if (err) return res.negotiate( err );
 
-          // send email
-          sails.hooks.email.send( 'password-reset', {
-              recipientName: reset.name,
-              senderName: 'ReportHub',
-              url: req.param( 'url' ) + reset.token,
-            }, {
-              to: reset.email,
-              subject: 'ReportHub Password Reset'
-            }, function(err) {
-              
-              // return error
-              if (err) return res.negotiate( err );
+          // return error
+          if (!user.length) return res.notFound({ msg: 'Account Not Found!' });
 
-              // email sent
-              return res.json(200, {'data': 'success' });
+          var resets = [],
+              counter = 0,
+              length = user.length;
 
-            });
+          // 
+          for (i = 0; i < user.length; i++) {
 
-        }); 
+            // reset user
+            var userReset = {
+              adminRpcode: user[i].adminRpcode,
+              admin0pcode: user[i].admin0pcode,         
+              organization_id: user[i].organization_id,
+              organization: user[i].organization,
+              cluster_id: user[i].cluster_id,
+              cluster: user[i].cluster,
+              user_id: user[i].id,
+              name: user[i].name,
+              username: user[i].username,
+              email: user[i].email,
+              token: jwtToken.issueToken({ sid: user[i].id })
+            }
 
-      });
+            // Add record in reset
+            UserReset
+              .create( userReset )
+              .exec( function( err, reset ) {
+
+                // return error
+                if (err) return res.negotiate( err );
+
+                // push
+                resets.push(reset);
+                // incement
+                counter++;
+                if( counter === length ){
+                  // send email
+                  sails.hooks.email.send( 'password-reset', {
+                      resets: resets,
+                      recipientName: resets[0].username,
+                      senderName: 'ReportHub',
+                      url: req.param( 'url' ),
+                    }, {
+                      to: reset.email,
+                      subject: 'ReportHub Password Reset ' + new Date()
+                    }, function(err) {
+                      
+                      // return error
+                      if (err) return res.negotiate( err );
+
+                      // email sent
+                      return res.json(200, { 'data': 'success' });
+                  });
+                }
+
+              });
+
+          }
+
+
+        });
 
   },
 

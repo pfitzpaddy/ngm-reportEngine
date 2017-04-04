@@ -18,7 +18,13 @@
 
 		<p>Hi <%=recipientName%>,</p>
 		<br/>
-		<p>Need a password reset? Please click the following <a title="Reset your ReportHub password" href="<%=url%>" >link</a> to reset your password.</p>
+		<p>Need a password reset? Select from the options below to reset your password;
+
+		<ul>
+			<% for(var i=0; i < resets.length; i++) { %>
+			<li> <%= resets[i].cluster.toUpperCase() %> <a title="Reset your ReportHub password for <%=resets[i].cluster%>" href="<%=resets[i].url %> <%=resets[i].token %>" >link</a></li>
+			<% } %>
+		</ul>
 
 		<p><br/><%=senderName%></p>
 
