@@ -26,7 +26,7 @@ module.exports = {
     }, function foundUser( err, user ) {
 
       // user exists
-      if ( user ) return res.json( 401, { msg: 'User already exists! Forgot password?' } );
+      if ( user ) return res.json({ err: true, msg: 'User already exists! Forgot password?' } );
 
       // else create user
       User
@@ -74,7 +74,7 @@ module.exports = {
       if (err) return res.negotiate( err );
 
       // user not found
-      if (!user) return res.negotiate({ msg: 'Invalid Username! User exists?' });
+      if (!user) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
@@ -89,7 +89,7 @@ module.exports = {
 
         // password incorrect
         incorrect: function (){
-          return res.negotiate({ msg: 'Invalid Password! Forgot Password?' });
+          return res.json({ err: true, msg: 'Invalid Password! Forgot Password?' });
         },
 
         // on success
@@ -172,7 +172,7 @@ module.exports = {
           if (err) return res.negotiate( err );
 
           // return error
-          if (!user.length) return res.negotiate({ msg: 'Account Not Found!' });
+          if (!user.length) return res.json({ err: true, msg: 'Account Not Found!' });
 
           var resets = [],
               counter = 0,
@@ -252,7 +252,7 @@ module.exports = {
       if (err) return res.negotiate( err );
 
       // return error
-      if (!userReset) return res.json(401, { msg: 'Reset token not found!' });
+      if (!userReset) return res.json({ err: true, msg: 'Reset token not found!' });
 
       // get user with userReset params
       User
@@ -266,7 +266,7 @@ module.exports = {
           require( 'bcrypt' ).hash( req.param( 'reset' ).newPassword, 10, function passwordEncrypted( err, encryptedPassword ) {
 
             // err
-            if ( err ) return res.json( 401, { msg: 'Reset password error' } );
+            if ( err ) return res.json({ err: true, msg: 'Reset password error' } );
 
             // new password
             user.password = encryptedPassword;
