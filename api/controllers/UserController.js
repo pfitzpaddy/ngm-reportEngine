@@ -39,8 +39,12 @@ module.exports = {
           // set token
           user.token = jwtToken.issueToken({ sid: user.id });
 
-          //  return user
-          res.json( 200, user );
+          // save
+          user.save( function(err){
+            //  return user
+            // console.log('User with ID '+user.id+' now has token '+user.token);
+            res.json( 200, user );
+          });
 
         });
 

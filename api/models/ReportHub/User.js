@@ -70,11 +70,11 @@ module.exports = {
 			required: true
 		},
 		phone: {
-			type: 'integer',
+			type: 'string',
 			required: true
 		},
 		email: {
-			type: 'email',
+			type: 'string',
 			unique: true,
 			required: true
 		},
