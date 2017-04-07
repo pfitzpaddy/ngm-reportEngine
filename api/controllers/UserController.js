@@ -89,7 +89,7 @@ module.exports = {
 
         // password incorrect
         incorrect: function (){
-          return res.notFound({ msg: 'Invalid Password!' });
+          return res.notFound({ msg: 'Invalid Password! Forgot Password?' });
         },
 
         // on success
