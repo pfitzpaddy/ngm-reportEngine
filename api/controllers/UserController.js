@@ -74,7 +74,7 @@ module.exports = {
       if (err) return res.negotiate( err );
 
       // user not found
-      if (!user) return res.notFound({ msg: 'Invalid Username! User exists?' });
+      if (!user) return res.negotiate({ msg: 'Invalid Username! User exists?' });
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
@@ -89,7 +89,7 @@ module.exports = {
 
         // password incorrect
         incorrect: function (){
-          return res.notFound({ msg: 'Invalid Password! Forgot Password?' });
+          return res.negotiate({ msg: 'Invalid Password! Forgot Password?' });
         },
 
         // on success
@@ -172,7 +172,7 @@ module.exports = {
           if (err) return res.negotiate( err );
 
           // return error
-          if (!user.length) return res.notFound({ msg: 'Account Not Found!' });
+          if (!user.length) return res.negotiate({ msg: 'Account Not Found!' });
 
           var resets = [],
               counter = 0,
