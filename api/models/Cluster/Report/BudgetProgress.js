@@ -133,6 +133,13 @@ module.exports = {
 		project_donor_name: {
 			type: 'string'
 		},
+		// activity_type
+		activity_type_id: {
+			type: 'string'
+		},
+		activity_type_name: {
+			type: 'string'
+		},
 		project_budget_currency: {
 			type: 'string',
 			required: true
