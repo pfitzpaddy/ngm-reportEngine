@@ -139,49 +139,49 @@ module.exports = {
       .exec( function( err ){
 
         // return error
-        if ( err ) return res.negotiate( err );
+        if ( err ) return res.json({ err: true, error: err });
 
         // target beneficiaries
         TargetBeneficiaries.destroy( { project_id: project_id } )
           .exec( function( err ){
 
             // return error
-            if ( err ) return res.negotiate( err );       
+            if ( err ) return res.json({ err: true, error: err });
 
             // target locations
             TargetLocation.destroy( { project_id: project_id } )
               .exec( function( err ){
 
                 // return error
-                if ( err ) return res.negotiate( err );
+                if ( err ) return res.json({ err: true, error: err });
 
                 // beneficiaries
                 Beneficiaries.destroy( { project_id: project_id } )
                   .exec( function( err ){
 
                     // return error
-                    if ( err ) return res.negotiate( err );
+                    if ( err ) return res.json({ err: true, error: err });
 
                     // budget progress
                     BudgetProgress.destroy( { project_id: project_id } )
                       .exec( function( err ){
 
                         // return error
-                        if ( err ) return res.negotiate( err ); 
+                        if ( err ) return res.json({ err: true, error: err });
 
                         // location
                         Location.destroy( { project_id: project_id } )
                           .exec( function( err ){
 
                             // return error
-                            if ( err ) return res.negotiate( err );
+                            if ( err ) return res.json({ err: true, error: err });
 
                             // location
                             Report.destroy( { project_id: project_id } )
                               .exec( function( err ){
 
                                 // return error
-                                if ( err ) return res.negotiate( err );
+                                if ( err ) return res.json({ err: true, error: err });
       
                                 // else
                                 return res.json( 200, { msg: 'Project ' + project_id + ' has been deleted!' } );
