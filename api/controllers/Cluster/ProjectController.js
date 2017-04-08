@@ -31,7 +31,7 @@ module.exports = {
       Project.create( $project ).exec( function( err, project ){
 
         // return error
-        if (err) return res.negotiate( err );       
+        if (err) return res.json({ err: true, error: err });
 
         Project
           .findOne({ id: project.id })
@@ -39,7 +39,7 @@ module.exports = {
           .exec( function( err, p ){
 
             // return error
-            if (err) return res.negotiate( err );
+            if (err) return res.json({ err: true, error: err });
 
             // return Project
             return res.json( 200, p );
@@ -54,7 +54,7 @@ module.exports = {
       Project.update( { id: $project.id }, $project ).exec(function(err, project){
 
         // return error
-        if (err) return res.negotiate( err );
+        if (err) return res.json({ err: true, error: err });
 
         Project
           .findOne({ id: project[0].id })
@@ -62,7 +62,7 @@ module.exports = {
           .exec( function( err, p ){
 
             // return error
-            if (err) return res.negotiate( err );
+            if (err) return res.json({ err: true, error: err });
 
             // return Project
             return res.json( 200, p );
