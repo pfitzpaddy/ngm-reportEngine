@@ -142,12 +142,10 @@ module.exports = {
 
 		// target locations
 		admin1pcode: {
-			type: 'array',
-			required: true
+			type: 'array'
 		},
 		admin2pcode: {
-			type: 'array',
-			required: true
+			type: 'array'
 		},
 
 
