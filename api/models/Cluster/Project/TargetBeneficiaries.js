@@ -158,6 +158,11 @@ module.exports = {
 		},
 
 		// indicator
+			// sessions -> training
+		sessions:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 			// units -> eiewg
 		units: {
 			type: 'integer',
