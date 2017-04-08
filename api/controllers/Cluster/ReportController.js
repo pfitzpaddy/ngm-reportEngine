@@ -138,7 +138,7 @@ module.exports = {
       .exec( function( err, report ){
 
         // return error
-        if ( err ) return res.negotiate( err );
+        if ( err ) return res.json({ err: true, error: err });
 
         // set updated
         $report = report[0].toObject();
@@ -150,7 +150,7 @@ module.exports = {
           .exec( function( err, locations ){
 
             // return error
-            if (err) return res.negotiate( err );
+            if ( err ) return res.json({ err: true, error: err });
 
             // add locations ( associations included )
             $report.locations = locations;
@@ -179,10 +179,10 @@ module.exports = {
        // when updating target locations in project details (this affects monthly report)
     Beneficiaries
       .update({ id: $beneficiary.id }, { location_reference_id: null })
-      .exec(function( err, b){
+      .exec(function( err, b ){
 
         // return error
-        if ( err ) return res.negotiate( err );           
+        if ( err ) return res.json({ err: true, error: err });           
 
         // return reports
         return res.json( 200, { msg: 'success' } );

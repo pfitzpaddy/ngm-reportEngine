@@ -146,6 +146,17 @@ module.exports = {
 			required: true
 		},
 
+
+		// delivery (population, service)
+		delivery_type_id: {
+			type: 'string',
+			defaultsTo: 'population'
+		},
+		delivery_type_name: {
+			type: 'string',
+			defaultsTo: 'New Beneficiaries'
+		},
+
 		// indicator
 			// units -> eiewg
 		units: {

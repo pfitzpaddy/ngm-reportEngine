@@ -118,8 +118,7 @@ module.exports = {
 			type: 'array'
 		},
 		beneficiary_type: {
-			type: 'array',
-			required: true
+			type: 'array'
 		},
 
 		// target locations

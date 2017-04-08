@@ -188,11 +188,11 @@ module.exports = {
 		// delivery (population, service)
 		delivery_type_id: {
 			type: 'string',
-			required: true
+			defaultsTo: 'population'
 		},
 		delivery_type_name: {
 			type: 'string',
-			required: true
+			defaultsTo: 'New Beneficiaries'
 		},
 
 		// indicator
