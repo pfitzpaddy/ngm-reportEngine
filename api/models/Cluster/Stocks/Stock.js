@@ -128,6 +128,12 @@ module.exports = {
 			required: true
 		},
 		stock_item_name: {
+			type: 'string'
+		},
+		stock_unit_type: {
+			type: 'string'
+		},
+		stock_unit_name: {
 			type: 'string',
 			required: true
 		},
