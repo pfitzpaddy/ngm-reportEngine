@@ -91,6 +91,8 @@ module.exports = {
 							for (var k in d){
 
 								//
+								var w = parseInt(d['reporting/reporting_details/reporting_week']);
+								var week =  w < 10 ? 'W0'+w : 'W'+w;
 								var key = k.split('/')[ k.split('/').length - 1 ];
 								
 								// add default values
@@ -102,13 +104,13 @@ module.exports = {
 									reporting_region_name: d['reporting/reporting_details/reporting_region'].replace(/_/g,' ').toUpperCase(),
 									reporting_province: d['reporting/reporting_details/reporting_province'],
 									reporting_province_name: provinces[d['reporting/reporting_details/reporting_province']].admin1name,
-									reporting_week: parseInt(d['reporting/reporting_details/reporting_week']),
+									reporting_week: week,
 									reporting_year: d['reporting/reporting_details/reporting_year'],
 									reporting_date: moment().year( d['reporting/reporting_details/reporting_year'] ).week( d['reporting/reporting_details/reporting_week'] ).add( 1, 'd' ).format( 'YYYY-MM-DD' ),
 									reporting_lat: provinces[d['reporting/reporting_details/reporting_province']].admin1lat,
 									reporting_lng: provinces[d['reporting/reporting_details/reporting_province']].admin1lng,
 									_submission_time: d['_submission_time']
-								};						
+								};
 								
 								switch ( key ) {
 									
@@ -236,6 +238,7 @@ module.exports = {
 									default:
 										// set record
 										obj[key] = d[k];
+										obj.reporting_week = week;
 										obj.reporting_date = moment().year( moment(d['_submission_time']).year() ).week( d['reporting/reporting_details/reporting_week'] ).add( 1, 'd' ).format( 'YYYY-MM-DD' ),
 										obj.reporting_year = parseInt(moment(d['_submission_time']).year());
 										obj.reporting_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;

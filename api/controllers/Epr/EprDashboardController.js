@@ -92,7 +92,7 @@ var EprDashboard = {
       year: { reporting_year: params.year },
       region: params.region !== 'all' ? { reporting_region: params.region } : {},
       province: params.province !== 'all' ? { reporting_province: params.province } : {},
-      week: params.week !== 'all' ? { reporting_week: parseInt(params.week) } : {},
+      week: params.week !== 'all' ? { reporting_week: params.week } : {},
       date: params.week === 'all' ? { reporting_date: { '>=': params.start_date, '<=': params.end_date } } : {}
     }
   },
