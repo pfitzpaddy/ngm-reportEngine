@@ -108,6 +108,9 @@ module.exports.routes = {
   // EPR
   'GET /epr/getKoboData': 'Epr/EprController.getKoboData',
   // EPR Dashboard
+  // get latest update
+  'GET /epr/latestUpdate': 'Epr/EprDashboardController.getlatestUpdate',
+  // Epr
   'GET /epr/indicator': 'Epr/EprDashboardController.getEprIndicator',
   'POST /epr/indicator': 'Epr/EprDashboardController.getEprIndicator',
   // alerts

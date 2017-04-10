@@ -11,6 +11,22 @@ var json2csv = require( 'json2csv' );
 
 var EprDashboard = {
 
+  // get latest date
+  getLatestUpdate: function( req, res ){
+    
+    Epr
+      .find().limit(1)
+      .exec( function( err, results ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // latest update
+        return res.json( 200, results[0] );
+
+      });
+  },
+
   // get sum by key
   getSum: function( key, records ){
 
