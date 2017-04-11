@@ -66,7 +66,7 @@ module.exports.routes = {
   'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
   'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
   // Admin Dashboard
-  'POST /cluster/admin/indicator': 'Cluster/AdminDashboardController.getHealthAdminIndicator',
+  'POST /cluster/admin/indicator': 'Cluster/AdminDashboardController.getClusterAdminIndicator',
   // Cluster Lists
   'GET /cluster/list/activities': 'Cluster/Lists/ListController.getActivities',
   'GET /cluster/list/donors': 'Cluster/Lists/ListController.getDonors',

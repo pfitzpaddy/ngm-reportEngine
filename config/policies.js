@@ -69,7 +69,7 @@ module.exports.policies = {
 
   // public
   'Cluster/AdminDashboardController': {
-    'getHealthAdminIndicator': true
+    '*': true
   },
 
   // public
