@@ -206,6 +206,14 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		// units
+		unit_type_id: {
+			type: 'string'
+		},
+		unit_type_name: {
+			type: 'string'
+		},
+
 			// conditional/unconditional
 		cash_amount: {
 			type: 'integer',
