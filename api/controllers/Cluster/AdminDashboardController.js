@@ -67,6 +67,7 @@ var AdminDashboardController = {
         // get organizations by project
         StockReport
           .find()
+          .where( params.cluster_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -94,6 +95,7 @@ var AdminDashboardController = {
           // get organizations by project
           StockReport
             .find()
+            .where( params.cluster_filter )
             .where( { adminRpcode: params.adminRpcode } )
             .where( { admin0pcode: params.admin0pcode } )
             .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -129,6 +131,7 @@ var AdminDashboardController = {
             // get organizations by project
             StockReport
               .find()
+              .where( params.cluster_filter )
               .where( { adminRpcode: params.adminRpcode } )
               .where( { admin0pcode: params.admin0pcode } )
               .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -168,6 +171,7 @@ var AdminDashboardController = {
         // reports total
         StockReport
           .find()
+          .where( params.cluster_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -233,6 +237,7 @@ var AdminDashboardController = {
         // reports complete
         StockReport
           .find()
+          .where( params.cluster_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -309,6 +314,7 @@ var AdminDashboardController = {
         // reports due
         StockReport
           .find()
+          .where( params.cluster_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { report_active: true } )
@@ -387,6 +393,7 @@ var AdminDashboardController = {
         // reports total
         StockReport
           .find()
+          .where( params.cluster_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -401,6 +408,7 @@ var AdminDashboardController = {
             // reports complete
             Report
               .find()
+              .where( params.cluster_filter )
               .where( { adminRpcode: params.adminRpcode } )
               .where( { admin0pcode: params.admin0pcode } )
               .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )

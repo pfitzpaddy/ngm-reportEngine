@@ -148,6 +148,12 @@ module.exports = {
 			type: 'integer',
 			required: true
 		},
+		currency_id: {
+			type: 'string'
+		},
+		currency_name: {
+			type: 'string'
+		},
 		project_budget_date_recieved: {
 			type: 'date',
 			required: true

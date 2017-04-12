@@ -130,12 +130,11 @@ module.exports = {
 		stock_item_name: {
 			type: 'string'
 		},
-		stock_unit_type: {
+		unit_type_id: {
 			type: 'string'
 		},
-		stock_unit_name: {
-			type: 'string',
-			required: true
+		unit_type_name: {
+			type: 'string'
 		},
 		number_in_stock: {
 			type: 'integer',
@@ -144,6 +143,12 @@ module.exports = {
 		number_in_pipeline: {
 			type: 'integer',
 			required: true
+		},
+		stock_status_id: {
+			type: 'string',
+		},
+		stock_status_name: {
+			type: 'string'
 		},
 		beneficiaries_covered:{
 			type: 'integer',
