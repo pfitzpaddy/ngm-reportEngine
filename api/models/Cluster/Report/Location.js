@@ -95,7 +95,7 @@ module.exports = {
 			required: true
 		},
 		project_budget: {
-			type: 'integer',
+			type: 'float',
 			required: true
 		},
 		project_budget_currency: {
