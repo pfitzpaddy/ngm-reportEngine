@@ -90,7 +90,7 @@ module.exports = {
 			required: true
 		},
 		project_budget: {
-			type: 'integer',
+			type: 'float',
 			required: true
 		},
 		project_budget_currency: {
@@ -148,7 +148,7 @@ module.exports = {
 			required: true
 		},
 		project_budget_amount_recieved: {
-			type: 'integer',
+			type: 'float',
 			required: true
 		},
 		currency_id: {
