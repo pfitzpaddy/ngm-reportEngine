@@ -425,8 +425,12 @@ function updateProjectReports( project, target_locations, generated_reports, nex
 
 						}
 
+						var report_status = reports[i].report_status;
+
 						// merge location changes
 						reports[i] = deepAssign( reports[i], skeleton_report );
+
+						reports[i].report_status = report_status;
 
 						// update
 						Report
@@ -454,116 +458,3 @@ function updateProjectReports( project, target_locations, generated_reports, nex
 	});
 
 }
-
-// update existing project reports
-// function updateProjectReports( reports, next ) {
-
-// 	// number of reports to update
-// 	var counter = 0,
-// 			length = reports.length;
-
-// 	// for each report
-// 	reports.forEach( function( report, r_index ) {
-
-// 		// report is true
-// 		var report_active = true;
-
-// 		// should be reports just for 2016 period and beyond!
-// 		if ( reports[ r_index ].report_year < 2016  ) {
-// 			report_active = false;
-// 		}
-
-// 		// updateOrCreate (returns array)
-// 		Report
-// 			.update( { 	project_id: reports[ r_index ].project_id,
-// 									report_month: reports[ r_index ].report_month, 
-// 									report_year: reports[ r_index ].report_year
-// 								}, { report_active: report_active } )
-// 			.exec( function( err, report ) {
-
-// 				// return error
-// 				if ( err ) return next( err );
-
-// 				// if no report - create
-// 				if ( !report.length ) {
-
-// 					// create with association
-// 					Report
-// 						.create( reports[ r_index ] )
-// 						.exec( function( err, report ) {
-
-// 							// return error
-// 							if ( err ) return next( err );
-
-// 							// counter
-// 							counter++;							
-
-// 							// final update
-// 							if ( counter === length ) {
-// 								// next!
-// 								next();
-
-// 							}
-							
-// 						});
-
-// 				} else {
-
-// 					// get locations
-// 					Location
-// 						.find()
-// 						.where( { report_id: report[0].id } )
-// 						.populateAll()
-// 						.exec( function( err, locations ){
-
-// 							// return error
-// 							if ( err ) return next( err );
-
-// 							// for each location
-// 							locations.forEach( function( location, l_index){
-
-// 								// add beneficiaries if existing
-// 								if ( location.beneficiaries.length ) {
-// 									if( !reports[ r_index ].locations[ l_index ] ){
-// 										reports[ r_index ].locations[ l_index ] = {
-// 											beneficiaries: []
-// 										}
-// 									}
-// 									reports[ r_index ].locations[ l_index ].beneficiaries = location.beneficiaries;
-// 								}
-								
-// 							});
-
-// 							// updates locations association
-// 							Report
-// 								.update( { 	project_id: reports[ r_index ].project_id,
-// 														report_month: reports[ r_index ].report_month, 
-// 														report_year: reports[ r_index ].report_year
-// 													}, { locations: reports[ r_index ].locations } )
-// 								.exec( function( err, report ) {
-
-// 									// return error
-// 									if ( err ) return next( err );
-
-// 									// counter
-// 									counter++;							
-									
-// 									// final update ?
-// 									if ( counter === length ) {
-										
-// 										// next!
-// 										next();
-// 									}
-
-// 								});
-
-						
-// 						});
-
-// 				}
-
-// 			});
-
-// 	});
-
-// }

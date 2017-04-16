@@ -5,7 +5,210 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+
+
 module.exports = {
+
+  // request as csv
+  getReportCsv: function( req, res ) {
+
+    // request input
+    if ( !req.param( 'report_type' ) || !req.param( 'report_id' ) ) {
+      return res.json( 401, { err: 'report_type & report_id required!' });
+    }
+
+    var json2csv = require( 'json2csv' ),
+      moment = require( 'moment' );
+
+    // activity 
+    if ( req.param( 'report_type' ) === 'activity' ) {
+
+      var fields = [
+            'project_id',
+            'report_id',
+            'cluster',
+            'organization',
+            'username',
+            'email',
+            'project_hrp_code',
+            'project_title',
+            'project_code',
+            'admin0name',
+            'admin1pcode',
+            'admin1name',
+            'admin2pcode',
+            'admin2name',
+            'fac_type_name',
+            'fac_name',
+            'report_month',
+            'report_year',
+            'activity_type_name',
+            'activity_description_name',
+            'category_type_name',
+            'beneficiary_type_name',
+            'delivery_type_name',
+            'units',
+            'unit_type_name',
+            'households',
+            'families',
+            'boys',
+            'girls',
+            'men',
+            'women',
+            'elderly_men',
+            'elderly_women',
+            'total',
+            'createdAt',
+            'updatedAt'
+          ],
+          fieldNames = [ 
+            'Project ID', 
+            'Report ID', 
+            'Cluster',
+            'Organization', 
+            'Username', 
+            'Email', 
+            'HRP Code',
+            'Project Title',
+            'Project Code',
+            'Country',
+            'Admin1 Pcode',
+            'Admin1 Name',
+            'Admin2 Pcode',
+            'Admin2 Name',
+            'Report Month',
+            'Report Year',
+            'Location Type',
+            'Location Name',
+            'Activity Type',
+            'Activity Description',
+            'Category Ttype',
+            'Beneficiary Type',
+            'Delivery',
+            'Unit',
+            'Unit Type',
+            'Households',
+            'Families',
+            'Boys',
+            'Girls',
+            'Men',
+            'Women',
+            'Elderly Men',
+            'Elderly Women',
+            'Total',
+            'Created',
+            'Last Update'
+          ];
+
+      // beneficiaries
+      Beneficiaries
+        .find( )
+        .where( { report_id: req.param( 'report_id' ) } )
+        .exec(function( err, response ){
+
+          // error
+          if ( err ) return res.negotiate( err );
+
+          // format month
+          response.forEach(function( d, i ){
+            response[i].report_month = moment( response[i].report_month ).format( 'MMMM' );
+            response[i].total = response[i].boys + 
+                                response[i].girls + 
+                                response[i].men + 
+                                response[i].women + 
+                                response[i].elderly_men + 
+                                response[i].elderly_women;
+          });
+
+          // return csv
+          json2csv({ data: response, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+            // error
+            if ( err ) return res.negotiate( err );
+
+            // success
+            return res.json( 200, { data: csv } );
+
+          });
+
+        });
+
+    } else {
+
+      var fields = [
+            'organization_id',
+            'report_id',
+            'organization',
+            'username',
+            'email',
+            'admin0name',
+            'admin1pcode',
+            'admin1name',
+            'admin2pcode',
+            'admin2name',
+            'fac_name',
+            'report_month',
+            'report_year',
+            'cluster',
+            'stock_item_name',
+            'stock_status_name',
+            'number_in_stock',
+            'number_in_pipeline',
+            'unit_type_name',
+            'beneficiaries_covered',
+            'createdAt',
+            'updatedAt'
+          ],
+          fieldNames = [ 
+            'Organization ID',
+            'Report ID', 
+            'Organization', 
+            'Username', 
+            'Email', 
+            'Country',
+            'Admin1 Pcode',
+            'Admin1 Name',
+            'Admin2 Pcode',
+            'Admin2 Name',
+            'Warehouse Name',
+            'Stock Month',
+            'Stock Year',
+            'Cluster',
+            'Stock Type',
+            'Status',
+            'No. in Stock',
+            'No. in Pipeline',
+            'Units',
+            'Beneficiary Coverage',
+            'Created',
+            'Last Update'
+          ];
+
+      // stocks
+      Stock
+        .find( )
+        .where( { report_id: req.param( 'report_id' ) } )
+        .exec(function( err, response ){
+
+          // error
+          if ( err ) return res.negotiate( err );
+
+          // return csv
+          json2csv({ data: response, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+            // error
+            if ( err ) return res.negotiate( err );
+
+            // success
+            return res.json( 200, { data: csv } );
+
+          });
+
+        });
+
+    }
+
+  },
 
   // get all reports by project id
   getReportsList: function( req, res ) {

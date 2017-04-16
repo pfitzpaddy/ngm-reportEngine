@@ -90,7 +90,10 @@ module.exports.routes = {
   'GET /cluster/stock/setReportsOpen': 'Cluster/Stocks/StockReportController.setReportsOpen',
   'GET /cluster/stock/setReportsReminder': 'Cluster/Stocks/StockReportController.setReportsReminder',
 
-  // REPORTS
+  // ACTIVITY REPORTS
+  
+  'POST /cluster/report/getReportCsv': 'Cluster/ReportController.getReportCsv',
+
   'POST /cluster/report/getReportsList': 'Cluster/ReportController.getReportsList',
   'POST /cluster/report/getReport': 'Cluster/ReportController.getReportById',
   'POST /cluster/report/setReport': 'Cluster/ReportController.setReportById',

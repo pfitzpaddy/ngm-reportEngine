@@ -71,6 +71,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		project_code: {
+			type: 'string'
+		},
 		project_status: {
 			type: 'string',
 			defaultsTo: 'new'

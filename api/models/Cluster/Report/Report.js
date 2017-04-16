@@ -62,6 +62,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		project_code: {
+			type: 'string'
+		},
 		project_id: {
 			type: 'string',
 			required: true

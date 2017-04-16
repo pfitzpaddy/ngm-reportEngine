@@ -28,7 +28,7 @@ var AdminDashboardController = {
     }
 
     // organizations to exclude totally
-    var $nin_organizations = [ 'iMMAP' ];
+    var $nin_organizations = [ 'iMMAP', 'ARCS' ];
         // organizations to exclude in calculations
         // ARCS
         // $nin_select_organizations = [ '56ff49200c68f2c746e3f83a' ];
