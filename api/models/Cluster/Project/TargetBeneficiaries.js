@@ -168,7 +168,7 @@ module.exports = {
 		},
 			// units -> eiewg
 		units: {
-			type: 'integer',
+			type: 'float',
 			defaultsTo: 0
 		},
 		// units
