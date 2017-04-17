@@ -272,36 +272,34 @@ function setStockReports( reports, cb ){
 	// for each report
 	reports.forEach( function( report, r_index ) {
 
-		// update (returns array)
 		StockReport
-			.update( { 	organization_id: reports[ r_index ].organization_id,
-									report_month: reports[ r_index ].report_month, 
-									report_year: reports[ r_index ].report_year
-								}, reports[ r_index ] )
-			.exec( function( err, update ) {
-
+			.find( { organization_id: reports[ r_index ].organization_id,
+						report_month: reports[ r_index ].report_month, 
+						report_year: reports[ r_index ].report_year
+					} )
+			.exec(function( err, sReport ){
+				
 				// return error
 				if ( err ) return cb( err );
 
-				// if report
-				if ( update.length ) {
-					// counter
-					counter++;
-					// final update
-					if ( counter === length ) {
-						// next!
-						cb();
-					}
+				// report length
+				if ( sReport.length ) {
+					reports[ r_index ].report_status = sReport[0].report_status;
 				}
-				// if no report - create
-				if ( !update.length ) {
 
-					// create with association
-					StockReport
-						.create( reports[ r_index ] )
-						.exec( function( err, new_report ) {
-							// return error
-							if ( err ) return cb( err );
+				// update (returns array)
+				StockReport
+					.update( { 	organization_id: reports[ r_index ].organization_id,
+											report_month: reports[ r_index ].report_month, 
+											report_year: reports[ r_index ].report_year
+										}, reports[ r_index ] )
+					.exec( function( err, update ) {
+
+						// return error
+						if ( err ) return cb( err );
+
+						// if report
+						if ( update.length ) {
 							// counter
 							counter++;
 							// final update
@@ -309,8 +307,28 @@ function setStockReports( reports, cb ){
 								// next!
 								cb();
 							}
-						});
-				}
+						}
+						// if no report - create
+						if ( !update.length ) {
+
+							// create with association
+							StockReport
+								.create( reports[ r_index ] )
+								.exec( function( err, new_report ) {
+									// return error
+									if ( err ) return cb( err );
+									// counter
+									counter++;
+									// final update
+									if ( counter === length ) {
+										// next!
+										cb();
+									}
+								});
+						}
+
+					});
+			
 
 			});
 	});

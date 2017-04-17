@@ -154,7 +154,7 @@ var ProjectDashboardController = {
           // success
           return res.json( 200, { data: csv } );
 
-        });     
+        });  
       
       }); 
 

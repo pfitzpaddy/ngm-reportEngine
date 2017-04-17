@@ -62,7 +62,7 @@ module.exports.routes = {
 
 
   // CLUSTER
-  // Locaiton lists
+  // Location lists
   'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
   'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
   // Admin Dashboard
@@ -101,6 +101,17 @@ module.exports.routes = {
   'GET /cluster/report/setReportsToDo': 'Cluster/ReportController.setReportsToDo',
   'GET /cluster/report/setReportsOpen': 'Cluster/ReportController.setReportsOpen',
   'GET /cluster/report/setReportsReminder': 'Cluster/ReportController.setReportsReminder',
+
+
+  // CLUSTER DASHBOARD
+  // get latest update
+  'GET /cluster/latestUpdate': 'Cluster/ClusterDashboardController.getlatestUpdate',
+
+  // data
+  'POST /cluster/indicator': 'Cluster/ClusterDashboardController.getIndicator',
+
+
+
 
 
   // HEALTH

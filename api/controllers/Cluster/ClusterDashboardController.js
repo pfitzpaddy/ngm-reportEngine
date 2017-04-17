@@ -8,14 +8,79 @@
 // require
 var moment = require( 'moment' );
 var json2csv = require( 'json2csv' );
+var $nin_organizations = [ 'iMMAP', 'ARCS' ];
 
-var ClusterDashboard = {
+var ClusterDashboardController = {
+
+  // flatten json
+  flatten: function( json ) {
+    var array = [];
+    for( var i in json ) {
+      if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
+        array.push( json[ i ] );
+      }
+    }
+    return array;
+  },
+
+  // get params from req
+  getParams: function( req, res ){
+    
+    // request input
+    if ( !req.param('indicator') || 
+          !req.param('cluster_id') ||
+          !req.param('adminRpcode') ||
+          !req.param('admin0pcode') ||
+          !req.param('organization') ||
+          !req.param('admin1pcode') ||
+          !req.param('admin2pcode') ||
+          !req.param('beneficiaries') ||
+          !req.param('start_date') ||
+          !req.param('end_date') ) {
+      return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization, admin1pcode, admin2pcode, beneficiaries, start_date, end_date required!'});
+    }
+
+    // return params
+    return {
+      csv: req.param('csv') ? req.param('csv') : false,
+      list: req.param('list') ? req.param('list') : false,
+      indicator: req.param('indicator'),
+      cluster_id: req.param('cluster_id'),
+      adminRpcode: req.param('adminRpcode'),
+      admin0pcode: req.param('admin0pcode'),
+      organization: req.param('organization'),
+      admin1pcode: req.param('admin1pcode'),
+      admin2pcode: req.param('admin2pcode'),
+      start_date: req.param('start_date'),
+      end_date: req.param('end_date')
+    }
+
+  },
+
+  // return filters
+  getFilters: function( params ){
+    // filters
+    return {
+      default: { report_month: { '>=': 0 }, report_year: { '>=': 2017 }, location_id: { '!': null } },
+      cluster_id: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
+      adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
+      admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
+      organization: params.organization === 'all' ? {} : { organization: params.organization },
+      admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
+      admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
+      date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
+      $nin_organizations: { organization: { '!': $nin_organizations } },
+    }
+  },
 
   // get latest date
   getLatestUpdate: function( req, res ){
     
-    Epr
-      .find().limit(1)
+    // beneficiaries
+    Beneficiaries
+      .find({ organization: { '!': $nin_organizations } })
+      .sort( 'updatedAt DESC' )
+      .limit(1)
       .exec( function( err, results ){
 
         // return error
@@ -27,210 +92,237 @@ var ClusterDashboard = {
       });
   },
 
-  // get sum by key
-  getSum: function( key, records ){
+  // indicators
+  getIndicator: function ( req, res  ) {
+    
+    // parmas, filters
+    var params = ClusterDashboardController.getParams( req, res );
+    var filters = ClusterDashboardController.getFilters( params );
 
-    var value=0;
+    // switch on indicator
+    switch( params.indicator ) {
 
-    records.forEach(function(d,i){
-      for (var d_key in d) {
-        if( key === d_key && !isNaN(d[d_key]) && typeof(d[d_key]) === 'number' ){
-          value += d[d_key];
-        }
-      }
-    });
+      case 'organizations':
 
-    return value;
-  },
+        // get organizations by project
+        Beneficiaries
+          .find()
+          .where( filters.default )
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( filters.date )
+          .where( filters.$nin_organizations )
+          .exec( function( err, beneficiaries ){
 
-  // get params from req
-  getParams: function( req ){
-    // check req
-    if (  !req.param('indicator') || !req.param('year') || !req.param('region') || !req.param('province')  || !req.param('week') || !req.param('start_date') || !req.param('end_date') ) {
-      return res.json( 401, { err: 'year, region, province, week, start_date, end_date required!' });
-    }
-    // return params
-    return {
-      indicator: req.param('indicator'),
-      list: req.param('list') ? req.param('list') : false,
-      year: parseInt( req.param('year') ),
-      region: req.param('region'),
-      province: req.param('province'),
-      week: req.param('week'),
-      start_date: req.param('start_date'),
-      end_date: req.param('end_date'),
-      current_week: ( parseInt( req.param('year') ) === moment().year() ) ? moment().week() : 53,
-      regions: {
-        'all': {
-          name: 'All'
-        },
-        'central': {
-          name: 'Central',
-          prov: [ 8,3,4,5,2,1 ]
-        },
-        'central_highlands': {
-          name: 'Central Highlands',
-          prov: [ 10,22 ]
-        },
-        'east': {
-          name: 'East',
-          prov: [ 13,7,14,6 ]
-        },
-        'north': {
-          name: 'North',
-          prov: [ 27,28,18,19,20 ]
-        },
-        'north_east': {
-          name: 'North East',
-          prov: [ 15,9,17,16 ]
-        },
-        'south': {
-          name: 'South',
-          prov: [ 32,23,34,24,33 ]
-        },
-        'south_east': {
-          name: 'South East',
-          prov: [  26,25,12,11 ]
-        },
-        'west': {
-          name: 'West',
-          prov: [ 31,21,29,30 ]
-        }
-      }
-    }
+            // return error
+            if (err) return res.negotiate( err );
 
-  },
+            // orgs
+            var organizations = [];
 
-  // return filters
-  getFilters: function( params ){
-    // filters
-    return {
-      year: { reporting_year: params.year },
-      region: params.region !== 'all' ? { reporting_region: params.region } : {},
-      province: params.province !== 'all' ? { reporting_province: params.province } : {},
-      week: params.week !== 'all' ? { reporting_week: params.week } : {},
-      date: params.week === 'all' ? { reporting_date: { '>=': params.start_date, '<=': params.end_date } } : {}
-    }
-  },
+            // projects 
+            beneficiaries.forEach(function( d, i ){
 
-  // get epr indicators
-  getEprIndicator: function(req, res) {
-
-    // params
-    var params = ClusterDashboard.getParams( req );
-
-    // filters
-    var filters = ClusterDashboard.getFilters( params );
-
-    // run query
-    Epr
-      .find()
-      .where( filters.year )
-      .where( filters.region )
-      .where( filters.province )
-      .where( filters.week )
-      .where( filters.date )
-      .exec( function( err, results ){
-
-        // return error
-        if (err) return res.negotiate( err );
-
-        // indicator
-        switch( params.indicator ){
-
-          // total reports submitted
-          case 'submitted_reports':
-
-            // return number of expected reports
-            return res.json( 200, { 'value': results.length } );
-
-            break;
-
-          // total reports outstanding
-          case 'outstanding_reports':
-
-            // 
-            var reports = params.province === 'all' ? 34 : 1,
-                weeks = params.week === 'all' ? params.current_week : 1;
-
-            // if reports for a region
-            if ( params.region !== 'all' ) {
-
-              reports = params.regions[params.region].prov.length;
-
-            }
-
-            // return number of expected reports
-            return res.json( 200, { 'value': ( reports * weeks ) - results.length } );
-
-            break;
-
-          // total reports due
-          case 'expected_reports':
-
-            // province/weeks
-            var reports = params.province === 'all' ? 34 : 1,
-                weeks = params.week === 'all' ? params.current_week : 1;
-
-            // if reports for a region
-            if ( params.region !== 'all' ) {
-              // region
-              reports = params.regions[params.region].prov.length;
-
-            }
-
-            // return number of expected reports
-            return res.json( 200, { 'value': reports * weeks } );
-
-            break;
-
-          // total reports due
-          case 'duplicate_reports':
-
-            // values
-            var store = {},
-                reports = [],
-                duplicates = 0;
-
-            // results
-            results.forEach(function( d, i ){
-              // week + province
-              if (!store[d.reporting_week + '_' + d.reporting_province]) {
-                store[d.reporting_week + '_' + d.reporting_province] = {};
-                store[d.reporting_week + '_' + d.reporting_province].count = 0;
-                store[d.reporting_week + '_' + d.reporting_province].data = [];
+              // if not existing
+              if( !organizations[ d.organization ] ) {
+                // add 
+                organizations[ d.organization ] = {};
+                organizations[ d.organization ].organization_id = d.organization_id;
+                organizations[ d.organization ].organization = d.organization;
               }
-              store[d.reporting_week + '_' + d.reporting_province].count++;
-              store[d.reporting_week + '_' + d.reporting_province].data.push(d);
+
             });
 
-            // store
-            for(var k in store){
-              if ( store[k].count > 1 ) {
-                // sum
-                duplicates++;
-                // convert to reports
-                store[k].data.forEach(function( d, i ){
-                  reports.push(d);
-                });
-              }
-            }
-              
-            // if list
+            // menu
             if ( params.list ) {
-              // return table
-              return res.json( 200, reports );
+              
+              // return org list
+              return res.json( 200, ClusterDashboardController.flatten( organizations ) );
+
             } else {
-              return res.json( 200, { 'value': duplicates } );
+              
+              // return org list
+              return res.json( 200, { 'value': ClusterDashboardController.flatten( organizations ).length } );
+
             }
 
-            break;
+          });
 
-          // total reports due
-          case 'data':
+        break;
+
+      case 'beneficiaries':
+
+        // get beneficiaries by project
+        Beneficiaries
+          .find()
+          .where( filters.default )
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( filters.date )
+          .where( filters.$nin_organizations )
+          .exec( function( err, beneficiaries ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            var sum = 0;
+
+            beneficiaries.forEach(function( d, i ){
+              var eld_men = d.elderly_men ? d.elderly_men : 0;
+              var eld_women = d.elderly_women ? d.elderly_women : 0;
+              sum += d.boys;
+              sum += d.girls;
+              sum += d.men;
+              sum += d.women;
+              sum += eld_men;
+              sum += eld_women;
+            });
+
+            if ( params.csv ) {
+
+              var fields = [
+                    'cluster_id',
+                    'cluster',
+                    'category_type_id',
+                    'category_type_name',
+                    'beneficiary_type_id',
+                    'beneficiary_type_name',
+                    'activity_type_id',
+                    'activity_type_name',
+                    'activity_description_id',
+                    'activity_description_name',
+                    'delivery_type_id',
+                    'delivery_type_name',
+                    'units',
+                    'cash_amount',
+                    'households',
+                    'sessions',
+                    'families',
+                    'boys',
+                    'girls',
+                    'men',
+                    'women',
+                    'elderly_men', 
+                    'elderly_women',
+                    'unit_type_id',
+                    'unit_type_name',
+                    'project_id',
+                    'report_id',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'fac_type_name',
+                    'fac_name',
+                    'adminRpcode',
+                    'adminRname',
+                    'admin0pcode',
+                    'admin0name',
+                    'admin1lng',
+                    'admin1lat',
+                    'admin2lng',
+                    'admin2lat',
+                    'conflict'
+                  ];
+
+              var fieldNames = [
+                    'cluster_id',
+                    'cluster',
+                    'category_type_id',
+                    'category_type_name',
+                    'beneficiary_type_id',
+                    'beneficiary_type_name',
+                    'activity_type_id',
+                    'activity_type_name',
+                    'activity_description_id',
+                    'activity_description_name',
+                    'delivery_type_id',
+                    'delivery_type_name',
+                    'units',
+                    'cash_amount',
+                    'households',
+                    'sessions',
+                    'families',
+                    'boys',
+                    'girls',
+                    'men',
+                    'women',
+                    'elderly_men', 
+                    'elderly_women',
+                    'unit_type_id',
+                    'unit_type_name',
+                    'project_id',
+                    'report_id',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'fac_type_name',
+                    'fac_name',
+                    'adminRpcode',
+                    'adminRname',
+                    'admin0pcode',
+                    'admin0name',
+                    'admin1lng',
+                    'admin1lat',
+                    'admin2lng',
+                    'admin2lat',
+                    'conflict'
+                  ];
+
+              // return csv
+              json2csv({ data: beneficiaries, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                
+                // error
+                if ( err ) return res.negotiate( err );
+
+                // success
+                return res.json( 200, { data: csv } );
+
+              });
+
+            } else {
+              
+              // return org list
+              return res.json( 200, { 'value': sum } );
+
+            }
+
+          });
+
+        break;
+
+      case 'contacts':
+
+        // require
+        var users = [],
+            fields = [ 'admin0name', 'cluster', 'organization', 'name', 'position', 'username', 'phone', 'email', 'createdAt' ],
+            fieldNames = [ 'Country', 'Cluster', 'Organization', 'Name', 'Position', 'Username', 'Phone', 'Email', 'Joined ReportHub' ];
+
+        // users
+        User
+          .find()
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .exec( function( err, users ){
+
+            // return error
+            if (err) return res.negotiate( err );
 
             // return csv
-            json2csv({ data: results }, function( err, csv ) {
+            json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
               
               // error
               if ( err ) return res.negotiate( err );
@@ -238,281 +330,265 @@ var ClusterDashboard = {
               // success
               return res.json( 200, { data: csv } );
 
-            });           
-
-            break;            
-
-          default:
-
-            // return number of reports
-            return res.json( 200, results );
-
-            break;
-
-        }
-
-
-      });
-
-  },
-
-  // get alert indicator
-  getAlertIndicator: function(req, res) {
-
-    // params
-    var params = ClusterDashboard.getParams( req );
-
-    // filters
-    var filters = ClusterDashboard.getFilters( params );
-
-    // run query
-    Alerts
-      .find()
-      .where( filters.year )
-      .where( filters.region )
-      .where( filters.province )
-      .where( filters.week )
-      .where( filters.date )
-      .exec( function( err, results ){
-
-        // return error
-        if (err) return res.negotiate( err );
-
-        // indicator
-        switch( params.indicator ){
-
-          // total reports due
-          case 'total':
-
-            // return number of expected reports
-            return res.json( 200, { 'value': results.length } );
-
-            break;
-
-          case 'cases':
-
-            var value = ClusterDashboard.getSum( 'cases', results );
-            return res.json( 200, { 'value': value } );
-
-          case 'deaths':
-
-            var value = ClusterDashboard.getSum( 'deaths', results );
-            return res.json( 200, { 'value': value } );
-
-          case 'markers':
-
-            // markers
-            var markers = {};
-
-            // for each
-            results.forEach(function(d,i){
-
-              // message
-              var message = '<div class="center card-panel" style="width:300px">' +
-                              '<div>' +
-                                '<div class="count" style="text-align:center">' + d.deaths + '</div> deaths <br/><br/>' + 
-                              '</div>' +
-                              '<div>' +
-                                '<div style="text-align:center"> with <span class="count">' + d.cases + '</span> cases from ' + d.alert_categories.replace(/_/g, ' ').toUpperCase() +
-                              '</div>' + 
-                              '<div>' +
-                                '<div style="text-align:center">Alert Verification: ' + d.alert_verification.replace(/_/g, ' ').toUpperCase()
-                              '</div>' + 
-                              '<div>' +
-                                'in ' + d.alert_province_name + ', ' + d.alert_district_name +
-                              '</div>' +
-                            '</div>';
-              // create markers
-              markers['marker' + i] = {
-                layer: 'alerts',
-                lat: d.alert_lat,
-                lng: d.alert_lng,
-                message: message
-              };
             });
 
-            // return markers
-            return res.json( { status:200, data: markers } );
+          });
 
-          default:
+        break;
 
-            // return number of expected reports
-            return res.json( 200, results );
+      case 'ocha_report':
 
-            break;
+        // require
+        var data = {},
+            fields = [ 'admin1pcode', 'admin1name', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total' ],
+            fieldNames = [ 'Admin1 Pcode', 'Admin1 Name', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total' ];
 
-        }
+        // get organizations by project
+        Beneficiaries
+          .find()
+          .where( filters.default )
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( filters.date )
+          .where( filters.$nin_organizations )
+          .exec( function( err, beneficiaries ){
 
+            // return error
+            if (err) return res.negotiate( err );
 
-      });
+            // beneficiarie
+            beneficiaries.forEach(function( d, i ){
+              if ( !data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] ) {
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] = {};
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total = 0;
+              }
+              var eld_men = d.elderly_men ? d.elderly_men : 0;
+              var eld_women = d.elderly_women ? d.elderly_women : 0;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name = d.category_type_name;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name = d.beneficiary_type_name;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys += d.boys;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls += d.girls;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men += d.men;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women += d.women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men += eld_men;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women += eld_women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total += d.boys + d.girls + d.men + d.women + eld_men + eld_women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
 
-  },
-
-  // get disaster indicators
-  getDisasterIndicator: function(req, res) {
-
-    // params
-    var params = ClusterDashboard.getParams( req );
-
-    // filters
-    var filters = ClusterDashboard.getFilters( params );
-
-    // run query
-    Disasters
-      .find()
-      .where( filters.year )
-      .where( filters.region )
-      .where( filters.province )
-      .where( filters.week )
-      .where( filters.date )
-      .exec( function( err, results ){
-
-        // return error
-        if (err) return res.negotiate( err );
-
-        // indicator
-        switch( params.indicator ){
-
-          // total reports due
-          case 'total':
-
-            // return number of expected reports
-            return res.json( 200, { 'value': results.length } );
-
-            break;
-
-          case 'casualties':
-
-            var value = ClusterDashboard.getSum( 'casualties', results );
-            return res.json( 200, { 'value': value } );
-
-          case 'deaths':
-
-            var value = ClusterDashboard.getSum( 'deaths', results );
-            return res.json( 200, { 'value': value } );
-
-          case 'markers':
-
-            // markers
-            var markers = {};
-
-            // for each
-            results.forEach(function(d,i){
-
-              // message
-              var message = '<div class="center card-panel" style="width:300px">' +
-                              '<div>' +
-                                '<div class="count" style="text-align:center">' + d.deaths + '</div> deaths <br/><br/>' + 
-                              '</div>' +
-                              '<div>' +
-                                '<div style="text-align:center"> with <span class="count">' + d.casualties + '</span> casualties from ' + d.disaster_type.replace(/_/g, ' ').toUpperCase() + ' incident' +
-                              '</div>' +  
-                              '<div>' +
-                                '<div style="text-align:center">Incident Category: ' + d['disaster_' + d.disaster_type + '_categories'].replace(/_/g, ' ').toUpperCase() +
-                              '</div>' + 
-                              '<div>' +
-                                'in ' + d.disaster_province_name + ', ' + d.disaster_district_name +
-                              '</div>' +
-                            '</div>';
-
-              // create markers
-              markers['marker' + i] = {
-                layer: 'disasters',
-                lat: d.disaster_lat,
-                lng: d.disaster_lng,
-                message: message
-              };
             });
 
-            // return markers
-            return res.json( { status:200, data: markers } );
+            // sort
+            var report = ClusterDashboardController.flatten( data );
 
-          default:
+            report.sort(function(a, b) {
+              return a.admin1name.localeCompare(b.admin1name) || 
+                      a.category_type_name.localeCompare(b.category_type_name) || 
+                      a.beneficiary_type_name.localeCompare(b.beneficiary_type_name)
+            });      
 
-            // return number of expected reports
-            return res.json( 200, results );
+            // return csv
+            json2csv({ data: report, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
 
-            break;
+              // success
+              return res.json( 200, { data: csv } );
 
-        }
+            });
 
 
-      });
+          });
 
-  },  
+        break;
 
-  getAlertData: function(req, res) {
+      case 'ocha_report':
 
-    // params
-    var params = ClusterDashboard.getParams( req );
+        // require
+        var data = {},
+            fields = [ 'admin1pcode', 'admin1name', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total', 'lat', 'lng' ],
+            fieldNames = [ 'Admin1 Pcode', 'Admin1 Name', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total', 'lat', 'lng' ];
 
-    // filters
-    var filters = ClusterDashboard.getFilters( params );
+        // get organizations by project
+        Beneficiaries
+          .find()
+          .where( filters.default )
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( filters.date )
+          .where( filters.$nin_organizations )
+          .exec( function( err, beneficiaries ){
 
-    // run query
-    Alerts
-      .find()
-      .where( filters.year )
-      .where( filters.region )
-      .where( filters.province )
-      .where( filters.week )
-      .where( filters.date )
-      .exec( function( err, results ){
+            // return error
+            if (err) return res.negotiate( err );
 
-        // return error
-        if (err) return res.negotiate( err );
+            // beneficiarie
+            beneficiaries.forEach(function( d, i ){
+              if ( !data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] ) {
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] = {};
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total = 0;
+              }
+              var eld_men = d.elderly_men ? d.elderly_men : 0;
+              var eld_women = d.elderly_women ? d.elderly_women : 0;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name = d.category_type_name;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name = d.beneficiary_type_name;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys += d.boys;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls += d.girls;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men += d.men;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women += d.women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men += eld_men;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women += eld_women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total += d.boys + d.girls + d.men + d.women + eld_men + eld_women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
 
-        // return csv
-        json2csv({ data: results }, function( err, csv ) {
-          
-          // error
-          if ( err ) return res.negotiate( err );
+            });
 
-          // success
-          return res.json( 200, { data: csv } );
+            // sort
+            var report = ClusterDashboardController.flatten( data );
 
-        }); 
+            report.sort(function(a, b) {
+              return a.admin1name.localeCompare(b.admin1name) || 
+                      a.category_type_name.localeCompare(b.category_type_name) || 
+                      a.beneficiary_type_name.localeCompare(b.beneficiary_type_name)
+            });      
 
-      });
+            // return csv
+            json2csv({ data: report, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
 
-  },
+              // success
+              return res.json( 200, { data: csv } );
 
-  getDisasterData: function(req, res) {
+            });
 
-    // params
-    var params = ClusterDashboard.getParams( req );
 
-    // filters
-    var filters = ClusterDashboard.getFilters( params );
+          });
 
-    // run query
-    Disasters
-      .find()
-      .where( filters.year )
-      .where( filters.region )
-      .where( filters.province )
-      .where( filters.week )
-      .where( filters.date )
-      .exec( function( err, results ){
+        break;
 
-        // return error
-        if (err) return res.negotiate( err );
+      // markers
+      case 'markers':
 
-        // return csv
-        json2csv({ data: results }, function( err, csv ) {
-          
-          // error
-          if ( err ) return res.negotiate( err );
+        // params
+        var markers = {},
+            counter = 0,
+            length = 0;
 
-          // success
-          return res.json( 200, { data: csv } );
+        // get organizations by project
+        TargetLocation
+          .find()
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
+          .where( { project_end_date: { '>=': new Date( params.start_date ) } } )
+          .where( filters.$nin_organizations )
+          .exec( function( err, beneficiaries ){
 
-        });
+            // return error
+            if (err) return res.negotiate( err );
 
-      });
+            // return no beneficiaries
+            if ( !beneficiaries.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'health', lat:34.5, lng:66.0, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
 
+            // length
+            length = beneficiaries.length;
+
+            // foreach location
+            beneficiaries.forEach( function( d, i ){
+
+              // get user details
+              User.findOne( { username: d.username } ).exec( function( err, user ){
+
+                // return error
+                if (err) return res.negotiate( err );
+
+                // popup message
+                var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
+                            + '<div style="text-align:center">' + d.admin0name + '</div>'
+                            + '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
+                            if ( d.cluster_id === 'health' ) {
+                              message += '<div style="text-align:center">' + d.fac_type_name + '</div>';
+                            }
+                            message +=  '<div style="text-align:center">' + d.fac_name + '</div>'
+                            + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
+                            + '<div style="text-align:center">' + user.name + '</div>'
+                            + '<div style="text-align:center">' + user.position + '</div>'
+                            + '<div style="text-align:center">' + user.phone + '</div>'
+                            + '<div style="text-align:center">' + user.email + '</div>';
+
+                // create markers
+                markers[ 'marker' + counter ] = {
+                  layer: 'projects',
+                  lat: d.admin2lat,
+                  lng: d.admin2lng,
+                  message: message
+                };
+
+                // plus
+                counter++;
+
+                // if last location
+                if( counter === length ){
+                  
+                  // return markers
+                  return res.json(200, { 'data': markers } );
+
+                }
+
+              });
+
+            });                          
+
+          });
+
+        break;
+
+    }
+    
   }
+
 
 };
 
-module.exports = ClusterDashboard;
+module.exports = ClusterDashboardController;
+

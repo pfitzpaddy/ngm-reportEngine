@@ -63,12 +63,17 @@ module.exports.policies = {
   },
 
   // public
-  'Cluster/Lists/ListController': {
+  'Cluster/AdminDashboardController': {
     '*': true
   },
 
   // public
-  'Cluster/AdminDashboardController': {
+  'Cluster/ClusterDashboardController': {
+    '*': true
+  },
+
+  // public
+  'Cluster/Lists/ListController': {
     '*': true
   },
 

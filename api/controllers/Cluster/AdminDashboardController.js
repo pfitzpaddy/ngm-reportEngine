@@ -59,6 +59,7 @@ var AdminDashboardController = {
 
   // stock reports
   getStockIndicator: function( $nin_organizations, params, req, res ){
+    
     // switch on indicator
     switch( params.indicator ) {
 
