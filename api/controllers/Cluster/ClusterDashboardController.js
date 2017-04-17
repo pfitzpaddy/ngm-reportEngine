@@ -154,9 +154,9 @@ var ClusterDashboardController = {
 
         break;
 
-      case 'beneficiaries':
+      case 'projects':
 
-        // get beneficiaries by project
+        // get organizations by project
         Beneficiaries
           .find()
           .where( filters.default )
@@ -173,118 +173,23 @@ var ClusterDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
-            var sum = 0;
+            // orgs
+            var projects = [];
 
+            // projects 
             beneficiaries.forEach(function( d, i ){
-              // var eld_men = d.elderly_men ? d.elderly_men : 0;
-              // var eld_women = d.elderly_women ? d.elderly_women : 0;
-              sum += d.boys;
-              sum += d.girls;
-              sum += d.men;
-              sum += d.women;
-              sum += d.elderly_men;
-              sum += d.elderly_women;
+
+              // if not existing
+              if( !projects[ d.project_id ] ) {
+                // add 
+                projects[ d.project_id ] = {};
+                projects[ d.project_id ].project_id = d.project_id;
+              }
+
             });
 
-            if ( params.csv ) {
-
-              var fields = [
-                    'project_id',
-                    'report_id',
-                    'cluster_id',
-                    'cluster',
-                    'organization',
-                    'admin1pcode',
-                    'admin1name',
-                    'admin2pcode',
-                    'admin2name',
-                    'conflict',
-                    'fac_type_name',
-                    'fac_name',
-                    'category_type_id',
-                    'category_type_name',
-                    'beneficiary_type_id',
-                    'beneficiary_type_name',
-                    'activity_type_id',
-                    'activity_type_name',
-                    'activity_description_id',
-                    'activity_description_name',
-                    'delivery_type_id',
-                    'delivery_type_name',
-                    'units',
-                    'unit_type_id',
-                    'unit_type_name',
-                    'households',
-                    'families',
-                    'boys',
-                    'girls',
-                    'men',
-                    'women',
-                    'elderly_men', 
-                    'elderly_women',
-                    'admin1lng',
-                    'admin1lat',
-                    'admin2lng',
-                    'admin2lat'
-                  ];
-
-              var fieldNames = [
-                    'project_id',
-                    'report_id',
-                    'cluster_id',
-                    'cluster',
-                    'organization',
-                    'admin1pcode',
-                    'admin1name',
-                    'admin2pcode',
-                    'admin2name',
-                    'conflict',
-                    'fac_type_name',
-                    'fac_name',
-                    'category_type_id',
-                    'category_type_name',
-                    'beneficiary_type_id',
-                    'beneficiary_type_name',
-                    'activity_type_id',
-                    'activity_type_name',
-                    'activity_description_id',
-                    'activity_description_name',
-                    'delivery_type_id',
-                    'delivery_type_name',
-                    'units',
-                    'unit_type_id',
-                    'unit_type_name',
-                    'households',
-                    'families',
-                    'boys',
-                    'girls',
-                    'men',
-                    'women',
-                    'elderly_men', 
-                    'elderly_women',
-                    'admin1lng',
-                    'admin1lat',
-                    'admin2lng',
-                    'admin2lat'
-                  ];
-
-              // return csv
-              json2csv({ data: beneficiaries, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-                
-                // error
-                if ( err ) return res.negotiate( err );
-
-                // success
-                return res.json( 200, { data: csv } );
-
-              });
-
-            } else {
-              
-              // return org list
-              return res.json( 200, { 'value': sum } );
-
-            }
+            // return org list
+            return res.json( 200, { 'value': ClusterDashboardController.flatten( projects ).length } );
 
           });
 
@@ -409,6 +314,176 @@ var ClusterDashboardController = {
 
         break;
 
+      // raw data export
+      case 'financial_report':
+
+        // require
+        var fields = [ 'cluster', 'organization', 'project_title', 'project_hrp_code', 'project_code', 'project_donor_id', 'project_budget', 'project_budget_currency', 'project_budget_date_recieved' ],
+            fieldNames = [ 'Cluster', 'Organization', 'Project Title', 'HRP Project Code', 'Project Code', 'Project Donor', 'Total Funding Amount', 'Funding Currency', 'Date Funds Recieved' ];
+
+        // get beneficiaries by project
+        BudgetProgress
+          .find()
+          .where( { project_id: { '!': null } } )
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )          
+          .where( filters.$nin_organizations )
+          .exec( function( err, budget ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return csv
+            json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              return res.json( 200, { data: csv } );
+
+            });
+
+          });
+
+        break;
+      
+
+      // raw data export
+      case 'beneficiaries':
+
+        // get beneficiaries by project
+        Beneficiaries
+          .find()
+          .where( filters.default )
+          .where( filters.cluster_id )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.organization )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( filters.date )
+          .where( filters.$nin_organizations )
+          .exec( function( err, beneficiaries ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            var sum = 0;
+
+            beneficiaries.forEach(function( d, i ){
+              sum += d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
+            });
+
+            if ( !params.csv ) {
+
+              // return org list
+              return res.json( 200, { 'value': sum } );
+
+            } else {
+
+              var fields = [
+                    'project_id',
+                    'report_id',
+                    'cluster_id',
+                    'cluster',
+                    'organization',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'conflict',
+                    'fac_type_name',
+                    'fac_name',
+                    'category_type_id',
+                    'category_type_name',
+                    'beneficiary_type_id',
+                    'beneficiary_type_name',
+                    'activity_type_id',
+                    'activity_type_name',
+                    'activity_description_id',
+                    'activity_description_name',
+                    'delivery_type_id',
+                    'delivery_type_name',
+                    'units',
+                    'unit_type_id',
+                    'unit_type_name',
+                    'households',
+                    'families',
+                    'boys',
+                    'girls',
+                    'men',
+                    'women',
+                    'elderly_men', 
+                    'elderly_women',
+                    'admin1lng',
+                    'admin1lat',
+                    'admin2lng',
+                    'admin2lat'
+                  ];
+
+              var fieldNames = [
+                    'project_id',
+                    'report_id',
+                    'cluster_id',
+                    'cluster',
+                    'organization',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'conflict',
+                    'fac_type_name',
+                    'fac_name',
+                    'category_type_id',
+                    'category_type_name',
+                    'beneficiary_type_id',
+                    'beneficiary_type_name',
+                    'activity_type_id',
+                    'activity_type_name',
+                    'activity_description_id',
+                    'activity_description_name',
+                    'delivery_type_id',
+                    'delivery_type_name',
+                    'units',
+                    'unit_type_id',
+                    'unit_type_name',
+                    'households',
+                    'families',
+                    'boys',
+                    'girls',
+                    'men',
+                    'women',
+                    'elderly_men', 
+                    'elderly_women',
+                    'admin1lng',
+                    'admin1lat',
+                    'admin2lng',
+                    'admin2lat'
+                  ];
+
+              // return csv
+              json2csv({ data: beneficiaries, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                
+                // error
+                if ( err ) return res.negotiate( err );
+
+                // success
+                return res.json( 200, { data: csv } );
+
+              });
+
+            }
+
+          });
+
+        break;
+
       // markers
       case 'markers':
 
@@ -498,4 +573,3 @@ var ClusterDashboardController = {
 };
 
 module.exports = ClusterDashboardController;
-
