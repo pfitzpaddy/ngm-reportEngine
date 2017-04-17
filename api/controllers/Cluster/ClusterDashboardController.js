@@ -176,21 +176,31 @@ var ClusterDashboardController = {
             var sum = 0;
 
             beneficiaries.forEach(function( d, i ){
-              var eld_men = d.elderly_men ? d.elderly_men : 0;
-              var eld_women = d.elderly_women ? d.elderly_women : 0;
+              // var eld_men = d.elderly_men ? d.elderly_men : 0;
+              // var eld_women = d.elderly_women ? d.elderly_women : 0;
               sum += d.boys;
               sum += d.girls;
               sum += d.men;
               sum += d.women;
-              sum += eld_men;
-              sum += eld_women;
+              sum += d.elderly_men;
+              sum += d.elderly_women;
             });
 
             if ( params.csv ) {
 
               var fields = [
+                    'project_id',
+                    'report_id',
                     'cluster_id',
                     'cluster',
+                    'organization',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'conflict',
+                    'fac_type_name',
+                    'fac_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -202,9 +212,9 @@ var ClusterDashboardController = {
                     'delivery_type_id',
                     'delivery_type_name',
                     'units',
-                    'cash_amount',
+                    'unit_type_id',
+                    'unit_type_name',
                     'households',
-                    'sessions',
                     'families',
                     'boys',
                     'girls',
@@ -212,30 +222,25 @@ var ClusterDashboardController = {
                     'women',
                     'elderly_men', 
                     'elderly_women',
-                    'unit_type_id',
-                    'unit_type_name',
-                    'project_id',
-                    'report_id',
-                    'admin1pcode',
-                    'admin1name',
-                    'admin2pcode',
-                    'admin2name',
-                    'fac_type_name',
-                    'fac_name',
-                    'adminRpcode',
-                    'adminRname',
-                    'admin0pcode',
-                    'admin0name',
                     'admin1lng',
                     'admin1lat',
                     'admin2lng',
-                    'admin2lat',
-                    'conflict'
+                    'admin2lat'
                   ];
 
               var fieldNames = [
+                    'project_id',
+                    'report_id',
                     'cluster_id',
                     'cluster',
+                    'organization',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'conflict',
+                    'fac_type_name',
+                    'fac_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -247,9 +252,9 @@ var ClusterDashboardController = {
                     'delivery_type_id',
                     'delivery_type_name',
                     'units',
-                    'cash_amount',
+                    'unit_type_id',
+                    'unit_type_name',
                     'households',
-                    'sessions',
                     'families',
                     'boys',
                     'girls',
@@ -257,25 +262,10 @@ var ClusterDashboardController = {
                     'women',
                     'elderly_men', 
                     'elderly_women',
-                    'unit_type_id',
-                    'unit_type_name',
-                    'project_id',
-                    'report_id',
-                    'admin1pcode',
-                    'admin1name',
-                    'admin2pcode',
-                    'admin2name',
-                    'fac_type_name',
-                    'fac_name',
-                    'adminRpcode',
-                    'adminRname',
-                    'admin0pcode',
-                    'admin0name',
                     'admin1lng',
                     'admin1lat',
                     'admin2lng',
-                    'admin2lat',
-                    'conflict'
+                    'admin2lat'
                   ];
 
               // return csv
@@ -376,8 +366,8 @@ var ClusterDashboardController = {
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women = 0;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total = 0;
               }
-              var eld_men = d.elderly_men ? d.elderly_men : 0;
-              var eld_women = d.elderly_women ? d.elderly_women : 0;
+              // var eld_men = d.elderly_men ? d.elderly_men : 0;
+              // var eld_women = d.elderly_women ? d.elderly_women : 0;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name = d.category_type_name;
@@ -386,92 +376,9 @@ var ClusterDashboardController = {
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls += d.girls;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men += d.men;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women += d.women;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men += eld_men;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women += eld_women;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total += d.boys + d.girls + d.men + d.women + eld_men + eld_women;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
-
-            });
-
-            // sort
-            var report = ClusterDashboardController.flatten( data );
-
-            report.sort(function(a, b) {
-              return a.admin1name.localeCompare(b.admin1name) || 
-                      a.category_type_name.localeCompare(b.category_type_name) || 
-                      a.beneficiary_type_name.localeCompare(b.beneficiary_type_name)
-            });      
-
-            // return csv
-            json2csv({ data: report, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
-              // error
-              if ( err ) return res.negotiate( err );
-
-              // success
-              return res.json( 200, { data: csv } );
-
-            });
-
-
-          });
-
-        break;
-
-      case 'ocha_report':
-
-        // require
-        var data = {},
-            fields = [ 'admin1pcode', 'admin1name', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total', 'lat', 'lng' ],
-            fieldNames = [ 'Admin1 Pcode', 'Admin1 Name', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total', 'lat', 'lng' ];
-
-        // get organizations by project
-        Beneficiaries
-          .find()
-          .where( filters.default )
-          .where( filters.cluster_id )
-          .where( filters.adminRpcode )
-          .where( filters.admin0pcode )
-          .where( filters.organization )
-          .where( filters.admin1pcode )
-          .where( filters.admin2pcode )
-          .where( filters.date )
-          .where( filters.$nin_organizations )
-          .exec( function( err, beneficiaries ){
-
-            // return error
-            if (err) return res.negotiate( err );
-
-            // beneficiarie
-            beneficiaries.forEach(function( d, i ){
-              if ( !data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] ) {
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] = {};
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys = 0;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls = 0;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men = 0;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women = 0;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men = 0;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women = 0;
-                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total = 0;
-              }
-              var eld_men = d.elderly_men ? d.elderly_men : 0;
-              var eld_women = d.elderly_women ? d.elderly_women : 0;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name = d.category_type_name;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name = d.beneficiary_type_name;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys += d.boys;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls += d.girls;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men += d.men;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women += d.women;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men += eld_men;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women += eld_women;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total += d.boys + d.girls + d.men + d.women + eld_men + eld_women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men += d.elderly_men;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women += d.elderly_women;
+              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total += d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
 
