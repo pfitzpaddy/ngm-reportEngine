@@ -318,7 +318,7 @@ var ClusterDashboardController = {
       case 'financial_report':
 
         // require
-        var fields = [ 'cluster', 'organization', 'project_title', 'project_hrp_code', 'project_code', 'project_donor_id', 'project_budget', 'project_budget_currency', 'project_budget_date_recieved' ],
+        var fields = [ 'cluster', 'organization', 'project_title', 'project_hrp_code', 'project_code', 'project_donor_name', 'project_budget', 'project_budget_currency', 'project_budget_date_recieved' ],
             fieldNames = [ 'Cluster', 'Organization', 'Project Title', 'HRP Project Code', 'Project Code', 'Project Donor', 'Total Funding Amount', 'Funding Currency', 'Date Funds Recieved' ];
 
         // get beneficiaries by project
