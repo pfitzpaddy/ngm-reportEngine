@@ -51,6 +51,7 @@ var ClusterDashboardController = {
       organization: req.param('organization'),
       admin1pcode: req.param('admin1pcode'),
       admin2pcode: req.param('admin2pcode'),
+      beneficiaries: req.param('beneficiaries'),
       start_date: req.param('start_date'),
       end_date: req.param('end_date')
     }
@@ -68,6 +69,7 @@ var ClusterDashboardController = {
       organization: params.organization === 'all' ? {} : { organization: params.organization },
       admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
       admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
+      beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
       date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
       $nin_organizations: { organization: { '!': $nin_organizations } },
     }
@@ -114,6 +116,7 @@ var ClusterDashboardController = {
           .where( filters.organization )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.beneficiaries )
           .where( filters.date )
           .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
@@ -166,6 +169,7 @@ var ClusterDashboardController = {
           .where( filters.organization )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.beneficiaries )
           .where( filters.date )
           .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
@@ -202,32 +206,59 @@ var ClusterDashboardController = {
             fields = [ 'admin0name', 'cluster', 'organization', 'name', 'position', 'username', 'phone', 'email', 'createdAt' ],
             fieldNames = [ 'Country', 'Cluster', 'Organization', 'Name', 'Position', 'Username', 'Phone', 'Email', 'Joined ReportHub' ];
 
-        // users
-        User
+
+        // get organizations by project
+        Beneficiaries
           .find()
+          .where( filters.default )
           .where( filters.cluster_id )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.organization )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
-          .exec( function( err, users ){
+          .where( filters.beneficiaries )
+          .where( filters.date )
+          .where( filters.$nin_organizations )
+          .exec( function( err, beneficiaries ){
 
             // return error
             if (err) return res.negotiate( err );
 
-            // return csv
-            json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
-              // error
-              if ( err ) return res.negotiate( err );
+            // orgs
+            var users = [];
 
-              // success
-              return res.json( 200, { data: csv } );
+            // projects 
+            beneficiaries.forEach(function( d, i ){
+
+              // if not existing
+              users.push( d.username );
 
             });
 
-          });
+            // users
+            User
+              .find()
+              .where( { username: users } )
+              .exec( function( err, users ){
+
+                // return error
+                if (err) return res.negotiate( err );
+
+                // return csv
+                json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+                  
+                  // error
+                  if ( err ) return res.negotiate( err );
+
+                  // success
+                  return res.json( 200, { data: csv } );
+
+                });
+
+              });
+
+            });
 
         break;
 
@@ -248,6 +279,7 @@ var ClusterDashboardController = {
           .where( filters.organization )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.beneficiaries )
           .where( filters.date )
           .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
@@ -367,6 +399,7 @@ var ClusterDashboardController = {
           .where( filters.organization )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.beneficiaries )
           .where( filters.date )
           .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
@@ -488,12 +521,13 @@ var ClusterDashboardController = {
       case 'markers':
 
         // params
-        var markers = {},
+        var locations = [],
+            markers = {},
             counter = 0,
             length = 0;
 
         // get organizations by project
-        TargetLocation
+        Beneficiaries
           .find()
           .where( filters.cluster_id )
           .where( filters.adminRpcode )
@@ -501,22 +535,31 @@ var ClusterDashboardController = {
           .where( filters.organization )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
-          .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
-          .where( { project_end_date: { '>=': new Date( params.start_date ) } } )
+          .where( filters.beneficiaries )
+          .where( filters.date )
           .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
 
             // return error
             if (err) return res.negotiate( err );
 
-            // return no beneficiaries
-            if ( !beneficiaries.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'health', lat:34.5, lng:66.0, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
+            // project ids
+            beneficiaries.forEach( function( d, i ){
+              if ( !locations[ d.project_id + d.admin2pcode ] ) {
+                locations[ d.project_id + d.admin2pcode ] = d;
+              }
+            });
+
+            locations = ClusterDashboardController.flatten( locations );
+
+            // return no locations
+            if ( !locations.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:34.5, lng:66.0, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
 
             // length
-            length = beneficiaries.length;
+            length = locations.length;
 
             // foreach location
-            beneficiaries.forEach( function( d, i ){
+            locations.forEach( function( d, i ){
 
               // get user details
               User.findOne( { username: d.username } ).exec( function( err, user ){
