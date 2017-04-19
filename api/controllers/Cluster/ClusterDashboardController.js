@@ -105,8 +105,6 @@ var ClusterDashboardController = {
 
       case 'organizations':
 
-        console.log( filters.organization )
-
         // get organizations by project
         Beneficiaries
           .find()
