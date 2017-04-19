@@ -66,7 +66,7 @@ var ClusterDashboardController = {
       cluster_id: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
       adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
       admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
-      organization: params.organization === 'ALL' ? { organization: { '!': $nin_organizations } } : { organization: params.organization },
+      organization: params.organization === 'all' || params.organization === 'ALL' ? { organization: { '!': $nin_organizations } } : { organization: params.organization },
       admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
       admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
       beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
