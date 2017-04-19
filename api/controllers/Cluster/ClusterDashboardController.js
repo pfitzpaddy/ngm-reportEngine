@@ -66,12 +66,11 @@ var ClusterDashboardController = {
       cluster_id: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
       adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
       admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
-      organization: params.organization === 'all' ? {} : { organization: params.organization },
+      organization: params.organization === 'all' ? { organization: { '!': $nin_organizations } } : { organization: params.organization },
       admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
       admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
       beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
-      date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
-      $nin_organizations: { organization: { '!': $nin_organizations } },
+      date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } }
     }
   },
 
@@ -118,7 +117,7 @@ var ClusterDashboardController = {
           .where( filters.admin2pcode )
           .where( filters.beneficiaries )
           .where( filters.date )
-          .where( filters.$nin_organizations )
+          // .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -171,7 +170,6 @@ var ClusterDashboardController = {
           .where( filters.admin2pcode )
           .where( filters.beneficiaries )
           .where( filters.date )
-          .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -219,7 +217,6 @@ var ClusterDashboardController = {
           .where( filters.admin2pcode )
           .where( filters.beneficiaries )
           .where( filters.date )
-          .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -281,7 +278,6 @@ var ClusterDashboardController = {
           .where( filters.admin2pcode )
           .where( filters.beneficiaries )
           .where( filters.date )
-          .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -363,8 +359,7 @@ var ClusterDashboardController = {
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
-          .where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )          
-          .where( filters.$nin_organizations )
+          .where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
           .exec( function( err, budget ){
 
             // return error
@@ -401,7 +396,6 @@ var ClusterDashboardController = {
           .where( filters.admin2pcode )
           .where( filters.beneficiaries )
           .where( filters.date )
-          .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -537,7 +531,6 @@ var ClusterDashboardController = {
           .where( filters.admin2pcode )
           .where( filters.beneficiaries )
           .where( filters.date )
-          .where( filters.$nin_organizations )
           .exec( function( err, beneficiaries ){
 
             // return error
