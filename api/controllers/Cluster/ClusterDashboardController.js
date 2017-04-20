@@ -403,7 +403,9 @@ var ClusterDashboardController = {
 
             var sum = 0;
 
+            // format
             beneficiaries.forEach(function( d, i ){
+              d.report_month = moment( d.reporting_period ).format( 'MMMM' );
               sum += d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
             });
 
@@ -420,6 +422,9 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'report_month',
+                    'report_year',
+                    'reporting_period',
                     'admin1pcode',
                     'admin1name',
                     'admin2pcode',
@@ -460,6 +465,9 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'report_month',
+                    'report_year',
+                    'reporting_period',
                     'admin1pcode',
                     'admin1name',
                     'admin2pcode',
