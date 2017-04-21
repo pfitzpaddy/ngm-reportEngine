@@ -186,6 +186,7 @@ module.exports = {
               adminRpcode: user[i].adminRpcode,
               admin0pcode: user[i].admin0pcode,         
               organization_id: user[i].organization_id,
+              organization_tag: user[i].organization_tag,
               organization: user[i].organization,
               cluster_id: user[i].cluster_id,
               cluster: user[i].cluster,

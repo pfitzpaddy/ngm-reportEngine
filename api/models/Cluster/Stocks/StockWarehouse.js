@@ -19,6 +19,10 @@ module.exports = {
 		organization_id: {
 			model: 'organization'
 		},
+		organization_tag: {
+			type: 'string',
+			required: true
+		},
 		organization: {
 			type: 'string',
 			required: true

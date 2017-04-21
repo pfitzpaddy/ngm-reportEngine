@@ -23,6 +23,10 @@ module.exports = {
 		organization_id: {
 			type: 'string'
 		},
+		organization_tag: {
+			type: 'string',
+			required: true
+		},
 		organization: {
 			type: 'string',
 			required: true

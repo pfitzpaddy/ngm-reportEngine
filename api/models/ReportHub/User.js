@@ -40,6 +40,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		organization_tag: {
+			type: 'string',
+			required: true
+		},
 		organization: {
 			type: 'string',
 			required: true

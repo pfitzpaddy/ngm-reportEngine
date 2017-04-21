@@ -23,15 +23,12 @@ var AdminDashboardController = {
   getClusterAdminIndicator: function( req, res ){
 
     // request input
-    if ( !req.param( 'report_type' ) || !req.param( 'indicator' ) || !req.param( 'cluster_id' ) || !req.param( 'organization' ) || !req.param( 'adminRpcode' )  || !req.param( 'admin0pcode' ) || !req.param( 'start_date' ) || !req.param( 'end_date' ) ) {
+    if ( !req.param( 'report_type' ) || !req.param( 'indicator' ) || !req.param( 'cluster_id' ) || !req.param( 'organization_tag' ) || !req.param( 'adminRpcode' )  || !req.param( 'admin0pcode' ) || !req.param( 'start_date' ) || !req.param( 'end_date' ) ) {
       return res.json( 401, { err: 'report_type, indicator, cluster_id, adminRpcode, admin0pcode, start_date, end_date required!' });
     }
 
     // organizations to exclude totally
-    var $nin_organizations = [ 'iMMAP', 'ARCS' ];
-        // organizations to exclude in calculations
-        // ARCS
-        // $nin_select_organizations = [ '56ff49200c68f2c746e3f83a' ];
+    var $nin_organizations = [ 'immap', 'arcs' ];
 
     // variables
     var params = {
@@ -40,8 +37,7 @@ var AdminDashboardController = {
           indicator: req.param( 'indicator' ),
           report_type: req.param( 'report_type' ),
           cluster_filter: req.param( 'cluster_id' ) === 'all' ? {} : { cluster_id: req.param( 'cluster_id' ) },
-          // organization_filter: req.param( 'organization' ) === 'all' ? { organization_id: { '!': $nin_select_organizations } } : { organization_id: req.param( 'organization' ) },
-          organization_filter: req.param( 'organization' ) === 'all' ? { organization: { '!': $nin_organizations } } : { organization_id: req.param( 'organization' ) },
+          organization_filter: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: req.param( 'organization_tag' ) },
           adminRpcode: req.param( 'adminRpcode' ).toUpperCase(),
           admin0pcode: req.param( 'admin0pcode' ).toUpperCase(),
           start_date: req.param( 'start_date' ),
@@ -90,8 +86,7 @@ var AdminDashboardController = {
 
       case 'organizations':
 
-        // get a list of projects for side menu
-        if ( params.list ) {
+          var organizations = [];
 
           // get organizations by project
           StockReport
@@ -106,64 +101,42 @@ var AdminDashboardController = {
               // return error
               if (err) return res.negotiate( err );
 
-              //
-              var organizations = [];
-
               // projects 
               projects.forEach(function( d, i ){
 
                 // if not existing
-                if( !organizations[d.organization_id] ) {
-                  // add 
-                  organizations[d.organization_id] = {};
-                  organizations[d.organization_id].organization_id = d.organization_id;
-                  organizations[d.organization_id].organization = d.organization;
+                if( !organizations[d.organization] ) {
+                  organizations[ d.organization ] = {};
+                  organizations[ d.organization ].organization_tag = d.organization_tag;
+                  organizations[ d.organization ].organization = d.organization;
                 }
 
               });
-              
-              // return org list
-              return res.json( 200, flatten( organizations ) );
+
+              // flatten
+              organizations = flatten( organizations );
+
+              // order
+              organizations.sort(function(a, b) {
+                return a.organization.localeCompare(b.organization);
+              }); 
+
+              // default
+              organizations.unshift({
+                organization_tag: 'all',
+                organization: 'ALL',
+              });
+
+              // get a list of projects for side menu
+              if ( params.list ) {
+                // return org list
+                return res.json( 200, organizations );
+              } else {
+                // return indicator
+                return res.json( 200, { 'value': organizations.length-1 });
+              }
 
             });
-
-          } else {
-
-            // get organizations by project
-            StockReport
-              .find()
-              .where( params.cluster_filter )
-              .where( { adminRpcode: params.adminRpcode } )
-              .where( { admin0pcode: params.admin0pcode } )
-              .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
-              .where( params.organization_filter )
-              .exec( function( err, projects ){
-
-                // return error
-                if (err) return res.negotiate( err );
-
-                //
-                var organizations = [];
-
-                // projects 
-                projects.forEach(function( d, i ){
-
-                  // if not existing
-                  if( !organizations[d.organization_id] ) {
-                    // add 
-                    organizations[d.organization_id] = {};
-                    organizations[d.organization_id].organization_id = d.organization_id;
-                    organizations[d.organization_id].organization = d.organization;
-                  }
-
-                });
-                
-                // return indicator
-                return res.json( 200, { 'value': flatten( organizations ).length });
-
-              });
-              
-          }
 
           break;
 
@@ -284,6 +257,7 @@ var AdminDashboardController = {
                       // if benficiaries
                       if ( !b.length ) {
                         // add status
+                        reports[i].status = '#80cbc4';
                         reports[i].icon = 'adjust'
                       }
 
@@ -450,7 +424,6 @@ var AdminDashboardController = {
           .where( { admin0pcode: params.admin0pcode } )
           .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
           .where( { project_end_date: { '>=': new Date( params.start_date ) } } )
-          // .where( { organization: { '!': $nin_organizations } } )
           .where( params.organization_filter )
           .sort( 'updatedAt DESC' )
           .limit(1)
@@ -469,8 +442,7 @@ var AdminDashboardController = {
 
       case 'organizations':
 
-        // get a list of projects for side menu
-        if ( params.list ) {
+          var organizations = [];
 
           // get organizations by project
           Project
@@ -486,65 +458,42 @@ var AdminDashboardController = {
               // return error
               if (err) return res.negotiate( err );
 
-              //
-              var organizations = [];
-
               // projects 
               projects.forEach(function( d, i ){
 
                 // if not existing
-                if( !organizations[d.organization_id] ) {
-                  // add 
-                  organizations[d.organization_id] = {};
-                  organizations[d.organization_id].organization_id = d.organization_id;
-                  organizations[d.organization_id].organization = d.organization;
+                if( !organizations[d.organization] ) {
+                  organizations[ d.organization ] = {};
+                  organizations[ d.organization ].organization_tag = d.organization_tag;
+                  organizations[ d.organization ].organization = d.organization;
                 }
 
               });
-              
-              // return org list
-              return res.json( 200, flatten( organizations ) );
+
+              // flatten
+              organizations = flatten( organizations );
+
+              // order
+              organizations.sort(function(a, b) {
+                return a.organization.localeCompare(b.organization);
+              }); 
+
+              // default
+              organizations.unshift({
+                organization_tag: 'all',
+                organization: 'ALL',
+              });
+
+              // get a list of projects for side menu
+              if ( params.list ) {
+                // return org list
+                return res.json( 200, organizations );
+              } else {
+                // return indicator
+                return res.json( 200, { 'value': organizations.length-1 });                
+              }
 
             });
-
-          } else {
-
-            // get organizations by project
-            Project
-              .find()
-              .where( params.cluster_filter )
-              .where( { adminRpcode: params.adminRpcode } )
-              .where( { admin0pcode: params.admin0pcode } )
-              .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
-              .where( { project_end_date: { '>=': new Date( params.start_date ) } } )
-              .where( params.organization_filter )
-              .exec( function( err, projects ){
-
-                // return error
-                if (err) return res.negotiate( err );
-
-                //
-                var organizations = [];
-
-                // projects 
-                projects.forEach(function( d, i ){
-
-                  // if not existing
-                  if( !organizations[d.organization_id] ) {
-                    // add 
-                    organizations[d.organization_id] = {};
-                    organizations[d.organization_id].organization_id = d.organization_id;
-                    organizations[d.organization_id].organization = d.organization;
-                  }
-
-                });
-                
-                // return indicator
-                return res.json( 200, { 'value': flatten( organizations ).length });
-
-              });
-              
-          }
 
           break;
 
@@ -665,6 +614,7 @@ var AdminDashboardController = {
                       // if benficiaries
                       if ( !b.length ) {
                         // add status
+                        reports[i].status = '#80cbc4';
                         reports[i].icon = 'adjust'
                       }
 
