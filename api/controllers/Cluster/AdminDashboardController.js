@@ -36,6 +36,7 @@ var AdminDashboardController = {
           list: req.param( 'list' ),
           indicator: req.param( 'indicator' ),
           report_type: req.param( 'report_type' ),
+          organization_tag: req.param( 'organization_tag' ),
           cluster_filter: req.param( 'cluster_id' ) === 'all' ? {} : { cluster_id: req.param( 'cluster_id' ) },
           organization_filter: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: req.param( 'organization_tag' ) },
           adminRpcode: req.param( 'adminRpcode' ).toUpperCase(),
@@ -127,14 +128,29 @@ var AdminDashboardController = {
                 organization: 'ALL',
               });
 
-              // get a list of projects for side menu
-              if ( params.list ) {
-                // return org list
-                return res.json( 200, organizations );
-              } else {
-                // return indicator
-                return res.json( 200, { 'value': organizations.length-1 });
-              }
+              // orgs
+              Organizations
+                .find()
+                .where( { organization_tag: params.organization_tag } )
+                .exec( function( err, organization ){
+
+                  // return error
+                  if (err) return res.negotiate( err );
+
+                  if ( !projects.length ) {
+                    organizations[1] = organization[0];
+                  }
+
+                  // get a list of projects for side menu
+                  if ( params.list ) {
+                    // return org list
+                    return res.json( 200, organizations );
+                  } else {
+                    // return indicator
+                    return res.json( 200, { 'value': organizations.length-1 });
+                  }
+
+                });
 
             });
 
@@ -484,14 +500,29 @@ var AdminDashboardController = {
                 organization: 'ALL',
               });
 
-              // get a list of projects for side menu
-              if ( params.list ) {
-                // return org list
-                return res.json( 200, organizations );
-              } else {
-                // return indicator
-                return res.json( 200, { 'value': organizations.length-1 });                
-              }
+              // orgs
+              Organizations
+                .find()
+                .where( { organization_tag: params.organization_tag } )
+                .exec( function( err, organization ){
+
+                  // return error
+                  if (err) return res.negotiate( err );
+
+                  if ( !projects.length ) {
+                    organizations[1] = organization[0];
+                  }
+
+                  // get a list of projects for side menu
+                  if ( params.list ) {
+                    // return org list
+                    return res.json( 200, organizations );
+                  } else {
+                    // return indicator
+                    return res.json( 200, { 'value': organizations.length-1 });
+                  }
+
+                });
 
             });
 
