@@ -8,7 +8,7 @@
 // require
 var moment = require( 'moment' );
 var json2csv = require( 'json2csv' );
-var $nin_organizations = [ 'iMMAP', 'ARCS' ];
+var $nin_organizations = [ 'immap', 'arcs' ];
 
 var ClusterDashboardController = {
 
@@ -31,13 +31,13 @@ var ClusterDashboardController = {
           !req.param('cluster_id') ||
           !req.param('adminRpcode') ||
           !req.param('admin0pcode') ||
-          !req.param('organization') ||
+          !req.param('organization_tag') ||
           !req.param('admin1pcode') ||
           !req.param('admin2pcode') ||
           !req.param('beneficiaries') ||
           !req.param('start_date') ||
           !req.param('end_date') ) {
-      return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization, admin1pcode, admin2pcode, beneficiaries, start_date, end_date required!'});
+      return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, admin1pcode, admin2pcode, beneficiaries, start_date, end_date required!'});
     }
 
     // return params
@@ -48,7 +48,7 @@ var ClusterDashboardController = {
       cluster_id: req.param('cluster_id'),
       adminRpcode: req.param('adminRpcode'),
       admin0pcode: req.param('admin0pcode'),
-      organization: req.param('organization'),
+      organization_tag: req.param('organization_tag'),
       admin1pcode: req.param('admin1pcode'),
       admin2pcode: req.param('admin2pcode'),
       beneficiaries: req.param('beneficiaries'),
@@ -62,11 +62,11 @@ var ClusterDashboardController = {
   getFilters: function( params ){
     // filters
     return {
-      default: { report_month: { '>=': 0 }, report_year: { '>=': 2017 }, location_id: { '!': null } },
+      default: { report_year: { '>=': 2017 }, location_id: { '!': null } },
       cluster_id: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
       adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
       admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
-      organization: params.organization === 'all' || params.organization === 'ALL' ? { organization: { '!': $nin_organizations } } : { organization: params.organization },
+      organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
       admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
       admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
       beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
@@ -79,7 +79,7 @@ var ClusterDashboardController = {
     
     // beneficiaries
     Beneficiaries
-      .find({ organization: { '!': $nin_organizations } })
+      .find({ organization_tag: { '!': $nin_organizations } })
       .sort( 'updatedAt DESC' )
       .limit(1)
       .exec( function( err, results ){
@@ -110,7 +110,7 @@ var ClusterDashboardController = {
           .find()
           .where( filters.default )
           .where( filters.cluster_id )
-          .where( filters.organization )
+          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
@@ -133,26 +133,51 @@ var ClusterDashboardController = {
               if( !organizations[ d.organization ] ) {
                 // add 
                 organizations[ d.organization ] = {};
-                organizations[ d.organization ].organization_id = d.organization_id;
+                organizations[ d.organization ].organization_tag = d.organization_tag;
                 organizations[ d.organization ].organization = d.organization;
               }
 
             });
 
-            // menu
-            if ( params.list ) {
-              
-              // return org list
-              return res.json( 200, ClusterDashboardController.flatten( organizations ) );
+              // flatten
+              organizations = ClusterDashboardController.flatten( organizations );
 
-            } else {
-              
-              // return org list
-              return res.json( 200, { 'value': ClusterDashboardController.flatten( organizations ).length } );
+              // order
+              organizations.sort(function(a, b) {
+                return a.organization.localeCompare(b.organization);
+              }); 
 
-            }
+              // default
+              organizations.unshift({
+                organization_tag: 'all',
+                organization: 'ALL',
+              });
 
-          });
+              // orgs
+              Organizations
+                .find()
+                .where( { organization_tag: params.organization_tag } )
+                .exec( function( err, organization ){
+
+                  // return error
+                  if (err) return res.negotiate( err );
+
+                  if ( !beneficiaries.length ) {
+                    organizations[1] = organization[0];
+                  }
+
+                  // get a list of projects for side menu
+                  if ( params.list ) {
+                    // return org list
+                    return res.json( 200, organizations );
+                  } else {
+                    // return indicator
+                    return res.json( 200, { 'value': organizations.length-1 });
+                  }
+
+                });
+
+            });
 
         break;
 
@@ -163,7 +188,7 @@ var ClusterDashboardController = {
           .find()
           .where( filters.default )
           .where( filters.cluster_id )
-          .where( filters.organization )
+          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
@@ -210,7 +235,7 @@ var ClusterDashboardController = {
           .find()
           .where( filters.default )
           .where( filters.cluster_id )
-          .where( filters.organization )
+          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
@@ -271,7 +296,7 @@ var ClusterDashboardController = {
           .find()
           .where( filters.default )
           .where( filters.cluster_id )
-          .where( filters.organization )
+          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
@@ -354,7 +379,7 @@ var ClusterDashboardController = {
           .find()
           .where( { project_id: { '!': null } } )
           .where( filters.cluster_id )
-          .where( filters.organization )
+          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
@@ -389,7 +414,7 @@ var ClusterDashboardController = {
           .find()
           .where( filters.default )
           .where( filters.cluster_id )
-          .where( filters.organization )
+          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
@@ -532,7 +557,7 @@ var ClusterDashboardController = {
         Beneficiaries
           .find()
           .where( filters.cluster_id )
-          .where( filters.organization )
+          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
@@ -569,7 +594,8 @@ var ClusterDashboardController = {
                 if (err) return res.negotiate( err );
 
                 // popup message
-                var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
+                var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.cluster + '</h5>'
+                            + '<h5 style="text-align:center; font-size:1.3rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
                             + '<div style="text-align:center">' + d.admin0name + '</div>'
                             + '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
                             if ( d.cluster_id === 'health' ) {
@@ -577,6 +603,7 @@ var ClusterDashboardController = {
                             }
                             message +=  '<div style="text-align:center">' + d.fac_name + '</div>'
                             + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
+                            + '<div style="text-align:center">' + user.organization + '</div>'
                             + '<div style="text-align:center">' + user.name + '</div>'
                             + '<div style="text-align:center">' + user.position + '</div>'
                             + '<div style="text-align:center">' + user.phone + '</div>'
