@@ -85,15 +85,19 @@ module.exports = {
 			exec = require('child_process').exec,
 			cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-print.js ' + report + ' ' 
 																																						 + printUrl + ' ' 
-																																						 + user.cluster + ' ' 
-																																						 + user.username + ' ' 
-																																						 + user.token + ' ' 
 																																						 + user.adminRpcode + ' ' 
 																																						 + user.adminRname + ' ' 
 																																						 + user.admin0pcode + ' ' 
 																																						 + user.admin0name + ' '
-																																						 + pageLoadTime;			
-		
+																																						 + user.cluster + ' '
+																																						 + user.cluster_id + ' ' 
+																																						 + user.organization + ' ' 
+																																						 + user.organization_tag + ' ' 
+																																						 + user.username + ' '
+																																						 + user.roles.toString() + ' ' 
+																																						 + user.token + ' ' 
+																																						 + pageLoadTime;
+
 		// width opts
 		cmd = viewportWidth ? cmd + ' ' + viewportWidth : cmd;
 		// height opts
