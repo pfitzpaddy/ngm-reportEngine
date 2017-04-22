@@ -107,39 +107,25 @@ module.exports = {
 
   	// moment
   	var moment = require('moment');
-
-  	Project
-  		.find( { organization_id: values.organization_id } )
-  		.sort('project_end_date DESC')
-  		.limit(1)
-  		.exec(function(err, projects){
-
+  	
+		// warehouse
+		StockWarehouse
+			.find( { organization_id: values.organization_id } )
+			.exec(function(err, warehouses){
+				
 				// return error
 				if ( err ) return cb( err );
 
-				// warehouse
-				StockWarehouse
-					.find( { organization_id: values.organization_id } )
-					.exec(function(err, warehouses){
-						
-						// return error
-						if ( err ) return cb( err );
+				// add 2017
+				projects = [{
+					project_start_date: '2017-01-01',
+					project_end_date: '2017-12-31'
+				}];
 
-						if(!projects.length){
+				// set
+				generateStockReports( values, projects[0], warehouses, cb );
 
-							// add 2017
-							projects = [{
-								project_start_date: '2017-01-01',
-								project_end_date: '2017-12-31'
-							}];
-
-						}
-
-						// set
-						generateStockReports( values, projects[0], warehouses, cb );
-
-  				});
-  		});
+			});
   }
 
 };
