@@ -6,11 +6,16 @@
 		</style>
 	</head>
 	<body>
-		<p>Hi <%= username %>,</p>
+		<p>Hi <%= name %>,</p>
 		<p>
-			The reporting period for <b><%= report_month %></b> is due on the <%= reporting_due_date %>! Follow the links below to complete and submit your pending <%= type %> reports.
+			The reporting period for <b><%= report_month %></b> is due on the <%= reporting_due_date %>! 
+		</p>
+		<p>
+			Follow the links below to complete and submit your pending <%= type %> reports.
+		</p>
 			<ul>
 			<% for(var i=0; i < reports.length; i++) { %>
+				<li><%= reports[i].cluster %></li>
 				<li><%= reports[i].project_title %></li>
 				<ul>
 					<li>

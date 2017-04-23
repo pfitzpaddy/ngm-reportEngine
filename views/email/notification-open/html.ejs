@@ -6,11 +6,12 @@
 		</style>
 	</head>
 	<body>
-		<p>Hi <%= username %>,</p>
+		<p>Hi <%= name %>,</p>
 		<p>
 			The <%= type %> reporting period for <b><%= report_month %></b> is now open! Follow the links below to complete the report
 			<ul>
 			<% for(var i=0; i < reports.length; i++) { %>
+				<li><%= reports[i].cluster %></li>
 				<li><%= reports[i].project_title %></li>
 				<ul>
 					<li>

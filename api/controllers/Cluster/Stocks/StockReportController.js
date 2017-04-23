@@ -268,45 +268,48 @@ module.exports = {
         .exec( function( err, reports ){
 
           // return error
-          if ( err ) return res.negotiate( err );
+          if ( err ) return res.negotiate( err ); 
+
+          // return
+          return res.json(200, { 'data': 'success' });
 
           // track 
-          var counter=0,
-              length=reports.length;
+          // var counter=0,
+          //     length=reports.length;
 
           // each report (only one stock report per org)
-          reports.forEach(function(report,i){
+          // reports.forEach(function(report,i){
 
-            // send email
-            sails.hooks.email.send( 'notification-open', {
-                type: 'Stock',
-                username: report.username,
-                email: report.email,
-                report_month:  moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase(),
-                reports: [{
-                  project_title: report.organization,
-                  report_url: req.protocol + '://' + req.host + '/desk/#/cluster/stocks/report/' + report.organization_id + '/' + report.id
-                }],
-                sendername: 'ReportHub'
-              }, {
-                to: report.email,
-                subject: 'ReportHub - Stock Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
-              }, function(err) {
+          //   // send email
+          //   sails.hooks.email.send( 'notification-open', {
+          //       type: 'Stock',
+          //       username: report.username,
+          //       email: report.email,
+          //       report_month:  moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase(),
+          //       reports: [{
+          //         project_title: report.organization,
+          //         report_url: req.protocol + '://' + req.host + '/desk/#/cluster/stocks/report/' + report.organization_id + '/' + report.id
+          //       }],
+          //       sendername: 'ReportHub'
+          //     }, {
+          //       to: report.email,
+          //       subject: 'ReportHub - Stock Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
+          //     }, function(err) {
                 
-                // return error
-                if (err) return res.negotiate( err );
+          //       // return error
+          //       if (err) return res.negotiate( err );
 
-                // add to counter
-                counter++;
-                // return 
-                if ( counter === length ) {
-                  // email sent
-                  return res.json(200, { 'data': 'success' });
-                }
+          //       // add to counter
+          //       counter++;
+          //       // return 
+          //       if ( counter === length ) {
+          //         // email sent
+          //         return res.json(200, { 'data': 'success' });
+          //       }
 
-              });            
+          //     });
 
-          });
+          // });
 
       });   
 
