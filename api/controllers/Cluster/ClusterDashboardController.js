@@ -426,18 +426,22 @@ var ClusterDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
-            var sum = 0;
+            var total = 0;
 
             // format
             beneficiaries.forEach(function( d, i ){
+              var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
+              total += sum;
+              // beneficiaries
+              d.total = sum;
+              d.report_month_number = d.report_month+1;
               d.report_month = moment( d.reporting_period ).format( 'MMMM' );
-              sum += d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
             });
 
             if ( !params.csv ) {
 
               // return org list
-              return res.json( 200, { 'value': sum } );
+              return res.json( 200, { 'value': total } );
 
             } else {
 
@@ -447,6 +451,7 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'report_month_number',
                     'report_month',
                     'report_year',
                     'reporting_period',
@@ -478,6 +483,7 @@ var ClusterDashboardController = {
                     'women',
                     'elderly_men', 
                     'elderly_women',
+                    'total',
                     'admin1lng',
                     'admin1lat',
                     'admin2lng',
@@ -490,6 +496,7 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'report_month_number',
                     'report_month',
                     'report_year',
                     'reporting_period',
@@ -521,6 +528,7 @@ var ClusterDashboardController = {
                     'women',
                     'elderly_men', 
                     'elderly_women',
+                    'total',
                     'admin1lng',
                     'admin1lat',
                     'admin2lng',
