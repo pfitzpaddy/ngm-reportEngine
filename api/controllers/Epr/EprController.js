@@ -106,7 +106,7 @@ module.exports = {
 									reporting_province_name: provinces[d['reporting/reporting_details/reporting_province']].admin1name,
 									reporting_week: week,
 									reporting_year: d['reporting/reporting_details/reporting_year'],
-									reporting_date: moment().year( d['reporting/reporting_details/reporting_year'] ).week( d['reporting/reporting_details/reporting_week'] ).add( 1, 'd' ).format( 'YYYY-MM-DD' ),
+									reporting_date: moment().year( d['reporting/reporting_details/reporting_year'] ).week( d['reporting/reporting_details/reporting_week'] ).format( 'YYYY-MM-DD' ),
 									reporting_lat: provinces[d['reporting/reporting_details/reporting_province']].admin1lat,
 									reporting_lng: provinces[d['reporting/reporting_details/reporting_province']].admin1lng,
 									_submission_time: d['_submission_time']
@@ -132,10 +132,10 @@ module.exports = {
 											// disease name
 											d_obj.alert_disease_name = disease_lookup[d_obj.alert_disease];
 											// cases
-											d_obj.cases_female_under5 = parseInt(d_obj.cases_female_under5);
-											d_obj.cases_female_over5 = parseInt(d_obj.cases_female_over5);
-											d_obj.cases_male_under5 = parseInt(d_obj.cases_male_under5);
-											d_obj.cases_male_over5 = parseInt(d_obj.cases_male_over5);
+											d_obj.cases_female_under5 = d_obj.cases_female_under5 ? parseInt(d_obj.cases_female_under5) : 0;
+											d_obj.cases_female_over5 = d_obj.cases_female_over5 ? parseInt(d_obj.cases_female_over5) : 0;
+											d_obj.cases_male_under5 = d_obj.cases_male_under5 ? parseInt(d_obj.cases_male_under5) : 0;
+											d_obj.cases_male_over5 = d_obj.cases_male_over5 ? parseInt(d_obj.cases_male_over5) : 0;
 											// total cases
 											if(!d_obj.cases){
 												d_obj.cases = 0;
@@ -146,10 +146,10 @@ module.exports = {
 											d_obj.cases += d_obj.cases_male_over5;
 											
 											// deaths
-											d_obj.deaths_female_under5 = parseInt(d_obj.deaths_female_under5);
-											d_obj.deaths_female_over5 = parseInt(d_obj.deaths_female_over5);
-											d_obj.deaths_male_under5 = parseInt(d_obj.deaths_male_under5);
-											d_obj.deaths_male_over5 = parseInt(d_obj.deaths_male_over5);
+											d_obj.deaths_female_under5 = d_obj.deaths_female_under5 ? parseInt(d_obj.deaths_female_under5) : 0;
+											d_obj.deaths_female_over5 = d_obj.deaths_female_over5 ? parseInt(d_obj.deaths_female_over5) : 0;
+											d_obj.deaths_male_under5 = d_obj.deaths_male_under5 ? parseInt(d_obj.deaths_male_under5) : 0;
+											d_obj.deaths_male_over5 = d_obj.deaths_male_over5 ? parseInt(d_obj.deaths_male_over5) : 0;
 											// total cases
 											if(!d_obj.deaths){
 												d_obj.deaths = 0;
@@ -163,6 +163,9 @@ module.exports = {
 											if (d_obj.alert_district) {
 												d_obj.alert_lat = districts[d_obj.alert_district].admin2lat;
 												d_obj.alert_lng = districts[d_obj.alert_district].admin2lng;
+											} else {
+												d_obj.alert_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;
+												d_obj.alert_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
 											}
 
 											// push as single record
@@ -189,10 +192,10 @@ module.exports = {
 											// reporting_year
 											d_obj.reporting_year = parseInt(d_obj.reporting_year);
 											// casualties
-											d_obj.casualties_female_under5 = parseInt(d_obj.casualties_female_under5);
-											d_obj.casualties_female_over5 = parseInt(d_obj.casualties_female_over5);
-											d_obj.casualties_male_under5 = parseInt(d_obj.casualties_male_under5);
-											d_obj.casualties_male_over5 = parseInt(d_obj.casualties_male_over5);											
+											d_obj.casualties_female_under5 = d_obj.casualties_female_under5 ? parseInt(d_obj.casualties_female_under5) : 0;
+											d_obj.casualties_female_over5 = d_obj.casualties_female_over5 ? parseInt(d_obj.casualties_female_over5) : 0;
+											d_obj.casualties_male_under5 = d_obj.casualties_male_under5 ? parseInt(d_obj.casualties_male_under5) : 0;
+											d_obj.casualties_male_over5 = d_obj.casualties_male_over5 ? parseInt(d_obj.casualties_male_over5) : 0;								
 											// total casualties
 											if(!d_obj.casualties){
 												d_obj.casualties = 0;
@@ -203,10 +206,10 @@ module.exports = {
 											d_obj.casualties += d_obj.casualties_male_over5;
 											
 											// deaths
-											d_obj.deaths_female_under5 = parseInt(d_obj.deaths_female_under5_001);
-											d_obj.deaths_female_over5 = parseInt(d_obj.deaths_female_over5_001);
-											d_obj.deaths_male_under5 = parseInt(d_obj.deaths_male_under5_001);
-											d_obj.deaths_male_over5 = parseInt(d_obj.deaths_male_over5_001);
+											d_obj.deaths_female_under5 = d_obj.deaths_female_under5_001 ? parseInt(d_obj.deaths_female_under5_001) : 0;
+											d_obj.deaths_female_over5 = d_obj.deaths_female_over5_001 ? parseInt(d_obj.deaths_female_over5_001) : 0;
+											d_obj.deaths_male_under5 = d_obj.deaths_male_under5_001 ? parseInt(d_obj.deaths_male_under5_001) : 0;
+											d_obj.deaths_male_over5 = d_obj.deaths_male_over5_001 ? parseInt(d_obj.deaths_male_over5_001) : 0;
 											// total cases
 											if(!d_obj.deaths){
 												d_obj.deaths = 0;
@@ -225,6 +228,9 @@ module.exports = {
 											if (d_obj.disaster_district) {
 												d_obj.disaster_lat = districts[d_obj.disaster_district].admin2lat;
 												d_obj.disaster_lng = districts[d_obj.disaster_district].admin2lng;
+											} else {
+												d_obj.disaster_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;
+												d_obj.disaster_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
 											}
 
 											// push as single record

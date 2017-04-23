@@ -321,6 +321,7 @@ var EprDashboard = {
                               '<div>' +
                                 'in ' + d.alert_province_name + ', ' + d.alert_district_name +
                               '</div>' +
+                              '<div>' + d.reporting_date + '</div>' +
                             '</div>';
               // create markers
               markers['marker' + i] = {
@@ -413,6 +414,7 @@ var EprDashboard = {
                               '<div>' +
                                 'in ' + d.disaster_province_name + ', ' + d.disaster_district_name +
                               '</div>' +
+                              '<div>' + d.reporting_date + '</div>' +
                             '</div>';
 
               // create markers

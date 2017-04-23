@@ -288,8 +288,8 @@ var ClusterDashboardController = {
 
         // require
         var data = {},
-            fields = [ 'admin1pcode', 'admin1name', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total' ],
-            fieldNames = [ 'Admin1 Pcode', 'Admin1 Name', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total' ];
+            fields = [ 'cluster', 'admin1pcode', 'admin1name', 'organization', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total' ],
+            fieldNames = [ 'Cluster', 'Admin1 Pcode', 'Admin1 Name', 'Organizations', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total' ];
 
         // get organizations by project
         Beneficiaries
@@ -308,12 +308,14 @@ var ClusterDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
-            // beneficiarie
+            // beneficiaries
             beneficiaries.forEach(function( d, i ){
               if ( !data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] ) {
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] = {};
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster = [];
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization = [];
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys = 0;
@@ -323,11 +325,17 @@ var ClusterDashboardController = {
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men = 0;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women = 0;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total = 0;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
               }
-              // var eld_men = d.elderly_men ? d.elderly_men : 0;
-              // var eld_women = d.elderly_women ? d.elderly_women : 0;
+              if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster.indexOf( d.cluster ) === -1 ){
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster.push( d.cluster );
+              }
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
+              if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.indexOf( d.organization ) === -1 ){
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.push( d.organization );
+              }
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name = d.category_type_name;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name = d.beneficiary_type_name;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys += d.boys;
@@ -337,14 +345,18 @@ var ClusterDashboardController = {
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men += d.elderly_men;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women += d.elderly_women;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total += d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
-              data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
+            });
 
+            // flatten
+            var report = ClusterDashboardController.flatten( data );
+
+            // array to string
+            report.forEach( function( d, i ) {
+              report[i].cluster = report[i].cluster.join(', ');
+              report[i].organization = report[i].organization.join(', ');
             });
 
             // sort
-            var report = ClusterDashboardController.flatten( data );
-
             report.sort(function(a, b) {
               return a.admin1name.localeCompare(b.admin1name) || 
                       a.category_type_name.localeCompare(b.category_type_name) || 
