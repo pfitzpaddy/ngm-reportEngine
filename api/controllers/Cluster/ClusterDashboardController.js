@@ -436,6 +436,7 @@ var ClusterDashboardController = {
               d.total = sum;
               d.report_month_number = d.report_month+1;
               d.report_month = moment( d.reporting_period ).format( 'MMMM' );
+              d.reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
             });
 
             if ( !params.csv ) {
@@ -451,6 +452,7 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'project_title',
                     'report_month_number',
                     'report_month',
                     'report_year',
@@ -496,6 +498,7 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'project_title',
                     'report_month_number',
                     'report_month',
                     'report_year',
