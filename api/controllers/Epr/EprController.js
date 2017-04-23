@@ -49,7 +49,7 @@ module.exports = {
 				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/106227?format=json -u eha:ehaTeam1234';
 
 		// run curl command
-		exec( cmd, { maxBuffer: 1024 * 1000 }, function( error, stdout, stderr ) {
+		exec( cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
 
 			if ( error ) {
 
