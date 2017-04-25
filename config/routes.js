@@ -108,9 +108,9 @@ module.exports.routes = {
   'GET /cluster/latestUpdate': 'Cluster/ClusterDashboardController.getlatestUpdate',
 
   // data
+  'GET /cluster/indicator': 'Cluster/ClusterDashboardController.getIndicator',
   'POST /cluster/indicator': 'Cluster/ClusterDashboardController.getIndicator',
-
-
+  
 
 
 
