@@ -442,13 +442,23 @@ var ClusterDashboardController = {
 
             // format
             beneficiaries.forEach(function( d, i ){
+              // hrp code
+              if ( !d.project_hrp_code ) {
+                d.project_hrp_code = '-';
+              }
+              // project code
+              if ( !d.project_code ) {
+                d.project_code = '-';
+              }
+              // sum
               var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
-              total += sum;
               // beneficiaries
               d.total = sum;
               d.report_month_number = d.report_month+1;
               d.report_month = moment( d.reporting_period ).format( 'MMMM' );
               d.reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
+              // grand total
+              total += sum;
             });
 
             if ( !params.csv ) {
@@ -464,6 +474,8 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'project_hrp_code',
+                    'project_code',
                     'project_title',
                     'report_month_number',
                     'report_month',
@@ -510,6 +522,8 @@ var ClusterDashboardController = {
                     'cluster_id',
                     'cluster',
                     'organization',
+                    'project_hrp_code',
+                    'project_code',
                     'project_title',
                     'report_month_number',
                     'report_month',
