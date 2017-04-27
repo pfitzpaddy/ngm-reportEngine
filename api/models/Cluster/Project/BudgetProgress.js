@@ -62,8 +62,13 @@ module.exports = {
 		},
 
 		// add a reference to Project
+		// project_id: {
+		// 	model: 'project'
+		// },
+
 		project_id: {
-			model: 'project'
+			type: 'string',
+			required: true
 		},
 
 		// project

@@ -78,8 +78,13 @@ module.exports = {
 		},
 		
 		// add a reference to Project
+		// project_id: {
+		// 	model: 'project'
+		// },
+
 		project_id: {
-			model: 'project'
+			type: 'string',
+			required: true
 		},
 
 		// project
@@ -180,6 +185,99 @@ module.exports = {
 			type: 'string'
 		}
 
-	}
+	},
+
+  // updateOrCreate 
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+  updateOrCreateEach: function( parent, values, cb ){
+    var self = this; // reference for use by callbacks
+    // If no values were specified, return []
+    if (!values.length) cb( false, [] );
+
+    var results = [],
+        counter = 0,
+        length = values.length;
+
+    // values
+    values.forEach(function( value ){
+
+      if( value.id ){
+        self.update({ id: value.id }, value, function( err, update ){
+          if(err) return cb(err, false);
+          results.push( update[0] );
+
+          counter++;
+          if( counter===length ){
+            cb( false, results );
+          }
+        });
+      }else{
+  			// set based on criteria
+  			for ( key in parent ){
+  				value[ key ] = parent[ key ];
+  			}
+        self.create(value, function( err, create ){
+          if(err) return cb(err, false);
+          results.push( create );
+          
+          counter++;
+          if( counter===length ){
+            cb( false, results );
+          }
+        });
+      }
+
+    });
+
+  },
+
+	// update report locations
+	afterCreate: function( target_location, next ) {
+
+		// check if edit to target_locastion
+		if ( target_location.project_id ) {
+
+			Report
+				.find()
+				.where({ project_id: target_location.project_id })
+				.exec( function( err, reports ){
+
+					// return error
+					if ( err ) return next( err );
+
+					console.log( 'create' );
+					console.log( target_location.id );
+
+					next();
+
+				});
+
+		}
+
+	},
+
+	// update report locations
+	afterUpdate: function( target_location, next ) {
+
+		// check if edit to target_locastion
+
+			// update admin1, admin2, name of report location
+
+			// console.log( 'update' )
+			// console.log( target_location.project_id );
+
+		console.log( 'update' );
+		next();
+
+	},
+
+	// update report locations
+	afterDestroy: function( target_location, next ) {
+
+		// check if edit to target_locastion
+		console.log( 'destroy' );
+		next();
+
+	},
 	
 };
