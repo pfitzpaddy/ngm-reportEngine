@@ -155,6 +155,7 @@ module.exports = {
 				  		admin0name: user.admin0name,
 				  		organization_type: user.organization_type,
 				  		organization_name: user.organization_name,
+				  		organization_tag: user.organization_tag,
 				  		organization: user.organization,
 				  		cluster_id: user.cluster_id,
 				  		cluster: user.cluster
