@@ -64,6 +64,8 @@ module.exports = {
           // set
           $project.project_budget_progress = budgetprogress;
 
+          console.log( { project_id: $project.id } )
+
           // target beneficiaries
           TargetBeneficiaries
             .find({ project_id: $project.id })
@@ -159,6 +161,34 @@ module.exports = {
 
   },
 
+  // remove target beneficiary
+  removeBeneficiaryById: function(req, res) {
+    // request input
+    if ( !req.param( 'id' ) ) {
+      // return error
+      return res.json({ err: true, error: 'id required!' });
+    }
+
+    var id = req.param( 'id' );
+
+    console.log( 'remove' );
+    console.log(id);
+
+    // target beneficiaries
+    TargetBeneficiaries
+      .update( { id: id }, { project_id: null } )
+      .exec( function( err, result ){
+
+        // return error
+        if ( err ) return res.json({ err: true, error: err });
+
+        // return Project
+        return res.json( 200, { msg: 'Success!' } );
+        
+      });
+
+
+  },
   // delete project
   deleteProjectById: function(req, res) {
 

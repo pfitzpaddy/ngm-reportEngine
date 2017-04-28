@@ -246,7 +246,7 @@ module.exports = {
 					if ( err ) return next( err );
 
 					console.log( 'create' );
-					console.log( target_location.id );
+					// console.log( target_location.id );
 
 					next();
 

@@ -78,6 +78,8 @@ module.exports.routes = {
   'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
   'POST /cluster/project/getProject': 'Cluster/ProjectController.getProjectById',
   'POST /cluster/project/setProject': 'Cluster/ProjectController.setProjectById',
+  'POST /cluster/project/removeBeneficiary': 'Cluster/ProjectController.removeBeneficiaryById',
+  
   'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
 
