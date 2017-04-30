@@ -134,9 +134,15 @@ module.exports = {
 		},
 
 		// report
+		// report_id: {
+		// 	model: 'report'
+		// },
+
 		report_id: {
-			model: 'report'
+			type: 'string'
 		},
+
+
 		report_active: {
 			type: 'boolean',
 			defaultsTo: true
@@ -214,10 +220,10 @@ module.exports = {
 		},
 
     // add reference to Beneficiaries
-    beneficiaries: {
-      collection: 'beneficiaries',
-      via: 'location_id'
-    },
+    // beneficiaries: {
+    //   collection: 'beneficiaries',
+    //   via: 'location_id'
+    // },
 
 
 
@@ -235,21 +241,21 @@ module.exports = {
 	},
 	
 	// re-link beneficiaries
-	afterUpdate: function( l, next ){
+	// afterUpdate: function( l, next ){
 
-		// get beneficiaries
-		Beneficiaries
-			.update({ location_reference_id: l.id.valueOf() }, { location_id: l.id } )
-			.exec(function( err, b ){
+	// 	// get beneficiaries
+	// 	Beneficiaries
+	// 		.update({ location_reference_id: l.id.valueOf() }, { location_id: l.id } )
+	// 		.exec(function( err, b ){
 
-				// return error
-				if ( err ) return next( err );
+	// 			// return error
+	// 			if ( err ) return next( err );
 
-				next();
+	// 			next();
 
-		});
+	// 	});
 
-	}
+	// }
 
 };
 

@@ -305,9 +305,6 @@ module.exports = {
     // values
     values.forEach(function( value ){
 
-    	console.log( 'target_beneficairies' );
-    	console.log( value.project_id );
-
       if( value.id ){
         self.update({ id: value.id }, value, function( err, update ){
           if(err) return cb(err, false);

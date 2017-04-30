@@ -83,8 +83,8 @@ module.exports = {
 		// },
 
 		project_id: {
-			type: 'string',
-			required: true
+			type: 'string' //,
+			// required: true
 		},
 
 		// project
@@ -174,6 +174,12 @@ module.exports = {
 			required: true
 		},
 
+		// flag to manage location updates
+		update_location: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+
 
 		
 
@@ -234,50 +240,110 @@ module.exports = {
 	// update report locations
 	afterCreate: function( target_location, next ) {
 
-		// check if edit to target_locastion
-		if ( target_location.project_id ) {
+		// variables
+		var _under = require('underscore');
 
-			Report
-				.find()
-				.where({ project_id: target_location.project_id })
-				.exec( function( err, reports ){
+		// find reports
+		Report
+			.find()
+			.where({ project_id: target_location.project_id })
+			.exec( function( err, reports ){
 
-					// return error
-					if ( err ) return next( err );
+				// return error
+				if ( err ) return next( err );
 
-					console.log( 'create' );
-					// console.log( target_location.id );
+				// counter
+				var counter = 0,
+						length = reports.length;
 
-					next();
+				// forEach
+				reports.forEach(function( report, i ){
+
+					// clone report
+					var r = _under.clone( report );
+									r.report_id = r.id.valueOf();
+									delete r.id;
+									delete r.admin1pcode;
+									delete r.admin1name;
+									delete r.admin2pcode;
+									delete r.admin2name;
+
+					// clone target_location
+					var location,
+							l = _under.clone( target_location );
+							l.target_location_reference_id = l.id;
+							delete l.id;
+
+					// merge reporting location
+					location = _under.extend( l, r );
+
+					// create reporting location
+					Location
+						.create( location )
+						.exec(function( err, result ){
+
+							// return error
+							if ( err ) return next( err );
+
+							counter++
+							if ( counter === length ) {
+								next();
+							}
+
+						});
 
 				});
 
-		}
+		});
 
 	},
 
 	// update report locations
 	afterUpdate: function( target_location, next ) {
 
-		// check if edit to target_locastion
+		// no edits, return
+		if ( !target_location.update_location ) return next();
 
-			// update admin1, admin2, name of report location
-
-			// console.log( 'update' )
-			// console.log( target_location.project_id );
-
-		console.log( 'update' );
-		next();
-
-	},
-
-	// update report locations
-	afterDestroy: function( target_location, next ) {
+		// variables
+		var _under = require('underscore');
 
 		// check if edit to target_locastion
-		console.log( 'destroy' );
-		next();
+		if ( target_location.project_id ) {
 
-	},
+			// clone target_location
+			var l = _under.clone( target_location );
+							l.target_location_reference_id = l.id;
+							delete l.id;
+
+			// location reference id!
+			Location
+				.update( { target_location_reference_id: l.target_location_reference_id }, l )
+				.exec( function( err, result ){
+
+					// return error
+					if ( err ) return next( err );
+
+					// next!
+					next();
+
+			});
+
+		} else {
+
+	    // get report by organization_id
+	    Location
+	      .update( { target_location_reference_id: target_location.id }, { report_id: null } )
+	      .exec( function( err, result ){
+
+					// return error
+					if ( err ) return next( err );					
+
+					// next!
+					next();
+
+	      });
+		}
+
+	}
 	
 };

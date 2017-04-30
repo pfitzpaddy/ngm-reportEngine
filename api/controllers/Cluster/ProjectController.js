@@ -86,6 +86,14 @@ module.exports = {
               // set
               $project.target_locations = target_locations;
 
+              // order
+              $project.target_locations.sort(function(a, b) {
+                return a.admin1name.localeCompare(b.admin1name) || 
+                        a.admin2name.localeCompare(b.admin2name) || 
+                        a.fac_type_name.localeCompare(b.fac_type_name) || 
+                        a.fac_name.localeCompare(b.fac_name)
+              });
+
               // return Project
               return res.json( 200, $project );
 
@@ -110,6 +118,7 @@ module.exports = {
     // get project
     var $project = req.param('project'),
         $status = req.param('project').project_status,
+        $project_budget_progress = req.param('project').project_budget_progress,
         $target_beneficiaries = req.param('project').target_beneficiaries,
         $target_locations = req.param('project').target_locations;
 
@@ -129,27 +138,39 @@ module.exports = {
       $project = project;
 
       // target beneficiaries
-      TargetBeneficiaries
-        .updateOrCreateEach( { project_id: $project.id }, $target_beneficiaries, function( err, target_beneficiaries ){
+      BudgetProgress
+        .updateOrCreateEach( { project_id: $project.id }, $project_budget_progress, function( err, project_budget_progress ){
 
         // return error
         if (err) return res.json({ err: true, error: err });
 
         // set
-        $project.target_beneficiaries = target_beneficiaries;
+        $project.project_budget_progress = project_budget_progress;
 
         // target beneficiaries
-        TargetLocation
-          .updateOrCreateEach( { project_id: $project.id }, $target_locations, function( err, target_locations ){
+        TargetBeneficiaries
+          .updateOrCreateEach( { project_id: $project.id }, $target_beneficiaries, function( err, target_beneficiaries ){
 
           // return error
           if (err) return res.json({ err: true, error: err });
 
           // set
-          $project.target_locations = target_locations;
+          $project.target_beneficiaries = target_beneficiaries;
 
-          // return Project
-          return res.json( 200, $project );
+          // target beneficiaries
+          TargetLocation
+            .updateOrCreateEach( { project_id: $project.id }, $target_locations, function( err, target_locations ){
+
+            // return error
+            if (err) return res.json({ err: true, error: err });
+
+            // set
+            $project.target_locations = target_locations;
+
+            // return Project
+            return res.json( 200, $project );
+
+          });
 
         });
 

@@ -78,10 +78,10 @@ module.exports = {
 		// },
 
 		// flag to manage location updates
-		update_locations: {
-			type: 'boolean',
-			defaultsTo: false
-		},
+		// update_locations: {
+		// 	type: 'boolean',
+		// 	defaultsTo: false
+		// },
 
 		// project
 		project_hrp_code: {
@@ -263,9 +263,6 @@ function getProjectReports( project ) {
 		// clone project
 		var p = _under.clone( project );
 						delete p.id;
-
-		// merge report with target_locations
-		// report.locations = getProjectReportLocations( report, target_locations );
 
 		// add report with p to reports
 		reports.push( _under.extend( {}, report, p ) );
