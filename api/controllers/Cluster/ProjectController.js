@@ -88,10 +88,16 @@ module.exports = {
 
               // order
               $project.target_locations.sort(function(a, b) {
-                return a.admin1name.localeCompare(b.admin1name) || 
-                        a.admin2name.localeCompare(b.admin2name) || 
-                        a.fac_type_name.localeCompare(b.fac_type_name) || 
-                        a.fac_name.localeCompare(b.fac_name)
+                if ( a.fac_type_name ) {
+                  return a.admin1name.localeCompare(b.admin1name) || 
+                          a.admin2name.localeCompare(b.admin2name) || 
+                          a.fac_type_name.localeCompare(b.fac_type_name) || 
+                          a.fac_name.localeCompare(b.fac_name);
+                } else {
+                  return a.admin1name.localeCompare(b.admin1name) || 
+                          a.admin2name.localeCompare(b.admin2name) || 
+                          a.fac_name.localeCompare(b.fac_name);
+                }
               });
 
               // return Project

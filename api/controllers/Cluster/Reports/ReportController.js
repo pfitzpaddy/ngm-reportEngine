@@ -387,15 +387,6 @@ module.exports = {
         // for each location
         $report.locations.forEach( function( location, i ){
 
-          // empty
-          // console.log('--------- beneficiaries ? --------- ')
-          // console.log( location.beneficiaries )
-          // if ( !location.beneficiaries ) {
-          //   location.beneficiaries = [];
-          // }
-          // console.log( location.beneficiaries )
-          // console.log( '-------- next ---------- ' )
-
           // beneficiaries
           Beneficiaries
             .updateOrCreateEach( { location_id: location.id }, location.beneficiaries, function( err, beneficiaries ){
@@ -416,22 +407,6 @@ module.exports = {
           });
 
         });
-        
-        // get report by organization_id
-        // Location
-        //   .find( { report_id: $report.id } )
-        //   .exec( function( err, locations ){
-
-        //     // return error
-        //     if ( err ) return res.json({ err: true, error: err });
-
-        //     // add locations ( associations included )
-        //     $report.locations = locations;
-
-        //     // return report
-        //     return res.json( 200, $report );
-
-        // });
 
     });
 
@@ -441,17 +416,17 @@ module.exports = {
   removeBeneficiary: function( req, res ){
     
     // request input
-    if ( !req.param( 'beneficiary' ) ) {
-      return res.json(401, { err: 'beneficiary required!' });
+    if ( !req.param( 'id' ) ) {
+      return res.json(401, { err: 'id required!' });
     }
     
     // get report
-    var $beneficiary = req.param( 'beneficiary' );
+    var $id = req.param( 'id' );
 
     // location_reference_id 're-links' association after any updates 
        // when updating target locations in project details (this affects monthly report)
     Beneficiaries
-      .update({ id: $beneficiary.id }, { location_reference_id: null })
+      .update({ id: $id }, { location_id: null })
       .exec(function( err, b ){
 
         // return error

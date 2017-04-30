@@ -265,8 +265,7 @@ module.exports = {
     // },
 
     location_id: {
-			type: 'string',
-			required: true
+			type: 'string'
     },
 		
 		// location

@@ -333,15 +333,37 @@ module.exports = {
 	    // get report by organization_id
 	    Location
 	      .update( { target_location_reference_id: target_location.id }, { report_id: null } )
-	      .exec( function( err, result ){
+	      .exec( function( err, location_results ){
 
 					// return error
-					if ( err ) return next( err );					
+					if ( err ) return next( err );
 
-					// next!
-					next();
+					var counter = 0,
+							length = location_results.length;
 
-	      });
+					// for each report location
+					location_results.forEach( function( location, i ) {
+
+						// beneficiaries
+						Beneficiaries
+							.update( { location_id: location.id }, { location_id: null } )
+							.exec( function( err, beneficiaries_result ){
+
+								// return error
+								if ( err ) return next( err );
+
+								// counter
+								if ( counter === length ) {
+									// next!
+									next();
+								}
+
+						});
+
+					});
+
+	    });
+
 		}
 
 	}
