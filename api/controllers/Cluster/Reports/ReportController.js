@@ -323,7 +323,21 @@ module.exports = {
 
             // counter
             var counter = 0,
-                length = $report.locations.length
+                length = $report.locations.length;
+
+            // sort by location
+            $report.locations.sort(function(a, b) {
+              if ( a.fac_type_name ) {
+                return a.admin1name.localeCompare(b.admin1name) || 
+                        a.admin2name.localeCompare(b.admin2name) || 
+                        a.fac_type_name.localeCompare(b.fac_type_name) || 
+                        a.fac_name.localeCompare(b.fac_name);
+              } else {
+                return a.admin1name.localeCompare(b.admin1name) || 
+                        a.admin2name.localeCompare(b.admin2name) || 
+                        a.fac_name.localeCompare(b.fac_name);
+              }
+            });
 
             // for each location
             $report.locations.forEach( function( location, i ){
@@ -338,6 +352,11 @@ module.exports = {
 
                   // add locations ( associations included )
                   $report.locations[i].beneficiaries = beneficiaries;
+
+                  // sort by id
+                  $report.locations[i].beneficiaries.sort( function( a, b ) {
+                    return a.id.localeCompare( b.id );
+                  });
 
                   // counter 
                   counter++;
@@ -382,7 +401,21 @@ module.exports = {
 
         // counter
         var counter = 0,
-            length = $report.locations.length
+            length = $report.locations.length;
+
+        // sort by location
+        $report.locations.sort(function(a, b) {
+          if ( a.fac_type_name ) {
+            return a.admin1name.localeCompare(b.admin1name) || 
+                    a.admin2name.localeCompare(b.admin2name) || 
+                    a.fac_type_name.localeCompare(b.fac_type_name) || 
+                    a.fac_name.localeCompare(b.fac_name);
+          } else {
+            return a.admin1name.localeCompare(b.admin1name) || 
+                    a.admin2name.localeCompare(b.admin2name) || 
+                    a.fac_name.localeCompare(b.fac_name);
+          }
+        });
 
         // for each location
         $report.locations.forEach( function( location, i ){
@@ -396,6 +429,11 @@ module.exports = {
 
               // add locations ( associations included )
               $report.locations[i].beneficiaries = beneficiaries;
+
+              // sort by id
+              $report.locations[i].beneficiaries.sort( function( a, b ) {
+                return a.id.localeCompare( b.id );
+              });
 
               // counter 
               counter++;

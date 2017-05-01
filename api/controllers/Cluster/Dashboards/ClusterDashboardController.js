@@ -145,7 +145,7 @@ var ClusterDashboardController = {
             // order
             organizations.sort(function(a, b) {
               return a.organization.localeCompare(b.organization);
-            }); 
+            });
 
             // default
             organizations.unshift({
