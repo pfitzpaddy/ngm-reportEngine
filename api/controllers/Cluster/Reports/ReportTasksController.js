@@ -67,8 +67,9 @@ module.exports = {
 
     // active projects ids
     var moment = require('moment'),
-        notification = {},
-        counter = 0;
+        nStore = {},
+        notifications =[];
+
 
     // only run if date is above monthly reporting period
     if ( moment().date() === 1 ) {
@@ -92,18 +93,19 @@ module.exports = {
           reports.forEach( function( report, i ) {
 
             // if username dosnt exist
-            if ( !notification[ report.email ] ) {
+            if ( !nStore[ report.email ] ) {
 
               // add for notification email template
-              notification[ report.email ] = {
+              nStore[ report.email ] = {
                 email: report.email,
+                username: report.username,
                 report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
                 reports: []
               };
             }
 
             // add report urls
-            notification[ report.email ].reports.push({
+            nStore[ report.email ].reports.push({
               cluster: report.cluster,
               username: report.username,
               project_title: report.project_title,
@@ -113,32 +115,51 @@ module.exports = {
           });
 
           // each user, send only one email!
-          for ( var user in notification ) {
+          for ( var user in nStore ) {
 
             // order
-            notification[ user ].reports.sort(function(a, b) {
+            nStore[ user ].reports.sort(function(a, b) {
               return a.cluster.localeCompare(b.cluster) || 
                       a.project_title.localeCompare(b.project_title);
             });
 
+            notifications.push( nStore[ user ] );
+
+          }
+
+          // counter
+          var counter = 0,
+              length = notifications.length;
+
+          // for each
+          notifications.forEach( function( notification, i ){
+            
+            // get name
             User
               .findOne()
-              .where({ email: notification[ user ].email })
+              .where({ email: notifications[i].email })
               .exec( function( err, result ){
 
                 // return error
                 if ( err ) return res.negotiate( err );
 
+                // really have no idea whats
+                if( !result ) {
+                  result = {
+                    name: notifications[i].username
+                  }
+                }
+
                 // send email
                 sails.hooks.email.send( 'notification-open', {
                     type: 'Project',
                     name: result.name,
-                    email: notification[ user ].email,
-                    report_month: notification[ user ].report_month.toUpperCase(),
-                    reports: notification[ user ].reports,
+                    email: notifications[i].email,
+                    report_month: notifications[i].report_month.toUpperCase(),
+                    reports: notifications[i].reports,
                     sendername: 'ReportHub'
                   }, {
-                    to: notification[ user ].email,
+                    to: notifications[i].email,
                     subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
                   }, function(err) {
                     
@@ -147,9 +168,7 @@ module.exports = {
 
                     // add to counter
                     counter++;
-
-                    // return 
-                    if ( counter === Object.keys( notification ).length ) {
+                    if ( counter === length ) {
                       
                       // email sent
                       return res.json(200, { 'data': 'success' });
@@ -159,12 +178,12 @@ module.exports = {
 
               });
 
-          }
+          });
 
       });
 
     } else {
-
+      
       // return reports
       return res.json( 200, { msg: 'Reporting not open for ' + moment().format( 'MMMM' ) + '!' } );
     }
@@ -176,8 +195,8 @@ module.exports = {
 
     // active projects ids
     var moment = require('moment'),
-        notification = {},
-        counter = 0;
+        nStore = {},
+        notifications =[];
 
     // only run if date is 1 week before monthly reporting period required
     if ( moment().date() >= 10 ) {
@@ -201,11 +220,12 @@ module.exports = {
           reports.forEach( function( report, i ) {
 
             // if username dosnt exist
-            if ( !notification[ report.email ] ) {
+            if ( !nStore[ report.email ] ) {
 
               // add for notification email template
-              notification[ report.email ] = {
+              nStore[ report.email ] = {
                 email: report.email,
+                username: report.username,
                 report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
                 reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
                 reports: []
@@ -213,7 +233,7 @@ module.exports = {
             }
 
             // add report urls
-            notification[ report.email ].reports.push({
+            nStore[ report.email ].reports.push({
               cluster: report.cluster,
               username: report.username,
               project_title: report.project_title,
@@ -225,34 +245,52 @@ module.exports = {
           });
 
           // each user, send only one email!
-          for ( var user in notification ) {
+          for ( var user in nStore ) {
 
             // order
-            notification[ user ].reports.sort(function(a, b) {
+            nStore[ user ].reports.sort(function(a, b) {
               return a.cluster.localeCompare(b.cluster) || 
                       a.project_title.localeCompare(b.project_title) || 
                       a.report_value - b.report_value;
             });
+            // push
+            notifications.push( nStore[ user ] );
+
+          }
+
+          // counter
+          var counter = 0,
+              length = notifications.length;
+
+          // for each
+          notifications.forEach( function( notification, i ){
 
             User
               .findOne()
-              .where({ email: notification[ user ].email })
+              .where({ email: notifications[i].email })
               .exec( function( err, result ){
 
                 // return error
                 if ( err ) return res.negotiate( err );
 
+                // really have no idea whats
+                if( !result ) {
+                  result = {
+                    name: notifications[i].username
+                  }
+                }
+
                 // send email
                 sails.hooks.email.send( 'notification-due', {
                     type: 'Project',
                     name: result.name,
-                    email: notification[ user ].email,
-                    report_month: notification[ user ].report_month.toUpperCase(),
-                    reporting_due_date: notification[ user ].reporting_due_date,
-                    reports: notification[ user ].reports,
+                    email: notifications[i].email,
+                    report_month: notifications[i].report_month.toUpperCase(),
+                    reporting_due_date: notifications[i].reporting_due_date,
+                    reports: notifications[i].reports,
                     sendername: 'ReportHub'
                   }, {
-                    to: notification[ user ].email,
+                    to: notifications[i].email,
                     subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' is Due Soon!'
                   }, function(err) {
                     
@@ -261,9 +299,7 @@ module.exports = {
 
                     // add to counter
                     counter++;
-                    
-                    // return 
-                    if ( counter === Object.keys( notification ).length ) {
+                    if ( counter === length ) {
                       
                       // email sent
                       return res.json( 200, { 'data': 'success' });
@@ -273,7 +309,7 @@ module.exports = {
 
             });
 
-          }
+          });
 
         });
 
