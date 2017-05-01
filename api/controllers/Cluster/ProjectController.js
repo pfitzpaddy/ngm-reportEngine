@@ -75,6 +75,11 @@ module.exports = {
             // set
             $project.target_beneficiaries = target_beneficiaries;
 
+            // sort by id
+            $project.target_beneficiaries.sort( function( a, b ) {
+              return a.id.localeCompare( b.id );
+            });
+
             // target beneficiaries
             TargetLocation
               .find({ project_id: $project.id })
@@ -162,6 +167,11 @@ module.exports = {
 
           // set
           $project.target_beneficiaries = target_beneficiaries;
+
+          // sort by id
+          $project.target_beneficiaries.sort( function( a, b ) {
+            return a.id.localeCompare( b.id );
+          });
 
           // target beneficiaries
           TargetLocation
