@@ -519,6 +519,13 @@ module.exports = {
                 // return error
                 if ( err ) return res.negotiate( err );
 
+                // really have no idea whats
+                if( !result && notification[ user ].email === 'ncra_afg@yahoo.com' ) {
+                  result = {
+                    name: 'Eng. Sayed Ghufran'
+                  }
+                }
+
                 // send email
                 sails.hooks.email.send( 'notification-open', {
                     type: 'Project',
@@ -537,8 +544,6 @@ module.exports = {
 
                     // add to counter
                     counter++;
-
-                    // return 
                     if ( counter === Object.keys( notification ).length ) {
                       
                       // email sent
