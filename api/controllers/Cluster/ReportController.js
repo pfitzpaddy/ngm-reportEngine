@@ -549,7 +549,7 @@ module.exports = {
                     reports: notifications[i].reports,
                     sendername: 'ReportHub'
                   }, {
-                    to: notification[ user ].email,
+                    to: notifications[i].email,
                     subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
                   }, function(err) {
                     
