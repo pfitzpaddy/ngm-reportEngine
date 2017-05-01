@@ -520,11 +520,13 @@ module.exports = {
                 if ( err ) return res.negotiate( err );
 
                 // really have no idea whats
-                if( !result && notification[ user ].email === 'ncra_afg@yahoo.com' ) {
+                if( !result ) {
                   result = {
-                    name: 'Eng. Sayed Ghufran'
+                    name: 'ReportHub User'
                   }
                 }
+
+                console.log(result.name);
 
                 // send email
                 sails.hooks.email.send( 'notification-open', {
