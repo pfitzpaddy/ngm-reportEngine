@@ -239,23 +239,90 @@ module.exports = {
 		}
 
 	},
-	
-	// re-link beneficiaries
-	// afterUpdate: function( l, next ){
 
-	// 	// get beneficiaries
-	// 	Beneficiaries
-	// 		.update({ location_reference_id: l.id.valueOf() }, { location_id: l.id } )
-	// 		.exec(function( err, b ){
+	// create new report locations based on project target_locations
+	createNewReportLocations: function( new_report, target_locations, cb ){
+    var self = this; // reference for use by callbacks
+    // If no values were specified, return []
+    if ( !new_report || !target_locations.length ) cb( false, [] );
 
-	// 			// return error
-	// 			if ( err ) return next( err );
+    // var
+    var results = [],
+        counter = 0,
+        length = target_locations.length,
+        _under = require('underscore');
 
-	// 			next();
+    // values
+    target_locations.forEach(function( t_location ){
 
-	// 	});
+			// clone target_location
+			var l = _under.clone( t_location );
+			    l.target_location_reference_id = l.id;
 
-	// }
+    	// check if it already exists
+			self
+				.find()
+				.where({ report_month: new_report.report_month })
+				.where({ report_year: new_report.report_year })
+				.where({ target_location_reference_id: t_location.id })
+				.exec(function( err, found ){
+          if ( err ) return cb( err, false );
+
+          // create
+          if ( !found ) {
+						delete l.id;
+					}
+
+          // update
+          if ( found ) {
+          	l.id = found.id
+          }
+
+          // merge reporting location
+          var location = _under.extend( {}, l, new_report );
+
+          // update or create reporting location
+          Location
+            .updateOrCreate( location, function( err, result ){
+
+              // return error
+              if ( err ) return next( err );
+
+              // push results
+              results.push( result );
+
+							// counter
+              counter++
+              if ( counter === length ) {
+                cb( false, results );
+              }
+
+        	});
+
+      });
+
+		});
+
+	},
+
+  // updateOrCreate 
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+  updateOrCreate: function( values, cb ){
+    var self = this; // reference for use by callbacks
+    // If no values were specified, return []
+    if ( !values ) cb( false, [] );
+
+    if( values.id ){
+    	// update returns array, need the object
+      self.update({ id: values.id }, values, function( err, update ){
+				if( err ) return cb( err, false );
+				cb( false, update[0] );
+      });
+    }else{
+      self.create( values, cb );
+    }
+
+  }
 
 };
 

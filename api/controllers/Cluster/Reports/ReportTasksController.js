@@ -13,51 +13,105 @@ module.exports = {
     // run this 1st day of the month
   setReportsToDo: function( req, res ) {
 
-    // active projects ids
-    var moment = require('moment'),
-        project_ids = [];
+    // libs
+    var _under = require('underscore'),
+        moment = require('moment');
 
     // only run if date is above monthly reporting period
-    if ( moment().date() === 1 ) {
+    // if ( moment().date() === 1 ) {
   
       // find active projects
       Project
         .find()
-        .where( { project_status: 'active' } )
+        .where( { project_status: 'active'} )
+        .where( { project_end_date: { $gte: moment().subtract( 1, 'M' ).startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
         .exec( function( err, projects ){
 
           // return error
-          if ( err ) return res.negotiate( err );            
+          if ( err ) return res.negotiate( err );
+
+          // counter
+          var counter = 0;
+              length = projects.length;     
 
           // for each project
           projects.forEach( function( project, i ){
 
-            // get project_id
-            project_ids.push( project.id );
+            // create report
+            var r = {
+              project_id: projects[i].id,
+              report_status: 'todo',
+              report_active: true,
+              report_month: moment().subtract( 1, 'M' ).month(),
+              report_year: moment().subtract( 1, 'M' ).year(),
+              reporting_period: moment().subtract( 1, 'M' ).set( 'date', 1 ).format(),
+              reporting_due_date: moment().set( 'date', 15 ).format()
+            };
 
-          });        
+            // clone project
+            var p = _under.clone( projects[i] );
+                    delete p.id;
 
-          // find active reports for the next reporting period
-          Report
-            .update( { project_id: project_ids, report_month: moment().subtract( 1, 'M' ).month(), report_year: moment().subtract( 1, 'M' ).year() },
-                     { report_active: true, report_status: 'todo' } )
-            .exec( function( err, reports ){
+            // create report
+            var newReport = _under.extend( {}, r, p );
 
-              // return error
-              if ( err ) return res.negotiate( err );               
+            // create reports
+            Report
+              .findOrCreate( { 
+                  project_id: newReport.project_id, 
+                  report_month: newReport.report_month, 
+                  report_year: newReport.report_year
+                }, newReport )
+              .exec( function( err, report ) {
 
-              // return reports
-              return res.json( 200, { msg: 'success' } );
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                // clone report
+                var r = _under.clone( report );
+                        r.report_id = r.id.valueOf();
+                        delete r.id;
+                        delete r.admin1pcode;
+                        delete r.admin1name;
+                        delete r.admin2pcode;
+                        delete r.admin2name;
+
+                // get target_locations
+                TargetLocation
+                  .find()
+                  .where( { project_id: r.project_id } )
+                  .exec( function( err, target_locations ){
+
+                    // return error
+                    if ( err ) return res.negotiate( err );
+
+                    // create report locations
+                    Location
+                      .createNewReportLocations( r, target_locations, function( err, locations ){
+
+                        // return error
+                        if ( err ) return res.negotiate( err );
+
+                        // counter
+                        counter++;
+                        if ( counter === length ) {
+                          return res.json( 200, { msg: 'success' } );
+                        }
+
+                    });
+
+                });
+            });
 
           });
 
       });
 
-    } else {
+    // } else {
 
-      // return reports
-      return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
-    }
+    //   // return reports
+    //   return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
+    // }
 
   },
 

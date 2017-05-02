@@ -310,6 +310,11 @@ module.exports = {
         // clone project to update
         $report = report;
 
+        // if no reports
+        if ( !$report ) {
+          return res.json( 200, [] );
+        } 
+
         // get report by organization_id
         Location
           .find( { report_id: $report.id } )
@@ -320,6 +325,11 @@ module.exports = {
 
             // add locations ( associations included )
             $report.locations = locations;
+
+            // if no reports
+            if ( !$report.locations.length ) {
+              return res.json( 200, $report );
+            }
 
             // counter
             var counter = 0,

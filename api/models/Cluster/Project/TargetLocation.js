@@ -290,7 +290,7 @@ module.exports = {
 								next();
 							}
 
-						});
+					});
 
 				});
 
@@ -307,7 +307,7 @@ module.exports = {
 		// variables
 		var _under = require('underscore');
 
-		// check if edit to target_locastion
+		// update
 		if ( target_location.project_id ) {
 
 			// clone target_location
@@ -315,7 +315,7 @@ module.exports = {
 							l.target_location_reference_id = l.id;
 							delete l.id;
 
-			// location reference id!
+			// target location reference id
 			Location
 				.update( { target_location_reference_id: l.target_location_reference_id }, l )
 				.exec( function( err, result ){
@@ -328,7 +328,10 @@ module.exports = {
 
 			});
 
-		} else {
+		}
+
+		// remove location from reportd
+		if ( !target_location.project_id ) {
 
 	    // get report by organization_id
 	    Location

@@ -217,13 +217,14 @@ module.exports = {
 				// next!
 				next();
 				
-			});
+		});
+			
 	},
 
 	// update report locations
 	afterUpdate: function( project, next ) {
 
-		// update project details of collections
+		// update project details of collections ?
 		next();
 
 	}
@@ -240,8 +241,8 @@ function getProjectReports( project ) {
 	
 	// variables
 	var reports = [],
-			s_date = moment( '2017-01-01' ),
-			e_date = moment().subtract( 1, 'M' ).endOf( 'month' );
+			s_date = moment( '2017-01-01' ), // start of 2017
+			e_date = moment().subtract( 1, 'M' ).endOf( 'month' ); // Current reporting period ( last month )
 
 	// number of reports
 	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
@@ -271,47 +272,6 @@ function getProjectReports( project ) {
 
 	// return the reports for the project period
 	return reports;
-
-};
-
-
-
-
-
-
-
-
-
-
-
-// generate an array of reports
-function getProjectReportLocations( report, target_locations ) {
-
-	// variables
-	var locations = [],
-			_under = require('underscore');
-	
-	// clone report
-	var r = _under.clone( report );
-	delete r.admin1pcode;
-	delete r.admin1name;
-	delete r.admin2pcode;
-	delete r.admin2name;
-
-	// for project target_locations
-	target_locations.forEach( function( target_location, t_index ) {
-
-		// clone target_location
-		var l = target_location.toObject();
-				l.target_location_reference_id = l.id.valueOf();
-				delete l.id;
-
-		locations.push( _under.extend( l, r ) );
-		
-	});
-
-	// return locations array
-	return locations;
 
 };
 
