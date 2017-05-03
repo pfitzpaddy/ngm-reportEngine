@@ -18,7 +18,7 @@ module.exports = {
         moment = require('moment');
 
     // only run if date is above monthly reporting period
-    // if ( moment().date() === 1 ) {
+    if ( moment().date() === 1 ) {
   
       // find active projects
       Project
@@ -98,10 +98,10 @@ module.exports = {
 
       });
 
-    // } else {
-    //   // return reports
-    //   return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
-    // }
+    } else {
+      // return reports
+      return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
+    }
 
   },
 
