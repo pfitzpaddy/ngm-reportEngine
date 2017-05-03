@@ -18,7 +18,7 @@ module.exports = {
 			required: true
 		},
 		email: {
-			type: 'email',
+			type: 'string',
 			required: true
 		},
 		dashboard: {
