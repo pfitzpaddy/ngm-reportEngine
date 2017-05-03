@@ -67,15 +67,6 @@ module.exports = {
                 // return error
                 if ( err ) return res.negotiate( err );
 
-                // clone report
-                var r = _under.clone( report );
-                        r.report_id = r.id.valueOf();
-                        delete r.id;
-                        delete r.admin1pcode;
-                        delete r.admin1name;
-                        delete r.admin2pcode;
-                        delete r.admin2name;
-
                 // get target_locations
                 TargetLocation
                   .find()
@@ -87,7 +78,7 @@ module.exports = {
 
                     // create report locations
                     Location
-                      .createNewReportLocations( r, target_locations, function( err, locations ){
+                      .createNewReportLocations( report, target_locations, function( err, locations ){
 
                         // return error
                         if ( err ) return res.negotiate( err );
@@ -108,7 +99,6 @@ module.exports = {
       });
 
     // } else {
-
     //   // return reports
     //   return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
     // }
