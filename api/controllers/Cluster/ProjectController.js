@@ -48,7 +48,9 @@ module.exports = {
       .exec( function( err, project ){
       
         // return error
-        if (err) return res.negotiate( err );
+        if ( err ) return res.negotiate( err );
+
+        if ( !project ) return res.json( 200, [] );
 
         // clone project to update
         $project = project;
