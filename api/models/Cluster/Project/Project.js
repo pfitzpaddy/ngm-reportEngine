@@ -238,11 +238,17 @@ function getProjectReports( project ) {
 	// tools
 	var moment = require('moment'),
 			_under = require('underscore');
+
+	// dates
+	var project_start = moment( project.project_start_date ).startOf( 'M' ),
+			project_end = moment( project.project_end_date ).endOf( 'M' ),
+			reports_start = moment( '2017-01-01' ),
+			reports_end = moment().subtract( 1, 'M' ).endOf( 'M' );
 	
 	// variables
 	var reports = [],
-			s_date = moment( '2017-01-01' ), // start of 2017
-			e_date = moment().subtract( 1, 'M' ).endOf( 'month' ); // Current reporting period ( last month )
+			s_date = project_start.format('YYYY-MM-DD') > reports_start.format('YYYY-MM-DD') ? project_start : reports_start,
+			e_date = project_end.format('YYYY-MM-DD') < reports_end.format('YYYY-MM-DD') ? project_end : reports_end;
 
 	// number of reports
 	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
