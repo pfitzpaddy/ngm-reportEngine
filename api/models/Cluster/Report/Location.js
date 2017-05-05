@@ -134,9 +134,15 @@ module.exports = {
 		},
 
 		// report
+		// report_id: {
+		// 	model: 'report'
+		// },
+
 		report_id: {
-			model: 'report'
+			type: 'string'
 		},
+
+
 		report_active: {
 			type: 'boolean',
 			defaultsTo: true
@@ -214,10 +220,10 @@ module.exports = {
 		},
 
     // add reference to Beneficiaries
-    beneficiaries: {
-      collection: 'beneficiaries',
-      via: 'location_id'
-    },
+    // beneficiaries: {
+    //   collection: 'beneficiaries',
+    //   via: 'location_id'
+    // },
 
 
 
@@ -233,19 +239,61 @@ module.exports = {
 		}
 
 	},
-	
-	// re-link beneficiaries
-	afterUpdate: function( l, next ){
 
-		// get beneficiaries
-		Beneficiaries
-			.update({ location_reference_id: l.id.valueOf() }, { location_id: l.id } )
-			.exec(function( err, b ){
+	// create new report locations based on project target_locations
+	createNewReportLocations: function( report, target_locations, cb ){
+    var self = this; // reference for use by callbacks
+    // If no values were specified, return []
+    if ( !report || !target_locations.length ) cb( false, [] );
 
-				// return error
-				if ( err ) return next( err );
+    // var
+    var results = [],
+        counter = 0,
+        length = target_locations.length,
+        _under = require('underscore');
 
-				next();
+    // clone report
+    var target_report = _under.clone( report );
+            target_report.report_id = report.id.valueOf();
+            delete target_report.id;
+            delete target_report.admin1pcode;
+            delete target_report.admin1name;
+            delete target_report.admin2pcode;
+            delete target_report.admin2name;
+
+    // values
+    target_locations.forEach(function( t_location ){
+
+			// clone target_location
+			var l = _under.clone( t_location );
+			    l.target_location_reference_id = t_location.id;
+			    delete l.id;
+
+      // merge reporting location
+      var location = _under.extend( {}, target_report, l );
+
+      // find or create
+			self
+        .findOrCreate( { 
+            project_id: target_report.project_id, 
+            report_month: target_report.report_month, 
+            report_year: target_report.report_year,
+            target_location_reference_id: t_location.id
+          }, location )
+        .exec( function( err, result ) {
+
+        	// err
+        	if ( err ) return cb( err, false );
+
+        	// results
+        	results.push( result );
+
+					// counter
+					counter++
+					if ( counter === length ) {
+						cb( false, results );
+					}
+			});
 
 		});
 

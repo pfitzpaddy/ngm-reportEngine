@@ -183,6 +183,9 @@ module.exports = {
 	// after create ensure not malicious user
 	afterCreate: function ( user, next ) {
 
+		// file system
+		var fs = require('fs');
+
     // get user by email
     User
     	.find()
@@ -192,6 +195,9 @@ module.exports = {
 
 				// return
 			  if ( err ) return next( err );
+
+			  // if no config file, return, else send email ( PROD )
+			  if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) return next();
 
 			  // if more then 1 user for that org
 				if ( admin.length > 1 ) {
@@ -220,7 +226,7 @@ module.exports = {
 	          });
 
 	    	} else {
-							  	
+
 			  	// next
 					next();
 

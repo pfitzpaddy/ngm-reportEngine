@@ -166,10 +166,11 @@ module.exports = {
 		},
 
     // add reference to Locations
-    locations: {
-      collection: 'location',
-      via: 'report_id'
-    },
+    // locations: {
+    //   collection: 'location',
+    //   via: 'report_id'
+    // },
+    
     notes: {
     	type: 'string'
     },

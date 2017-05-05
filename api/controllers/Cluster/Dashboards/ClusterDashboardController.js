@@ -139,45 +139,45 @@ var ClusterDashboardController = {
 
             });
 
-              // flatten
-              organizations = ClusterDashboardController.flatten( organizations );
+            // flatten
+            organizations = ClusterDashboardController.flatten( organizations );
 
-              // order
-              organizations.sort(function(a, b) {
-                return a.organization.localeCompare(b.organization);
-              }); 
+            // order
+            organizations.sort(function(a, b) {
+              return a.organization.localeCompare(b.organization);
+            });
 
-              // default
-              organizations.unshift({
-                organization_tag: 'all',
-                organization: 'ALL',
+            // default
+            organizations.unshift({
+              organization_tag: 'all',
+              organization: 'ALL',
+            });
+
+            // orgs
+            Organizations
+              .find()
+              .where( { organization_tag: params.organization_tag } )
+              .exec( function( err, organization ){
+
+                // return error
+                if (err) return res.negotiate( err );
+
+                if ( !beneficiaries.length ) {
+                  organizations[1] = organization[0];
+                }
+
+                // get a list of projects for side menu
+                if ( params.list ) {
+                  // return org list
+                  return res.json( 200, organizations );
+                } else {
+                  // return indicator
+                  return res.json( 200, { 'value': organizations.length-1 });
+                }
+
               });
 
-              // orgs
-              Organizations
-                .find()
-                .where( { organization_tag: params.organization_tag } )
-                .exec( function( err, organization ){
-
-                  // return error
-                  if (err) return res.negotiate( err );
-
-                  if ( !beneficiaries.length ) {
-                    organizations[1] = organization[0];
-                  }
-
-                  // get a list of projects for side menu
-                  if ( params.list ) {
-                    // return org list
-                    return res.json( 200, organizations );
-                  } else {
-                    // return indicator
-                    return res.json( 200, { 'value': organizations.length-1 });
-                  }
-
-                });
-
-            });
+          });
 
         break;
 

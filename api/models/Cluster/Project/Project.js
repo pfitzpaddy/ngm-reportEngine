@@ -16,22 +16,22 @@ module.exports = {
 	// attributes
 	attributes: {
 		// region/country id
-	    adminRpcode: {
+    adminRpcode: {
 			type: 'string',
 			required: true
-	    },
-	    adminRname: {
+    },
+    adminRname: {
 			type: 'string',
 			required: true
-	    },
-	    admin0pcode: {
+    },
+    admin0pcode: {
 			type: 'string',
 			required: true
-	    },
-	    admin0name: {
+    },
+    admin0name: {
 			type: 'string',
 			required: true
-	    },
+    },
 		organization_id: {
 			type: 'string',
 			required: true
@@ -62,26 +62,26 @@ module.exports = {
 		},
 
 		// add reference to Target beneficiaries
-		target_beneficiaries: {
-			collection: 'targetbeneficiaries',
-			via: 'project_id'
-		},	
-		// add reference to Target Locations
-		target_locations: {
-			collection: 'targetlocation',
-			via: 'project_id'
-    	},
-		// add reference to Budget Progress
-		project_budget_progress: {
-			collection: 'budgetprogress',
-			via: 'project_id'
-		},
+		// target_beneficiaries: {
+		// 	collection: 'targetbeneficiaries',
+		// 	via: 'project_id'
+		// },	
+		// // add reference to Target Locations
+		// target_locations: {
+		// 	collection: 'targetlocation',
+		// 	via: 'project_id'
+  	// },
+		// // add reference to Budget Progress
+		// project_budget_progress: {
+		// 	collection: 'budgetprogress',
+		// 	via: 'project_id'
+		// },
 
 		// flag to manage location updates
-		update_locations: {
-			type: 'boolean',
-			defaultsTo: false
-		},
+		// update_locations: {
+		// 	type: 'boolean',
+		// 	defaultsTo: false
+		// },
 
 		// project
 		project_hrp_code: {
@@ -90,7 +90,7 @@ module.exports = {
 		},
 		project_status: {
 			type: 'string',
-			defaultsTo: 'new'
+			defaultsTo: 'active'
 		},
 		project_title: {
 			type: 'string',
@@ -181,95 +181,74 @@ module.exports = {
 
 	},
 
+  // updateOrCreate 
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+  updateOrCreate: function( values, cb ){
+    var self = this; // reference for use by callbacks
+    // If no values were specified, return []
+    if (!values) cb( false, [] );
+
+    if( values.id ){
+    	// update returns array, need the object
+      self.update({ id: values.id }, values, function( err, update ){
+				if(err) return cb(err, false);
+				cb( false, update[0] );
+      });
+    }else{
+      self.create(values, cb);
+    }
+
+  },
+
 	// afterCreate
 	afterCreate: function( project, next ) {
-		
-		// for each project target locations
-		TargetLocation
-			.find()
-			.where( { project_id: project.id } )
-			.exec( function( err, target_locations ) {
+
+		// generate an array of reports
+		var reports = getProjectReports( project );
+
+		// create reports
+		Report
+			.create( reports )
+			.exec( function( err, reports ) {
 
 				// return error
 				if ( err ) return next( err );
 
-				// if none
-				if ( !target_locations || !target_locations.length ) return next();
-
-				// if target_locations
-				if ( target_locations && target_locations.length ) {
-
-					// generate an array of reports
-					var reports = getProjectReports( project, target_locations );
-
-					// create reports
-					Report
-						.create( reports )
-						.exec( function( err, reports ) {
-
-							// return error
-							if ( err ) return next( err );
-
-							// next!
-							next();
-							
-						});
-				}
-
-			});
+				// next!
+				next();
+				
+		});
+			
 	},
 
 	// update report locations
 	afterUpdate: function( project, next ) {
 
-		// if no updates
-		if ( !project.update_locations ) return next();
-		
-		// if update required
-		if( project.update_locations ){
-
-			// for each project target locations
-			TargetLocation
-				.find()
-				.where( { project_id: project.id } )
-				.exec( function( err, target_locations ) {
-
-					// return error
-					if ( err ) return next( err );
-
-					// if none
-					if ( !target_locations || !target_locations.length ) return next();
-
-					// if target_locations
-					if ( target_locations && target_locations.length ) {
-
-						// generate an array of reports
-						var generated_reports = getProjectReports( project, target_locations );				
-
-						// could make this a new func
-						updateProjectReports( project, target_locations, generated_reports, next );
-
-					}
-
-			});
-
-		}
+		// update project details of collections ?
+		next();
 
 	}
+
 };
 
 
 // generate an array of reports
-function getProjectReports( project, target_locations ) {
+function getProjectReports( project ) {
 
 	// tools
 	var moment = require('moment'),
 			_under = require('underscore');
+
+	// dates
+	var project_start = moment( project.project_start_date ).startOf( 'M' ),
+			project_end = moment( project.project_end_date ).endOf( 'M' ),
+			reports_start = moment( '2017-01-01' ),
+			reports_end = moment().subtract( 1, 'M' ).endOf( 'M' );
+	
 	// variables
 	var reports = [],
-			// set start date / end date to start and end of respective months
-			s_date = moment( project.project_start_date ).startOf( 'month' ),
-			e_date = moment( project.project_end_date ).endOf( 'month' );
+			s_date = project_start.format('YYYY-MM-DD') > reports_start.format('YYYY-MM-DD') ? project_start : reports_start,
+			e_date = project_end.format('YYYY-MM-DD') < reports_end.format('YYYY-MM-DD') ? project_end : reports_end;
 
 	// number of reports
 	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
@@ -277,42 +256,23 @@ function getProjectReports( project, target_locations ) {
 	// for each report month
 	for ( m = 0; m < reports_duration; m++ ) {
 
-		// report is true
-		var report_active = true;
-
-		// should be reports just for 2017 period!
-		if ( moment( s_date ).add( m, 'M' ).year() < 2017 ) {
-			report_active = false;
-		}
-
-		// report_status 'todo' open from 1st of next month
-		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).endOf( 'month' ) ) >= 0 ? 'todo' : 'pending';
-
 		// create report
 		var report = {
-			// defaults
-			report_status: report_status,
-			report_active: report_active,
+			project_id: project.id,
+			report_status: 'todo',
+			report_active: true,
 			report_month: moment( s_date ).add( m, 'M' ).month(),
 			report_year: moment( s_date ).add( m, 'M' ).year(),
 			reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
-			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format()//,
-			// locations: []
+			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format()
 		};
 
 		// clone project
 		var p = _under.clone( project );
-		// merge with report
-		report = _under.extend( {}, report, p );
-		report.project_id = p.id;
-		// remove id for new object
-		delete report.id;
+						delete p.id;
 
-		// merge report with target_locations
-		report.locations = getProjectReportLocations( report, target_locations );
-
-		// add report to reports
-		reports.push( report );
+		// add report with p to reports
+		reports.push( _under.extend( {}, report, p ) );
 
 	}
 
@@ -321,144 +281,3 @@ function getProjectReports( project, target_locations ) {
 
 };
 
-// generate an array of reports
-function getProjectReportLocations( report, target_locations ) {
-
-	// variables
-	var locations = [],
-			_under = require('underscore');
-	
-	// clone report
-	var r = _under.clone( report );
-	delete r.admin1pcode;
-	delete r.admin1name;
-	delete r.admin2pcode;
-	delete r.admin2name;
-
-	// for project target_locations
-	target_locations.forEach( function( target_location, t_index ) {
-
-		// clone target_location
-		var l = target_location.toObject();
-				l.target_location_reference_id = l.id.valueOf();
-				delete l.id;
-
-		locations.push( _under.extend( l, r ) );
-		
-	});
-
-	// return locations array
-	return locations;
-
-};
-
-function updateProjectReports( project, target_locations, generated_reports, next ){
-
-	// counter
-	var counter = 0,
-			length = generated_reports.length,
-			deepAssign = require( 'deep-assign' );
-
-	// loop
-	generated_reports.forEach(function( skeleton_report, r_index ){
-
-		// find
-		Report
-			.find( { 	project_id: skeleton_report.project_id,
-								report_month: skeleton_report.report_month, 
-								report_year: skeleton_report.report_year
-							})
-			.populateAll()
-			.exec( function( err, reports ) {
-
-				// return error
-				if ( err ) return next( err );
-
-				// if no report - create
-				if ( !reports.length ) {
-
-					// create with association
-					Report
-						.create( skeleton_report )
-						.exec( function( err, report ) {
-
-							// return error
-							if ( err ) return next( err );
-
-							// counter
-							counter++;							
-
-							// final update
-							if ( counter === length ) {
-								// next!
-								next();
-
-							}
-							
-					});
-
-				}
-
-				// if report loop and update!
-				if ( reports.length ) {
-
-					// for each
-					reports.forEach(function( r, i ){
-
-						// if report removed
-						if( reports[i].locations.length > skeleton_report.locations.length ){
-
-							// target array
-							var locations = [],
-									target_location_reference_ids = '';
-
-							// pick out target_location_reference_id
-							skeleton_report.locations.forEach(function( d, k ){
-								target_location_reference_ids += d.target_location_reference_id + ',';
-							});
-
-							// filter locations
-							reports[i].locations.forEach(function( d, k ){
-								if( target_location_reference_ids.indexOf(d.target_location_reference_id) !== -1 ){
-									locations.push(d);
-								}
-							});
-
-							// 
-							reports[i].locations = locations;
-
-						}
-
-						var report_status = reports[i].report_status;
-
-						// merge location changes
-						reports[i] = deepAssign( reports[i], skeleton_report );
-
-						reports[i].report_status = report_status;
-
-						// update
-						Report
-							.update( { id: r.id }, reports[i] )
-							.exec( function( err, report ) {
-
-								// return error
-								if ( err ) return next( err );
-
-								// counter
-								counter++;
-
-								// final update ?
-								if ( counter === length ) {
-									next();
-								}
-
-						});
-
-					});
-
-				}
-
-			});
-	});
-
-}

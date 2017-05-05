@@ -63,12 +63,12 @@ module.exports.policies = {
   },
 
   // public
-  'Cluster/AdminDashboardController': {
+  'Cluster/Dashboards/AdminDashboardController': {
     '*': true
   },
 
   // public
-  'Cluster/ClusterDashboardController': {
+  'Cluster/Dashboards/ClusterDashboardController': {
     '*': true
   },
 
@@ -83,7 +83,7 @@ module.exports.policies = {
   },
 
   // public
-  'Cluster/ReportController': {
+  'Cluster/Reports/ReportTasksController': {
     '*': true
   },
 

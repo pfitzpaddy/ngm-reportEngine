@@ -32,6 +32,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  // -------- NGM -------- 
   // User authentication / password reset
   'GET /login': 'UserController.login',
   'POST /login': 'UserController.login',
@@ -61,23 +62,29 @@ module.exports.routes = {
   'GET /getBeneficiairiesCsv': 'FileController.getBeneficiairiesCsv',
 
 
-  // CLUSTER
+
+  // -------- CLUSTER -------- 
   // Location lists
   'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
   'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
-  // Admin Dashboard
-  'POST /cluster/admin/indicator': 'Cluster/AdminDashboardController.getClusterAdminIndicator',
+
   // Cluster Lists
   'GET /cluster/list/activities': 'Cluster/Lists/ListController.getActivities',
   'GET /cluster/list/donors': 'Cluster/Lists/ListController.getDonors',
   'GET /cluster/list/indicators': 'Cluster/Lists/ListController.getIndicators',
   'GET /cluster/list/stockitems': 'Cluster/Lists/ListController.getStockItems',
   'GET /cluster/list/organizations': 'Cluster/Lists/ListController.getOrganizations',
+  
+  // ADMIN DASHBOARD
+  'POST /cluster/admin/indicator': 'Cluster/Dashboards/AdminDashboardController.getClusterAdminIndicator',
 
   // PROJECTS
   'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
   'POST /cluster/project/getProject': 'Cluster/ProjectController.getProjectById',
   'POST /cluster/project/setProject': 'Cluster/ProjectController.setProjectById',
+  'POST /cluster/project/removeBeneficiary': 'Cluster/ProjectController.removeBeneficiaryById',
+  'POST /cluster/project/removeLocation': 'Cluster/ProjectController.removeLocationById',
+  
   'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
 
@@ -91,38 +98,32 @@ module.exports.routes = {
   'GET /cluster/stock/setReportsReminder': 'Cluster/Stocks/StockReportController.setReportsReminder',
 
   // ACTIVITY REPORTS
-  
-  'POST /cluster/report/getReportCsv': 'Cluster/ReportController.getReportCsv',
+  'POST /cluster/report/getReportCsv': 'Cluster/Reports/ReportController.getReportCsv',
+  'POST /cluster/report/getReportsList': 'Cluster/Reports/ReportController.getReportsList',
+  'POST /cluster/report/getReport': 'Cluster/Reports/ReportController.getReportById',
+  'POST /cluster/report/setReport': 'Cluster/Reports/ReportController.setReportById',
+  'POST /cluster/report/removeBeneficiary': 'Cluster/Reports/ReportController.removeBeneficiary',
 
-  'POST /cluster/report/getReportsList': 'Cluster/ReportController.getReportsList',
-  'POST /cluster/report/getReport': 'Cluster/ReportController.getReportById',
-  'POST /cluster/report/setReport': 'Cluster/ReportController.setReportById',
-  'POST /cluster/report/removeBeneficiary': 'Cluster/ReportController.removeBeneficiary',
-  'GET /cluster/report/setReportsToDo': 'Cluster/ReportController.setReportsToDo',
-  'GET /cluster/report/setReportsOpen': 'Cluster/ReportController.setReportsOpen',
-  'GET /cluster/report/setReportsReminder': 'Cluster/ReportController.setReportsReminder',
-
+  // ACTIVITY REPORTS TASKS
+  'GET /cluster/report/setReportsToDo': 'Cluster/Reports/ReportTasksController.setReportsToDo',
+  'GET /cluster/report/setReportsOpen': 'Cluster/Reports/ReportTasksController.setReportsOpen',
+  'GET /cluster/report/setReportsReminder': 'Cluster/Reports/ReportTasksController.setReportsReminder',
 
   // CLUSTER DASHBOARD
-  // get latest update
-  'GET /cluster/latestUpdate': 'Cluster/ClusterDashboardController.getlatestUpdate',
-
-  // data
-  'GET /cluster/indicator': 'Cluster/ClusterDashboardController.getIndicator',
-  'POST /cluster/indicator': 'Cluster/ClusterDashboardController.getIndicator',
-  
+  'GET /cluster/latestUpdate': 'Cluster/Dashboards/ClusterDashboardController.getlatestUpdate',
+  'GET /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator',
+  'POST /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator',
 
 
-
-  // HEALTH
+  // -------- HEALTH -------- 
   // 4W Dashboard
   'POST /health/indicator': 'Cluster/Health/HealthDashboardController.getHealthDetails',
   'POST /health/data/contacts': 'Cluster/Health/HealthDashboardController.getContactListCsv',
 
-  // EPR
+
+  // -------- EPR -------- 
   'GET /epr/getKoboData': 'Epr/EprController.getKoboData',
   // EPR Dashboard
-  // get latest update
   'GET /epr/latestUpdate': 'Epr/EprDashboardController.getlatestUpdate',
   // Epr
   'GET /epr/indicator': 'Epr/EprDashboardController.getEprIndicator',
@@ -138,7 +139,8 @@ module.exports.routes = {
   'GET /epr/disasters/data': 'Epr/EprDashboardController.getDisasterData',
   'POST /epr/disasters/data': 'Epr/EprDashboardController.getDisasterData',
 
-  // DEWS 
+
+  // -------- DEWS -------- 
   'POST /dews/indicator': 'Dews/DewsController.getIndicator',
   'POST /dews/chart': 'Dews/DewsController.getChart',
   'POST /dews/calendar': 'Dews/DewsController.getCalendar',
@@ -147,7 +149,8 @@ module.exports.routes = {
   'POST /dews/markers': 'Dews/DewsController.getMarkers',
   'POST /dews/map': 'Dews/DewsController.getMap',
 
-  // WATCHKEEPER
+
+  // -------- WATCHKEEPER -------- 
   'POST /wk/calendar': 'Watchkeeper/WatchkeeperController.getCalendar',
   'POST /wk/indicator': 'Watchkeeper/WatchkeeperController.getIndicator',
   'POST /wk/difference': 'Watchkeeper/WatchkeeperController.getDifference',

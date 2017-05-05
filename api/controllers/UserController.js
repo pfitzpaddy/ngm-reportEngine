@@ -125,6 +125,9 @@ module.exports = {
     if ( !req.param( 'user' ) ) {
       return res.json(401, { msg: 'user required' });
     }
+
+    // file system
+    var fs = require('fs');
     
     // get user by username
     User
@@ -210,6 +213,10 @@ module.exports = {
                 // incement
                 counter++;
                 if( counter === length ){
+
+                  // if no config file, return, else send email ( PROD )
+                  if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) return res.json(200, { 'data': 'No email config' });
+
                   // send email
                   sails.hooks.email.send( 'password-reset', {
                       resets: resets,

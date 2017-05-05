@@ -201,7 +201,7 @@ var ProjectDashboardController = {
           .where( filters.financial_filter )
           // .where( filters.financial_filter_s )
           // .where( filters.financial_filter_e )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, budget ) {
 
             // error
@@ -257,7 +257,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -323,7 +323,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, beneficiaries ){
             
             // return error
@@ -412,7 +412,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, beneficiaries ){
             
             // return error
@@ -493,7 +493,7 @@ var ProjectDashboardController = {
     var params = {
 
       // organizations to ignore
-      $nin_organizations: [ 'iMMAP', 'ARCS' ],
+      $nin_organizations: [ 'immap', 'arcs' ],
       
       details: req.param('details') ? req.param('details') : false,
 
@@ -512,7 +512,7 @@ var ProjectDashboardController = {
       beneficiary_type: req.param('beneficiary_type') ? req.param('beneficiary_type') : ['all'],
 
       // organization
-      organization_id: req.param('organization_id') ? req.param('organization_id') : false,
+      organization_tag: req.param('organization_tag') ? req.param('organization_tag') : false,
 
       //
       // cluster_id
@@ -533,10 +533,10 @@ var ProjectDashboardController = {
       project_id: params.project_id ? { id: params.project_id } : {},
 
       // organizations
-      organization_filter: params.organization_id === 'all' ? {} : { organization_id: params.organization_id },
+      organization_filter: params.organization_tag === 'all' ? { organization_tag: { '!': params.$nin_organizations } } : { organization_tag: params.organization_tag },
 
       // organization $nin
-      organization_$nin_filter: { organization: { '!': params.$nin_organizations } },
+      organization_$nin_filter: { organization_tag: { '!': params.$nin_organizations } },
 
       // admin1pcode locations filter
       cluster_id_filter: params.cluster_id !== '*' ? { cluster_id: params.cluster_id } : {},      
@@ -590,7 +590,7 @@ var ProjectDashboardController = {
       .where( filters.project_status_filter )
       .where( filters.project_type_filter )
       .where( filters.beneficiaries_filter )
-      .where( filters.organization_$nin_filter )
+      // .where( filters.organization_$nin_filter )
       .exec( function( err, projects ){
       
         // return error
@@ -692,7 +692,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .where( conflict )
           .exec( function( err, target_locations ) {
 
@@ -755,7 +755,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, locations ){
 
             // return error
@@ -864,7 +864,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, locations ){
 
             // return error
@@ -940,7 +940,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, beneficiaries ){
 
             // return error
@@ -1029,7 +1029,7 @@ var ProjectDashboardController = {
           .where( filters.organization_filter )
           .where( filters.admin1pcode_filter )
           .where( filters.admin2pcode_filter )
-          .where( filters.organization_$nin_filter )
+          // .where( filters.organization_$nin_filter )
           .exec( function( err, beneficiaries ){
 
             // return error
