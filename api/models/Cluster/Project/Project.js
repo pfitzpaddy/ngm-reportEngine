@@ -223,8 +223,38 @@ module.exports = {
 	// update report locations
 	afterUpdate: function( project, next ) {
 
-		// update project details of collections ?
-		next();
+		// generate an array of reports
+		var reports = getProjectReports( project );
+
+		// counter
+		var counter = 0,
+				length = reports.length;
+
+		// reports
+		reports.forEach( function( report, i ){
+
+	    // create reports
+	    Report
+	      .findOrCreate( { 
+	          project_id: project.id, 
+	          report_month: report.report_month, 
+	          report_year: report.report_year
+	        }, report )
+	      .exec( function( err, r ) {
+
+					// return error
+					if ( err ) return next( err );
+
+					// counter
+					counter++;
+					if ( counter === length )  {
+						// next!
+						next();
+					}
+					
+			});
+
+		});
 
 	}
 
