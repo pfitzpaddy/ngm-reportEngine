@@ -246,7 +246,7 @@ module.exports = {
 
     // target location
     TargetLocation
-      .update( { id: id }, { project_id: null } )
+      .update( { id: id }, { project_id: null, update_location: true } )
       .exec( function( err, result ){
 
         // return error
