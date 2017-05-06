@@ -77,11 +77,12 @@ module.exports = {
 		// 	via: 'project_id'
 		// },
 
-		// flag to manage location updates
-		// update_locations: {
-		// 	type: 'boolean',
-		// 	defaultsTo: false
-		// },
+
+		// flag to manage date changes
+		update_dates: {
+			type: 'boolean',
+			defaultsTo: false
+		},
 
 		// project
 		project_hrp_code: {
@@ -223,42 +224,70 @@ module.exports = {
 	// update report locations
 	afterUpdate: function( project, next ) {
 
-		// generate an array of reports
-		var reports = getProjectReports( project );
+		// no updates required
+		if ( !project.update_dates ) return next();
 
-		// counter
-		var counter = 0,
-				length = reports.length;
+		// update to dates
+		if ( project.update_dates ) {
 
-		// reports
-		reports.forEach( function( report, i ){
+			// generate an array of reports
+			var reports = getProjectReports( project );
 
-	    // create reports
-	    Report
-	      .findOrCreate( { 
-	          project_id: project.id, 
-	          report_month: report.report_month, 
-	          report_year: report.report_year
-	        }, report )
-	      .exec( function( err, r ) {
+			// counter
+			var counter = 0,
+					length = reports.length;
 
-					// return error
-					if ( err ) return next( err );
+			// reports
+			reports.forEach( function( report, i ){
 
-					// counter
-					counter++;
-					if ( counter === length )  {
-						// next!
-						next();
-					}
-					
+		    // create reports
+		    Report
+		      .findOrCreate( { 
+		          project_id: project.id, 
+		          report_month: report.report_month, 
+		          report_year: report.report_year
+		        }, report )
+		      .exec( function( err, report_result ) {
+
+						// return error
+						if ( err ) return next( err );
+
+	          // target beneficiaries
+	          TargetLocation
+	            .find({ project_id: project.id })
+	            .exec( function( err, target_locations ){
+
+								// return error
+								if ( err ) return next( err );
+								
+								// TargetLocations
+			          Location
+			            .createNewReportLocations( report_result, target_locations, function( err, targert_locations_results ){
+
+									// return error
+									if ( err ) return next( err );
+
+									// counter
+									counter++;
+									if ( counter === length ) {
+										// next!
+										next();
+									}
+
+								});
+
+	          });
+						
+				});
+
 			});
 
-		});
+		}
 
 	}
 
 };
+
 
 
 // generate an array of reports

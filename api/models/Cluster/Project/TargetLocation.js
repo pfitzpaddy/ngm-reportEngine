@@ -306,7 +306,9 @@ module.exports = {
 		// variables
 		var _under = require('underscore');
 
-		// update
+
+		// --------- UPDATE LOCATIONS ---------
+		// update location
 		if ( target_location.project_id ) {
 
 			// clone target_location
@@ -329,7 +331,9 @@ module.exports = {
 
 		}
 
-		// remove location from reportd
+		
+		// --------- REMOVE LOCATIONS ---------
+		// remove location from reports!
 		if ( !target_location.project_id ) {
 
 	    // get report by organization_id
@@ -340,6 +344,7 @@ module.exports = {
 					// return error
 					if ( err ) return next( err );
 
+					// counter
 					var counter = 0,
 							length = location_results.length;
 
