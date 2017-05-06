@@ -336,9 +336,6 @@ module.exports = {
 		// remove location from reports!
 		if ( !target_location.project_id ) {
 
-			console.log('console')
-			console.log(target_location.id)
-
 	    // get report by organization_id
 	    Location
 	      .update( { target_location_reference_id: target_location.id }, { report_id: null } )
