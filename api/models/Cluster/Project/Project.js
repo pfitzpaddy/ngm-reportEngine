@@ -240,9 +240,9 @@ module.exports = {
 			// reports
 			reports.forEach( function( report, i ){
 
-		    // create reports
+		    // update reports ( status )
 		    Report
-		      .findOrCreate( { 
+		      .update( { 
 		          project_id: project.id, 
 		          report_month: report.report_month, 
 		          report_year: report.report_year
@@ -262,7 +262,7 @@ module.exports = {
 								
 								// TargetLocations
 			          Location
-			            .createNewReportLocations( report_result, target_locations, function( err, targert_locations_results ){
+			            .createNewReportLocations( report_result[0], target_locations, function( err, targert_locations_results ){
 
 									// return error
 									if ( err ) return next( err );
@@ -305,8 +305,8 @@ function getProjectReports( project ) {
 	
 	// variables
 	var reports = [],
-			s_date = project_start.format('YYYY-MM-DD') > reports_start.format('YYYY-MM-DD') ? project_start : reports_start,
-			e_date = project_end.format('YYYY-MM-DD') < reports_end.format('YYYY-MM-DD') ? project_end : reports_end;
+			s_date = reports_start, // project_start.format('YYYY-MM-DD') > reports_start.format('YYYY-MM-DD') ? project_start : reports_start,
+			e_date = project_end.format('YYYY-MM-DD') < reports_end.format( 'YYYY-MM-DD' ) ? project_end : reports_end;
 
 	// number of reports
 	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
@@ -314,15 +314,17 @@ function getProjectReports( project ) {
 	// for each report month
 	for ( m = 0; m < reports_duration; m++ ) {
 
+		// report_status pending if dates before project start date
+		var report_status = moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format() >= project_start.format() ? 'todo' : 'pending';
 		// create report
 		var report = {
 			project_id: project.id,
-			report_status: 'todo',
+			report_status: report_status,
 			report_active: true,
 			report_month: moment( s_date ).add( m, 'M' ).month(),
 			report_year: moment( s_date ).add( m, 'M' ).year(),
-			reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
-			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format()
+			reporting_period: moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format(),
+			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 15 ).format()
 		};
 
 		// clone project
