@@ -185,6 +185,20 @@ module.exports = {
             // set
             $project.target_locations = target_locations;
 
+            // order
+            $project.target_locations.sort(function(a, b) {
+              if ( a.fac_type_name ) {
+                return a.admin1name.localeCompare(b.admin1name) || 
+                        a.admin2name.localeCompare(b.admin2name) || 
+                        a.fac_type_name.localeCompare(b.fac_type_name) || 
+                        a.fac_name.localeCompare(b.fac_name);
+              } else {
+                return a.admin1name.localeCompare(b.admin1name) || 
+                        a.admin2name.localeCompare(b.admin2name) || 
+                        a.fac_name.localeCompare(b.fac_name);
+              }
+            });
+
             // return Project
             return res.json( 200, $project );
 
