@@ -100,8 +100,7 @@ module.exports = {
 			required: true
 		},
 		project_budget: {
-			type: 'float',
-			required: true
+			type: 'float'
 		},
 		project_budget_currency: {
 			type: 'string',
