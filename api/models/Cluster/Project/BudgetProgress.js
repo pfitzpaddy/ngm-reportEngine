@@ -108,6 +108,9 @@ module.exports = {
 		inter_cluster_activities: {
 			type: 'array'
 		},
+		mpc_delivery_type: {
+			type: 'array'
+		},
 		activity_type: {
 			type: 'array',
 			required: true

@@ -109,6 +109,9 @@ module.exports = {
 		inter_cluster_activities: {
 			type: 'array'
 		},
+		mpc_delivery_type: {
+			type: 'array'
+		},
 		project_donor: {
 			type: 'array'
 		},
@@ -199,6 +202,16 @@ module.exports = {
 		delivery_type_name: {
 			type: 'string',
 			defaultsTo: 'New Beneficiaries'
+		},
+
+		// transfers per beneficiary
+		transfer_type_id: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		transfer_type_value: {
+			type: 'integer',
+			defaultsTo: 0
 		},
 
 		// indicator
