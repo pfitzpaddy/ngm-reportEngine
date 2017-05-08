@@ -125,9 +125,6 @@ module.exports = {
 		inter_cluster_activities: {
 			type: 'array'
 		},
-		mpc_delivery_type: {
-			type: 'array'
-		},
 		project_donor: {
 			type: 'array'
 		},
