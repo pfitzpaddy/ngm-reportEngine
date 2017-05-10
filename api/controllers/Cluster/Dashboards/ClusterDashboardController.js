@@ -581,6 +581,50 @@ var ClusterDashboardController = {
 
         break;
 
+
+      // raw data export
+      case 'stocks':
+
+        // get beneficiaries by project
+        Stock
+          .find()
+          .where( filters.default )
+          .where( filters.cluster_id )
+          .where( filters.organization_tag )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          // .where( filters.beneficiaries )
+          .where( filters.date )
+          .exec( function( err, stocks ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // format stocks
+            stocks.forEach(function( d, i ){ 
+              stocks[ i ].report_month_number = d.report_month+1;
+              stocks[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
+              stocks[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
+            });
+
+            // return csv
+            json2csv({ data: stocks }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              return res.json( 200, { data: csv } );
+
+            });
+
+          });
+
+        break;
+     
+
       // markers
       case 'markers':
 
