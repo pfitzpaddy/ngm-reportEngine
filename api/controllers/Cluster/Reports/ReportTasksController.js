@@ -10,6 +10,46 @@
 module.exports = {
 
   // updates reports required for completion
+    // run this 1st day of the month  
+  setStocksToDo: function( req, res ) {
+
+    // libs
+    var _under = require('underscore'),
+        moment = require('moment');
+
+    // only run if date is above monthly reporting period
+    // if ( moment().date() === 1 ) {
+
+      // warehouse
+      StockWarehouse
+        .find( { organization_id: values.organization_id } )
+        .exec(function(err, warehouses){
+          
+          // return error
+          if ( err ) return cb( err );
+
+          // moment().subtract( 1, 'M' ).startOf( 'M' ).format( 'YYYY-MM-DD' )
+          // moment().subtract( 1, 'M' ).endOf( 'M' ).format( 'YYYY-MM-DD' )
+
+          // add 2017
+          projects = [{
+            project_start_date: '2017-01-01',
+            project_end_date: '2017-12-31'
+          }];
+
+          // set
+          generateStockReports( values, projects[0], warehouses, cb );
+
+        });
+
+    // } else {
+    //   // return reports
+    //   return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
+    // }
+
+  },
+
+  // updates reports required for completion
     // run this 1st day of the month
   setReportsToDo: function( req, res ) {
 
