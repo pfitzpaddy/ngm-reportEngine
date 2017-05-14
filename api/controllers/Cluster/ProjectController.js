@@ -66,6 +66,11 @@ module.exports = {
           // set
           $project.project_budget_progress = budgetprogress;
 
+          // order dates
+          $project.project_budget_progress.sort(function(a, b) {
+            return a.project_budget_date_recieved < b.project_budget_date_recieved;
+          });
+
           // target beneficiaries
           TargetBeneficiaries
             .find({ project_id: $project.id })
@@ -159,6 +164,11 @@ module.exports = {
 
         // set
         $project.project_budget_progress = project_budget_progress;
+
+        // order dates
+        $project.project_budget_progress.sort(function(a, b) {
+          return a.project_budget_date_recieved > b.project_budget_date_recieved;
+        });
 
         // target beneficiaries
         TargetBeneficiaries
