@@ -167,7 +167,7 @@ module.exports = {
 
         // order dates
         $project.project_budget_progress.sort(function(a, b) {
-          return a.project_budget_date_recieved > b.project_budget_date_recieved;
+          return a.project_budget_date_recieved < b.project_budget_date_recieved;
         });
 
         // target beneficiaries
