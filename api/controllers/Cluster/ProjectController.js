@@ -212,6 +212,29 @@ module.exports = {
 
   },
 
+  // remvoe budget item
+  removeBudgetItemById: function(req, res) {
+    // request input
+    if ( !req.param( 'id' ) ) {
+      return res.json({ err: true, error: 'id required!' });
+    }
+
+    var id = req.param( 'id' );
+
+    // target beneficiaries
+    BudgetProgress
+      .update( { id: id }, { project_id: null } )
+      .exec( function( err, result ){
+
+        // return error
+        if ( err ) return res.json({ err: true, error: err });
+
+        // return Project
+        return res.json( 200, { msg: 'Success!' } );
+        
+      });
+  },
+
   // remove target beneficiary
   removeBeneficiaryById: function(req, res) {
     // request input

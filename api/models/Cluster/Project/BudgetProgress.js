@@ -67,8 +67,7 @@ module.exports = {
 		// },
 
 		project_id: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 
 		// project

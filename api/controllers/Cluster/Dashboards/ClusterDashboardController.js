@@ -63,7 +63,7 @@ var ClusterDashboardController = {
     // filters
     return {
       default: { report_year: { '>=': 2017 }, location_id: { '!': null } },
-      cluster_id: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
+      cluster_id: params.cluster_id === 'all' || 'rnr_chapter' ? {} : { cluster_id: params.cluster_id },
       adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
       admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
       organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
