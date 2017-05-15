@@ -165,6 +165,9 @@ module.exports = {
     if ( !req.param( 'user' ) || !req.param( 'url' ) ) {
       return res.json(401, { msg: 'user, url required' });
     }
+
+    // file system
+    var fs = require('fs');
     
     // get user by email
     User
