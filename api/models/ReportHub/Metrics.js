@@ -9,9 +9,9 @@ module.exports = {
 
 	// strict schema
 	attributes: {
-		organisation: {
+		organization: {
 			type: 'string',
-			required: false
+			required: true
 		},
 		username: {
 			type: 'string',

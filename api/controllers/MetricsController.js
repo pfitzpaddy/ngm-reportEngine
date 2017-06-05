@@ -69,6 +69,8 @@ module.exports = {
       return res.json(401, {err: 'Metric request missing params'});
     }
 
+    console.log( req.param('organization') )
+
     Metrics.create({
       organization: req.param('organization'),
       username: req.param('username'),
