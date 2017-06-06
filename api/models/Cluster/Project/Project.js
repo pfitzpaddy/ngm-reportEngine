@@ -230,55 +230,61 @@ module.exports = {
 		// update to dates
 		if ( project.update_dates ) {
 
-			// generate an array of reports
-			var reports = getProjectReports( project );
+			// set all reports to report_active: false
+			// to cover reduction of project time
+			Report
+				.update( { project_id: project.id, report_year: 2017 }, { report_active: false } )
+				.exec( function( err, report ) {
+					
+					// return error
+					if ( err ) return next( err );
 
-			// counter
-			var counter = 0,
-					length = reports.length;
+					// generate an array of reports
+					var reports = getProjectReports( project );
 
-			// reports
-			reports.forEach( function( report, i ){
+					// counter
+					var counter = 0,
+							length = reports.length;
 
-		    // update reports ( status )
-		    Report
-		      .update( { 
-		          project_id: project.id, 
-		          report_month: report.report_month, 
-		          report_year: report.report_year
-		        }, report )
-		      .exec( function( err, report_result ) {
+					// reports
+					reports.forEach( function( report, i ){
 
-						// return error
-						if ( err ) return next( err );
-
-	          // target beneficiaries
-	          TargetLocation
-	            .find({ project_id: project.id })
-	            .exec( function( err, target_locations ){
+				    // update reports ( status )
+				    Report
+				    	.updateOrCreate( report, { project_id: project.id, report_month: report.report_month, report_year: report.report_year }, function( err, report_result ){
 
 								// return error
 								if ( err ) return next( err );
+
+			          // target beneficiaries
+			          TargetLocation
+			            .find({ project_id: project.id })
+			            .exec( function( err, target_locations ){
+
+										// return error
+										if ( err ) return next( err );
+										
+										// TargetLocations
+					          Location
+					            .createNewReportLocations( report_result, target_locations, function( err, targert_locations_results ){
+
+											// return error
+											if ( err ) return next( err );
+
+											// counter
+											counter++;
+											if ( counter === length ) {
+												// next!
+												next();
+											}
+
+										});
+
+			          });
 								
-								// TargetLocations
-			          Location
-			            .createNewReportLocations( report_result[0], target_locations, function( err, targert_locations_results ){
+						});
 
-									// return error
-									if ( err ) return next( err );
-
-									// counter
-									counter++;
-									if ( counter === length ) {
-										// next!
-										next();
-									}
-
-								});
-
-	          });
-						
-				});
+					});
 
 			});
 
