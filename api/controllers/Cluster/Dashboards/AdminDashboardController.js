@@ -33,6 +33,7 @@ var AdminDashboardController = {
     // variables
     var params = {
           moment: require( 'moment' ),
+          csv: req.param( 'csv' ),
           list: req.param( 'list' ),
           indicator: req.param( 'indicator' ),
           report_type: req.param( 'report_type' ),
@@ -45,17 +46,26 @@ var AdminDashboardController = {
           end_date: req.param( 'end_date' )
       }
 
+    // csv export
+    var json2csv = require( 'json2csv' ),
+        moment = require( 'moment' ),
+        fields = [ 'cluster', 'organization', 'username', 'email', 'project_title', 'report_month_format', 'status_title', 'report_link' ],
+        fieldNames = [ 'Cluster', 'Organization', 'User', 'Contact', 'Project Title', 'Month', 'Status', 'Link' ];
+
+    // url
+    params.url = req.protocol + '://' + req.get('host') + '/desk/';
+
     // stock/activity
     if ( params.report_type === 'stock' ) {
-      AdminDashboardController.getStockIndicator( $nin_organizations, params, req, res );
+      AdminDashboardController.getStockIndicator( $nin_organizations, params, json2csv, moment, fields, fieldNames, req, res );
     } else {
-      AdminDashboardController.getActivityIndicator( $nin_organizations, params, req, res );
+      AdminDashboardController.getActivityIndicator( $nin_organizations, params, json2csv, moment, fields, fieldNames, req, res );
     }
 
   },
 
   // stock reports
-  getStockIndicator: function( $nin_organizations, params, req, res ){
+  getStockIndicator: function( $nin_organizations, params, json2csv, moment, fields, fieldNames, req, res ){
     
     // switch on indicator
     switch( params.indicator ) {
@@ -222,6 +232,108 @@ var AdminDashboardController = {
 
         break;
 
+      case 'reports_due':
+
+        // reports due
+        StockReport
+          .find()
+          .where( params.cluster_filter )
+          .where( { adminRpcode: params.adminRpcode } )
+          .where( { admin0pcode: params.admin0pcode } )
+          .where( { report_active: true } )
+          .where( { report_status: 'todo' } )
+          .where( { report_month: { '>=': params.moment( params.start_date ).month(), '<=': params.moment( params.end_date ).month() } } )
+          .where( { report_year: { '>=': params.moment( params.start_date ).year(), '<=': params.moment( params.end_date ).year() } } )
+          .where( params.organization_filter )
+          .sort('updatedAt DESC')
+          .exec( function( err, reports ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return
+            if ( params.list ) {
+
+              // counter
+              var counter=0,
+                  length=reports.length;
+
+              // if no reports
+              if ( length === 0 ) {
+                
+                // return empty
+                return res.json( 200, [] );
+
+              } else {
+
+                // reports
+                reports.forEach( function( d, i ){
+
+                  // check if form has been edited
+                  Stock
+                    .count( { report_id: d.id } )
+                    .exec(function( err, b ){
+                      
+                      // return error
+                      if (err) return res.negotiate( err );
+
+                      // add status
+                      reports[i].status = '#e57373'
+                      reports[i].icon = 'watch_later';
+                      reports[i].status_title = 'Due';
+                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_link = params.url + '#/cluster/stocks/report/' + reports[i].organization_id + '/' + reports[i].id;
+
+                      // if benficiaries
+                      if ( b ) {
+                        // add status
+                        reports[i].status = '#fff176'
+                        reports[i].status_title = 'Pending';
+                      }
+
+                      // reutrn
+                      counter++;
+                      if ( counter === length ) {
+
+                        // !csv
+                        if ( !params.csv ) {
+                          // table
+                          return res.json( 200, reports );
+                        }
+
+                        // csv
+                        if ( params.csv ) {
+                          // return csv
+                          json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
+                            
+                            // error
+                            if ( err ) return res.negotiate( err );
+
+                            // success
+                            return res.json( 200, { data: csv } );
+
+                          });
+                        }
+
+                      }
+
+                    });
+
+                });
+
+              }
+
+            } else {
+
+              // return indicator
+              return res.json( 200, { 'value': reports.length });
+            }
+            
+
+          });  
+
+        break;
+
       case 'reports_complete':
 
         // reports complete
@@ -269,19 +381,42 @@ var AdminDashboardController = {
                       // add status
                       reports[i].status = '#4db6ac'
                       reports[i].icon = 'check_circle';
+                      reports[i].status_title = 'Complete';
+                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_link = params.url + '#/cluster/stocks/report/' + reports[i].organization_id + '/' + reports[i].id;
 
                       // if benficiaries
                       if ( !b.length ) {
                         // add status
                         reports[i].status = '#80cbc4';
                         reports[i].icon = 'adjust'
+                        reports[i].status_title = 'Empty Submission';
                       }
 
                       // reutrn
                       counter++;
                       if ( counter === length ) {
-                        // table
-                        return res.json( 200, reports );
+
+                        // !csv
+                        if ( !params.csv ) {
+                          // table
+                          return res.json( 200, reports );
+                        }
+
+                        // csv
+                        if ( params.csv ) {
+                          // return csv
+                          json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
+                            
+                            // error
+                            if ( err ) return res.negotiate( err );
+
+                            // success
+                            return res.json( 200, { data: csv } );
+
+                          });
+                        }
+
                       }
 
                     });
@@ -295,85 +430,6 @@ var AdminDashboardController = {
               // return indicator
               return res.json( 200, { 'value': reports.length });
             }
-
-          });  
-
-        break;
-
-      case 'reports_due':
-
-        // reports due
-        StockReport
-          .find()
-          .where( params.cluster_filter )
-          .where( { adminRpcode: params.adminRpcode } )
-          .where( { admin0pcode: params.admin0pcode } )
-          .where( { report_active: true } )
-          .where( { report_status: 'todo' } )
-          .where( { report_month: { '>=': params.moment( params.start_date ).month(), '<=': params.moment( params.end_date ).month() } } )
-          .where( { report_year: { '>=': params.moment( params.start_date ).year(), '<=': params.moment( params.end_date ).year() } } )
-          .where( params.organization_filter )
-          .sort('updatedAt DESC')
-          .exec( function( err, reports ){
-
-            // return error
-            if (err) return res.negotiate( err );
-
-            // return
-            if ( params.list ) {
-
-              // counter
-              var counter=0,
-                  length=reports.length;
-
-              // if no reports
-              if ( length === 0 ) {
-                
-                // return empty
-                return res.json( 200, [] );
-
-              } else {
-
-                // reports
-                reports.forEach( function( d, i ){
-
-                  // check if form has been edited
-                  Stock
-                    .count( { report_id: d.id } )
-                    .exec(function( err, b){
-                      
-                      // return error
-                      if (err) return res.negotiate( err );
-
-                      // add status
-                      reports[i].status = '#e57373'
-                      reports[i].icon = 'watch_later';
-
-                      // if benficiaries
-                      if ( b ) {
-                        // add status
-                        reports[i].status = '#fff176'
-                      }
-
-                      // reutrn
-                      counter++;
-                      if ( counter === length ) {
-                        // table
-                        return res.json( 200, reports );
-                      }
-
-                    });
-
-                });
-
-              }
-
-            } else {
-
-              // return indicator
-              return res.json( 200, { 'value': reports.length });
-            }
-            
 
           });  
 
@@ -422,10 +478,11 @@ var AdminDashboardController = {
             break;
 
     }
+  
   },
   
   // monthly reports
-  getActivityIndicator: function( $nin_organizations, params, req, res ){
+  getActivityIndicator: function( $nin_organizations, params, json2csv, moment, fields, fieldNames, req, res ){
 
     // switch on indicator
     switch( params.indicator ) {
@@ -593,85 +650,7 @@ var AdminDashboardController = {
           });
 
         break;
-
-      case 'reports_complete':
-
-        // reports complete
-        Report
-          .find()
-          .where( params.cluster_filter )
-          .where( { adminRpcode: params.adminRpcode } )
-          .where( { admin0pcode: params.admin0pcode } )
-          .where( { report_active: true } )
-          .where( { report_status: 'complete' } )
-          .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
-          .where( params.organization_filter )
-          .sort('updatedAt DESC')
-          .exec( function( err, reports ){
-
-            // return error
-            if (err) return res.negotiate( err );
-
-            // return
-            if ( params.list ) {
-
-              // counter
-              var counter=0,
-                  length=reports.length;
-
-              // if no reports
-              if ( length === 0 ) {
-                
-                // return empty
-                return res.json( 200, [] );
-
-              } else {
-              
-                // reports
-                reports.forEach( function( d, i ){
-
-                  // check if form has been edited
-                  Beneficiaries
-                    .find( { report_id: d.id } )
-                    .exec(function( err, b){
-                      
-                      // return error
-                      if (err) return res.negotiate( err );
-
-                      // add status
-                      reports[i].status = '#4db6ac'
-                      reports[i].icon = 'check_circle';
-
-                      // if benficiaries
-                      if ( !b.length ) {
-                        // add status
-                        reports[i].status = '#80cbc4';
-                        reports[i].icon = 'adjust'
-                      }
-
-                      // reutrn
-                      counter++;
-                      if ( counter === length ) {
-                        // table
-                        return res.json( 200, reports );
-                      }
-
-                    });
-
-                });
-
-              }  
-
-            } else {
-              
-              // return indicator
-              return res.json( 200, { 'value': reports.length });
-            }
-
-          });  
-
-        break;
-
+      
       case 'reports_due':
 
         // reports due
@@ -719,19 +698,43 @@ var AdminDashboardController = {
 
                       // add status
                       reports[i].status = '#e57373'
+                      reports[i].status_title = 'Due';
                       reports[i].icon = 'watch_later';
+                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i].id;
 
                       // if benficiaries
                       if ( b ) {
                         // add status
-                        reports[i].status = '#fff176'
+                        reports[i].status = '#fff176';
+                        reports[i].status_title = 'Pending';
                       }
 
                       // reutrn
                       counter++;
                       if ( counter === length ) {
-                        // table
-                        return res.json( 200, reports );
+
+                        // !csv
+                        if ( !params.csv ) {
+                          // table
+                          return res.json( 200, reports );
+                        }
+
+                        // csv
+                        if ( params.csv ) {
+                          
+                          // return csv
+                          json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
+                            
+                            // error
+                            if ( err ) return res.negotiate( err );
+
+                            // success
+                            return res.json( 200, { data: csv } );
+
+                          });
+                        }
+
                       }
 
                     });
@@ -746,6 +749,108 @@ var AdminDashboardController = {
               return res.json( 200, { 'value': reports.length });
             }
             
+
+          });  
+
+        break;
+
+      case 'reports_complete':
+
+        // reports complete
+        Report
+          .find()
+          .where( params.cluster_filter )
+          .where( { adminRpcode: params.adminRpcode } )
+          .where( { admin0pcode: params.admin0pcode } )
+          .where( { report_active: true } )
+          .where( { report_status: 'complete' } )
+          .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
+          .where( params.organization_filter )
+          .sort('updatedAt DESC')
+          .exec( function( err, reports ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return
+            if ( params.list ) {
+
+              // counter
+              var counter=0,
+                  length=reports.length;
+
+              // if no reports
+              if ( length === 0 ) {
+                
+                // return empty
+                return res.json( 200, [] );
+
+              } else {
+              
+                // reports
+                reports.forEach( function( d, i ){
+
+                  // check if form has been edited
+                  Beneficiaries
+                    .find( { report_id: d.id } )
+                    .exec(function( err, b){
+                      
+                      // return error
+                      if (err) return res.negotiate( err );
+
+                      // add status
+                      reports[i].status = '#4db6ac'
+                      reports[i].status_title = 'Complete';
+                      reports[i].icon = 'check_circle';
+                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i].id;
+
+                      // if benficiaries
+                      if ( !b.length ) {
+                        // add status
+                        reports[i].status = '#80cbc4';
+                        reports[i].icon = 'adjust';
+                        reports[i].status_title = 'Empty Submission';
+                      }
+
+                      // reutrn
+                      counter++;
+                      if ( counter === length ) {
+
+                        // !csv
+                        if ( !params.csv ) {
+                          // table
+                          return res.json( 200, reports );
+                        }
+
+                        // csv
+                        if ( params.csv ) {
+                          
+                          // return csv
+                          json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
+                            
+                            // error
+                            if ( err ) return res.negotiate( err );
+
+                            // success
+                            return res.json( 200, { data: csv } );
+
+                          });
+                        }
+
+                      }
+
+                    });
+
+                });
+
+              }  
+
+            } else {
+              
+              // return indicator
+              return res.json( 200, { 'value': reports.length });
+            }
 
           });  
 

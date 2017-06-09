@@ -675,7 +675,7 @@ var ClusterDashboardController = {
                 if (err) return res.negotiate( err );
 
                 // popup message
-                var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.cluster + '</h5>'
+                var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d.cluster + '</h5>'
                             + '<h5 style="text-align:center; font-size:1.3rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
                             + '<div style="text-align:center">' + d.admin0name + '</div>'
                             + '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
