@@ -281,7 +281,7 @@ var AdminDashboardController = {
                       reports[i].status = '#e57373'
                       reports[i].icon = 'watch_later';
                       reports[i].status_title = 'Due';
-                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
                       reports[i].report_link = params.url + '#/cluster/stocks/report/' + reports[i].organization_id + '/' + reports[i].id;
 
                       // if benficiaries
@@ -382,7 +382,7 @@ var AdminDashboardController = {
                       reports[i].status = '#4db6ac'
                       reports[i].icon = 'check_circle';
                       reports[i].status_title = 'Complete';
-                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
                       reports[i].report_link = params.url + '#/cluster/stocks/report/' + reports[i].organization_id + '/' + reports[i].id;
 
                       // if benficiaries
@@ -700,7 +700,7 @@ var AdminDashboardController = {
                       reports[i].status = '#e57373'
                       reports[i].status_title = 'Due';
                       reports[i].icon = 'watch_later';
-                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
                       reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i].id;
 
                       // if benficiaries
@@ -802,7 +802,7 @@ var AdminDashboardController = {
                       reports[i].status = '#4db6ac'
                       reports[i].status_title = 'Complete';
                       reports[i].icon = 'check_circle';
-                      reports[i].report_month_format = moment( reports[i].report_month, 'MM' ).format('MMMM');
+                      reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
                       reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i].id;
 
                       // if benficiaries
