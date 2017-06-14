@@ -105,6 +105,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		mpc_purpose: {
+			type: 'array'
+		},
+		mpc_purpose_cluster_id: {
+			type: 'array'
+		},
 		inter_cluster_activities: {
 			type: 'array'
 		},
