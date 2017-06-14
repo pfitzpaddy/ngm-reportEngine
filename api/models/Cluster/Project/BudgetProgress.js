@@ -108,7 +108,7 @@ module.exports = {
 			type: 'array'
 		},
 		mpc_purpose_cluster_id: {
-			type: 'array'
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'

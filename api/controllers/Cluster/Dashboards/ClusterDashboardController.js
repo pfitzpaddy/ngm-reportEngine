@@ -63,7 +63,7 @@ var ClusterDashboardController = {
     // filters
     return {
       default: { report_year: { '>=': 2017 }, location_id: { '!': null } },
-      cluster_id: params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' ? {} : { cluster_id: params.cluster_id },
+      cluster_id: params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' ? {} : { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] },
       adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
       admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
       organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
@@ -442,6 +442,7 @@ var ClusterDashboardController = {
 
             // format
             beneficiaries.forEach(function( d, i ){
+              console.log(d.implementing_partners)
               // hrp code
               if ( !d.project_hrp_code ) {
                 d.project_hrp_code = '-';
@@ -473,7 +474,9 @@ var ClusterDashboardController = {
                     'report_id',
                     'cluster_id',
                     'cluster',
+                    'mpc_purpose_cluster_id',
                     'organization',
+                    'implementing_partners',
                     'project_hrp_code',
                     'project_code',
                     'project_title',
@@ -501,6 +504,7 @@ var ClusterDashboardController = {
                     'units',
                     'unit_type_id',
                     'unit_type_name',
+                    'transfer_type_value',
                     'households',
                     'families',
                     'boys',
@@ -521,7 +525,9 @@ var ClusterDashboardController = {
                     'report_id',
                     'cluster_id',
                     'cluster',
+                    'mpc_purpose_cluster_ids',
                     'organization',
+                    'implementing_partners',
                     'project_hrp_code',
                     'project_code',
                     'project_title',
@@ -549,6 +555,7 @@ var ClusterDashboardController = {
                     'units',
                     'unit_type_id',
                     'unit_type_name',
+                    'transfers',
                     'households',
                     'families',
                     'boys',
@@ -673,6 +680,16 @@ var ClusterDashboardController = {
 
                 // return error
                 if (err) return res.negotiate( err );
+
+                if ( !user ) {
+                  var user = {
+                    organization: 'AFG',
+                    name: 'HRP 2017',
+                    position: 'IMO',
+                    phone: '+93',
+                    email: '@immap.org',
+                  }
+                }
 
                 // popup message
                 var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d.cluster + '</h5>'

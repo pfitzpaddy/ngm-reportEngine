@@ -44,6 +44,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		implementing_partners: {
+			type: 'string'
+		},
 		cluster_id: {
 			type: 'string',
 			required: true
@@ -110,7 +113,7 @@ module.exports = {
 			type: 'array'
 		},
 		mpc_purpose_cluster_id: {
-			type: 'array'
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'
@@ -338,7 +341,6 @@ module.exports = {
 			type: 'float',
 			required: true
 		},
-
 
 
 

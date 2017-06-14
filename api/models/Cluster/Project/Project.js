@@ -44,6 +44,14 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		// implementing partners
+		implementing_partners_checked: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		implementing_partners: {
+			type: 'string'
+		},
 		cluster_id: {
 			type: 'string',
 			required: true
@@ -120,7 +128,7 @@ module.exports = {
 			type: 'array'
 		},
 		mpc_purpose_cluster_id: {
-			type: 'array'
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'
@@ -160,7 +168,6 @@ module.exports = {
 
 
 
-
 		/*********** 2016 *************/ 
 		project_code: {
 			type: 'string'
@@ -175,13 +182,6 @@ module.exports = {
 			type: 'string'
 		},
 		activity_description_other: {
-			type: 'string'
-		},
-		implementing_partners_checked: {
-			type: 'boolean',
-			defaultsTo: false
-		},
-		implementing_partners: {
 			type: 'string'
 		}
 
