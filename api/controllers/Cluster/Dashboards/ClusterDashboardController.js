@@ -442,7 +442,6 @@ var ClusterDashboardController = {
 
             // format
             beneficiaries.forEach(function( d, i ){
-              console.log(d.implementing_partners)
               // hrp code
               if ( !d.project_hrp_code ) {
                 d.project_hrp_code = '-';
