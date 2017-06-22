@@ -168,6 +168,9 @@ module.exports = {
 												d_obj.alert_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
 											}
 
+											// remane to pcode
+											d_obj.admin2pcode = d_obj.alert_district;
+
 											// push as single record
 											if( d_obj.alert_categories ){
 												alerts.push( d_obj );
@@ -232,6 +235,9 @@ module.exports = {
 												d_obj.disaster_lat = provinces[d['reporting/reporting_details/reporting_province']].admin1lat;
 												d_obj.disaster_lng = provinces[d['reporting/reporting_details/reporting_province']].admin1lng;
 											}
+
+											// remane to pcode
+											d_obj.admin2pcode = d_obj.disaster_district;
 
 											// push as single record
 											if( d_obj.disaster_type ){
