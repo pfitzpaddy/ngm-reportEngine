@@ -258,16 +258,30 @@ module.exports = {
 
                 // add status as green
                 reports[i].status = '#4db6ac';
+                reports[i].icon = 'check_circle';
+                reports[i].status_title = 'Complete';
 
                 // if report is 'todo' and past due date!
                 if ( reports[i].report_status === 'todo' && moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
                         
                   // set to red (overdue!)
                   reports[i].status = '#e57373'
+                  reports[i].icon = 'watch_later';
+                  reports[i].status_title = 'Due';
 
                   // if beneficiaries ( report has been updated )
                   if ( b ) {
-                    reports[i].status = '#fff176'
+                    reports[i].status = '#fff176';
+                    reports[i].status_title = 'Pending';
+                  }
+
+                } else {
+                  // if no benficiaries and submitted
+                  if ( !b ) {
+                    // add status
+                    reports[i].status = '#80cbc4';
+                    reports[i].icon = 'adjust'
+                    reports[i].status_title = 'Empty Submission';
                   }
                 }
 
