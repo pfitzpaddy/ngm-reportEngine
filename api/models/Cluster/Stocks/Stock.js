@@ -21,6 +21,12 @@ module.exports = {
       model: 'stocklocation'
     },
 
+    // warehouse id
+    stock_warehouse_id: {
+			type: 'string',
+			required: true
+		},
+
 		// user/project
 		organization_id: {
 			type: 'string',
