@@ -307,6 +307,8 @@ var EprDashboard = {
             // for each
             results.forEach(function(d,i){
 
+              var alert_verification = d.alert_verification ? d.alert_verification.replace(/_/g, ' ').toUpperCase() : 'N/A';
+
               // message
               var message = '<div class="center card-panel" style="width:300px">' +
                               '<div>' +
@@ -316,7 +318,7 @@ var EprDashboard = {
                                 '<div style="text-align:center"> with <span class="count">' + d.cases + '</span> cases from ' + d.alert_categories.replace(/_/g, ' ').toUpperCase() +
                               '</div>' + 
                               '<div>' +
-                                '<div style="text-align:center">Alert Verification: ' + d.alert_verification.replace(/_/g, ' ').toUpperCase()
+                                '<div style="text-align:center">Alert Verification: ' + alert_verification +
                               '</div>' + 
                               '<div>' +
                                 'in ' + d.alert_province_name + ', ' + d.alert_district_name +
