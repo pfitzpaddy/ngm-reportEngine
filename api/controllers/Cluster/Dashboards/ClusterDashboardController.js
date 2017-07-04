@@ -41,8 +41,9 @@ var ClusterDashboardController = {
     }
 
     // return params
-    return {
+    return {      
       csv: req.param('csv') ? req.param('csv') : false,
+      ocha: req.param('ocha') ? req.param('ocha') : false,
       list: req.param('list') ? req.param('list') : false,
       indicator: req.param('indicator'),
       cluster_id: req.param('cluster_id'),
@@ -370,7 +371,12 @@ var ClusterDashboardController = {
               if ( err ) return res.negotiate( err );
 
               // success
-              return res.json( 200, { data: csv } );
+              if ( params.ocha ) {
+                res.set('Content-Type', 'text/csv');
+                return res.send( 200, csv );
+              } else { 
+                return res.json( 200, { data: csv } );
+              }
 
             });
 
@@ -577,7 +583,12 @@ var ClusterDashboardController = {
                 if ( err ) return res.negotiate( err );
 
                 // success
-                return res.json( 200, { data: csv } );
+                if ( params.ocha ) {
+                  res.set('Content-Type', 'text/csv');
+                  return res.send( 200, csv );
+                } else { 
+                  return res.json( 200, { data: csv } );
+                }
 
               });
 

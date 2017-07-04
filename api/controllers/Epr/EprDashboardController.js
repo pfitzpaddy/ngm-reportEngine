@@ -307,6 +307,7 @@ var EprDashboard = {
             // for each
             results.forEach(function(d,i){
 
+              // breaking on alert_verificaiton
               var alert_verification = d.alert_verification ? d.alert_verification.replace(/_/g, ' ').toUpperCase() : 'N/A';
 
               // message
