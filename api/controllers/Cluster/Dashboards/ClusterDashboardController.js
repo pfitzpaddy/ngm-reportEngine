@@ -294,8 +294,24 @@ var ClusterDashboardController = {
 
         // require
         var data = {},
-            fields = [ 'cluster', 'admin1pcode', 'admin1name', 'organization', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total' ],
-            fieldNames = [ 'Cluster', 'Admin1 Pcode', 'Admin1 Name', 'Organizations', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total' ];
+            hxl_codes = {
+              cluster: '#sector+name',
+              admin1pcode: '#adm1+code',
+              admin1name: '#adm1+name',
+              organization: '#org+prog',
+              implementing_partners: '#org+impl', 
+              category_type_name: '',
+              beneficiary_type_name: '',
+              boys: '#reached+m+children',
+              girls: '#reached+f+children',
+              men: '#reached+m+adult',
+              women: '#reached+f+adult',
+              elderly_men: '',
+              elderly_men: '',
+              total: '#reached'
+            },
+            fields = [ 'cluster', 'admin1pcode', 'admin1name', 'organization', 'implementing_partners', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total' ],
+            fieldNames = [ 'Cluster', 'Admin1 Pcode', 'Admin1 Name', 'Organizations', 'Implementing Partners', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total' ];
 
         // get organizations by project
         Beneficiaries
@@ -322,6 +338,7 @@ var ClusterDashboardController = {
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization = [];
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].implementing_partners = [];
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys = 0;
@@ -334,14 +351,25 @@ var ClusterDashboardController = {
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
               }
+
+              // cluster
               if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster.indexOf( d.cluster ) === -1 ){
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster.push( d.cluster );
               }
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
+              
+              // organization
               if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.indexOf( d.organization ) === -1 ){
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.push( d.organization );
               }
+
+              // implementing partners
+              if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].implementing_partners.indexOf( d.implementing_partners ) === -1 ){
+                data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].implementing_partners.push( d.implementing_partners );
+              }
+
+              // data
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name = d.category_type_name;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name = d.beneficiary_type_name;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys += d.boys;
@@ -360,6 +388,7 @@ var ClusterDashboardController = {
             report.forEach( function( d, i ) {
               report[i].cluster = report[i].cluster.join(', ');
               report[i].organization = report[i].organization.join(', ');
+              report[i].implementing_partners = report[i].implementing_partners.join(', ');
             });
 
             // sort
@@ -367,7 +396,10 @@ var ClusterDashboardController = {
               return a.admin1name.localeCompare(b.admin1name) || 
                       a.category_type_name.localeCompare(b.category_type_name) || 
                       a.beneficiary_type_name.localeCompare(b.beneficiary_type_name)
-            });      
+            });
+
+            // hxl_codes
+            report.unshift( hxl_codes );
 
             // return csv
             json2csv({ data: report, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
@@ -393,9 +425,9 @@ var ClusterDashboardController = {
       // raw data export
       case 'financial_report':
 
-        // require
-        var fields = [ 'cluster', 'organization', 'project_title', 'project_hrp_code', 'project_code', 'project_donor_name', 'project_budget', 'project_budget_currency', 'project_budget_date_recieved' ],
-            fieldNames = [ 'Cluster', 'Organization', 'Project Title', 'HRP Project Code', 'Project Code', 'Project Donor', 'Total Funding Amount', 'Funding Currency', 'Date Funds Recieved' ];
+        // fields
+        var fields = [ 'cluster', 'organization', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'comments' ]
+            fieldNames = [ 'Cluster', 'Organization', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Comments' ];
 
         // get beneficiaries by project
         BudgetProgress

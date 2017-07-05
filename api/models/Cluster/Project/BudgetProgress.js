@@ -70,6 +70,52 @@ module.exports = {
 			type: 'string'
 		},
 
+		// 2017
+		grant_id: {
+			type: 'string'
+		},
+		contribution_status: {
+			type: 'string',
+			default: 'paid'
+		},
+		budget_plan: {
+			type: 'string',
+			default: 'HAFG17'
+		},
+		budget_funds_id: {
+			type: 'string'
+		},
+		budget_funds_name: {
+			type: 'string'
+		},
+		financial_programming_id: {
+			type: 'string'
+		},
+		financial_programming_name: {
+			type: 'string'
+		},
+		multi_year_funding_id: {
+			type: 'string'
+		},
+		multi_year_funding_name: {
+			type: 'string'
+		},
+		funding_2017: {
+			type: 'float',
+		},
+		reported_on_fts_id: {
+			type: 'string'
+		},
+		reported_on_fts_name: {
+			type: 'string'
+		},
+		fts_record_id: {
+			type: 'string'
+		},
+		comments: {
+			type: 'string'
+		},
+
 		// project
 		project_hrp_code: {
 			type: 'string',
