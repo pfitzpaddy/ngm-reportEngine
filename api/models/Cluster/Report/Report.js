@@ -69,6 +69,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		project_acbar_partner: {
+			type: 'boolean'
+		},
 		project_code: {
 			type: 'string'
 		},

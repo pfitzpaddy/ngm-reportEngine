@@ -74,6 +74,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		project_acbar_partner: {
+			type: 'boolean'
+		},
 		project_hrp_code: {
 			type: 'string',
 			required: true
