@@ -76,11 +76,11 @@ module.exports = {
 		},
 		contribution_status: {
 			type: 'string',
-			default: 'paid'
+			defaultsTo: 'paid'
 		},
 		budget_plan: {
 			type: 'string',
-			default: 'HAFG17'
+			defaultsTo: 'HAFG17'
 		},
 		budget_funds_id: {
 			type: 'string'

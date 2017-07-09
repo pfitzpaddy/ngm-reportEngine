@@ -38,7 +38,8 @@ var AdminDashboardController = {
           indicator: req.param( 'indicator' ),
           report_type: req.param( 'report_type' ),
           organization_tag: req.param( 'organization_tag' ),
-          cluster_filter: req.param( 'cluster_id' ) === 'all' ? {} : { cluster_id: req.param( 'cluster_id' ) },
+          cluster_filter: req.param( 'cluster_id' ) === 'all' || req.param( 'cluster_id' ) === 'acbar' ? {} : { cluster_id: req.param( 'cluster_id' ) },
+          acbar_partners_filter: req.param( 'cluster_id' ) === 'acbar' ? { project_acbar_partner: true } : {},
           organization_filter: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: req.param( 'organization_tag' ) },
           adminRpcode: req.param( 'adminRpcode' ).toUpperCase(),
           admin0pcode: req.param( 'admin0pcode' ).toUpperCase(),
@@ -493,6 +494,7 @@ var AdminDashboardController = {
         Report
           .find()
           .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
@@ -521,6 +523,7 @@ var AdminDashboardController = {
           Project
             .find()
             .where( params.cluster_filter )
+            .where( params.acbar_partners_filter )
             .where( { adminRpcode: params.adminRpcode } )
             .where( { admin0pcode: params.admin0pcode } )
             .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
@@ -591,6 +594,7 @@ var AdminDashboardController = {
         Report
           .find()
           .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { report_active: true } )
@@ -657,6 +661,7 @@ var AdminDashboardController = {
         Report
           .find()
           .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { report_active: true } )
@@ -760,6 +765,7 @@ var AdminDashboardController = {
         Report
           .find()
           .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { report_active: true } )
@@ -862,6 +868,7 @@ var AdminDashboardController = {
         Report
           .find()
           .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
           .where( { adminRpcode: params.adminRpcode } )
           .where( { admin0pcode: params.admin0pcode } )
           .where( { report_active: true } )
@@ -877,6 +884,7 @@ var AdminDashboardController = {
             Report
               .find()
               .where( params.cluster_filter )
+              .where( params.acbar_partners_filter )
               .where( { adminRpcode: params.adminRpcode } )
               .where( { admin0pcode: params.admin0pcode } )
               .where( { report_active: true } )

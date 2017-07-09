@@ -76,35 +76,6 @@ var ClusterDashboardController = {
     }
   },
 
-  // get latest date
-  getLatestUpdate: function( req, res ){
-    
-    // beneficiaries
-    Beneficiaries
-      .find()
-      .where( filters.default )
-      .where( filters.adminRpcode )
-      .where( filters.admin0pcode )
-      .where( filters.admin1pcode )
-      .where( filters.admin2pcode )
-      .where( filters.cluster_id )
-      .where( filters.acbar_partners )
-      .where( filters.organization_tag )
-      .where( filters.beneficiaries )
-      .where( filters.date )
-      .sort( 'updatedAt DESC' )
-      .limit(1)
-      .exec( function( err, results ){
-
-        // return error
-        if (err) return res.negotiate( err );
-
-        // latest update
-        return res.json( 200, results[0] );
-
-      });
-  },
-
   // indicators
   getIndicator: function ( req, res  ) {
     
@@ -114,6 +85,35 @@ var ClusterDashboardController = {
 
     // switch on indicator
     switch( params.indicator ) {
+
+      case 'latest_update':
+
+        // beneficiaries
+        Beneficiaries
+          .find()
+          .where( filters.default )
+          .where( filters.adminRpcode )
+          .where( filters.admin0pcode )
+          .where( filters.admin1pcode )
+          .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
+          .where( filters.beneficiaries )
+          .where( filters.date )
+          .sort( 'updatedAt DESC' )
+          .limit(1)
+          .exec( function( err, results ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // latest update
+            return res.json( 200, results[0] );
+
+          });
+
+        break;
 
       case 'organizations':
 
