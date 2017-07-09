@@ -64,12 +64,13 @@ var ClusterDashboardController = {
     // filters
     return {
       default: { report_year: { '>=': 2017 }, location_id: { '!': null } },
-      cluster_id: params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' ? {} : { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] },
       adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
       admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
-      organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
       admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
       admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
+      cluster_id: params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ? {} : { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] },
+      acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
+      organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
       beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
       date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } }
     }
@@ -80,7 +81,17 @@ var ClusterDashboardController = {
     
     // beneficiaries
     Beneficiaries
-      .find({ organization_tag: { '!': $nin_organizations } })
+      .find()
+      .where( filters.default )
+      .where( filters.adminRpcode )
+      .where( filters.admin0pcode )
+      .where( filters.admin1pcode )
+      .where( filters.admin2pcode )
+      .where( filters.cluster_id )
+      .where( filters.acbar_partners )
+      .where( filters.organization_tag )
+      .where( filters.beneficiaries )
+      .where( filters.date )
       .sort( 'updatedAt DESC' )
       .limit(1)
       .exec( function( err, results ){
@@ -110,12 +121,13 @@ var ClusterDashboardController = {
         Beneficiaries
           .find()
           .where( filters.default )
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
           .where( filters.beneficiaries )
           .where( filters.date )
           // .where( filters.$nin_organizations )
@@ -188,12 +200,13 @@ var ClusterDashboardController = {
         Beneficiaries
           .find()
           .where( filters.default )
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
           .where( filters.beneficiaries )
           .where( filters.date )
           .exec( function( err, beneficiaries ){
@@ -235,12 +248,13 @@ var ClusterDashboardController = {
         Beneficiaries
           .find()
           .where( filters.default )
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
           .where( filters.beneficiaries )
           .where( filters.date )
           .exec( function( err, beneficiaries ){
@@ -317,12 +331,13 @@ var ClusterDashboardController = {
         Beneficiaries
           .find()
           .where( filters.default )
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
           .where( filters.beneficiaries )
           .where( filters.date )
           .exec( function( err, beneficiaries ){
@@ -426,19 +441,20 @@ var ClusterDashboardController = {
       case 'financial_report':
 
         // fields
-        var fields = [ 'cluster', 'organization', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
-            fieldNames = [ 'Cluster', 'Organization', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
+        var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
+            fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
 
         // get beneficiaries by project
         BudgetProgress
           .find()
           .where( { project_id: { '!': null } } )
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
           .where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
           .exec( function( err, budget ){
 
@@ -473,12 +489,13 @@ var ClusterDashboardController = {
         Beneficiaries
           .find()
           .where( filters.default )
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
           .where( filters.beneficiaries )
           .where( filters.date )
           .exec( function( err, beneficiaries ){
@@ -648,13 +665,12 @@ var ClusterDashboardController = {
         Stock
           .find()
           .where( filters.default )
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
-          // .where( filters.beneficiaries )
+          .where( filters.cluster_id )
+          .where( filters.organization_tag )
           .where( filters.date )
           .exec( function( err, stocks ){
 
@@ -701,12 +717,14 @@ var ClusterDashboardController = {
         // get organizations by project
         Beneficiaries
           .find()
-          .where( filters.cluster_id )
-          .where( filters.organization_tag )
+          .where( filters.default )
           .where( filters.adminRpcode )
           .where( filters.admin0pcode )
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
+          .where( filters.cluster_id )
+          .where( filters.acbar_partners )
+          .where( filters.organization_tag )
           .where( filters.beneficiaries )
           .where( filters.date )
           .exec( function( err, beneficiaries ){
