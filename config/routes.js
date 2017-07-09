@@ -46,6 +46,8 @@ module.exports.routes = {
   'POST /getOrganization': 'OrganizationController.getOrganization',
   'GET /setOrganization': 'OrganizationController.setOrganization',
   'POST /setOrganization': 'OrganizationController.setOrganization',
+  'GET /setOrganizationPartner': 'OrganizationController.setOrganizationPartner',
+  'POST /setOrganizationPartner': 'OrganizationController.setOrganizationPartner',
 
   // Metrics
   'POST /metrics/set': 'MetricsController.set',

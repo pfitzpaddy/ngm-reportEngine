@@ -31,6 +31,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
+    // project acbar
+		project_acbar_partner: {
+			type: 'boolean'
+		},
+
 		// user/project
 		organization_id: {
 			type: 'string',

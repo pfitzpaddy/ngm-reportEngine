@@ -52,7 +52,10 @@ module.exports = {
 		cluster: {
 			type: 'string',
 			required: true
-		},		
+		},
+		project_acbar_partner: {
+			type: 'boolean'
+		},
     // add reference to Warehouse
     warehouses: {
       collection: 'stockwarehouse',

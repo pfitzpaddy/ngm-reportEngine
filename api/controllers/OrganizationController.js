@@ -35,6 +35,30 @@ module.exports = {
 
   },
 
+  // set organizaiton partner
+  setOrganizationPartner: function( req, res ){
+
+    // check params
+    if ( !req.param( 'organization_id' ) ) {
+      return res.json(200, { err: true, msg: 'organization_id, project_acbar_partner required' });
+    }
+
+    // set
+    var $organization_id = req.param( 'organization_id' ),
+        $project_acbar_partner = req.param( 'project_acbar_partner' ) ? true : false;
+
+    // update
+    Organization
+      .update( { id: $organization_id }, { project_acbar_partner: $project_acbar_partner } )
+      .exec( function( err, update ){
+        // return error
+        if ( err ) return res.negotiate( err );
+        // return
+        return res.json( 200, { success: true } );
+      });    
+
+  },
+
   setOrganization: function( req, res ){
 
     // check params

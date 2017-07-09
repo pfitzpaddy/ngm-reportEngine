@@ -87,6 +87,12 @@ module.exports = {
 			type: 'date',
 			required: true
 		},
+
+    // project acbar
+		project_acbar_partner: {
+			type: 'boolean'
+		},
+
     // add reference to Locations
     stocklocations: {
       collection: 'stocklocation',

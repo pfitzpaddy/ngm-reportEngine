@@ -21,6 +21,11 @@ module.exports = {
       model: 'stocklocation'
     },
 
+    // project acbar
+		project_acbar_partner: {
+			type: 'boolean'
+		},
+
     // warehouse id
     stock_warehouse_id: {
 			type: 'string',
