@@ -132,11 +132,11 @@ module.exports = {
 		// category
 		category_type_id: {
 			type: 'string',
-			required: true
+			defaultsTo: 'category_a'
 		},
 		category_type_name: {
 			type: 'string',
-			required: true
+			defaultsTo: 'A) Emergency Relief Needs'
 		},
 
 		// beneficiary
