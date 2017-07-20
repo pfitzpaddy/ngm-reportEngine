@@ -168,6 +168,15 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		new_school_id: {
+			type: 'string'
+		},
+		new_school_name: {
+			type: 'string'
+		},
+		school_id: {
+			type: 'integer'
+		},
 		admin1lng: {
 			type: 'float',
 			required: true

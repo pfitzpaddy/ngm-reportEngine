@@ -213,6 +213,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		school_id: {
+			type: 'integer'
+		},
 		admin1lng: {
 			type: 'float',
 			required: true

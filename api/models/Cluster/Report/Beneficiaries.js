@@ -165,12 +165,10 @@ module.exports = {
 
 		// category
 		category_type_id: {
-			type: 'string',
-			defaultsTo: 'category_a'
+			type: 'string'
 		},
 		category_type_name: {
-			type: 'string',
-			defaultsTo: 'A) Emergency Relief Needs'
+			type: 'string'
 		},
 
 		// beneficiary

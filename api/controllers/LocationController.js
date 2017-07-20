@@ -57,6 +57,34 @@ module.exports = {
 
   },
 
+  // get admin2 list by admin0, admin1
+  getAdmin2Schools: function( req, res ) {
+
+    // !admin0pcode || !admin1pcode
+    if ( !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) ) {
+       return res.json( 401, { msg: 'admin0pcode required and must be string' });
+    }
+
+    // get list
+    Admin2Schools
+      .find()
+      // .where({ admin0pcode: req.param( 'admin0pcode' ) })
+      .where({ admin0pcode: 'AF' })
+      .where({ admin1pcode: req.param( 'admin1pcode' ) })
+      .where({ admin2pcode: req.param( 'admin2pcode' ) })
+      .sort('admin2name ASC')
+      .exec( function( err, admin2 ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // return new Project
+        return res.json( 200, admin2 );
+
+      });
+
+  },
+
   // get Provinces for dashboard
   getProvinceMenu: function(req, res) {
 
