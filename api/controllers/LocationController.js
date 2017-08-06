@@ -15,10 +15,13 @@ module.exports = {
     //    return res.json( 401, { msg: 'admin0pcode required and must be string' });
     // }
 
+    // admin0pcode
+    var admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: req.param( 'admin0pcode' ) } : {};
+
     // get list
     Admin1
       .find()
-      // .where({ admin0pcode: req.param( 'admin0pcode' ) })
+      .where( admin0pcode_filter )
       .sort('admin1name ASC')
       .exec( function( err, admin1 ){
 
@@ -40,10 +43,13 @@ module.exports = {
     //    return res.json( 401, { msg: 'admin0pcode required and must be string' });
     // }
 
+    // admin0pcode
+    var admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: req.param( 'admin0pcode' ) } : {};
+
     // get list
     Admin2
       .find()
-      // .where({ admin0pcode: req.param( 'admin0pcode' ) })
+      .where( admin0pcode_filter )
       .sort('admin2name ASC')
       .exec( function( err, admin2 ){
 
