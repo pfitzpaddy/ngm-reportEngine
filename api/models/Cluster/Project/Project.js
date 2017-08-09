@@ -316,7 +316,7 @@ function getProjectReports( project ) {
 	var project_start = moment( project.project_start_date ).startOf( 'M' ),
 			project_end = moment( project.project_end_date ).endOf( 'M' ),
 			reports_start = moment( '2017-01-01' ),
-			reports_end = moment().subtract( 1, 'M' ).endOf( 'M' );
+			reports_end = moment().endOf( 'M' );
 	
 	// variables
 	var reports = [],
@@ -339,7 +339,7 @@ function getProjectReports( project ) {
 			report_month: moment( s_date ).add( m, 'M' ).month(),
 			report_year: moment( s_date ).add( m, 'M' ).year(),
 			reporting_period: moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format(),
-			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 15 ).format()
+			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 5 ).format()
 		};
 
 		// clone project

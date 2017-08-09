@@ -18,7 +18,7 @@ module.exports = {
         moment = require('moment');
 
     // only run if date is above monthly reporting period
-    // if ( moment().date() === 1 ) {
+    if ( moment().date() === 1 ) {
 
       // warehouse
       StockWarehouse
@@ -27,9 +27,6 @@ module.exports = {
           
           // return error
           if ( err ) return cb( err );
-
-          // moment().subtract( 1, 'M' ).startOf( 'M' ).format( 'YYYY-MM-DD' )
-          // moment().subtract( 1, 'M' ).endOf( 'M' ).format( 'YYYY-MM-DD' )
 
           // add 2017
           projects = [{
@@ -42,10 +39,10 @@ module.exports = {
 
         });
 
-    // } else {
-    //   // return reports
-    //   return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
-    // }
+    } else {
+      // return reports
+      return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
+    }
 
   },
 
@@ -64,7 +61,7 @@ module.exports = {
       Project
         .find()
         // .where( { project_status: 'active'} )
-        .where( { project_end_date: { $gte: moment().subtract( 1, 'M' ).startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
+        .where( { project_end_date: { $gte: moment().startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
         .exec( function( err, projects ){
 
           // return error
@@ -82,10 +79,10 @@ module.exports = {
               project_id: projects[i].id,
               report_status: 'todo',
               report_active: true,
-              report_month: moment().subtract( 1, 'M' ).month(),
-              report_year: moment().subtract( 1, 'M' ).year(),
-              reporting_period: moment().subtract( 1, 'M' ).set( 'date', 1 ).format(),
-              reporting_due_date: moment().set( 'date', 15 ).format()
+              report_month: moment().month(),
+              report_year: moment().year(),
+              reporting_period: moment().set( 'date', 1 ).format(),
+              reporting_due_date: moment().add( 1, 'M' ).set( 'date', 5 ).format()
             };
 
             // clone project
@@ -158,8 +155,8 @@ module.exports = {
       // find active reports for the next reporting period
       Report
         .find()
-        .where( { report_month: moment().subtract( 1, 'M' ).month() } )
-        .where( { report_year: moment().subtract( 1, 'M' ).year() } )
+        .where( { report_month: moment().month() } )
+        .where( { report_year: moment().year() } )
         .where( { report_active: true } )
         .where( { report_status: 'todo' } )
         .exec( function( err, reports ){
@@ -168,7 +165,7 @@ module.exports = {
           if ( err ) return res.negotiate( err );
 
           // no reports return
-          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );
 
           // for each report, group by username
           reports.forEach( function( report, i ) {
@@ -180,7 +177,7 @@ module.exports = {
               nStore[ report.email ] = {
                 email: report.email,
                 username: report.username,
-                report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
+                report_month: moment().format( 'MMMM' ),
                 reports: []
               };
             }
@@ -241,7 +238,7 @@ module.exports = {
                     sendername: 'ReportHub'
                   }, {
                     to: notifications[i].email,
-                    subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
+                    subject: 'ReportHub - Project Reporting Period for ' + moment().format( 'MMMM' ).toUpperCase() + ' Now Open!'
                   }, function(err) {
                     
                     // return error
@@ -277,15 +274,15 @@ module.exports = {
     // active projects ids
     var moment = require('moment'),
         nStore = {},
-        notifications =[];
+        notifications = [];
 
     // only run if date is 1 week before monthly reporting period required
-    if ( moment().date() >= 10 ) {
+    if ( moment().date() <= 10 ) {
 
       // find active reports for the next reporting period
       Report
         .find()
-        .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
+        .where( { report_month: { '<=': moment().month() } } )
         .where( { report_active: true } )
         .where( { report_status: 'todo' } )
         .exec( function( err, reports ){
@@ -294,7 +291,7 @@ module.exports = {
           if ( err ) return res.negotiate( err );
 
           // no reports return
-          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );
 
 
           // for each report, group by username
@@ -303,12 +300,25 @@ module.exports = {
             // if username dosnt exist
             if ( !nStore[ report.email ] ) {
 
+              var due_message = 'due SOON';
+
+              // set due message TODAY
+              if ( moment().day() === moment( report.reporting_due_date ).day() ) {
+                due_message = 'due TODAY';
+              }
+
+              // set due message PENDING
+              if ( moment().day() > moment( report.reporting_due_date ).day() ) {
+                due_message = 'OVERDUE';
+              }
+
               // add for notification email template
               nStore[ report.email ] = {
                 email: report.email,
                 username: report.username,
-                report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
+                report_month: moment().format( 'MMMM' ),
                 reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
+                reporting_due_message: due_message,
                 reports: []
               };
             }
@@ -368,11 +378,12 @@ module.exports = {
                     email: notifications[i].email,
                     report_month: notifications[i].report_month.toUpperCase(),
                     reporting_due_date: notifications[i].reporting_due_date,
+                    reporting_due_message: notifications[i].reporting_due_message,
                     reports: notifications[i].reports,
                     sendername: 'ReportHub'
                   }, {
                     to: notifications[i].email,
-                    subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' is Due Soon!'
+                    subject: 'ReportHub - Project Reporting Period for ' + moment().format( 'MMMM' ).toUpperCase() + ' is ' + notifications[i].reporting_due_message + ' !'
                   }, function(err) {
                     
                     // return error
@@ -397,7 +408,7 @@ module.exports = {
       } else {
 
         // return reports
-        return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+        return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );
       }
 
   }

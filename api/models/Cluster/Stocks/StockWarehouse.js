@@ -121,10 +121,7 @@ module.exports = {
 				
 				// return error
 				if ( err ) return cb( err );
-
-        // moment().subtract( 1, 'M' ).startOf( 'M' ).format( 'YYYY-MM-DD' )
-        // moment().subtract( 1, 'M' ).endOf( 'M' ).format( 'YYYY-MM-DD' )
-
+				
 				// add 2017
 				projects = [{
 					project_start_date: '2017-01-01',

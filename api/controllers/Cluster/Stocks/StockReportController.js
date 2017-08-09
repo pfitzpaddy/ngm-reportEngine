@@ -262,8 +262,8 @@ module.exports = {
 
       // find active reports for the next reporting period
       StockReport
-        .update( { report_month: moment().subtract( 1, 'M' ).month(), 
-                    report_year: moment().subtract( 1, 'M' ).year() },
+        .update( { report_month: moment().month(), 
+                    report_year: moment().year() },
                 { report_active: true, report_status: 'todo' } )
         .exec( function( err, reports ){
 
@@ -285,7 +285,7 @@ module.exports = {
           //       type: 'Stock',
           //       username: report.username,
           //       email: report.email,
-          //       report_month:  moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase(),
+          //       report_month:  moment().format( 'MMMM' ).toUpperCase(),
           //       reports: [{
           //         project_title: report.organization,
           //         report_url: req.protocol + '://' + req.host + '/desk/#/cluster/stocks/report/' + report.organization_id + '/' + report.id
@@ -293,7 +293,7 @@ module.exports = {
           //       sendername: 'ReportHub'
           //     }, {
           //       to: report.email,
-          //       subject: 'ReportHub - Stock Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
+          //       subject: 'ReportHub - Stock Reporting Period for ' + moment().format( 'MMMM' ).toUpperCase() + ' Now Open!'
           //     }, function(err) {
                 
           //       // return error
@@ -332,8 +332,8 @@ module.exports = {
 
       // find active reports for the next reporting period
       StockReport
-        .find( { report_month: { '<=': moment().subtract( 1, 'M' ).month() }, 
-                    report_year: moment().subtract( 1, 'M' ).year(),
+        .find( { report_month: { '<=': moment().month() }, 
+                    report_year: moment().year(),
                     report_active: true, 
                     report_status: 'todo' } )
         .exec( function( err, reports ){
@@ -373,7 +373,7 @@ module.exports = {
                 sendername: 'ReportHub'
               }, {
                 to: report.email,
-                subject: 'ReportHub - Stock Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' Now Open!'
+                subject: 'ReportHub - Stock Reporting Period for ' + moment().format( 'MMMM' ).toUpperCase() + ' Now Open!'
               }, function(err) {
                 
                 // return error
