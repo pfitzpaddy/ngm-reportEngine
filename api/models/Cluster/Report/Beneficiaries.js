@@ -326,6 +326,21 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		school_status_id: {
+			type: 'string'
+		},
+		school_status_name: {
+			type: 'string'
+		},
+		school_id: {
+			type: 'integer'
+		},
+		school_hub_id: {
+			type: 'integer'
+		},
+		school_hub_name: {
+			type: 'string'
+		},
 		admin1lng: {
 			type: 'float',
 			required: true
