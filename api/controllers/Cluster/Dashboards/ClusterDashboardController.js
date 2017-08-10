@@ -584,7 +584,67 @@ var ClusterDashboardController = {
                     'admin2lat'
                   ];
 
-              var fieldNames = [
+              // eiewg download fields
+              if ( params.cluster_id === 'eiewg' ) {
+                var fields = [
+                    'project_id',
+                    'report_id',
+                    'cluster_id',
+                    'cluster',
+                    'mpc_purpose_cluster_id',
+                    'organization',
+                    'implementing_partners',
+                    'project_hrp_code',
+                    'project_code',
+                    'project_title',
+                    'report_month_number',
+                    'report_month',
+                    'report_year',
+                    'reporting_period',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'conflict',
+                    'school_status_name',
+                    'fac_type_name',
+                    'school_id',
+                    'fac_name',
+                    'school_hub_id',
+                    'school_hub_name',
+                    'category_type_id',
+                    'category_type_name',
+                    'beneficiary_type_id',
+                    'beneficiary_type_name',
+                    'activity_type_id',
+                    'activity_type_name',
+                    'activity_description_id',
+                    'activity_description_name',
+                    'delivery_type_id',
+                    'delivery_type_name',
+                    'units',
+                    'unit_type_id',
+                    'unit_type_name',
+                    'transfer_type_value',
+                    'households',
+                    'families',
+                    'boys',
+                    'girls',
+                    'men',
+                    'women',
+                    'elderly_men', 
+                    'elderly_women',
+                    'total',
+                    'admin1lng',
+                    'admin1lat',
+                    'admin2lng',
+                    'admin2lat'
+                  ];
+              }
+
+              // eiewg download fieldNames
+              if ( params.cluster_id === 'eiewg' ) {
+                var fieldNames = [
                     'project_id',
                     'report_id',
                     'cluster_id',
@@ -604,8 +664,12 @@ var ClusterDashboardController = {
                     'admin2pcode',
                     'admin2name',
                     'conflict',
-                    'fac_type_name',
-                    'fac_name',
+                    'school_status',
+                    'school_type',
+                    'school_id',
+                    'school_name',
+                    'school_hub_id',
+                    'school_hub_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -634,6 +698,7 @@ var ClusterDashboardController = {
                     'admin2lng',
                     'admin2lat'
                   ];
+              }
 
               // return csv
               json2csv({ data: beneficiaries, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
