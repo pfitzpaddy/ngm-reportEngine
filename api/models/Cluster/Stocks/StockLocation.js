@@ -99,6 +99,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		admin3pcode: {
+			type: 'string'
+		},
+		admin3name: {
+			type: 'string'
+		},
 		conflict: {
 			type: 'boolean',
 			required: true
@@ -122,6 +128,12 @@ module.exports = {
 		admin2lat: {
 			type: 'float',
 			required: true
+		},
+		admin3lng: {
+			type: 'float'
+		},
+		admin3lat: {
+			type: 'float'
 		},
     // add reference to Beneficiaries
     stocks: {
