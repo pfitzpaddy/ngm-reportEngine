@@ -199,6 +199,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		admin3pcode: {
+			type: 'string'
+		},
+		admin3name: {
+			type: 'string'
+		},
 		conflict: {
 			type: 'boolean',
 			required: true
@@ -244,6 +250,12 @@ module.exports = {
 			type: 'float',
 			required: true
 		},
+		admin3lng: {
+			type: 'float'
+		},
+		admin3lat: {
+			type: 'float'
+		},
 
     // add reference to Beneficiaries
     // beneficiaries: {
@@ -286,6 +298,8 @@ module.exports = {
             delete target_report.admin1name;
             delete target_report.admin2pcode;
             delete target_report.admin2name;
+            delete target_report.admin3pcode;
+            delete target_report.admin3name;
 
     // values
     target_locations.forEach(function( t_location ){

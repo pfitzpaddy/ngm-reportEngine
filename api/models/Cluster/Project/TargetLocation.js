@@ -48,6 +48,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		admin3pcode: {
+			type: 'string'
+		},
+		admin3name: {
+			type: 'string'
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -205,6 +211,12 @@ module.exports = {
 			type: 'float',
 			required: true
 		},
+		admin3lng: {
+			type: 'float'
+		},
+		admin3lat: {
+			type: 'float'
+		},
 
 		// flag to manage location updates
 		update_location: {
@@ -299,6 +311,8 @@ module.exports = {
 									delete r.admin1name;
 									delete r.admin2pcode;
 									delete r.admin2name;
+									delete r.admin3pcode;
+									delete r.admin3name;
 
 					// clone target_location
 					var location,

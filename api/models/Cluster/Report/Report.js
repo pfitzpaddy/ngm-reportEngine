@@ -146,6 +146,9 @@ module.exports = {
 		admin2pcode: {
 			type: 'array'
 		},
+		admin3pcode: {
+			type: 'array'
+		},
 
 		// report
 		report_active: {

@@ -69,6 +69,7 @@ module.exports.routes = {
   // Location lists
   'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
   'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
+  'GET /location/getAdmin3List': 'LocationController.getAdmin3List',
   'GET /location/getAdmin2Schools': 'LocationController.getAdmin2Schools',
 
   // Cluster Lists

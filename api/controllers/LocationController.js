@@ -64,6 +64,34 @@ module.exports = {
   },
 
   // get admin2 list by admin0, admin1
+  getAdmin3List: function( req, res ) {
+
+    // !admin0pcode || !admin1pcode
+    // if ( !req.param( 'admin0pcode' ) ) {
+    //    return res.json( 401, { msg: 'admin0pcode required and must be string' });
+    // }
+
+    // admin0pcode
+    var admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: req.param( 'admin0pcode' ) } : {};
+
+    // get list
+    Admin3
+      .find()
+      .where( admin0pcode_filter )
+      .sort('admin3name ASC')
+      .exec( function( err, admin3 ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // return new Project
+        return res.json( 200, admin3 );
+
+      });
+
+  },
+
+  // get admin2 list by admin0, admin1
   getAdmin2Schools: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
