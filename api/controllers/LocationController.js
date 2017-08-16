@@ -95,17 +95,16 @@ module.exports = {
   getAdmin2Schools: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
-    if ( !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) ) {
-       return res.json( 401, { msg: 'admin0pcode required and must be string' });
+    if ( !req.param( 'admin1pcode' ) || !req.param( 'admin2name' ) ) {
+       return res.json( 401, { msg: 'admin1pcode & admin2name required and must be string' });
     }
 
     // get list
     Admin2Schools
       .find()
-      // .where({ admin0pcode: req.param( 'admin0pcode' ) })
       .where({ admin0pcode: 'AF' })
       .where({ admin1pcode: req.param( 'admin1pcode' ) })
-      .where({ admin2pcode: req.param( 'admin2pcode' ) })
+      .where({ admin2name: req.param( 'admin2name' ) })
       .sort('admin2name ASC')
       .exec( function( err, admin2 ){
 
