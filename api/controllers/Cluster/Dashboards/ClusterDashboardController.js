@@ -552,6 +552,8 @@ var ClusterDashboardController = {
                     'admin1name',
                     'admin2pcode',
                     'admin2name',
+                    'admin3pcode',
+                    'admin3name',
                     'conflict',
                     'fac_type_name',
                     'fac_name',
@@ -581,7 +583,64 @@ var ClusterDashboardController = {
                     'admin1lng',
                     'admin1lat',
                     'admin2lng',
-                    'admin2lat'
+                    'admin2lat',
+                    'admin3lng',
+                    'admin3lat'
+                  ];
+
+              var fieldNames = [
+                    'project_id',
+                    'report_id',
+                    'cluster_id',
+                    'cluster',
+                    'mpc_purpose_cluster_ids',
+                    'organization',
+                    'implementing_partners',
+                    'project_hrp_code',
+                    'project_code',
+                    'project_title',
+                    'report_month_number',
+                    'report_month',
+                    'report_year',
+                    'reporting_period',
+                    'admin1pcode',
+                    'admin1name',
+                    'admin2pcode',
+                    'admin2name',
+                    'admin3pcode',
+                    'admin3name',
+                    'conflict',
+                    'fac_type_name',
+                    'fac_name',
+                    'category_type_id',
+                    'category_type_name',
+                    'beneficiary_type_id',
+                    'beneficiary_type_name',
+                    'activity_type_id',
+                    'activity_type_name',
+                    'activity_description_id',
+                    'activity_description_name',
+                    'delivery_type_id',
+                    'delivery_type_name',
+                    'units',
+                    'unit_type_id',
+                    'unit_type_name',
+                    'transfers',
+                    'households',
+                    'families',
+                    'boys',
+                    'girls',
+                    'men',
+                    'women',
+                    'elderly_men', 
+                    'elderly_women',
+                    'total',
+                    'admin1lng',
+                    'admin1lat',
+                    'admin2lng',
+                    'admin2lat',
+                    'admin3lng',
+                    'admin3lat'
                   ];
 
               // eiewg download fields
@@ -640,10 +699,7 @@ var ClusterDashboardController = {
                     'admin2lng',
                     'admin2lat'
                   ];
-              }
 
-              // eiewg download fieldNames
-              if ( params.cluster_id === 'eiewg' ) {
                 var fieldNames = [
                     'project_id',
                     'report_id',
