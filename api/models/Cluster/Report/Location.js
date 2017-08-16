@@ -226,10 +226,10 @@ module.exports = {
 			type: 'string'
 		},
 		school_id: {
-			type: 'integer'
+			type: 'string'
 		},
 		school_hub_id: {
-			type: 'integer'
+			type: 'string'
 		},
 		school_hub_name: {
 			type: 'string'
