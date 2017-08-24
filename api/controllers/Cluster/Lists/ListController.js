@@ -10,9 +10,15 @@ module.exports = {
   // get list of cluster activities
   getActivities: function( req, res ) {
 
+    // admin0pcode
+    var admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: { contains: req.param( 'admin0pcode' ) } } : {};
+
+    console.log(admin0pcode_filter)
+
     // get activity list
     Activities
       .find()
+      .where( admin0pcode_filter )
       .exec( function( err, activities ){
         
         // return error
