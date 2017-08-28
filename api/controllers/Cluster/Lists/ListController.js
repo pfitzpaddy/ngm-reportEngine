@@ -13,8 +13,6 @@ module.exports = {
     // admin0pcode
     var admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: { contains: req.param( 'admin0pcode' ) } } : {};
 
-    console.log(admin0pcode_filter)
-
     // get activity list
     Activities
       .find()
