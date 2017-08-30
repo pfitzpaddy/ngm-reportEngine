@@ -159,41 +159,65 @@ module.exports = {
 			type: 'array'
 		},
 
-		// target location
-		conflict: {
-			type: 'boolean',
-			required: true
-		},
-		fac_type_id: {
+		facility_id: {
 			type: 'string'
 		},
-		fac_type_name: {
+
+
+
+
+
+		// ADD THIS TO ADMIN2FACILITIES AS "EDUCATION" OR "HEALTH"
+		facility_class: {
 			type: 'string'
-		},		
-		fac_name: {
+		},
+
+
+
+		// ADD THIS TO ADMIN2FACILITIES AS OPEN
+		facility_status: {
+			type: 'string'
+		},
+
+
+		
+		facility_implementation_id: {
+			type: 'string'
+		},
+		facility_implementation_name: {
+			type: 'string'
+		},
+		facility_type_id: {
+			type: 'string'
+		},
+		facility_type_name: {
+			type: 'string'
+		},
+		facility_name: {
 			type: 'string',
 			required: true
 		},
-		school_status_id: {
+
+
+		// //////////////
+		new_facility_id: {
 			type: 'string'
 		},
-		school_status_name: {
+		new_facility_name: {
 			type: 'string'
 		},
-		new_school_id: {
+		// //////////////
+
+
+
+		facility_hub_id: {
 			type: 'string'
 		},
-		new_school_name: {
+		facility_hub_name: {
 			type: 'string'
 		},
-		school_id: {
-			type: 'string'
-		},
-		school_hub_id: {
-			type: 'string'
-		},
-		school_hub_name: {
-			type: 'string'
+		conflict: {
+			type: 'boolean'
 		},
 		admin1lng: {
 			type: 'float',
@@ -216,6 +240,14 @@ module.exports = {
 		},
 		admin3lat: {
 			type: 'float'
+		},
+		facility_lng: {
+			type: 'float',
+			required: true
+		},
+		facility_lat: {
+			type: 'float',
+			required: true
 		},
 
 		// flag to manage location updates

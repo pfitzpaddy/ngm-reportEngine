@@ -307,7 +307,7 @@ var ProjectDashboardController = {
 
         // store data by project
         var projectStore = {},
-          fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'fac_type_name', 'fac_name', 'beneficiary_type', 'boys', 'girls', 'men', 'women', 'penta3_vacc_boys_under1', 'penta3_vacc_girls_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'training_male', 'training_female', 'total', 'lng', 'lat' ],
+          fields = [ 'project_id', 'organization', 'project_code', 'project_title', 'project_status', 'project_start_date', 'project_end_date', 'admin0pcode', 'admin0name', 'admin1pcode', 'admin1name', 'admin2pcode', 'admin2name', 'facility_type_name', 'facility_name', 'beneficiary_type', 'boys', 'girls', 'men', 'women', 'penta3_vacc_boys_under1', 'penta3_vacc_girls_under1', 'skilled_birth_attendant', 'conflict_trauma_treated', 'education_male', 'education_female', 'training_male', 'training_female', 'total', 'lng', 'lat' ],
           fieldNames = [ 'Project ID', 'Partner', 'Project Code', 'Project Title', 'Project Status', 'Project Start Date', 'Project End Date', 'Country Pcode', 'Country', 'Admin1 Pcode', 'Admin1 Name', 'Admin2 Pcode', 'Admin2 Name', 'Health Facility Type', 'Health Facility Name', 'Beneficiary Category', 'Under 5 Male', 'Under 5 Female', 'Over 5 Male', 'Over 5 Female', 'Penta3 Vacc Male Under1', 'Penta3 Vacc Female Under1', 'Skilled Birth Attendant', 'Conflict Trauma Treated', 'Education Male', 'Education Female', 'Capacity Building Male', 'Capacity Building Female', 'Total', 'lng', 'lat' ];
 
         // beneficiaires
@@ -333,20 +333,20 @@ var ProjectDashboardController = {
             beneficiaries.forEach( function( b, i ){
 
               // if no values at key
-              if ( !projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] ) {
+              if ( !projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ] ) {
                 // beneficiaries
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] = _.merge({}, {}, b);
+                projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ] = _.merge({}, {}, b);
                 // init indicators
-                projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] = _.merge({}, projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ], indicators);
+                projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ] = _.merge({}, projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ], indicators);
               }
 
               // aggregate beneficiaries
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ] = 
-                    ProjectDashboardController.getBeneficiaries( projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ], indicators, b );
+              projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ] = 
+                    ProjectDashboardController.getBeneficiaries( projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ], indicators, b );
 
               // lat/lng
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].lat = b.admin2lat;
-              projectStore[ b.project_id + b.admin2pcode + b.fac_type + b.fac_name + b.beneficiary_type ].lng = b.admin2lng;
+              projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ].lat = b.admin2lat;
+              projectStore[ b.project_id + b.admin2pcode + b.facility_type + b.facility_name + b.beneficiary_type ].lng = b.admin2lng;
 
             });
   
@@ -768,7 +768,7 @@ var ProjectDashboardController = {
             locations.forEach( function( location, i ){
 
               // switch
-              switch ( location.fac_type ) {
+              switch ( location.facility_type ) {
 
                 // cases
                 case 'RH':
@@ -829,13 +829,13 @@ var ProjectDashboardController = {
 
               }
 
-              // if ( !facilities[ location.fac_type ] ) {
-              //   facilities[ location.fac_type ] = {};
-              //   facilities[ location.fac_type ].name = location.fac_type_name;
-              //   facilities[ location.fac_type ].y = 0;
+              // if ( !facilities[ location.facility_type ] ) {
+              //   facilities[ location.facility_type ] = {};
+              //   facilities[ location.facility_type ].name = location.facility_type_name;
+              //   facilities[ location.facility_type ].y = 0;
               // }
               // // increment
-              // facilities[ location.fac_type ].y++;
+              // facilities[ location.facility_type ].y++;
 
             });
 
@@ -889,8 +889,8 @@ var ProjectDashboardController = {
                 var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
                             + '<div style="text-align:center">' + d.admin0name + '</div>'
                             + '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>'
-                            + '<div style="text-align:center">' + d.fac_type_name + '</div>'
-                            + '<div style="text-align:center">' + d.fac_name + '</div>'
+                            + '<div style="text-align:center">' + d.facility_type_name + '</div>'
+                            + '<div style="text-align:center">' + d.facility_name + '</div>'
                             + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
                             + '<div style="text-align:center">' + user.name + '</div>'
                             + '<div style="text-align:center">' + user.position + '</div>'

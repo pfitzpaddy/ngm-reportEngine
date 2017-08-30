@@ -144,16 +144,11 @@ module.exports = {
 			type: 'array'
 		},
 
-		// report
-		// report_id: {
-		// 	model: 'report'
-		// },
-
 		report_id: {
 			type: 'string'
 		},
 
-
+		// report
 		report_active: {
 			type: 'boolean',
 			defaultsTo: true
@@ -205,34 +200,39 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
-		conflict: {
-			type: 'boolean',
-			required: true
-		},
-		fac_type: {
+		facility_id: {
 			type: 'string'
 		},
-		fac_type_name: {
+		facility_class: {
 			type: 'string'
-		},		
-		fac_name: {
+		},
+		facility_status: {
+			type: 'string'
+		},
+		facility_implementation_id: {
+			type: 'string'
+		},
+		facility_implementation_name: {
+			type: 'string'
+		},
+		facility_type_id: {
+			type: 'string'
+		},
+		facility_type_name: {
+			type: 'string'
+		},
+		facility_name: {
 			type: 'string',
 			required: true
 		},
-		school_status_id: {
+		facility_hub_id: {
 			type: 'string'
 		},
-		school_status_name: {
+		facility_hub_name: {
 			type: 'string'
 		},
-		school_id: {
-			type: 'string'
-		},
-		school_hub_id: {
-			type: 'string'
-		},
-		school_hub_name: {
-			type: 'string'
+		conflict: {
+			type: 'boolean'
 		},
 		admin1lng: {
 			type: 'float',
@@ -256,12 +256,14 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-
-    // add reference to Beneficiaries
-    // beneficiaries: {
-    //   collection: 'beneficiaries',
-    //   via: 'location_id'
-    // },
+		facility_lng: {
+			type: 'float',
+			required: true
+		},
+		facility_lat: {
+			type: 'float',
+			required: true
+		},
 
 
 
