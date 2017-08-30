@@ -879,11 +879,11 @@ var ClusterDashboardController = {
 
                 if ( !user ) {
                   var user = {
-                    organization: 'AFG',
-                    name: 'HRP 2017',
+                    organization: 'ORG',
+                    name: 'HRP ' + moment().format('YYYY'),
                     position: 'IMO',
-                    phone: '+93',
-                    email: '@immap.org',
+                    phone: '+00',
+                    email: '@org',
                   }
                 }
 
@@ -891,7 +891,11 @@ var ClusterDashboardController = {
                 var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d.cluster + '</h5>'
                             + '<h5 style="text-align:center; font-size:1.3rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
                             + '<div style="text-align:center">' + d.admin0name + '</div>'
-                            + '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
+                            if ( d.admin3name ) {
+                              message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + ', ' + d.admin3name + '</div>';
+                            } else {
+                              message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
+                            }
                             if ( d.cluster_id === 'health' ) {
                               message += '<div style="text-align:center">' + d.fac_type_name + '</div>';
                             }
@@ -906,8 +910,8 @@ var ClusterDashboardController = {
                 // create markers
                 markers[ 'marker' + counter ] = {
                   layer: 'projects',
-                  lat: d.admin2lat,
-                  lng: d.admin2lng,
+                  lat: d.admin3lat ? d.admin3lat : d.admin2lat,
+                  lng: d.admin3lng ? d.admin3lng : d.admin2lng,
                   message: message
                 };
 

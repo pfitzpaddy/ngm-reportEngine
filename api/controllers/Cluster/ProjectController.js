@@ -100,15 +100,30 @@ module.exports = {
 
               // order
               $project.target_locations.sort(function(a, b) {
-                if ( a.fac_type_name ) {
-                  return a.admin1name.localeCompare(b.admin1name) || 
-                          a.admin2name.localeCompare(b.admin2name) || 
-                          a.fac_type_name.localeCompare(b.fac_type_name) || 
-                          a.fac_name.localeCompare(b.fac_name);
+                if ( a.facility_type_name ) {
+                  if( a.admin3name ) {
+                    return a.admin1name.localeCompare(b.admin1name) || 
+                            a.admin2name.localeCompare(b.admin2name) ||
+                            a.admin3name.localeCompare(b.admin3name) ||
+                            a.facility_type_name.localeCompare(b.facility_type_name) || 
+                            a.facility_name.localeCompare(b.facility_name);
+                  } else {
+                    return a.admin1name.localeCompare(b.admin1name) || 
+                            a.admin2name.localeCompare(b.admin2name) ||
+                            a.facility_type_name.localeCompare(b.facility_type_name) || 
+                            a.facility_name.localeCompare(b.facility_name);
+                  }
                 } else {
-                  return a.admin1name.localeCompare(b.admin1name) || 
-                          a.admin2name.localeCompare(b.admin2name) || 
-                          a.fac_name.localeCompare(b.fac_name);
+                  if( a.admin3name ) {
+                    return a.admin1name.localeCompare(b.admin1name) || 
+                            a.admin2name.localeCompare(b.admin2name) ||
+                            a.admin3name.localeCompare(b.admin3name) ||
+                            a.facility_name.localeCompare(b.facility_name);
+                  } else {
+                    return a.admin1name.localeCompare(b.admin1name) || 
+                            a.admin2name.localeCompare(b.admin2name) ||
+                            a.facility_name.localeCompare(b.facility_name);
+                  }
                 }
               });
 
@@ -197,15 +212,30 @@ module.exports = {
 
             // order
             $project.target_locations.sort(function(a, b) {
-              if ( a.fac_type_name ) {
-                return a.admin1name.localeCompare(b.admin1name) || 
-                        a.admin2name.localeCompare(b.admin2name) || 
-                        a.fac_type_name.localeCompare(b.fac_type_name) || 
-                        a.fac_name.localeCompare(b.fac_name);
+              if ( a.facility_type_name ) {
+                if( a.admin3name ) {
+                  return a.admin1name.localeCompare(b.admin1name) || 
+                          a.admin2name.localeCompare(b.admin2name) ||
+                          a.admin3name.localeCompare(b.admin3name) ||
+                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_name.localeCompare(b.facility_name);
+                } else {
+                  return a.admin1name.localeCompare(b.admin1name) || 
+                          a.admin2name.localeCompare(b.admin2name) ||
+                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_name.localeCompare(b.facility_name);
+                }
               } else {
-                return a.admin1name.localeCompare(b.admin1name) || 
-                        a.admin2name.localeCompare(b.admin2name) || 
-                        a.fac_name.localeCompare(b.fac_name);
+                if( a.admin3name ) {
+                  return a.admin1name.localeCompare(b.admin1name) || 
+                          a.admin2name.localeCompare(b.admin2name) ||
+                          a.admin3name.localeCompare(b.admin3name) ||
+                          a.facility_name.localeCompare(b.facility_name);
+                } else {
+                  return a.admin1name.localeCompare(b.admin1name) || 
+                          a.admin2name.localeCompare(b.admin2name) ||
+                          a.facility_name.localeCompare(b.facility_name);
+                } 
               }
             });
 

@@ -91,20 +91,24 @@ module.exports = {
 
   },
 
-  // get admin2 list by admin0, admin1
-  getAdmin2Schools: function( req, res ) {
+  // get admin2 list by admin0, admin1, admin2name
+  getAdmin2Facilities: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
-    if ( !req.param( 'admin1pcode' ) || !req.param( 'admin2name' ) ) {
-       return res.json( 401, { msg: 'admin1pcode & admin2name required and must be string' });
+    if ( !req.param( 'cluster_id' ) || !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) || !req.param( 'admin2name' ) ) {
+       return res.json( 401, { msg: 'admin0pcode, admin1pcode, admin2pcode & admin2name required and must be string' });
     }
 
+    // admin filter on pcode prefered! But Kabul has PDs!
+    var admin2filter = req.param( 'admin2pcode' ) === '101' ? { admin2name: req.param( 'admin2name' ) } : { admin2pcode: req.param( 'admin2pcode' ) };
+
     // get list
-    Admin2Schools
+    Admin2Facilities
       .find()
-      .where({ admin0pcode: 'AF' })
+      .where({ admin0pcode: req.param( 'admin0pcode' ) })
       .where({ admin1pcode: req.param( 'admin1pcode' ) })
-      .where({ admin2name: req.param( 'admin2name' ) })
+      .where( admin2filter )
+      .where({ facility_class: req.param( 'cluster_id' ) })
       .sort('admin2name ASC')
       .exec( function( err, admin2 ){
 
@@ -113,6 +117,34 @@ module.exports = {
 
         // return new Project
         return res.json( 200, admin2 );
+
+      });
+
+  },
+
+  // get admin3 list by admin0, admin1, admin2name, admin3pcode
+  getAdmin3Facilities: function( req, res ) {
+
+    // !admin0pcode || !admin1pcode
+    if ( !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) || !req.param( 'admin2name' ) || !req.param( 'admin3pcode' ) ) {
+       return res.json( 401, { msg: 'admin0pcode, admin1pcode, admin2name & admin3pcode required and must be string' });
+    }
+
+    // get list
+    Admin2Facilities
+      .find()
+      .where({ admin0pcode: req.param( 'admin0pcode' ) })
+      .where({ admin1pcode: req.param( 'admin1pcode' ) })
+      .where({ admin2name: req.param( 'admin2name' ) })
+      .where({ admin3pcode: req.param( 'admin3pcode' ) })
+      .sort('admin3name ASC')
+      .exec( function( err, admin3 ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // return new Project
+        return res.json( 200, admin3 );
 
       });
 

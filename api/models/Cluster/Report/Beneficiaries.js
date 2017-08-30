@@ -64,12 +64,6 @@ module.exports = {
 			required: true
 		},
 
-		// reference to location
-			// this avoids unlinking when updating Report->Location 
-		// location_reference_id: {
-		// 	type: 'string'
-		// },
-
 		// project
 		project_id: {
 			type: 'string',
@@ -285,17 +279,11 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
-
-		// add a reference to Location
-    // location_id: {
-    //   model: 'location'
-    // },
-
+		
+		// location
     location_id: {
 			type: 'string'
     },
-		
-		// location
 		admin1pcode: {
 			type: 'string',
 			required: true
@@ -318,34 +306,39 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
-		conflict: {
-			type: 'boolean',
-			required: true
-		},
-		fac_type: {
+		facility_id: {
 			type: 'string'
 		},
-		fac_type_name: {
+		facility_class: {
 			type: 'string'
 		},
-		fac_name: {
+		facility_status: {
+			type: 'string'
+		},
+		facility_implementation_id: {
+			type: 'string'
+		},
+		facility_implementation_name: {
+			type: 'string'
+		},
+		facility_type_id: {
+			type: 'string'
+		},
+		facility_type_name: {
+			type: 'string'
+		},
+		facility_name: {
 			type: 'string',
 			required: true
 		},
-		school_status_id: {
+		facility_hub_id: {
 			type: 'string'
 		},
-		school_status_name: {
+		facility_hub_name: {
 			type: 'string'
 		},
-		school_id: {
-			type: 'string'
-		},
-		school_hub_id: {
-			type: 'string'
-		},
-		school_hub_name: {
-			type: 'string'
+		conflict: {
+			type: 'boolean'
 		},
 		admin1lng: {
 			type: 'float',
@@ -369,7 +362,14 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-
+		facility_lng: {
+			type: 'float',
+			required: true
+		},
+		facility_lat: {
+			type: 'float',
+			required: true
+		},
 
 
 
