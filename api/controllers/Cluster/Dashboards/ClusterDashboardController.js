@@ -555,8 +555,8 @@ var ClusterDashboardController = {
                     'admin3pcode',
                     'admin3name',
                     'conflict',
-                    'fac_type_name',
-                    'fac_name',
+                    'facility_type_name',
+                    'facility_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -585,7 +585,9 @@ var ClusterDashboardController = {
                     'admin2lng',
                     'admin2lat',
                     'admin3lng',
-                    'admin3lat'
+                    'admin3lat',
+                    'facility_lng',
+                    'facility_lat'
                   ];
 
               var fieldNames = [
@@ -610,8 +612,8 @@ var ClusterDashboardController = {
                     'admin3pcode',
                     'admin3name',
                     'conflict',
-                    'fac_type_name',
-                    'fac_name',
+                    'facility_type_name',
+                    'facility_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -640,7 +642,9 @@ var ClusterDashboardController = {
                     'admin2lng',
                     'admin2lat',
                     'admin3lng',
-                    'admin3lat'
+                    'admin3lat',
+                    'facility_lng',
+                    'facility_lat'
                   ];
 
               // eiewg download fields
@@ -665,12 +669,12 @@ var ClusterDashboardController = {
                     'admin2pcode',
                     'admin2name',
                     'conflict',
-                    'school_status_name',
-                    'fac_type_name',
-                    'school_id',
-                    'fac_name',
-                    'school_hub_id',
-                    'school_hub_name',
+                    'facility_implementation_name',
+                    'facility_type_name',
+                    'facility_id',
+                    'facility_name',
+                    'facility_hub_id',
+                    'facility_hub_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -697,7 +701,9 @@ var ClusterDashboardController = {
                     'admin1lng',
                     'admin1lat',
                     'admin2lng',
-                    'admin2lat'
+                    'admin2lat',
+                    'facility_lng',
+                    'facility_lat'
                   ];
 
                 var fieldNames = [
@@ -752,7 +758,9 @@ var ClusterDashboardController = {
                     'admin1lng',
                     'admin1lat',
                     'admin2lng',
-                    'admin2lat'
+                    'admin2lat',
+                    'facility_lng',
+                    'facility_lat'
                   ];
               }
 
@@ -897,9 +905,9 @@ var ClusterDashboardController = {
                               message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
                             }
                             if ( d.cluster_id === 'health' ) {
-                              message += '<div style="text-align:center">' + d.fac_type_name + '</div>';
+                              message += '<div style="text-align:center">' + d.facility_type_name + '</div>';
                             }
-                            message +=  '<div style="text-align:center">' + d.fac_name + '</div>'
+                            message +=  '<div style="text-align:center">' + d.facility_name + '</div>'
                             + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
                             + '<div style="text-align:center">' + user.organization + '</div>'
                             + '<div style="text-align:center">' + user.name + '</div>'
@@ -910,8 +918,8 @@ var ClusterDashboardController = {
                 // create markers
                 markers[ 'marker' + counter ] = {
                   layer: 'projects',
-                  lat: d.admin3lat ? d.admin3lat : d.admin2lat,
-                  lng: d.admin3lng ? d.admin3lng : d.admin2lng,
+                  lat: d.facility_lat,
+                  lng: d.facility_lng,
                   message: message
                 };
 
