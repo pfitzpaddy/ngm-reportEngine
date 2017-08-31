@@ -863,8 +863,8 @@ var ClusterDashboardController = {
 
             // project ids
             beneficiaries.forEach( function( d, i ){
-              if ( !locations[ d.project_id + d.admin2pcode ] ) {
-                locations[ d.project_id + d.admin2pcode ] = d;
+              if ( !locations[ d.project_id + d.facility_lat + d.facility_lng ] ) {
+                locations[ d.project_id + d.facility_lat + d.facility_lng ] = d;
               }
             });
 
