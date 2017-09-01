@@ -60,7 +60,6 @@ module.exports = {
       // find active projects
       Project
         .find()
-        // .where( { project_status: 'active'} )
         .where( { project_end_date: { $gte: moment().startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
         .exec( function( err, projects ){
 
