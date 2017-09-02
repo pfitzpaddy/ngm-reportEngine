@@ -53,12 +53,10 @@ module.exports = {
 			required: true
 		},
 		username: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		email: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		report_active: {
 			type: 'boolean',
@@ -102,6 +100,34 @@ module.exports = {
     	type: 'string'
     }
 	
-	}
+	},
+
+  // updateOrCreate 
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+  updateOrCreate: function( criteria, values, cb ){
+    var self = this; // reference for use by callbacks
+    // If no values were specified, return []
+    if (!values) cb( false, [] );
+
+    // find
+    this.findOne( criteria, function ( err, result ){
+      if(err) return cb(err, false);
+
+      // update or create
+      if( result ){
+      	// keep complete reports complete
+      	if ( result.report_status === 'complete' ){
+      		values.report_status = result.report_status;
+      	} 
+	      self.update( criteria, values, function( err, update ){
+					if(err) return cb(err, false);
+					cb( false, update[0] );
+	      });
+	    }else{
+	      self.create( values, cb );
+	    }
+    });
+
+  }
 
 };

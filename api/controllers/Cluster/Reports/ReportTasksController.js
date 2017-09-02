@@ -9,40 +9,92 @@
 
 module.exports = {
 
-  // updates reports required for completion
-    // run this 1st day of the month  
+  // set reports ToDo
   setStocksToDo: function( req, res ) {
 
-    // libs
-    var _under = require('underscore'),
-        moment = require('moment');
+    // tools
+    var moment = require('moment');
+    // variables
+    var reports = [];
 
     // only run if date is above monthly reporting period
-    if ( moment().date() === 1 ) {
+    // if ( moment().date() === 1 ) {
 
-      // warehouse
-      StockWarehouse
-        .find( { organization_id: values.organization_id } )
-        .exec(function(err, warehouses){
-          
+      Organization
+        .find({ organization_tag: { '!': null } })
+        .exec( function( err, organizations ){
+
           // return error
-          if ( err ) return cb( err );
+          if ( err ) return res.negotiate( err );
 
-          // add 2017
-          projects = [{
-            project_start_date: '2017-01-01',
-            project_end_date: '2017-12-31'
-          }];
+          // counters
+          var counter = 0,
+              length = organizations.length;
 
-          // set
-          generateStockReports( values, projects[0], warehouses, cb );
+          // organizations
+          organizations.forEach(function( d ){
+
+            // create report
+            var report = {
+              report_status: 'todo',
+              report_active: true,
+              report_month: moment().month(),
+              report_year: moment().year(),
+              reporting_period: moment().set('date', 1).format(),
+              reporting_due_date: moment().add( 1, 'M' ).set('date', 15).format(),
+              stocklocations: []
+            };
+
+            // merge with organization
+            report = _.merge( {}, report, d );
+            report.organization_id = report.id;
+            delete report.id;
+
+            // warehouses
+            StockWarehouse
+              .find( { organization_id: report.organization_id } )
+              .exec(function(err, warehouses){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                // remove ids
+                warehouses.forEach( function( warehouse, i ) {
+                  warehouses[i].stock_warehouse_id = warehouse.id;
+                  warehouses[i].report_month = report.report_month;
+                  warehouses[i].report_year = report.report_year;
+                  delete warehouses[i].id;
+                });
+
+                // set locations
+                report.stocklocations = warehouses;
+
+                // create reports
+                StockReport
+                  .updateOrCreate( {
+                      organization_id: report.organization_id, 
+                      report_month: report.report_month, 
+                      report_year: report.report_year
+                    }, report, function( err, new_report ) {
+
+                    // return error
+                    if ( err ) return res.negotiate( err );
+
+                    // counter
+                    counter++;
+                    if ( counter === length ) {
+                      return res.json( 200, { msg: 'success' } );
+                    }
+
+                });
+
+            });
+
+          });
 
         });
 
-    } else {
-      // return reports
-      return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } );
-    }
+    // } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
 
   },
 

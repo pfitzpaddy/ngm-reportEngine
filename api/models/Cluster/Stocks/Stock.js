@@ -122,7 +122,7 @@ module.exports = {
 			type: 'boolean',
 			required: true
 		},
-		fac_name: {
+		facility_name: {
 			type: 'string',
 			required: true
 		},
@@ -147,6 +147,14 @@ module.exports = {
 		},
 		admin3lat: {
 			type: 'float'
+		},
+		facility_lng: {
+			type: 'float',
+			required: true
+		},
+		facility_lat: {
+			type: 'float',
+			required: true
 		},
 
 		// stocks

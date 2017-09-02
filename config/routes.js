@@ -100,9 +100,6 @@ module.exports.routes = {
   'POST /cluster/stock/getReport': 'Cluster/Stocks/StockReportController.getReportById',
   'POST /cluster/stock/setReport': 'Cluster/Stocks/StockReportController.setReportById',
   'POST /cluster/stock/removeStockLocation': 'Cluster/Stocks/StockReportController.removeReportLocation',
-  'GET /cluster/stock/setReportsToDo': 'Cluster/Stocks/StockReportController.setReportsToDo',
-  'GET /cluster/stock/setReportsOpen': 'Cluster/Stocks/StockReportController.setReportsOpen',
-  'GET /cluster/stock/setReportsReminder': 'Cluster/Stocks/StockReportController.setReportsReminder',
 
   // ACTIVITY REPORTS
   'POST /cluster/report/getReportCsv': 'Cluster/Reports/ReportController.getReportCsv',
@@ -111,7 +108,8 @@ module.exports.routes = {
   'POST /cluster/report/setReport': 'Cluster/Reports/ReportController.setReportById',
   'POST /cluster/report/removeBeneficiary': 'Cluster/Reports/ReportController.removeBeneficiary',
 
-  // ACTIVITY REPORTS TASKS
+  // STOCK / ACTIVITY REPORTS TASKS
+  'GET /cluster/report/setStocksToDo': 'Cluster/Reports/ReportTasksController.setStocksToDo',
   'GET /cluster/report/setReportsToDo': 'Cluster/Reports/ReportTasksController.setReportsToDo',
   'GET /cluster/report/setReportsOpen': 'Cluster/Reports/ReportTasksController.setReportsOpen',
   'GET /cluster/report/setReportsReminder': 'Cluster/Reports/ReportTasksController.setReportsReminder',
