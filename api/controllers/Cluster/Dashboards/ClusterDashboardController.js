@@ -115,6 +115,7 @@ var ClusterDashboardController = {
 
         break;
 
+      
       case 'organizations':
 
         // get organizations by project
@@ -168,29 +169,15 @@ var ClusterDashboardController = {
               organization: 'ALL',
             });
 
-            // orgs
-            Organizations
-              .find()
-              .where( { organization_tag: params.organization_tag } )
-              .exec( function( err, organization ){
 
-                // return error
-                if (err) return res.negotiate( err );
-
-                if ( !beneficiaries.length ) {
-                  organizations[1] = organization[0];
-                }
-
-                // get a list of projects for side menu
-                if ( params.list ) {
-                  // return org list
-                  return res.json( 200, organizations );
-                } else {
-                  // return indicator
-                  return res.json( 200, { 'value': organizations.length-1 });
-                }
-
-              });
+            // get a list of projects for side menu
+            if ( params.list ) {
+              // return org list
+              return res.json( 200, organizations );
+            } else {
+              // return indicator
+              return res.json( 200, { 'value': organizations.length-1 });
+            }
 
           });
 
@@ -237,6 +224,7 @@ var ClusterDashboardController = {
           });
 
         break;
+
 
       case 'contacts':
 
@@ -305,6 +293,7 @@ var ClusterDashboardController = {
             });
 
         break;
+
 
       case 'ocha_report':
 
@@ -439,6 +428,7 @@ var ClusterDashboardController = {
 
         break;
 
+      
       // raw data export
       case 'financial_report':
 
@@ -834,7 +824,7 @@ var ClusterDashboardController = {
           });
 
         break;
-     
+
 
       // markers
       case 'markers':
@@ -881,64 +871,46 @@ var ClusterDashboardController = {
             // foreach location
             locations.forEach( function( d, i ){
 
-              // get user details
-              User.findOne( { username: d.username } ).exec( function( err, user ){
+              // popup message
+              var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d.cluster + '</h5>'
+                          + '<h5 style="text-align:center; font-size:1.3rem; font-weight:100;">' + d.organization + ' | ' + d.project_title + '</h5>'
+                          + '<div style="text-align:center">' + d.admin0name + '</div>'
+                          if ( d.admin3name ) {
+                            message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + ', ' + d.admin3name + '</div>';
+                          } else {
+                            message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
+                          }
+                          if ( d.cluster_id === 'health' ) {
+                            message += '<div style="text-align:center">' + d.facility_type_name + '</div>';
+                          }
+                          message +=  '<div style="text-align:center">' + d.facility_name + '</div>'
+                          + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
+                          + '<div style="text-align:center">' + d.organization + '</div>'
+                          + '<div style="text-align:center">' + d.name + '</div>'
+                          + '<div style="text-align:center">' + d.position + '</div>'
+                          + '<div style="text-align:center">' + d.phone + '</div>'
+                          + '<div style="text-align:center">' + d.email + '</div>';
 
-                // return error
-                if (err) return res.negotiate( err );
+              // create markers
+              markers[ 'marker' + counter ] = {
+                layer: 'projects',
+                lat: d.facility_lat,
+                lng: d.facility_lng,
+                message: message
+              };
 
-                if ( !user ) {
-                  var user = {
-                    organization: 'ORG',
-                    name: 'HRP ' + moment().format('YYYY'),
-                    position: 'IMO',
-                    phone: '+00',
-                    email: '@org',
-                  }
-                }
+              // plus
+              counter++;
 
-                // popup message
-                var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d.cluster + '</h5>'
-                            + '<h5 style="text-align:center; font-size:1.3rem; font-weight:100;">' + user.organization + ' | ' + d.project_title + '</h5>'
-                            + '<div style="text-align:center">' + d.admin0name + '</div>'
-                            if ( d.admin3name ) {
-                              message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + ', ' + d.admin3name + '</div>';
-                            } else {
-                              message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
-                            }
-                            if ( d.cluster_id === 'health' ) {
-                              message += '<div style="text-align:center">' + d.facility_type_name + '</div>';
-                            }
-                            message +=  '<div style="text-align:center">' + d.facility_name + '</div>'
-                            + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
-                            + '<div style="text-align:center">' + user.organization + '</div>'
-                            + '<div style="text-align:center">' + user.name + '</div>'
-                            + '<div style="text-align:center">' + user.position + '</div>'
-                            + '<div style="text-align:center">' + user.phone + '</div>'
-                            + '<div style="text-align:center">' + user.email + '</div>';
+              // if last location
+              if( counter === length ){
+                
+                // return markers
+                return res.json(200, { 'data': markers } );
 
-                // create markers
-                markers[ 'marker' + counter ] = {
-                  layer: 'projects',
-                  lat: d.facility_lat,
-                  lng: d.facility_lng,
-                  message: message
-                };
+              }
 
-                // plus
-                counter++;
-
-                // if last location
-                if( counter === length ){
-                  
-                  // return markers
-                  return res.json(200, { 'data': markers } );
-
-                }
-
-              });
-
-            });                          
+            });
 
           });
 

@@ -52,11 +52,24 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		username: {
+		name: {
+			type: 'string',
+			required: true
+		},
+		position: {
+			type: 'string',
+			required: true
+		},
+		phone: {
 			type: 'string',
 			required: true
 		},
 		email: {
+			type: 'string',
+			unique: true,
+			required: true
+		},
+		username: {
 			type: 'string',
 			required: true
 		},
