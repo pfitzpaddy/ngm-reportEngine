@@ -143,17 +143,19 @@ var ClusterDashboardController = {
             beneficiaries.forEach(function( d, i ){
 
               // if not existing
-              if( !organizations[ d.organization ] ) {
-                // add 
-                organizations[ d.organization ] = {};
-                organizations[ d.organization ].organization_tag = d.organization_tag;
-                organizations[ d.organization ].organization = d.organization;
+              if( !organizations[ d.organization_tag ] ) {
+                // add
+                organizations[ d.organization_tag ] = {};
+                organizations[ d.organization_tag ].organization_tag = d.organization_tag;
+                organizations[ d.organization_tag ].organization = d.organization;
               }
 
             });
 
             // flatten
-            organizations = ClusterDashboardController.flatten( organizations );
+            if ( organizations ) {
+              organizations = ClusterDashboardController.flatten( organizations );
+            }
 
             // order
             organizations.sort(function(a, b) {

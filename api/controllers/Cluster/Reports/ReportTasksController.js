@@ -18,7 +18,7 @@ module.exports = {
     var reports = [];
 
     // only run if date is above monthly reporting period
-    // if ( moment().date() === 1 ) {
+    if ( moment().date() === 1 ) {
 
       Organization
         .find({ organization_tag: { '!': null } })
@@ -94,7 +94,7 @@ module.exports = {
 
         });
 
-    // } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
+    } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
 
   },
 
