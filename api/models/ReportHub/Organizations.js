@@ -8,6 +8,6 @@
 module.exports = {
 
 	// connection
-	connection: 'ngmHealthClusterServer',
+	connection: 'ngmReportHubServer',
 	
 }

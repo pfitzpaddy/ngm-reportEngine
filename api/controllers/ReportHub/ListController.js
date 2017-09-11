@@ -7,6 +7,24 @@
 
 module.exports = {
 
+  // get list of organizations
+  getOrganizations: function( req, res ) {
+
+    // get organizations list
+    Organizations
+      .find()
+      .exec( function( err, organizations ){
+        
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // return organizations
+        return res.json( 200, organizations );
+
+      })
+
+  },
+
   // get admin1 list by admin0
   getAdmin1List: function( req, res ) {
 
@@ -220,6 +238,6 @@ module.exports = {
 
       });
 
-  }
+  }  
 
 };

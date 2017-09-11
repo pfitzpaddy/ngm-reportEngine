@@ -34,44 +34,46 @@ module.exports.routes = {
 
   // -------- NGM -------- 
   // User authentication / password reset
-  'GET /login': 'UserController.login',
-  'POST /login': 'UserController.login',
-  'POST /create': 'UserController.create',
-  'POST /update': 'UserController.updateLogin',
-  'POST /send-email': 'UserController.passwordResetEmail',
-  'POST /password-reset': 'UserController.passwordReset',
+  'GET /login': 'ReportHub/UserController.login',
+  'POST /login': 'ReportHub/UserController.login',
+  'POST /create': 'ReportHub/UserController.create',
+  'POST /update': 'ReportHub/UserController.updateLogin',
+  'POST /send-email': 'ReportHub/UserController.passwordResetEmail',
+  'POST /password-reset': 'ReportHub/UserController.passwordReset',
 
   // org
-  'GET /getOrganization': 'OrganizationController.getOrganization',
-  'POST /getOrganization': 'OrganizationController.getOrganization',
-  'GET /setOrganization': 'OrganizationController.setOrganization',
-  'POST /setOrganization': 'OrganizationController.setOrganization',
-  'GET /setOrganizationPartner': 'OrganizationController.setOrganizationPartner',
-  'POST /setOrganizationPartner': 'OrganizationController.setOrganizationPartner',
+  'GET /getOrganization': 'ReportHub/OrganizationController.getOrganization',
+  'POST /getOrganization': 'ReportHub/OrganizationController.getOrganization',
+  'GET /setOrganization': 'ReportHub/OrganizationController.setOrganization',
+  'POST /setOrganization': 'ReportHub/OrganizationController.setOrganization',
+  'GET /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
+  'POST /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
 
   // Metrics
-  'POST /metrics/set': 'MetricsController.set',
-  'GET /metrics/getUsers': 'MetricsController.getUsers',
-  'GET /metrics/getLocations': 'MetricsController.getLocations',
-  'GET /metrics/getReports': 'MetricsController.getReports',
+  'POST /metrics/set': 'ReportHub/MetricsController.set',
+  'GET /metrics/getUsers': 'ReportHub/MetricsController.getUsers',
+  'GET /metrics/getLocations': 'ReportHub/MetricsController.getLocations',
+  'GET /metrics/getReports': 'ReportHub/MetricsController.getReports',
 
   // Upload
-  'POST /upload-file': 'FileController.upload',
-  'POST /process': 'FileController.process',
-  'POST /print': 'FileController.print',
-  'POST /proxy': 'FileController.proxy',
-  'GET /export': 'FileController.export',
-  'GET /getBeneficiairiesCsv': 'FileController.getBeneficiairiesCsv',
+  'POST /upload-file': 'ReportHub/FileController.upload',
+  'POST /process': 'ReportHub/FileController.process',
+  'POST /print': 'ReportHub/FileController.print',
+  'POST /proxy': 'ReportHub/FileController.proxy',
+  'GET /export': 'ReportHub/FileController.export',
+  'GET /getBeneficiairiesCsv': 'ReportHub/FileController.getBeneficiairiesCsv',
 
 
 
   // -------- CLUSTER -------- 
   // Location lists
-  'GET /location/getAdmin1List': 'LocationController.getAdmin1List',
-  'GET /location/getAdmin2List': 'LocationController.getAdmin2List',
-  'GET /location/getAdmin3List': 'LocationController.getAdmin3List',
-  'GET /location/getAdmin2Facilities': 'LocationController.getAdmin2Facilities',
-  'GET /location/getAdmin3Facilities': 'LocationController.getAdmin3Facilities',
+  'GET /list/organizations': 'ReportHub/ListController.getOrganizations',
+  'GET /list/getAdmin1List': 'ReportHub/ListController.getAdmin1List',
+  'GET /list/getAdmin2List': 'ReportHub/ListController.getAdmin2List',
+  'GET /list/getAdmin3List': 'ReportHub/ListController.getAdmin3List',
+  'GET /list/getAdmin2Facilities': 'ReportHub/ListController.getAdmin2Facilities',
+  'GET /list/getAdmin3Facilities': 'ReportHub/ListController.getAdmin3Facilities',
+
 
 
   // Cluster Lists
@@ -79,7 +81,6 @@ module.exports.routes = {
   'GET /cluster/list/donors': 'Cluster/Lists/ListController.getDonors',
   'GET /cluster/list/indicators': 'Cluster/Lists/ListController.getIndicators',
   'GET /cluster/list/stockitems': 'Cluster/Lists/ListController.getStockItems',
-  'GET /cluster/list/organizations': 'Cluster/Lists/ListController.getOrganizations',
   
   // ADMIN DASHBOARD
   'POST /cluster/admin/indicator': 'Cluster/Dashboards/AdminDashboardController.getClusterAdminIndicator',

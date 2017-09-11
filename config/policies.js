@@ -30,17 +30,17 @@ module.exports.policies = {
   '*': ['isAuthorized'],
    
   // public
-  'UserController': {
+  'ReportHub/UserController': {
     '*': true
   },
   
   // public
-  'MetricsController': {
+  'ReportHub/MetricsController': {
     '*': true
   },
 
   // public
-  'FileController': {
+  'ReportHub/FileController': {
     'print': true,
     'proxy': true,
     'export': true,
@@ -48,7 +48,7 @@ module.exports.policies = {
   },
 
   // public
-  'LocationController': {
+  'ReportHub/ListController': {
     '*': true
   },
 
