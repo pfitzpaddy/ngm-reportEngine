@@ -16,7 +16,7 @@ module.exports.http = {
     var fn;
 
     // Default to built-in bodyParser:
-    fn = require('./../node_modules/sails/node_modules/skipper');
+    fn = require('skipper');
     return fn(opts);
 
   })
