@@ -11,6 +11,16 @@
 
 module.exports.http = {
 
+  bodyParser: (function () {
+    var opts = { limit: 1024*1024*5 }; // set it to 5 megabytes
+    var fn;
+
+    // Default to built-in bodyParser:
+    fn = require('./../node_modules/sails/node_modules/skipper');
+    return fn(opts);
+
+  })
+
   /****************************************************************************
   *                                                                           *
   * Express middleware to use for every Sails request. To add custom          *
