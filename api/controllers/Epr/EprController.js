@@ -43,9 +43,10 @@ module.exports = {
 				// set cmd
 				moment = require( 'moment' ),
 				exec = require('child_process').exec,
-				// account form ids
-				// 105600
-				// 106227
+				// API
+					// https://kc.kobotoolbox.org/api/v1/
+				// view forms
+					// curl -X GET https://kc.humanitarianresponse.info/api/v1/forms -u eha:ehaTeam1234
 				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/106227?format=json -u eha:ehaTeam1234';
 
 		// run curl command
