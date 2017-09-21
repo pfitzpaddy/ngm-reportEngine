@@ -64,7 +64,7 @@ var ClusterDashboardController = {
     // filters
     return {
       default: { report_year: { '>=': 2017 }, location_id: { '!': null } },
-      adminRpcode: params.adminRpcode === 'all' ? {} : { adminRpcode: params.adminRpcode },
+      adminRpcode: params.adminRpcode === 'hq' ? {} : { adminRpcode: params.adminRpcode },
       admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
       admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
       admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
