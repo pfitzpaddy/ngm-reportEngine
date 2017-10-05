@@ -333,7 +333,7 @@ module.exports = {
       // find active reports for the next reporting period
       Report
         .find()
-        .where( { report_month: { '<=': moment().month() } } )
+        .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
         .where( { report_active: true } )
         .where( { report_status: 'todo' } )
         .exec( function( err, reports ){
@@ -342,7 +342,7 @@ module.exports = {
           if ( err ) return res.negotiate( err );
 
           // no reports return
-          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );
+          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
 
 
           // for each report, group by username
@@ -367,7 +367,7 @@ module.exports = {
               nStore[ report.email ] = {
                 email: report.email,
                 username: report.username,
-                report_month: moment().format( 'MMMM' ),
+                report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
                 reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
                 reporting_due_message: due_message,
                 reports: []
@@ -434,7 +434,7 @@ module.exports = {
                     sendername: 'ReportHub'
                   }, {
                     to: notifications[i].email,
-                    subject: 'ReportHub - Project Reporting Period for ' + moment().format( 'MMMM' ).toUpperCase() + ' is ' + notifications[i].reporting_due_message + ' !'
+                    subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' is ' + notifications[i].reporting_due_message + ' !'
                   }, function(err) {
                     
                     // return error
@@ -459,7 +459,7 @@ module.exports = {
       } else {
 
         // return reports
-        return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );
+        return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
       }
 
   }
