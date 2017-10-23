@@ -41,7 +41,7 @@ module.exports = {
               report_month: moment().month(),
               report_year: moment().year(),
               reporting_period: moment().set('date', 1).format(),
-              reporting_due_date: moment().add( 1, 'M' ).set('date', 15).format(),
+              reporting_due_date: moment().add( 1, 'M' ).set('date', 10 ).format(),
               stocklocations: []
             };
 
@@ -133,7 +133,7 @@ module.exports = {
               report_month: moment().month(),
               report_year: moment().year(),
               reporting_period: moment().set( 'date', 1 ).format(),
-              reporting_due_date: moment().add( 1, 'M' ).set( 'date', 5 ).format()
+              reporting_due_date: moment().add( 1, 'M' ).set( 'date', 10 ).format()
             };
 
             // clone project
