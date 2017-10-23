@@ -355,7 +355,7 @@ function getProjectReports( project ) {
 			report_month: moment( s_date ).add( m, 'M' ).month(),
 			report_year: moment( s_date ).add( m, 'M' ).year(),
 			reporting_period: moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format(),
-			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 5 ).format()
+			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 10 ).format()
 		};
 
 		// clone project
