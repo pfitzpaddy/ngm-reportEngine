@@ -148,6 +148,8 @@ module.exports = {
        return res.json( 401, { msg: 'cluster_id, admin0pcode, admin1pcode, & admin3pcode required and must be string' });
     }
 
+    var facility_class = req.param( 'cluster_id' ) === 'wash' ? { facility_class: 'health' } : { facility_class: req.param( 'cluster_id' ) };
+
     // get list
     Admin3Facilities
       .find()
@@ -155,7 +157,7 @@ module.exports = {
       .where({ admin1pcode: req.param( 'admin1pcode' ) })
       .where({ admin2pcode: req.param( 'admin2pcode' ) })
       .where({ admin3pcode: req.param( 'admin3pcode' ) })
-      .where({ facility_class: req.param( 'cluster_id' ) })
+      .where( facility_class )
       .sort('admin3name ASC')
       .exec( function( err, admin3 ){
 
