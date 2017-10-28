@@ -20,7 +20,7 @@ module.exports = {
     var json2csv = require( 'json2csv' ),
       moment = require( 'moment' );
 
-    // activity 
+    // activity
     if ( req.param( 'report_type' ) === 'activity' ) {
 
       var fields = [
@@ -38,6 +38,8 @@ module.exports = {
             'admin1name',
             'admin2pcode',
             'admin2name',
+            'admin3pcode',
+            'admin3name',
             'facility_type_name',
             'facility_name',
             'report_month',
@@ -61,13 +63,13 @@ module.exports = {
             'createdAt',
             'updatedAt'
           ],
-          fieldNames = [ 
-            'Project ID', 
-            'Report ID', 
+          fieldNames = [
+            'Project ID',
+            'Report ID',
             'Cluster',
-            'Organization', 
-            'Username', 
-            'Email', 
+            'Organization',
+            'Username',
+            'Email',
             'HRP Code',
             'Project Title',
             'Project Code',
@@ -76,10 +78,12 @@ module.exports = {
             'Admin1 Name',
             'Admin2 Pcode',
             'Admin2 Name',
+            'Admin3 Pcode',
+            'Admin3 Name',
+            'Facility Type',
+            'Location Name',
             'Report Month',
             'Report Year',
-            'Location Type',
-            'Location Name',
             'Activity Type',
             'Activity Description',
             'Category Ttype',
@@ -112,17 +116,17 @@ module.exports = {
           // format  / sum
           response.forEach(function( d, i ){
             response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
-            response[i].total = response[i].boys + 
-                                response[i].girls + 
-                                response[i].men + 
-                                response[i].women + 
-                                response[i].elderly_men + 
+            response[i].total = response[i].boys +
+                                response[i].girls +
+                                response[i].men +
+                                response[i].women +
+                                response[i].elderly_men +
                                 response[i].elderly_women;
           });
 
           // return csv
           json2csv({ data: response, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
+
             // error
             if ( err ) return res.negotiate( err );
 
@@ -146,6 +150,8 @@ module.exports = {
             'admin1name',
             'admin2pcode',
             'admin2name',
+            'admin3pcode',
+            'admin3name',
             'facility_name',
             'report_month',
             'report_year',
@@ -159,17 +165,19 @@ module.exports = {
             'createdAt',
             'updatedAt'
           ],
-          fieldNames = [ 
+          fieldNames = [
             'Organization ID',
-            'Report ID', 
-            'Organization', 
-            'Username', 
-            'Email', 
+            'Report ID',
+            'Organization',
+            'Username',
+            'Email',
             'Country',
             'Admin1 Pcode',
             'Admin1 Name',
             'Admin2 Pcode',
             'Admin2 Name',
+            'Admin3 Pcode',
+            'Admin3 Name',
             'Warehouse Name',
             'Stock Month',
             'Stock Year',
@@ -200,7 +208,7 @@ module.exports = {
 
           // return csv
           json2csv({ data: response, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
+
             // error
             if ( err ) return res.negotiate( err );
 
@@ -222,13 +230,13 @@ module.exports = {
     if ( !req.param( 'filter' ) ) {
       return res.json( 401, { err: 'filter required!' });
     }
-    
+
     // get project by organization_id & status
     Report
       .find( req.param( 'filter' ) )
       .sort( 'report_month ASC' )
       .exec ( function( err, reports ){
-      
+
         // return error
         if ( err ) return res.negotiate( err );
 
@@ -244,7 +252,7 @@ module.exports = {
 
         // determine status
         if ( length )  {
-    
+
           // reports
           reports.forEach( function( d, i ){
 
@@ -252,7 +260,7 @@ module.exports = {
             Beneficiaries
               .count( { report_id: d.id } )
               .exec(function( err, b ){
-                
+
                 // return error
                 if (err) return res.negotiate( err );
 
@@ -271,7 +279,7 @@ module.exports = {
 
                 // if report is 'todo' and past due date!
                 if ( reports[i].report_status === 'todo' && moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
-                        
+
                   // set to red (overdue!)
                   reports[i].status = '#e57373'
                   reports[i].icon = 'watch_later';
@@ -311,23 +319,23 @@ module.exports = {
     }
 
     // report for UI
-    var $report = {};    
-    
+    var $report = {};
+
     // get report by organization_id
     Report
       .findOne( { id: req.param( 'id' ) } )
       .exec( function( err, report ){
-      
+
         // return error
         if (err) return res.negotiate( err );
-        
+
         // clone project to update
         $report = report;
 
         // if no reports
         if ( !$report ) {
           return res.json( 200, [] );
-        } 
+        }
 
         // get report by organization_id
         Location
@@ -353,28 +361,28 @@ module.exports = {
             $report.locations.sort(function(a, b) {
               if ( a.facility_type_name ) {
                 if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_type_name.localeCompare(b.facility_type_name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 } else {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_type_name.localeCompare(b.facility_type_name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 }
               } else {
                 if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 } else {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.facility_name.localeCompare(b.facility_name);
-                } 
+                }
               }
             });
 
@@ -397,7 +405,7 @@ module.exports = {
                     return a.id.localeCompare( b.id );
                   });
 
-                  // counter 
+                  // counter
                   counter++;
                   if ( counter === length ) {
                     // return report
@@ -410,7 +418,7 @@ module.exports = {
 
         });
 
-      });  
+      });
 
   },
 
@@ -421,7 +429,7 @@ module.exports = {
     if ( !req.param( 'report' ) ) {
       return res.json(401, { err: 'report required!' });
     }
-    
+
     // get report
     var $report = req.param( 'report' ),
         $locations = req.param( 'report' ).locations;
@@ -446,28 +454,28 @@ module.exports = {
         $report.locations.sort(function(a, b) {
           if ( a.facility_type_name ) {
             if( a.admin3name ) {
-              return a.admin1name.localeCompare(b.admin1name) || 
+              return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
                       a.admin3name.localeCompare(b.admin3name) ||
-                      a.facility_type_name.localeCompare(b.facility_type_name) || 
+                      a.facility_type_name.localeCompare(b.facility_type_name) ||
                       a.facility_name.localeCompare(b.facility_name);
             } else {
-              return a.admin1name.localeCompare(b.admin1name) || 
+              return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
-                      a.facility_type_name.localeCompare(b.facility_type_name) || 
+                      a.facility_type_name.localeCompare(b.facility_type_name) ||
                       a.facility_name.localeCompare(b.facility_name);
             }
           } else {
             if( a.admin3name ) {
-              return a.admin1name.localeCompare(b.admin1name) || 
+              return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
                       a.admin3name.localeCompare(b.admin3name) ||
                       a.facility_name.localeCompare(b.facility_name);
             } else {
-              return a.admin1name.localeCompare(b.admin1name) || 
+              return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
                       a.facility_name.localeCompare(b.facility_name);
-            } 
+            }
           }
         });
 
@@ -489,7 +497,7 @@ module.exports = {
                 return a.id.localeCompare( b.id );
               });
 
-              // counter 
+              // counter
               counter++;
               if ( counter === length ) {
                 // return report
@@ -506,23 +514,23 @@ module.exports = {
 
   // remove
   removeBeneficiary: function( req, res ){
-    
+
     // request input
     if ( !req.param( 'id' ) ) {
       return res.json(401, { err: 'id required!' });
     }
-    
+
     // get report
     var $id = req.param( 'id' );
 
-    // location_reference_id 're-links' association after any updates 
+    // location_reference_id 're-links' association after any updates
        // when updating target locations in project details (this affects monthly report)
     Beneficiaries
       .update({ id: $id }, { location_id: null })
       .exec(function( err, b ){
 
         // return error
-        if ( err ) return res.json({ err: true, error: err });           
+        if ( err ) return res.json({ err: true, error: err });
 
         // return reports
         return res.json( 200, { msg: 'success' } );
@@ -532,4 +540,3 @@ module.exports = {
   }
 
 };
-
