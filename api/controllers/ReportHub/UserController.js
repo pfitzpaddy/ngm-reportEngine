@@ -125,9 +125,6 @@ module.exports = {
     if ( !req.param( 'user' ) ) {
       return res.json(401, { msg: 'user required' });
     }
-
-    // file system
-    var fs = require('fs');
     
     // get user by username
     User
@@ -155,6 +152,157 @@ module.exports = {
         });
 
       });
+
+  },
+
+  // update user profile
+  updateProfile: function(req, res){
+
+    // check params
+    if ( !req.param( 'user' ) ) {
+      return res.json(401, { msg: 'user required' });
+    }
+
+    // new profile
+    var updatedUser = req.param( 'user' );
+
+    // check to make sure username is not taken
+    User.findOne({
+      username: updatedUser.username
+    }, function foundUser( err, user ) {
+
+      // generic error
+      if (err) return res.negotiate( err );
+      
+      // if username exists twice!
+      if ( user && user.id !== updatedUser.id ) {
+
+        // username already taken
+        return res.json( 200, { err: true, msg: 'Username already taken, try again!' });
+
+      } else {
+
+        // check to make sure username is not taken
+        User.findOne({
+          id: updatedUser.id
+        }, function foundUser( err, originalUser ) {
+        
+          User
+            .update( { id: updatedUser.id }, updatedUser )
+            .exec( function( err, result ){
+
+              // generic error
+              if (err) return res.negotiate( err );
+
+              // user object to update tables
+              var updatedRelationsUser = {
+                username: result[0].username,
+                name: result[0].name,
+                position: result[0].position,
+                phone: result[0].phone,
+                email: result[0].email
+              }
+
+              // each collection needs to be updated - this needs to change to relational!
+
+              // project
+              Project
+                .update({ username: originalUser.username }, updatedRelationsUser )
+                .exec( function( err, project ){
+                  // generic error
+                  if (err) return res.negotiate( err );
+                  
+                  // budget
+                  BudgetProgress
+                    .update({ username: originalUser.username }, updatedRelationsUser )
+                    .exec( function( err, budget ){
+                      // generic error
+                      if (err) return res.negotiate( err );
+                      
+                      // TargetBeneficairies
+                      TargetBeneficiaries
+                        .update({ username: originalUser.username }, updatedRelationsUser )
+                        .exec( function( err, targetBeneficairies ){
+                          // generic error
+                          if (err) return res.negotiate( err );
+
+                          // TargetLocations
+                          TargetLocation
+                            .update({ username: originalUser.username }, updatedRelationsUser )
+                            .exec( function( err, targetLocations ){
+                              // generic error
+                              if (err) return res.negotiate( err );
+                              
+                              // Report
+                              Report
+                                .update({ username: originalUser.username }, updatedRelationsUser )
+                                .exec( function( err, report ){
+                                  // generic error
+                                  if (err) return res.negotiate( err );
+                                  
+                                  // Location
+                                  Location
+                                    .update({ username: originalUser.username }, updatedRelationsUser )
+                                    .exec( function( err, location ){
+                                      // generic error
+                                      if (err) return res.negotiate( err );
+                                      
+                                      // Beneficiaries
+                                      Beneficiaries
+                                        .update({ username: originalUser.username }, updatedRelationsUser )
+                                        .exec( function( err, beneficiaries ){
+                                          // generic error
+                                          if (err) return res.negotiate( err );
+                                          
+                                          // Stock
+                                          Stock
+                                            .update({ username: originalUser.username }, updatedRelationsUser )
+                                            .exec( function( err, stock ){
+                                              // generic error
+                                              if (err) return res.negotiate( err );
+                                              
+                                              // StockLocation
+                                              StockLocation
+                                                .update({ username: originalUser.username }, updatedRelationsUser )
+                                                .exec( function( err, stockLocation ){
+                                                  // generic error
+                                                  if (err) return res.negotiate( err );
+                                                  
+                                                  // StockReport
+                                                  StockReport
+                                                    .update({ username: originalUser.username }, updatedRelationsUser )
+                                                    .exec( function( err, stockReport ){
+                                                      // generic error
+                                                      if (err) return res.negotiate( err );
+                                                      
+                                                      // StockWarehouse
+                                                      StockWarehouse
+                                                        .update({ username: originalUser.username }, updatedRelationsUser )
+                                                        .exec( function( err, stockWarehouse ){
+                                                          // generic error
+                                                          if (err) return res.negotiate( err );
+                                                            
+                                                            // return updated user
+                                                            return res.json( 200, { success: true, user: result[0] } );
+
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+
+        });
+      
+      }
+
+    });
 
   },
 

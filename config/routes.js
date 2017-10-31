@@ -38,6 +38,7 @@ module.exports.routes = {
   'POST /login': 'ReportHub/UserController.login',
   'POST /create': 'ReportHub/UserController.create',
   'POST /update': 'ReportHub/UserController.updateLogin',
+  'POST /profile/update': 'ReportHub/UserController.updateProfile',
   'POST /send-email': 'ReportHub/UserController.passwordResetEmail',
   'POST /password-reset': 'ReportHub/UserController.passwordReset',
 
