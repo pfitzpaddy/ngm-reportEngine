@@ -35,7 +35,7 @@ module.exports = {
 
           // err
           if (err) return res.negotiate( err );
-        
+
           // set token
           user.token = jwtToken.issueToken({ sid: user.id });
 
@@ -49,7 +49,7 @@ module.exports = {
         });
 
     });
-  
+
   },
 
   // Check provided email address and password
@@ -69,7 +69,7 @@ module.exports = {
       //     email: req.param( 'user' ).email
       //   }]
     }, function foundUser( err, user ) {
-      
+
       // generic error
       if (err) return res.negotiate( err );
 
@@ -103,10 +103,10 @@ module.exports = {
 
           // save updates
           user.save( function( err ) {
-              
+
             // err
             if( err ) return res.negotiate( err );
-            
+
             // Send back user with token
             return res.json( 200, user );
 
@@ -117,20 +117,20 @@ module.exports = {
     });
 
   },
-  
-  // 
+
+  //
   updateLogin: function(req, res){
 
     // check params
     if ( !req.param( 'user' ) ) {
       return res.json(401, { msg: 'user required' });
     }
-    
+
     // get user by username
     User
       .findOne({ username: req.param( 'user' ).username })
       .exec(function(err, user){
-      
+
         // return error
         if (err) return res.negotiate( err );
 
@@ -142,7 +142,7 @@ module.exports = {
 
         // save updates
         user.save(function(err) {
-          
+
           // err
           if(err) return res.negotiate( err );
 
@@ -173,7 +173,7 @@ module.exports = {
 
       // generic error
       if (err) return res.negotiate( err );
-      
+
       // if username exists twice!
       if ( user && user.id !== updatedUser.id ) {
 
@@ -186,7 +186,7 @@ module.exports = {
         User.findOne({
           id: updatedUser.id
         }, function foundUser( err, originalUser ) {
-        
+
           User
             .update( { id: updatedUser.id }, updatedUser )
             .exec( function( err, result ){
@@ -203,110 +203,45 @@ module.exports = {
                 email: result[0].email
               }
 
+              var findOriginalUser = {
+                username: originalUser.username
+              }
+
               // each collection needs to be updated - this needs to change to relational!
 
-              // project
-              Project
-                .update({ username: originalUser.username }, updatedRelationsUser )
-                .exec( function( err, project ){
-                  // generic error
-                  if (err) return res.negotiate( err );
-                  
-                  // budget
-                  BudgetProgress
-                    .update({ username: originalUser.username }, updatedRelationsUser )
-                    .exec( function( err, budget ){
-                      // generic error
-                      if (err) return res.negotiate( err );
-                      
-                      // TargetBeneficairies
-                      TargetBeneficiaries
-                        .update({ username: originalUser.username }, updatedRelationsUser )
-                        .exec( function( err, targetBeneficairies ){
-                          // generic error
-                          if (err) return res.negotiate( err );
+              var Promise = require('bluebird');
 
-                          // TargetLocations
-                          TargetLocation
-                            .update({ username: originalUser.username }, updatedRelationsUser )
-                            .exec( function( err, targetLocations ){
-                              // generic error
-                              if (err) return res.negotiate( err );
-                              
-                              // Report
-                              Report
-                                .update({ username: originalUser.username }, updatedRelationsUser )
-                                .exec( function( err, report ){
-                                  // generic error
-                                  if (err) return res.negotiate( err );
-                                  
-                                  // Location
-                                  Location
-                                    .update({ username: originalUser.username }, updatedRelationsUser )
-                                    .exec( function( err, location ){
-                                      // generic error
-                                      if (err) return res.negotiate( err );
-                                      
-                                      // Beneficiaries
-                                      Beneficiaries
-                                        .update({ username: originalUser.username }, updatedRelationsUser )
-                                        .exec( function( err, beneficiaries ){
-                                          // generic error
-                                          if (err) return res.negotiate( err );
-                                          
-                                          // Stock
-                                          Stock
-                                            .update({ username: originalUser.username }, updatedRelationsUser )
-                                            .exec( function( err, stock ){
-                                              // generic error
-                                              if (err) return res.negotiate( err );
-                                              
-                                              // StockLocation
-                                              StockLocation
-                                                .update({ username: originalUser.username }, updatedRelationsUser )
-                                                .exec( function( err, stockLocation ){
-                                                  // generic error
-                                                  if (err) return res.negotiate( err );
-                                                  
-                                                  // StockReport
-                                                  StockReport
-                                                    .update({ username: originalUser.username }, updatedRelationsUser )
-                                                    .exec( function( err, stockReport ){
-                                                      // generic error
-                                                      if (err) return res.negotiate( err );
-                                                      
-                                                      // StockWarehouse
-                                                      StockWarehouse
-                                                        .update({ username: originalUser.username }, updatedRelationsUser )
-                                                        .exec( function( err, stockWarehouse ){
-                                                          // generic error
-                                                          if (err) return res.negotiate( err );
-                                                            
-                                                            // return updated user
-                                                            return res.json( 200, { success: true, user: result[0] } );
-
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
+              Promise.all([
+                Project.update( findOriginalUser, updatedRelationsUser ),
+                BudgetProgress.update( findOriginalUser, updatedRelationsUser ),
+                TargetBeneficiaries.update( findOriginalUser, updatedRelationsUser ),
+                TargetLocation.update( findOriginalUser, updatedRelationsUser ),
+                Report.update( findOriginalUser, updatedRelationsUser ),
+                Location.update( findOriginalUser, updatedRelationsUser ),
+                Beneficiaries.update( findOriginalUser, updatedRelationsUser ),
+                Stock.update( findOriginalUser, updatedRelationsUser ),
+                StockLocation.update( findOriginalUser, updatedRelationsUser ),
+                StockReport.update( findOriginalUser, updatedRelationsUser ),
+                StockWarehouse.update( findOriginalUser, updatedRelationsUser )
+              ])
+                .catch( function(err) {
+                  return res.negotiate( err )
+                })
+                .done( function() {
+                  return res.json( 200, { success: true, user: result[0] } )
                 });
+
             });
 
         });
-      
+
       }
 
     });
 
   },
 
-  // 
+  //
   passwordResetEmail: function(req, res){
 
     // check params
@@ -316,7 +251,7 @@ module.exports = {
 
     // file system
     var fs = require('fs');
-    
+
     // get user by email
     User
       .find({ email: req.param( 'user' ).email })
@@ -332,13 +267,13 @@ module.exports = {
               counter = 0,
               length = user.length;
 
-          // 
+          //
           for (i = 0; i < user.length; i++) {
 
             // reset user
             var userReset = {
               adminRpcode: user[i].adminRpcode,
-              admin0pcode: user[i].admin0pcode,         
+              admin0pcode: user[i].admin0pcode,
               organization_id: user[i].organization_id,
               organization_tag: user[i].organization_tag,
               organization: user[i].organization,
@@ -378,7 +313,7 @@ module.exports = {
                       to: reset.email,
                       subject: 'ReportHub Password Reset ' + new Date()
                     }, function(err) {
-                      
+
                       // return error
                       if (err) return res.negotiate( err );
 
@@ -396,7 +331,7 @@ module.exports = {
 
   },
 
-  // 
+  //
   passwordReset: function(req, res){
 
     // check params
