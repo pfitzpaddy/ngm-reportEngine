@@ -78,8 +78,7 @@ module.exports = {
 			required: true
 		},
 		skype: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		email: {
 			type: 'string',
