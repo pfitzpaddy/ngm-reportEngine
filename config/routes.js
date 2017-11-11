@@ -65,6 +65,10 @@ module.exports.routes = {
   'GET /getBeneficiairiesCsv': 'ReportHub/FileController.getBeneficiairiesCsv',
 
 
+  // -------- ETHIOPIA -------- 
+  // -------- CTC -------- 
+  'GET /ctc/getKoboData': 'Country/Eth/Ctc/CtcController.getKoboData',  
+
 
   // -------- CLUSTER -------- 
   // Location lists
@@ -127,34 +131,33 @@ module.exports.routes = {
   'POST /health/indicator': 'Cluster/Health/HealthDashboardController.getHealthDetails',
   'POST /health/data/contacts': 'Cluster/Health/HealthDashboardController.getContactListCsv',
 
-
   // -------- EPR -------- 
-  'GET /epr/getKoboData': 'Epr/EprController.getKoboData',
+  'GET /epr/getKoboData': 'Country/Afg/Epr/EprController.getKoboData',
   // EPR Dashboard
-  'GET /epr/latestUpdate': 'Epr/EprDashboardController.getlatestUpdate',
+  'GET /epr/latestUpdate': 'Country/Afg/Epr/EprDashboardController.getlatestUpdate',
   // Epr
-  'GET /epr/indicator': 'Epr/EprDashboardController.getEprIndicator',
-  'POST /epr/indicator': 'Epr/EprDashboardController.getEprIndicator',
+  'GET /epr/indicator': 'Country/Afg/Epr/EprDashboardController.getEprIndicator',
+  'POST /epr/indicator': 'Country/Afg/Epr/EprDashboardController.getEprIndicator',
   // alerts
-  'GET /epr/alerts/indicator': 'Epr/EprDashboardController.getAlertIndicator',
-  'POST /epr/alerts/indicator': 'Epr/EprDashboardController.getAlertIndicator',
-  'GET /epr/alerts/data': 'Epr/EprDashboardController.getAlertData',
-  'POST /epr/alerts/data': 'Epr/EprDashboardController.getAlertData',
+  'GET /epr/alerts/indicator': 'Country/Afg/Epr/EprDashboardController.getAlertIndicator',
+  'POST /epr/alerts/indicator': 'Country/Afg/Epr/EprDashboardController.getAlertIndicator',
+  'GET /epr/alerts/data': 'Country/Afg/Epr/EprDashboardController.getAlertData',
+  'POST /epr/alerts/data': 'Country/Afg/Epr/EprDashboardController.getAlertData',
   // disasters
-  'GET /epr/disasters/indicator': 'Epr/EprDashboardController.getDisasterIndicator',
-  'POST /epr/disasters/indicator': 'Epr/EprDashboardController.getDisasterIndicator',
-  'GET /epr/disasters/data': 'Epr/EprDashboardController.getDisasterData',
-  'POST /epr/disasters/data': 'Epr/EprDashboardController.getDisasterData',
+  'GET /epr/disasters/indicator': 'Country/Afg/Epr/EprDashboardController.getDisasterIndicator',
+  'POST /epr/disasters/indicator': 'Country/Afg/Epr/EprDashboardController.getDisasterIndicator',
+  'GET /epr/disasters/data': 'Country/Afg/Epr/EprDashboardController.getDisasterData',
+  'POST /epr/disasters/data': 'Country/Afg/Epr/EprDashboardController.getDisasterData',
 
 
   // -------- DEWS -------- 
-  'POST /dews/indicator': 'Dews/DewsController.getIndicator',
-  'POST /dews/chart': 'Dews/DewsController.getChart',
-  'POST /dews/calendar': 'Dews/DewsController.getCalendar',
-  'POST /dews/summary': 'Dews/DewsController.getSummary',
-  'POST /dews/data': 'Dews/DewsController.getData',
-  'POST /dews/markers': 'Dews/DewsController.getMarkers',
-  'POST /dews/map': 'Dews/DewsController.getMap',
+  'POST /dews/indicator': 'Country/Afg/Dews/DewsController.getIndicator',
+  'POST /dews/chart': 'Country/Afg/Dews/DewsController.getChart',
+  'POST /dews/calendar': 'Country/Afg/Dews/DewsController.getCalendar',
+  'POST /dews/summary': 'Country/Afg/Dews/DewsController.getSummary',
+  'POST /dews/data': 'Country/Afg/Dews/DewsController.getData',
+  'POST /dews/markers': 'Country/Afg/Dews/DewsController.getMarkers',
+  'POST /dews/map': 'Country/Afg/Dews/DewsController.getMap',
 
 
   // -------- WATCHKEEPER -------- 
