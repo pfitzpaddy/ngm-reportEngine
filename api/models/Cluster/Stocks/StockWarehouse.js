@@ -233,7 +233,8 @@ function getStockReportLocations( stockwarehouse, reports, target_locations, cb 
 				.find({ organization_id: stockwarehouse.organization_id,
 										stock_warehouse_id: target_location.id,
 										report_month: report.report_month,
-										report_year: report.report_year })
+                    report_year: report.report_year,
+                    report_id: { '!' : null } })
 				.populateAll()
 				.exec(function(err, stocklocation){
 
