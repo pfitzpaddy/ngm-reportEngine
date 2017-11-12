@@ -53,12 +53,22 @@ module.exports.policies = {
   },
 
   // public
-  'Epr/EprController': {
+  'Country/Eth/Ctc/CtcController': {
     '*': true
   },
 
   // public
-  'Epr/EprDashboardController': {
+  'Country/Eth/Ctc/CtcDashboardController': {
+    '*': true
+  },
+
+  // public
+  'Country/Afg/Epr/EprController': {
+    '*': true
+  },
+
+  // public
+  'Country/Afg/Epr/EprDashboardController': {
     '*': true
   },
 
