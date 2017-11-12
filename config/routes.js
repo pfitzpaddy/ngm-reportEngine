@@ -67,7 +67,11 @@ module.exports.routes = {
 
   // -------- ETHIOPIA -------- 
   // -------- CTC -------- 
-  'GET /ctc/getKoboData': 'Country/Eth/Ctc/CtcController.getKoboData',  
+  'GET /ctc/getKoboData': 'Country/Eth/Ctc/CtcController.getKoboData',
+  'GET /ctc/latestUpdate': 'Country/Eth/Ctc/CtcDashboard.getLatestUpdate',
+  'POST /ctc/menu': 'Country/Eth/Ctc/CtcDashboard.getCtcMenu',
+  'POST /ctc/assessments/indicator': 'Country/Eth/Ctc/CtcDashboard.getCtcIndicator',
+  'POST /ctc/case_management/indicator': 'Country/Eth/Ctc/CtcDashboard.getCaseManagementIndicator',
 
 
   // -------- CLUSTER -------- 
