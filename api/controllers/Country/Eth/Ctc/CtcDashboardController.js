@@ -78,6 +78,7 @@ var CtcDashboard = {
       
     // rows
     var menu, rows = [];
+    var url = '#/who/ethiopia/ctc/';
     // params
     var params = CtcDashboard.getParams( req );
 
@@ -102,7 +103,7 @@ var CtcDashboard = {
                 'param': 'zone',
                 'active': d.admin2pcode,
                 'class': 'grey-text text-darken-2 waves-effect waves-teal waves-teal-lighten-4',
-                'href': '#ctc/' + params.region + '/' + d.admin2pcode + '/all/' + params.start_date  + '/' + params.end_date
+                'href': url + params.region + '/' + d.admin2pcode + '/all/' + params.start_date  + '/' + params.end_date
               });
             });
 
@@ -140,7 +141,7 @@ var CtcDashboard = {
                 'param': 'woreda',
                 'active': d.admin3pcode,
                 'class': 'grey-text text-darken-2 waves-effect waves-teal waves-teal-lighten-4',
-                'href': '#ctc/' + params.region + '/' + params.zone + '/' + d.admin3pcode + '/' + params.start_date  + '/' + params.end_date
+                'href': url + params.region + '/' + params.zone + '/' + d.admin3pcode + '/' + params.start_date  + '/' + params.end_date
               });
             });
 
@@ -178,7 +179,7 @@ var CtcDashboard = {
                 'param': 'region',
                 'active': d.admin1pcode,
                 'class': 'grey-text text-darken-2 waves-effect waves-teal waves-teal-lighten-4',
-                'href': '#ctc/' + d.admin1pcode + '/' + params.zone + '/' + params.woreda  + '/' + params.start_date  + '/' + params.end_date
+                'href': url + d.admin1pcode + '/' + params.zone + '/' + params.woreda  + '/' + params.start_date  + '/' + params.end_date
               });
             });
 
