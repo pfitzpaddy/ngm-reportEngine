@@ -409,12 +409,72 @@ module.exports = {
                     return a.id.localeCompare( b.id );
                   });
 
-                  // counter
-                  counter++;
-                  if ( counter === length ) {
-                    // return report
-                    return res.json( 200, $report );
-                  }
+                  // Trainings
+                  Trainings
+                    .find( { location_id: location.id } )
+                    .exec( function( err, trainings ){
+
+                      // return error
+                      if (err) return res.negotiate( err );
+
+                      // add locations ( associations included )
+                      $report.locations[i].trainings = trainings;
+
+                      // sort by id
+                      $report.locations[i].trainings.sort( function( a, b ) {
+                        return a.id.localeCompare( b.id );
+                      });
+
+                      // if length
+                      if ( $report.locations[i].trainings && $report.locations[i].trainings.length) {
+
+                        // counter
+                        var trainingsCounter = 0,
+                            trainingsLength = $report.locations[i].trainings.length;
+
+                        // trainings
+                        $report.locations[i].trainings.forEach(function( training, j ){
+
+                          // Trainings
+                          TrainingParticipants
+                            .find( { training_id: training.id } )
+                            .exec( function( err, trainees ){
+
+                              // return error
+                              if (err) return res.negotiate( err );
+
+                              // add locations ( associations included )
+                              $report.locations[i].trainings[j].training_participants = trainees;
+
+                              // sort by id
+                              $report.locations[i].trainings[j].training_participants.sort( function( a, b ) {
+                                return a.id.localeCompare( b.id );
+                              });
+
+                              trainingsCounter++;
+                              if ( trainingsCounter == trainingsLength ) {
+                                // counter
+                                counter++;
+                                if ( counter === length ) {
+                                  // return report
+                                  return res.json( 200, $report );
+                                }
+                              }
+
+                            });
+
+                        });
+
+                      } else {
+                        // counter
+                        counter++;
+                        if ( counter === length ) {
+                          // return report
+                          return res.json( 200, $report );
+                        }
+                      }
+
+                    });
 
               });
 
@@ -501,11 +561,74 @@ module.exports = {
                 return a.id.localeCompare( b.id );
               });
 
-              // counter
-              counter++;
-              if ( counter === length ) {
-                // return report
-                return res.json( 200, $report );
+              // traings
+              if ( location.trainings && location.trainings.length ) {
+
+                // keeps training_participants
+                var originalTrainings = location.trainings;
+
+                // trainings
+                Trainings
+                  .updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
+
+                  // return error
+                  if (err) return res.negotiate( err );
+
+                  // add locations ( associations included )
+                  $report.locations[i].trainings = trainings;
+
+                  // sort by id
+                  $report.locations[i].trainings.sort( function( a, b ) {
+                    return a.id.localeCompare( b.id );
+                  });
+
+                  
+                  // trainings
+                  var trainingCounter = 0,
+                      trainingLength = trainings.length;
+
+                  // trainings
+                  originalTrainings.forEach( function( training, j ){
+
+                    // set training_ids
+                    training.training_participants.forEach( function( trainee, k ){
+                      training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
+                    });
+
+                    // trainings
+                    TrainingParticipants
+                      .updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
+
+                        // return error
+                        if (err) return res.negotiate( err );
+
+                        // add locations ( associations included )
+                        $report.locations[i].trainings[j].training_participants = trainees;
+
+                        // trianing
+                        trainingCounter++;
+                        if ( trainingCounter === trainingLength ) {
+                          // counter
+                          counter++;
+                          if ( counter === length ) {
+                            // return report
+                            return res.json( 200, $report );
+                          }                       
+                        }
+
+                      });
+
+                  });
+
+                });
+
+              } else {
+                // counter
+                counter++;
+                if ( counter === length ) {
+                  // return report
+                  return res.json( 200, $report );
+                }
               }
 
           });
@@ -541,6 +664,68 @@ module.exports = {
 
       });
 
-  }
+  },
+
+  // remove
+  removeTrainingById: function( req, res ){
+
+    // request input
+    if ( !req.param( 'id' ) ) {
+      return res.json(401, { err: 'id required!' });
+    }
+
+    // get report
+    var $id = req.param( 'id' );
+
+    // destroy
+    Trainings
+      .destroy({ id: $id })
+      .exec(function( err, b ){
+
+        // return error
+        if ( err ) return res.json({ err: true, error: err });
+
+        // destroy
+        TrainingParticipants
+          .destroy({ training_id: $id })
+          .exec(function( err, b ){
+
+            // return error
+            if ( err ) return res.json({ err: true, error: err });       
+
+            // return reports
+            return res.json( 200, { msg: 'success' } );
+
+          });
+
+      });
+
+  },
+
+  // remove
+  removeTraineeById: function( req, res ){
+
+    // request input
+    if ( !req.param( 'id' ) ) {
+      return res.json(401, { err: 'id required!' });
+    }
+
+    // get report
+    var $id = req.param( 'id' );
+
+    // destroy
+    TrainingParticipants
+      .destroy({ id: $id })
+      .exec(function( err, b ){
+
+        // return error
+        if ( err ) return res.json({ err: true, error: err });
+
+        // return reports
+        return res.json( 200, { msg: 'success' } );
+
+      });
+
+  },
 
 };

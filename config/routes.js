@@ -117,6 +117,8 @@ module.exports.routes = {
   'POST /cluster/report/getReport': 'Cluster/Reports/ReportController.getReportById',
   'POST /cluster/report/setReport': 'Cluster/Reports/ReportController.setReportById',
   'POST /cluster/report/removeBeneficiary': 'Cluster/Reports/ReportController.removeBeneficiary',
+  'POST /cluster/report/removeTrainee': 'Cluster/Reports/ReportController.removeTrainingById',
+  'POST /cluster/report/removeTrainee': 'Cluster/Reports/ReportController.removeTraineeById',
 
   // STOCK / ACTIVITY REPORTS TASKS
   'GET /cluster/report/setStocksToDo': 'Cluster/Reports/ReportTasksController.setStocksToDo',
