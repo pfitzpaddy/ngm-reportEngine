@@ -35,6 +35,38 @@ module.exports = {
 
   },
 
+  // get organization by id
+  getOrganizationUsers: function( req, res ){
+
+    // check params
+    if ( !req.param( 'admin0pcode' ) || !req.param( 'cluster_id' ) || !req.param( 'organization' ) ) {
+      return res.json(401, { msg: 'admin0pcode, cluster_id, organization required' });
+    }
+
+    // id params
+    var admin0pcode = req.param( 'admin0pcode' ),
+        cluster_id = req.param( 'cluster_id' ),
+        organization = req.param( 'organization' );
+
+
+    // find
+    User
+      .find()
+      .where( { admin0pcode: admin0pcode } )
+      .where( { cluster_id: cluster_id } )
+      .where( { organization: organization } )
+      .exec( function( err, users ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // return updated user
+        return res.json( 200, users );
+
+      })
+
+  },
+
   // set organizaiton partner
   setOrganizationPartner: function( req, res ){
 

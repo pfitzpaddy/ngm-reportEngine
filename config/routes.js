@@ -47,6 +47,8 @@ module.exports.routes = {
   'POST /getOrganization': 'ReportHub/OrganizationController.getOrganization',
   'GET /setOrganization': 'ReportHub/OrganizationController.setOrganization',
   'POST /setOrganization': 'ReportHub/OrganizationController.setOrganization',
+  'GET /getOrganizationUsers': 'ReportHub/OrganizationController.getOrganizationUsers',
+  'POST /getOrganizationUsers': 'ReportHub/OrganizationController.getOrganizationUsers',
   'GET /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
   'POST /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
 

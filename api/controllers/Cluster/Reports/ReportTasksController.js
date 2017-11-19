@@ -204,54 +204,70 @@ module.exports = {
     if ( moment().date() === 1 ) {
 
       // find active reports for the next reporting period
-      Report
+      Location
         .find()
+        .where( { report_id: { '!' : null } } )
         .where( { report_month: moment().month() } )
         .where( { report_year: moment().year() } )
         .where( { report_active: true } )
         .where( { report_status: 'todo' } )
-        .exec( function( err, reports ){
+        .exec( function( err, locations ){
 
           // return error
           if ( err ) return res.negotiate( err );
 
           // no reports return
-          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );
+          if ( !locations.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().format( 'MMMM' ) + '!' } );
 
           // for each report, group by username
-          reports.forEach( function( report, i ) {
+          locations.forEach( function( location, i ) {
 
             // if username dosnt exist
-            if ( !nStore[ report.email ] ) {
+            if ( !nStore[ location.email ] ) {
 
               // add for notification email template
-              nStore[ report.email ] = {
-                email: report.email,
-                username: report.username,
+              nStore[ location.email ] = {
+                email: location.email,
+                username: location.username,
                 report_month: moment().format( 'MMMM' ),
-                reports: []
+                reportsStore: []
               };
+
             }
 
-            // add report urls
-            nStore[ report.email ].reports.push({
-              cluster: report.cluster,
-              username: report.username,
-              project_title: report.project_title,
-              report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + report.project_id + '/' + report.id
-            });
+            // group reports by report!
+            if ( !nStore[ location.email ].reportsStore[ location.report_id ] ){
+              // add location urls
+              nStore[ location.email ].reportsStore[ location.report_id ] = {
+                country: location.admin0name,
+                cluster: location.cluster,
+                username: location.username,
+                project_title: location.project_title,
+                report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+              };
+            }
 
           });
 
           // each user, send only one email!
           for ( var user in nStore ) {
 
-            // order
+            // flatten and order
+            for ( var report in nStore[ user ].reportsStore ) {
+              if ( !nStore[ user ].reports ) {
+                nStore[ user ].reports = [];
+              }
+              nStore[ user ].reports.push( nStore[ user ].reportsStore[ report ] );
+            }
+
+            // sort
             nStore[ user ].reports.sort(function(a, b) {
-              return a.cluster.localeCompare(b.cluster) || 
+              return a.country.localeCompare(b.country) || 
+                      a.cluster.localeCompare(b.cluster) || 
                       a.project_title.localeCompare(b.project_title);
             });
 
+            // push
             notifications.push( nStore[ user ] );
 
           }
@@ -281,7 +297,7 @@ module.exports = {
 
                 // send email
                 sails.hooks.email.send( 'notification-open', {
-                    type: 'Project',
+                    type: 'Monthly Activity',
                     name: result.name,
                     email: notifications[i].email,
                     report_month: notifications[i].report_month.toUpperCase(),
@@ -324,77 +340,104 @@ module.exports = {
 
     // active projects ids
     var moment = require('moment'),
+        // update this if the due date of the report changes
+        due_date = 10,
         nStore = {},
         notifications = [];
 
     // only run if date is 1 week before monthly reporting period required
-    if ( moment().date() <= 10 ) {
+    // if ( moment().date() <= 10 ) {
 
       // find active reports for the next reporting period
-      Report
+      Location
         .find()
+        .where( { report_id: { '!' : null } } )
         .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
         .where( { report_active: true } )
         .where( { report_status: 'todo' } )
-        .exec( function( err, reports ){
+        .sort( 'report_month DESC' )
+        .exec( function( err, locations ){
 
           // return error
           if ( err ) return res.negotiate( err );
 
           // no reports return
-          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+          if ( !locations.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
 
 
           // for each report, group by username
-          reports.forEach( function( report, i ) {
+          locations.forEach( function( location, i ) {
 
             // if username dosnt exist
-            if ( !nStore[ report.email ] ) {
+            if ( !nStore[ location.email ] ) {
 
               var due_message = 'due SOON';
-
               // set due message TODAY
-              if ( moment().day() === moment( report.reporting_due_date ).day() ) {
+              console.log( moment().date() )
+              if ( moment().date() === due_date ) {
                 due_message = 'due TODAY';
               }
-
               // set due message PENDING
-              if ( moment().day() > moment( report.reporting_due_date ).day() ) {
+              if ( moment().date() > due_date ) {
                 due_message = 'OVERDUE';
               }
 
               // add for notification email template
-              nStore[ report.email ] = {
-                email: report.email,
-                username: report.username,
+              nStore[ location.email ] = {
+                email: location.email,
+                username: location.username,
                 report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
-                reporting_due_date: moment( report.reporting_due_date ).format( 'DD MMMM, YYYY' ),
+                reporting_due_date: moment( location.reporting_due_date ).format( 'DD MMMM, YYYY' ),
                 reporting_due_message: due_message,
-                reports: []
+                projectsStore: []
               };
             }
 
-            // add report urls
-            nStore[ report.email ].reports.push({
-              cluster: report.cluster,
-              username: report.username,
-              project_title: report.project_title,
-              report_value: report.report_month,
-              report_month: moment( report.reporting_period ).format( 'MMMM' ),
-              report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + report.project_id + '/' + report.id
-            });
+            // group reports by report!
+            if ( !nStore[ location.email ].projectsStore[ location.project_id ] ){
+
+              // add report urls
+              nStore[ location.email ].projectsStore[ location.project_id ] = {
+                country: location.admin0name,
+                cluster: location.cluster,
+                project_title: location.project_title,
+                reports: []
+              }
+
+            }
+
+            // one report per month
+            if ( !nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] ) {
+              // project reports
+              nStore[ location.email ].projectsStore[ location.project_id ].reports.push({
+                report_value: location.report_month,
+                report_month: moment( location.reporting_period ).format( 'MMMM' ),
+                report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+              });
+              // avoids report row per location
+              nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] = [{ report: true }];
+            }
 
           });
 
           // each user, send only one email!
           for ( var user in nStore ) {
 
-            // order
-            nStore[ user ].reports.sort(function(a, b) {
-              return a.cluster.localeCompare(b.cluster) || 
-                      a.project_title.localeCompare(b.project_title) || 
-                      a.report_value - b.report_value;
+            // flatten and order
+            for ( var project in nStore[ user ].projectsStore ) {
+              if ( !nStore[ user ].projects ) {
+                nStore[ user ].projects = [];
+              }
+              nStore[ user ].projects.push( nStore[ user ].projectsStore[ project ] );
+            }
+
+            // sort
+            nStore[ user ].projects.sort(function(a, b) {
+              return a.country.localeCompare(b.country) || 
+                      a.cluster.localeCompare(b.cluster) || 
+                      a.project_title.localeCompare(b.project_title);
             });
+
             // push
             notifications.push( nStore[ user ] );
 
@@ -424,13 +467,13 @@ module.exports = {
 
                 // send email
                 sails.hooks.email.send( 'notification-due', {
-                    type: 'Project',
+                    type: 'Monthly Activity',
                     name: result.name,
                     email: notifications[i].email,
                     report_month: notifications[i].report_month.toUpperCase(),
                     reporting_due_date: notifications[i].reporting_due_date,
                     reporting_due_message: notifications[i].reporting_due_message,
-                    reports: notifications[i].reports,
+                    projects: notifications[i].projects,
                     sendername: 'ReportHub'
                   }, {
                     to: notifications[i].email,
@@ -456,11 +499,7 @@ module.exports = {
 
         });
 
-      } else {
-
-        // return reports
-        return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
-      }
+      // } else { return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } ); }
 
   }
 
