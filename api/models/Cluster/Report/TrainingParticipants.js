@@ -180,6 +180,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		training_topics: {
+			type: 'string',
+			required: true
+		},
 		training_start_date: {
 			type: 'date',
 			required: true
