@@ -98,7 +98,7 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		
+
 		// add a reference to Project
 		// project_id: {
 		// 	model: 'project'
@@ -152,6 +152,12 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
+    },
+    mpc_purpose_type_id: {
+			type: 'string'
+    },
+    mpc_purpose_type_name: {
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'
@@ -193,7 +199,7 @@ module.exports = {
 		},
 
 
-		
+
 		facility_implementation_id: {
 			type: 'string'
 		},
@@ -270,7 +276,7 @@ module.exports = {
 		},
 
 
-		
+
 
 		/*********** 2016 *************/
 		project_type: {
@@ -282,7 +288,7 @@ module.exports = {
 
 	},
 
-  // updateOrCreate 
+  // updateOrCreate
     // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
   updateOrCreateEach: function( parent, values, cb ){
     var self = this; // reference for use by callbacks
@@ -314,7 +320,7 @@ module.exports = {
         self.create(value, function( err, create ){
           if(err) return cb(err, false);
           results.push( create );
-          
+
           counter++;
           if( counter===length ){
             cb( false, results );
@@ -423,7 +429,7 @@ module.exports = {
 
 		}
 
-		
+
 		// --------- REMOVE LOCATIONS ---------
 		// remove location from reports!
 		if ( !target_location.project_id ) {
@@ -466,5 +472,5 @@ module.exports = {
 		}
 
 	}
-	
+
 };

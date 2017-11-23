@@ -171,6 +171,12 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
+    },
+    mpc_purpose_type_id: {
+			type: 'string'
+    },
+    mpc_purpose_type_name: {
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'
@@ -256,7 +262,7 @@ module.exports = {
 
 	},
 
-  // updateOrCreate 
+  // updateOrCreate
     // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
   updateOrCreateEach: function( parent, values, cb ){
     var self = this; // reference for use by callbacks
