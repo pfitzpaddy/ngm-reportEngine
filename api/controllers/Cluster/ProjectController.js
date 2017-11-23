@@ -14,13 +14,13 @@ module.exports = {
     if ( !req.param('filter') ) {
       return res.json(401, { err: 'filter required!' });
     }
-    
+
     // get project by organization_id & status
     Project
       .find( req.param( 'filter' ) )
       .sort('updatedAt DESC')
       .exec(function(err, projects){
-      
+
         // return error
         if (err) return res.negotiate( err );
 
@@ -33,7 +33,7 @@ module.exports = {
 
   // get project details by id
   getProjectById: function(req, res){
-    
+
     // request input
     if (!req.param('id')) {
       return res.json(401, { err: 'id required!' });
@@ -41,12 +41,12 @@ module.exports = {
 
     // project for UI
     var $project = {};
-    
+
     // get project by organization_id
     Project
       .findOne( { id: req.param('id') } )
       .exec( function( err, project ){
-      
+
         // return error
         if ( err ) return res.negotiate( err );
 
@@ -102,25 +102,25 @@ module.exports = {
               $project.target_locations.sort(function(a, b) {
                 if ( a.facility_type_name ) {
                   if( a.admin3name ) {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) || 
+                            a.facility_type_name.localeCompare(b.facility_type_name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   } else {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) || 
+                            a.facility_type_name.localeCompare(b.facility_type_name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   }
                 } else {
                   if( a.admin3name ) {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   } else {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   }
@@ -136,7 +136,7 @@ module.exports = {
 
         });
 
-      });   
+      });
 
   },
 
@@ -154,7 +154,6 @@ module.exports = {
         $project_budget_progress = req.param('project').project_budget_progress,
         $target_beneficiaries = req.param('project').target_beneficiaries,
         $target_locations = req.param('project').target_locations;
-
     // update project status if new
     if( $status === 'new' ){
       $project.project_status = 'active';
@@ -214,31 +213,34 @@ module.exports = {
             $project.target_locations.sort(function(a, b) {
               if ( a.facility_type_name ) {
                 if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_type_name.localeCompare(b.facility_type_name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 } else {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_type_name.localeCompare(b.facility_type_name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 }
               } else {
                 if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 } else {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.facility_name.localeCompare(b.facility_name);
-                } 
+                }
               }
             });
-
+            // project user contact details
+            // beside project details related collections updates also report's ones
+            // TODO make it return promise
+            updateUser($project);
             // return Project
             return res.json( 200, $project );
 
@@ -250,6 +252,36 @@ module.exports = {
 
     });
 
+    var updateUser = function($project){
+      // user object to update tables
+      var updatedRelationsUser = {
+        username: $project.username,
+        name: $project.name,
+        position: $project.position,
+        phone: $project.phone,
+        email: $project.email
+      }
+
+      var findProject = {
+        project_id: $project.id
+      }
+      // TODO make it global
+      var Promise = require('bluebird');
+
+      Promise.all([
+        Project.update( { id: $project.id }, updatedRelationsUser ),
+        BudgetProgress.update( findProject, updatedRelationsUser ),
+        TargetBeneficiaries.update( findProject, updatedRelationsUser ),
+        TargetLocation.update( findProject, updatedRelationsUser ),
+        Report.update( findProject, updatedRelationsUser ),
+        Location.update( findProject, updatedRelationsUser ),
+        Beneficiaries.update( findProject, updatedRelationsUser ),
+      ])
+        .catch( function(err) {
+          return res.negotiate( err )
+        })
+        .done();
+    }
   },
 
   // remvoe budget item
@@ -271,7 +303,7 @@ module.exports = {
 
         // return Project
         return res.json( 200, { msg: 'Success!' } );
-        
+
       });
   },
 
@@ -294,7 +326,7 @@ module.exports = {
 
         // return Project
         return res.json( 200, { msg: 'Success!' } );
-        
+
       });
   },
 
@@ -317,7 +349,7 @@ module.exports = {
 
         // return Project
         return res.json( 200, { msg: 'Success!' } );
-        
+
       });
   },
 
@@ -331,7 +363,7 @@ module.exports = {
 
     // project id
     var project_id = req.param( 'project_id' );
-        
+
     // set project by project id
     Project.destroy( { id: project_id } )
       .exec( function( err ){
@@ -372,7 +404,7 @@ module.exports = {
                         .exec( function( err ){
 
                           // return error
-                          if ( err ) return res.json({ err: true, error: err });                    
+                          if ( err ) return res.json({ err: true, error: err });
 
                           // beneficiaries
                           Beneficiaries.destroy( { project_id: project_id } )
@@ -380,7 +412,7 @@ module.exports = {
 
                               // return error
                               if ( err ) return res.json({ err: true, error: err });
-      
+
                                 // else
                                 return res.json( 200, { msg: 'Project ' + project_id + ' has been deleted!' } );
 
@@ -391,9 +423,9 @@ module.exports = {
                       });
 
                   });
-                    
+
               });
-                
+
         });
 
       });
