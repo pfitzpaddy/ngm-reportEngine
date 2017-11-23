@@ -86,7 +86,7 @@ module.exports = {
 		// target_beneficiaries: {
 		// 	collection: 'targetbeneficiaries',
 		// 	via: 'project_id'
-		// },	
+		// },
 		// // add reference to Target Locations
 		// target_locations: {
 		// 	collection: 'targetlocation',
@@ -145,6 +145,12 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
+    },
+    mpc_purpose_type_id: {
+			type: 'string'
+    },
+    mpc_purpose_type_name: {
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'
@@ -187,7 +193,7 @@ module.exports = {
 
 
 
-		/*********** 2016 *************/ 
+		/*********** 2016 *************/
 		project_code: {
 			type: 'string'
 		},
@@ -206,7 +212,7 @@ module.exports = {
 
 	},
 
-  // updateOrCreate 
+  // updateOrCreate
     // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
   updateOrCreate: function( values, cb ){
     var self = this; // reference for use by callbacks
@@ -241,9 +247,9 @@ module.exports = {
 
 				// next!
 				next();
-				
+
 		});
-			
+
 	},
 
 	// update report locations
@@ -260,7 +266,7 @@ module.exports = {
 			Report
 				.update( { project_id: project.id, report_year: 2017 }, { report_active: false } )
 				.exec( function( err, report ) {
-					
+
 					// return error
 					if ( err ) return next( err );
 
@@ -288,7 +294,7 @@ module.exports = {
 
 										// return error
 										if ( err ) return next( err );
-										
+
 										// TargetLocations
 					          Location
 					            .createNewReportLocations( report_result, target_locations, function( err, targert_locations_results ){
@@ -306,7 +312,7 @@ module.exports = {
 										});
 
 			          });
-								
+
 						});
 
 					});
@@ -333,7 +339,7 @@ function getProjectReports( project ) {
 			project_end = moment( project.project_end_date ).endOf( 'M' ),
 			reports_start = moment( '2017-01-01' ),
 			reports_end = moment().endOf( 'M' );
-	
+
 	// variables
 	var reports = [],
 			s_date = reports_start, // project_start.format('YYYY-MM-DD') > reports_start.format('YYYY-MM-DD') ? project_start : reports_start,

@@ -128,6 +128,12 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
+    },
+    mpc_purpose_type_id: {
+			type: 'string'
+    },
+    mpc_purpose_type_name: {
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'
@@ -158,7 +164,7 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		
+
 		// activity_type
 		activity_type_id: {
 			type: 'string',
@@ -241,7 +247,7 @@ module.exports = {
 		},
 		boys:{
 			type: 'integer',
-			defaultsTo: 0			
+			defaultsTo: 0
 		},
 		girls:{
 			type: 'integer',
@@ -278,7 +284,7 @@ module.exports = {
 
 
 
-		/*********** 2017 *************/ 
+		/*********** 2017 *************/
 		activity_type: {
 			type: 'array'
 		},
@@ -301,7 +307,7 @@ module.exports = {
 		},
 		capacity_building_topic: {
 			type: 'string'
-		},		
+		},
 		capacity_building_sessions:{
 			type: 'integer',
 			defaultsTo: 0
@@ -316,7 +322,7 @@ module.exports = {
 		},
 		education_topic: {
 			type: 'string'
-		},		
+		},
 		education_sessions:{
 			type: 'integer',
 			defaultsTo: 0
@@ -332,7 +338,7 @@ module.exports = {
 
 	},
 
-  // updateOrCreate 
+  // updateOrCreate
     // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
   updateOrCreateEach: function( parent, values, cb ){
     var self = this; // reference for use by callbacks

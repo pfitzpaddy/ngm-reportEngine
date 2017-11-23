@@ -129,6 +129,12 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
+    },
+    mpc_purpose_type_id: {
+			type: 'string'
+    },
+    mpc_purpose_type_name: {
+			type: 'string'
 		},
 		inter_cluster_activities: {
 			type: 'array'
@@ -329,9 +335,9 @@ module.exports = {
 
       // find or create
 			self
-        .findOrCreate( { 
-            project_id: target_report.project_id, 
-            report_month: target_report.report_month, 
+        .findOrCreate( {
+            project_id: target_report.project_id,
+            report_month: target_report.report_month,
             report_year: target_report.report_year,
             target_location_reference_id: t_location.id
           }, location )
