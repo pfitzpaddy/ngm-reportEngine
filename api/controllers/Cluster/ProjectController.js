@@ -272,9 +272,9 @@ module.exports = {
         Project.update( { id: $project.id }, updatedRelationsUser ),
         BudgetProgress.update( findProject, updatedRelationsUser ),
         TargetBeneficiaries.update( findProject, updatedRelationsUser ),
-        TargetLocation.update( findProject, updatedRelationsUser ),
+        //TargetLocation.update( findProject, updatedRelationsUser ),
         Report.update( findProject, updatedRelationsUser ),
-        Location.update( findProject, updatedRelationsUser ),
+        //Location.update( findProject, updatedRelationsUser ),
         Beneficiaries.update( findProject, updatedRelationsUser ),
       ])
         .catch( function(err) {
