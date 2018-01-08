@@ -819,8 +819,72 @@ var ClusterDashboardController = {
               stocks[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
             });
 
+            var fields = [
+                'cluster',
+                'report_id',
+                'location_id',
+                'stock_warehouse_id',
+                'stock_item_type',
+                'stock_item_name',
+                'report_month',
+                'report_year',
+                'reporting_period',
+                'adminRpcode',
+                'adminRname',
+                'admin0pcode',
+                'admin0name',
+                'organization',
+                'username',
+                'email',
+                'createdAt',
+                'updatedAt',
+                'admin1pcode',
+                'admin1name',
+                'admin2pcode',
+                'admin2name',
+                'conflict',
+                'number_in_stock',
+                'number_in_pipeline',
+                'beneficiaries_covered',
+                'facility_name',
+                'facility_lng',
+                'facility_lat'
+                ];
+
+            var fieldNames = [
+                'cluster',
+                'report_id',
+                'location_id',
+                'stock_warehouse_id',
+                'stock_item_type',
+                'stock_item_name',
+                'report_month',
+                'report_year',
+                'reporting_period',
+                'adminRpcode',
+                'adminRname',
+                'admin0pcode',
+                'admin0name',
+                'organization',
+                'username',
+                'email',
+                'createdAt',
+                'updatedAt',
+                'admin1pcode',
+                'admin1name',
+                'admin2pcode',
+                'admin2name',
+                'conflict',
+                'number_in_stock',
+                'number_in_pipeline',
+                'beneficiaries_covered',
+                'facility_name',
+                'facility_lng',
+                'facility_lat'
+                ];
+
             // return csv
-            json2csv({ data: stocks }, function( err, csv ) {
+            json2csv({ data: stocks, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
               
               // error
               if ( err ) return res.negotiate( err );
