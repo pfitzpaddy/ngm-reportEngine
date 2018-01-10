@@ -17,13 +17,13 @@ module.exports = {
     if ( !req.param( 'filter' ) ) {
       return res.json( 401, { err: 'filter required!' });
     }
-    
+
     // get by organization_id & status
     StockReport
       .find( req.param( 'filter' ) )
       .sort( 'report_month ASC' )
       .exec ( function( err, reports ){
-      
+
         // return error
         if ( err ) return res.negotiate( err );
 
@@ -38,7 +38,7 @@ module.exports = {
 
         // determine status
         if ( length )  {
-    
+
           // reports
           reports.forEach( function( d, i ){
 
@@ -46,7 +46,7 @@ module.exports = {
             Stock
               .count( { report_id: d.id } )
               .exec(function( err, b ){
-                
+
                 // return error
                 if (err) return res.negotiate( err );
 
@@ -55,7 +55,7 @@ module.exports = {
 
                 // if report is 'todo' and past due date!
                 if ( reports[i].report_status === 'todo' && moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
-                        
+
                   // set to red (overdue!)
                   reports[i].status = '#e57373'
 
@@ -91,16 +91,16 @@ module.exports = {
     }
 
     // report for UI
-    var $report = {};    
-    
+    var $report = {};
+
     // get report by organization_id
     StockReport
       .findOne( { id: req.param( 'id' ) } )
       .exec( function( err, report ){
-      
+
         // return error
         if (err) return res.negotiate( err );
-        
+
         // clone to update
         $report = report.toObject();
 
@@ -122,7 +122,7 @@ module.exports = {
 
         });
 
-      });  
+      });
 
   },
 
@@ -133,7 +133,7 @@ module.exports = {
     if ( !req.param( 'report' ) ) {
       return res.json(401, { err: 'report required!' });
     }
-    
+
     // get report
     var $report = req.param( 'report' );
 
@@ -143,10 +143,28 @@ module.exports = {
       .exec( function( err, report ){
 
         // return error
-        if ( err ) return res.negotiate( err );    
+        if ( err ) return res.negotiate( err );
 
-        // return Report
-        return res.json( 200, report[0] );
+        // clone to update
+        $report = report[0].toObject();
+
+        // get report by organization_id
+        StockLocation
+          .find( { report_id: $report.id } )
+          // .populate('stock')
+          .populateAll()
+          .exec( function( err, locations ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // add locations ( associations included )
+            $report.stocklocations = locations;
+
+            // return Report
+            return res.json( 200, $report );
+
+        });
 
       });
 
@@ -154,7 +172,7 @@ module.exports = {
 
   // removes reports with stock_warehouse_id
   removeReportLocation: function( req, res ) {
-    
+
     // request input
     if ( !req.param( 'stock_warehouse_id' ) ) {
       return res.json(401, { err: 'stock_warehouse_id required!' });
@@ -169,7 +187,7 @@ module.exports = {
       .exec( function( err, stocklocations ){
 
         // return error
-        if ( err ) return res.negotiate( err );    
+        if ( err ) return res.negotiate( err );
 
         // return Report
         return res.json( 200, stocklocations );
