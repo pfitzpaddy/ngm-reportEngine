@@ -103,10 +103,23 @@ module.exports = {
 
         // clone to update
         $report = report.toObject();
+        var reporting_period = moment($report.reporting_period)
+          .startOf("month")
+          .format("YYYY-MM-DD");
 
         // get report by organization_id
         StockLocation
-          .find( { report_id: $report.id } )
+          .find({
+            report_id: $report.id,
+            or: [{
+              date_inactivated: null
+            }, {
+              date_inactivated: {
+                '>': new Date(reporting_period)
+              }
+            }]
+          })
+
           // .populate('stock')
           .populateAll()
           .exec( function( err, locations ){
@@ -181,9 +194,13 @@ module.exports = {
     // stock_warehouse_id
     var stock_warehouse_id = req.param( 'stock_warehouse_id' );
 
+    // uncomment to test diff dates
+    // var inactivation_date = moment('2017-12-03').startOf('month').format('YYYY-MM-DD');
+    var inactivation_date = moment().startOf('month').format('YYYY-MM-DD');
+
     // update report
     StockLocation
-      .update( { stock_warehouse_id: stock_warehouse_id }, { report_id: null } )
+      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date) } )
       .exec( function( err, stocklocations ){
 
         // return error
