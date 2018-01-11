@@ -199,8 +199,7 @@ module.exports = {
       // stocks
       Stock
         .find( )
-        .where( { report_id: req.param( 'report_id' ) } )
-        .where(  { location_id: {'!':null }  } )
+        .where( { report_id: req.param( 'report_id' ), location_id: { '!' : null } } )
         .exec(function( err, response ){
 
           // error
