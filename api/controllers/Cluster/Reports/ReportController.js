@@ -200,6 +200,7 @@ module.exports = {
       Stock
         .find( )
         .where( { report_id: req.param( 'report_id' ) } )
+        .where(  { location_id: {'!':null }  } )
         .exec(function( err, response ){
 
           // error
@@ -582,7 +583,7 @@ module.exports = {
                     return a.id.localeCompare( b.id );
                   });
 
-                  
+
                   // trainings
                   var trainingCounter = 0,
                       trainingLength = trainings.length;
@@ -613,7 +614,7 @@ module.exports = {
                           if ( counter === length ) {
                             // return report
                             return res.json( 200, $report );
-                          }                       
+                          }
                         }
 
                       });
@@ -691,7 +692,7 @@ module.exports = {
           .exec(function( err, b ){
 
             // return error
-            if ( err ) return res.json({ err: true, error: err });       
+            if ( err ) return res.json({ err: true, error: err });
 
             // return reports
             return res.json( 200, { msg: 'success' } );
