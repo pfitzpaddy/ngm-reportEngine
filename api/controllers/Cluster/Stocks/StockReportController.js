@@ -90,6 +90,8 @@ module.exports = {
       return res.json(401, { err: 'id required!' });
     }
 
+    if ( req.param('previous')) var prev = true;
+
     // report for UI
     var $report = {};
 
@@ -130,9 +132,51 @@ module.exports = {
           // add locations ( associations included )
           $report.stocklocations = locations;
 
+          if (prev) {
+            query_previous = {
+              report_month: moment($report.reporting_period).subtract(1, 'M').month(),
+              report_year: moment($report.reporting_period).subtract(1, 'M').year(),
+              organization_tag: $report.organization_tag,
+              cluster_id: $report.cluster_id,
+              admin0pcode: $report.admin0pcode
+            };
+
+            StockReport
+              .findOne(query_previous)
+              .exec(function (err, report_prev) {
+
+                 // return error
+                  if (err) return res.negotiate(err);
+
+                  // clone to update
+                  $report_prev = report_prev.toObject();
+
+                  // get report by organization_id
+                  StockLocation
+                    .find({
+                      report_id: $report_prev.id
+                    })
+                    // .populate('stock')
+                    .populateAll()
+                    .exec(function (err, locations_prev) {
+
+                        // return error
+                        if (err) return res.negotiate(err);
+
+                        // add locations ( associations included )
+                        $report_prev.stocklocations = locations_prev;
+
+          // return report
+                    return res.json(200, $report_prev);
+
+        });
+
+      });
+
+          } else {
           // return report
           return res.json( 200, $report );
-
+          }
         });
 
       });
