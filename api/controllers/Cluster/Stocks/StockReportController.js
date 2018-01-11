@@ -17,13 +17,13 @@ module.exports = {
     if ( !req.param( 'filter' ) ) {
       return res.json( 401, { err: 'filter required!' });
     }
-    
+
     // get by organization_id & status
     StockReport
       .find( req.param( 'filter' ) )
       .sort( 'report_month ASC' )
       .exec ( function( err, reports ){
-      
+
         // return error
         if ( err ) return res.negotiate( err );
 
@@ -38,7 +38,7 @@ module.exports = {
 
         // determine status
         if ( length )  {
-    
+
           // reports
           reports.forEach( function( d, i ){
 
@@ -46,7 +46,7 @@ module.exports = {
             Stock
               .count( { report_id: d.id } )
               .exec(function( err, b ){
-                
+
                 // return error
                 if (err) return res.negotiate( err );
 
@@ -55,7 +55,7 @@ module.exports = {
 
                 // if report is 'todo' and past due date!
                 if ( reports[i].report_status === 'todo' && moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
-                        
+
                   // set to red (overdue!)
                   reports[i].status = '#e57373'
 
@@ -90,23 +90,38 @@ module.exports = {
       return res.json(401, { err: 'id required!' });
     }
 
+    if ( req.param('previous')) var prev = true;
+
     // report for UI
-    var $report = {};    
-    
+    var $report = {};
+
     // get report by organization_id
     StockReport
       .findOne( { id: req.param( 'id' ) } )
       .exec( function( err, report ){
-      
+
         // return error
         if (err) return res.negotiate( err );
-        
+
         // clone to update
         $report = report.toObject();
+        var reporting_period = moment($report.reporting_period)
+          .startOf("month")
+          .format("YYYY-MM-DD");
 
         // get report by organization_id
         StockLocation
-          .find( { report_id: $report.id } )
+          .find({
+            report_id: $report.id,
+            or: [{
+              date_inactivated: null
+            }, {
+              date_inactivated: {
+                '>': new Date(reporting_period)
+              }
+            }]
+          })
+
           // .populate('stock')
           .populateAll()
           .exec( function( err, locations ){
@@ -117,12 +132,54 @@ module.exports = {
           // add locations ( associations included )
           $report.stocklocations = locations;
 
+          if (prev) {
+            query_previous = {
+              report_month: moment($report.reporting_period).subtract(1, 'M').month(),
+              report_year: moment($report.reporting_period).subtract(1, 'M').year(),
+              organization_tag: $report.organization_tag,
+              cluster_id: $report.cluster_id,
+              admin0pcode: $report.admin0pcode
+            };
+
+            StockReport
+              .findOne(query_previous)
+              .exec(function (err, report_prev) {
+
+                 // return error
+                  if (err) return res.negotiate(err);
+
+                  // clone to update
+                  $report_prev = report_prev.toObject();
+
+                  // get report by organization_id
+                  StockLocation
+                    .find({
+                      report_id: $report_prev.id
+                    })
+                    // .populate('stock')
+                    .populateAll()
+                    .exec(function (err, locations_prev) {
+
+                        // return error
+                        if (err) return res.negotiate(err);
+
+                        // add locations ( associations included )
+                        $report_prev.stocklocations = locations_prev;
+
           // return report
-          return res.json( 200, $report );
+                    return res.json(200, $report_prev);
 
         });
 
-      });  
+      });
+
+          } else {
+          // return report
+          return res.json( 200, $report );
+          }
+        });
+
+      });
 
   },
 
@@ -133,7 +190,7 @@ module.exports = {
     if ( !req.param( 'report' ) ) {
       return res.json(401, { err: 'report required!' });
     }
-    
+
     // get report
     var $report = req.param( 'report' );
 
@@ -143,10 +200,28 @@ module.exports = {
       .exec( function( err, report ){
 
         // return error
-        if ( err ) return res.negotiate( err );    
+        if ( err ) return res.negotiate( err );
 
-        // return Report
-        return res.json( 200, report[0] );
+        // clone to update
+        $report = report[0].toObject();
+
+        // get report by organization_id
+        StockLocation
+          .find( { report_id: $report.id } )
+          // .populate('stock')
+          .populateAll()
+          .exec( function( err, locations ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // add locations ( associations included )
+            $report.stocklocations = locations;
+
+            // return Report
+            return res.json( 200, $report );
+
+        });
 
       });
 
@@ -154,7 +229,7 @@ module.exports = {
 
   // removes reports with stock_warehouse_id
   removeReportLocation: function( req, res ) {
-    
+
     // request input
     if ( !req.param( 'stock_warehouse_id' ) ) {
       return res.json(401, { err: 'stock_warehouse_id required!' });
@@ -163,13 +238,17 @@ module.exports = {
     // stock_warehouse_id
     var stock_warehouse_id = req.param( 'stock_warehouse_id' );
 
+    // uncomment to test diff dates
+    // var inactivation_date = moment('2017-12-03').startOf('month').format('YYYY-MM-DD');
+    var inactivation_date = moment().startOf('month').format('YYYY-MM-DD');
+
     // update report
     StockLocation
-      .update( { stock_warehouse_id: stock_warehouse_id }, { report_id: null } )
+      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date) } )
       .exec( function( err, stocklocations ){
 
         // return error
-        if ( err ) return res.negotiate( err );    
+        if ( err ) return res.negotiate( err );
 
         // return Report
         return res.json( 200, stocklocations );
