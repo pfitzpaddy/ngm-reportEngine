@@ -143,10 +143,13 @@ module.exports = {
 				// return error
 				if ( err ) return cb( err );
 				
-				// add 2017
+        // daterange for warehouses reports
+        var year_start = moment().startOf('year').format('YYYY-MM-DD'),
+            year_end   = moment().endOf('year').format('YYYY-MM-DD')
+
 				projects = [{
-					project_start_date: '2017-01-01',
-					project_end_date: '2017-12-31'
+					project_start_date: year_start,
+					project_end_date:   year_end
 				}];
 
 				// set
