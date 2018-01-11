@@ -15,7 +15,7 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		
+
 		// add a reference to Location
     location_id: {
       model: 'stocklocation'
@@ -100,7 +100,7 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
-		
+
 		// reports
 		report_id: {
 			type: 'string',
@@ -164,6 +164,12 @@ module.exports = {
 		},
 		stock_item_name: {
 			type: 'string'
+    },
+    stock_item_purpose_id: {
+			type: 'string',
+    },
+    stock_item_purpose_name: {
+			type: 'string',
 		},
 		unit_type_id: {
 			type: 'string'
