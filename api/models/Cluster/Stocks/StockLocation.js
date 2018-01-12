@@ -149,8 +149,12 @@ module.exports = {
 		},
 		facility_lat: {
 			type: 'float',
-			required: true
-		},
+      required: true
+    },
+    createdOn: {
+      type: 'date'
+    },
+
 
     // add reference to Beneficiaries
     stocks: {
