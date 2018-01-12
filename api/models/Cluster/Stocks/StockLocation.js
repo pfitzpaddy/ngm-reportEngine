@@ -23,6 +23,10 @@ module.exports = {
       // location status
       type: 'date',
     },
+    active: {
+      // location status
+      type: 'boolean',
+    },
 		report_month: {
 			type: 'integer',
 			required: true

@@ -22,6 +22,7 @@ module.exports = {
     StockReport
       .find( req.param( 'filter' ) )
       .sort( 'report_month ASC' )
+      .populate('stocklocations', { where: { date_inactivated: null }})
       .exec ( function( err, reports ){
 
         // return error
@@ -30,6 +31,11 @@ module.exports = {
         // counter
         var counter=0,
             length=reports.length;
+
+        if (length){
+          reports = _.difference(reports, _.where(reports, {stocklocations:[]}))
+          length = reports.length;
+        }
 
         // no reports
         if ( !length ) {
@@ -145,9 +151,10 @@ module.exports = {
               .findOne(query_previous)
               .exec(function (err, report_prev) {
 
-                 // return error
-                  if (err) return res.negotiate(err);
+                // return error
+                if (err) return res.negotiate(err);
 
+                if (report_prev) {
                   // clone to update
                   $report_prev = report_prev.toObject();
 
@@ -160,18 +167,19 @@ module.exports = {
                     .populateAll()
                     .exec(function (err, locations_prev) {
 
-                        // return error
-                        if (err) return res.negotiate(err);
+                      // return error
+                      if (err) return res.negotiate(err);
 
-                        // add locations ( associations included )
-                        $report_prev.stocklocations = locations_prev;
+                      // add locations ( associations included )
+                      $report_prev.stocklocations = locations_prev;
 
-          // return report
-                    return res.json(200, $report_prev);
+                      // return report
+                      return res.json(200, $report_prev);
 
-        });
+                    });
+                } else return res.json(200, {});
+              });
 
-      });
 
           } else {
           // return report
@@ -244,7 +252,7 @@ module.exports = {
 
     // update report
     StockLocation
-      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date) } )
+      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date), active: false } )
       .exec( function( err, stocklocations ){
 
         // return error
