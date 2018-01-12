@@ -22,7 +22,7 @@ module.exports = {
     StockReport
       .find( req.param( 'filter' ) )
       .sort( 'report_month ASC' )
-      .populate('stocklocations', { where: { date_inactivated: null }})
+      .populate('stocklocations')
       .exec ( function( err, reports ){
 
         // return error
@@ -249,18 +249,26 @@ module.exports = {
     // uncomment to test diff dates
     // var inactivation_date = moment('2017-12-03').startOf('month').format('YYYY-MM-DD');
     var inactivation_date = moment().startOf('month').format('YYYY-MM-DD');
-
+    var month = moment().month(),
+        year  = moment().year();
     // update report
     StockLocation
-      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date), active: false } )
+      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date), active: false  })
       .exec( function( err, stocklocations ){
 
         // return error
         if ( err ) return res.negotiate( err );
 
-        // return Report
-        return res.json( 200, stocklocations );
+        StockLocation
+          .update( { stock_warehouse_id: stock_warehouse_id, report_year: year, report_month: month }, { report_id: null })
+          .exec( function( err, stocklocations ){
 
+            // return error
+            if ( err ) return res.negotiate( err );
+              // return Report
+            return res.json( 200, stocklocations );
+
+          });
       });
 
   }
