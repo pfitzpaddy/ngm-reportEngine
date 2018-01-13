@@ -69,6 +69,10 @@ module.exports = {
                 // set locations
                 report.stocklocations = warehouses;
 
+                if(!report.stocklocations.length) {
+                  report.report_status = 'pending';
+                  report.report_active = false;
+                }
                 // create reports
                 StockReport
                   .updateOrCreate( {

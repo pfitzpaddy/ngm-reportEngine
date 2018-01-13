@@ -5,6 +5,8 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var moment = require('moment');
+
 module.exports = {
 
 	// connection
@@ -258,6 +260,7 @@ function getStockReportLocations( stockwarehouse, reports, target_locations, cb 
 								sl.report_month = reports[r_index].report_month;
 								sl.report_year = reports[r_index].report_year;
 								delete sl.id;
+                sl.createdOn  = moment().format();
 						// sl
 						reports[r_index].stocklocations.push(sl);
 					}

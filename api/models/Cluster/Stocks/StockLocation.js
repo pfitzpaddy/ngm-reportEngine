@@ -23,6 +23,10 @@ module.exports = {
       // location status
       type: 'date',
     },
+    active: {
+      // location status
+      type: 'boolean',
+    },
 		report_month: {
 			type: 'integer',
 			required: true
@@ -145,8 +149,12 @@ module.exports = {
 		},
 		facility_lat: {
 			type: 'float',
-			required: true
-		},
+      required: true
+    },
+    createdOn: {
+      type: 'date'
+    },
+
 
     // add reference to Beneficiaries
     stocks: {

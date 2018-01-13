@@ -22,6 +22,7 @@ module.exports = {
     StockReport
       .find( req.param( 'filter' ) )
       .sort( 'report_month ASC' )
+      .populate('stocklocations')
       .exec ( function( err, reports ){
 
         // return error
@@ -30,6 +31,11 @@ module.exports = {
         // counter
         var counter=0,
             length=reports.length;
+
+        if (length){
+          reports = _.difference(reports, _.where(reports, {stocklocations:[]}))
+          length = reports.length;
+        }
 
         // no reports
         if ( !length ) {
@@ -145,9 +151,10 @@ module.exports = {
               .findOne(query_previous)
               .exec(function (err, report_prev) {
 
-                 // return error
-                  if (err) return res.negotiate(err);
+                // return error
+                if (err) return res.negotiate(err);
 
+                if (report_prev) {
                   // clone to update
                   $report_prev = report_prev.toObject();
 
@@ -160,18 +167,19 @@ module.exports = {
                     .populateAll()
                     .exec(function (err, locations_prev) {
 
-                        // return error
-                        if (err) return res.negotiate(err);
+                      // return error
+                      if (err) return res.negotiate(err);
 
-                        // add locations ( associations included )
-                        $report_prev.stocklocations = locations_prev;
+                      // add locations ( associations included )
+                      $report_prev.stocklocations = locations_prev;
 
-          // return report
-                    return res.json(200, $report_prev);
+                      // return report
+                      return res.json(200, $report_prev);
 
-        });
+                    });
+                } else return res.json(200, {});
+              });
 
-      });
 
           } else {
           // return report
@@ -239,21 +247,41 @@ module.exports = {
     var stock_warehouse_id = req.param( 'stock_warehouse_id' );
 
     // uncomment to test diff dates
-    // var inactivation_date = moment('2017-12-03').startOf('month').format('YYYY-MM-DD');
-    var inactivation_date = moment().startOf('month').format('YYYY-MM-DD');
+    // var inactivation_date = moment('2017-10-03').startOf('month').format('YYYY-MM-DD');
+
+    var inactivation_date = moment().format();
+    var month = moment().month(),
+        year  = moment().year();
 
     // update report
     StockLocation
-      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date) } )
+      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date), active: false })
       .exec( function( err, stocklocations ){
 
         // return error
         if ( err ) return res.negotiate( err );
 
-        // return Report
-        return res.json( 200, stocklocations );
+        // null all reports locations, else only this month and above
+        var ifCreatedThisMonth = stocklocations[0]&&moment(stocklocations[0].createdOn).format('YYYY-MM') === moment().format('YYYY-MM');
 
-      });
+        if (ifCreatedThisMonth) {
+          var updateQuery = { stock_warehouse_id: stock_warehouse_id };
+        } else {
+          var updateQuery = { stock_warehouse_id: stock_warehouse_id, report_year: year, report_month: { ">=": month } };
+        }
+
+        StockLocation
+            .update( updateQuery, { report_id: null })
+            .exec(function (err, stocklocations) {
+
+              // return error
+              if (err) return res.negotiate(err);
+              // return Report
+              return res.json(200, stocklocations);
+
+            });
+
+        });
 
   }
 
