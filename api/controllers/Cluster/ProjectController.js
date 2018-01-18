@@ -5,6 +5,10 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var json2csv = require('json2csv');
+var Promise  = require('bluebird');
+var moment   = require('moment');
+
 module.exports = {
 
   // get all Projects by organization
@@ -14,13 +18,13 @@ module.exports = {
     if ( !req.param('filter') ) {
       return res.json(401, { err: 'filter required!' });
     }
-    
+
     // get project by organization_id & status
     Project
       .find( req.param( 'filter' ) )
       .sort('updatedAt DESC')
       .exec(function(err, projects){
-      
+
         // return error
         if (err) return res.negotiate( err );
 
@@ -31,9 +35,203 @@ module.exports = {
 
   },
 
+  // get projects summary
+  getProjects: function(req, res){
+
+    // Guards
+    if (!req.param('id')&&!req.param('query')) {
+      return res.json(401, { err: 'params required!' });
+    }
+
+    var allowedParams =
+        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode'];
+
+    // if dissallowed parameters sent
+    if ( req.param('query') && _.difference(Object.keys(req.param('query')),allowedParams).length > 0 ) {
+      return res.json(401, { err: 'ivalid query params!' });
+    }
+
+    // build query object
+    // legacy `id` api backward compatibility
+    if (req.param('id')){
+      var query = { project_id : req.param('id') };
+      var queryProject = { id : req.param('id') };
+    } else {
+      var query, queryProject = req.param('query');
+      if (req.param('query').project_id){
+        queryProject.id = queryProject.project_id;
+        delete queryProject.project_id;
+      }
+    }
+
+    var csv = req.param('csv');
+
+    // process request pipeline
+    var pipe = Promise.resolve()
+      .then(function(){ return actions._getProjectData(queryProject, query) })
+      .then(function(res){ return actions._processCollections(res) })
+      .then(function($project){ return actions._doResponse($project) })
+      .catch(function(err){ return err === 'NO PROJECT' } , function(err) { return actions._errorNoProjectRes(err) })
+      .catch(function(err){ return actions._error(err) });
+
+    // pipeline actions definitions
+    var actions = {
+
+    _error : function(err){
+      return res.negotiate(err);
+    },
+
+    _errorNoProjectRes : function(err){
+      return res.json( 200, [] );
+    },
+
+    _getProjectData : function(queryProject, query){
+
+                  return Promise.props({
+                    project: Project.find( queryProject ),
+                    budget: BudgetProgress.find( query ),
+                    beneficiaries: TargetBeneficiaries.find( query ),
+                    targetlocations: TargetLocation.find( query ),
+                    //Report.find( findProject, updatedRelationsUser ),
+                    //Location.update( findProject, updatedRelationsUser ),
+                    //Beneficiaries.find( findProject, updatedRelationsUser ),
+                  })
+
+    },
+
+    _processCollections : function(data){
+
+      // no project found
+      if ( !data.project.length ) return Promise.reject('NO PROJECT');
+
+      // all projects
+      $project = [];
+
+      var _comparatorBuilder = this._comparatorBuilder
+
+      // populate&sort fields
+                        // TODO maybe realate models via populate
+      var uppendDataToProject = function(project){
+
+                    var projectId = project.id;
+                    var i = data.project.indexOf(project);
+                    // assemble project data
+                    $project[i] = project;
+                    $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
+                    $project[i].target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
+                    $project[i].target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
+
+                    /// order
+                    $project[i].target_beneficiaries
+                               .sort(function(a, b){ return a.id.localeCompare( b.id ) });
+                    $project[i].project_budget_progress
+                               .sort(function(a, b){ return a.id > b.id });
+                    $project[i].target_locations
+                               .sort(function(a, b){
+                                  if (a.facility_type_name){
+                                    if(a.admin3name){
+                                      return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','facility_type_name','facility_name']));
+                                    } else {
+                                      return eval(_comparatorBuilder(['admin1name','admin2name','facility_type_name','facility_name']));
+                                    }
+                                  } else {
+                                      if( a.admin3name){
+                                        return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','facility_name']));
+                                      } else {
+                                        return eval(_comparatorBuilder(['admin1name','admin2name','facility_name']));
+                                      }
+                                    }
+                    });
+
+                    $project[i].project_start_date = moment($project[i].project_start_date).format('YYYY-MM-DD');
+                    $project[i].project_end_date   = moment($project[i].project_end_date).format('YYYY-MM-DD');
+                    $project[i].createdAt          = moment( $project[i].createdAt ).format('YYYY-MM-DD');
+                    // callback if error or post work can be called here `cb()`;
+                };
+
+      async.each(data.project, uppendDataToProject);
+
+      return $project;
+    },
+
+    // build a to b localeCompare from array of props
+    _comparatorBuilder : function(compareObj){
+        var compareArr = [];
+        compareObj.forEach( function (criteria, i ) {
+          compareArr.push('a'+'.'+criteria + '.' + 'localeCompare(b.' + criteria + ')');
+        });
+        return compareArr.join('||')
+    },
+
+    // do response
+    _doResponse : function($project){
+      if (csv) {
+        var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list', 'target_locations_list','createdAt']
+        fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Target locations','Created' ];
+        $project = this._projectJson2Csv($project);
+
+        json2csv({ data: $project, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+          if ( err ) return res.negotiate( err );
+          return res.json( 200, { data: csv } );
+        });
+
+      } else {
+      // return Project
+      return res.json( 200, $project.length===1?$project[0]:$project );
+      }
+    },
+
+    // flatten subdocuments values
+    // takes array of projects
+    _projectJson2Csv : function(projects){
+
+        var setKey = function(p, keyfrom,keyto,array){
+          if ( p.hasOwnProperty(keyfrom)&&Array.isArray(p[keyfrom]) ) {
+                var pa = [];
+                p[keyfrom].forEach( function( p,i ){
+                  if(p&&typeof p==='object'&&p!==null){
+                    var ka = [];
+                    var row = array.forEach(function( v,i ){
+                      if (v.substring(0,4)==='key:'){
+                        if (p.hasOwnProperty(v.substring(4))){
+                          ka.push( v.substring(4)+':'+p[v.substring(4)] );
+                        }
+                      }else{
+                        if (p.hasOwnProperty(v)) ka.push( p[v] );
+                      }
+                    });
+                    var kl = ka.join(',');
+                    if (p) pa.push( kl );
+                  } //else if (p) pa.push(p);
+                    //if old no obj array benef format
+                });
+              p[keyto] = pa.join('; ');
+            }
+          };
+        // takes subdocuments key and produces flattened list of its values ->key_list
+        var updateJson = function(project){
+            setKey( project, 'strategic_objectives', 'strategic_objectives_list', ['objective_type_name', 'objective_type_description'] );
+            setKey( project, 'beneficiary_type', 'beneficiary_type_list', ['beneficiary_type_name'] );
+            setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
+            setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
+            setKey( project, 'inter_cluster_activities', 'inter_cluster_activities_list', ['cluster']  );
+            setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
+            setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'activity_type_name', 'activity_description_name', 'delivery_type_name',
+            'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
+            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','facility_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+
+        };
+
+        async.each(projects, updateJson);
+
+        return projects;
+        }
+      }
+  },
+
   // get project details by id
   getProjectById: function(req, res){
-    
+
     // request input
     if (!req.param('id')) {
       return res.json(401, { err: 'id required!' });
@@ -41,12 +239,12 @@ module.exports = {
 
     // project for UI
     var $project = {};
-    
+
     // get project by organization_id
     Project
       .findOne( { id: req.param('id') } )
       .exec( function( err, project ){
-      
+
         // return error
         if ( err ) return res.negotiate( err );
 
@@ -102,25 +300,25 @@ module.exports = {
               $project.target_locations.sort(function(a, b) {
                 if ( a.facility_type_name ) {
                   if( a.admin3name ) {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) || 
+                            a.facility_type_name.localeCompare(b.facility_type_name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   } else {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) || 
+                            a.facility_type_name.localeCompare(b.facility_type_name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   }
                 } else {
                   if( a.admin3name ) {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   } else {
-                    return a.admin1name.localeCompare(b.admin1name) || 
+                    return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.facility_name.localeCompare(b.facility_name);
                   }
@@ -136,7 +334,7 @@ module.exports = {
 
         });
 
-      });   
+      });
 
   },
 
@@ -154,7 +352,6 @@ module.exports = {
         $project_budget_progress = req.param('project').project_budget_progress,
         $target_beneficiaries = req.param('project').target_beneficiaries,
         $target_locations = req.param('project').target_locations;
-
     // update project status if new
     if( $status === 'new' ){
       $project.project_status = 'active';
@@ -214,31 +411,34 @@ module.exports = {
             $project.target_locations.sort(function(a, b) {
               if ( a.facility_type_name ) {
                 if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_type_name.localeCompare(b.facility_type_name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 } else {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) || 
+                          a.facility_type_name.localeCompare(b.facility_type_name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 }
               } else {
                 if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
                           a.facility_name.localeCompare(b.facility_name);
                 } else {
-                  return a.admin1name.localeCompare(b.admin1name) || 
+                  return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.facility_name.localeCompare(b.facility_name);
-                } 
+                }
               }
             });
-
+            // project user contact details
+            // beside project details related collections updates also report's ones
+            // TODO make it return promise
+            updateUser($project);
             // return Project
             return res.json( 200, $project );
 
@@ -250,6 +450,36 @@ module.exports = {
 
     });
 
+    var updateUser = function($project){
+      // user object to update tables
+      var updatedRelationsUser = {
+        username: $project.username,
+        name: $project.name,
+        position: $project.position,
+        phone: $project.phone,
+        email: $project.email
+      }
+
+      var findProject = {
+        project_id: $project.id
+      }
+      // TODO make it global
+      var Promise = require('bluebird');
+
+      Promise.all([
+        Project.update( { id: $project.id }, updatedRelationsUser ),
+        BudgetProgress.update( findProject, updatedRelationsUser ),
+        TargetBeneficiaries.update( findProject, updatedRelationsUser ),
+        //TargetLocation.update( findProject, updatedRelationsUser ),
+        Report.update( findProject, updatedRelationsUser ),
+        //Location.update( findProject, updatedRelationsUser ),
+        Beneficiaries.update( findProject, updatedRelationsUser ),
+      ])
+        .catch( function(err) {
+          return res.negotiate( err )
+        })
+        .done();
+    }
   },
 
   // remvoe budget item
@@ -271,7 +501,7 @@ module.exports = {
 
         // return Project
         return res.json( 200, { msg: 'Success!' } );
-        
+
       });
   },
 
@@ -294,7 +524,7 @@ module.exports = {
 
         // return Project
         return res.json( 200, { msg: 'Success!' } );
-        
+
       });
   },
 
@@ -317,7 +547,7 @@ module.exports = {
 
         // return Project
         return res.json( 200, { msg: 'Success!' } );
-        
+
       });
   },
 
@@ -331,7 +561,7 @@ module.exports = {
 
     // project id
     var project_id = req.param( 'project_id' );
-        
+
     // set project by project id
     Project.destroy( { id: project_id } )
       .exec( function( err ){
@@ -372,7 +602,7 @@ module.exports = {
                         .exec( function( err ){
 
                           // return error
-                          if ( err ) return res.json({ err: true, error: err });                    
+                          if ( err ) return res.json({ err: true, error: err });
 
                           // beneficiaries
                           Beneficiaries.destroy( { project_id: project_id } )
@@ -380,7 +610,7 @@ module.exports = {
 
                               // return error
                               if ( err ) return res.json({ err: true, error: err });
-      
+
                                 // else
                                 return res.json( 200, { msg: 'Project ' + project_id + ' has been deleted!' } );
 
@@ -391,9 +621,9 @@ module.exports = {
                       });
 
                   });
-                    
+
               });
-                
+
         });
 
       });

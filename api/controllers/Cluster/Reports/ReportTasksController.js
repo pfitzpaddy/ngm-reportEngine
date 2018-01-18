@@ -69,6 +69,10 @@ module.exports = {
                 // set locations
                 report.stocklocations = warehouses;
 
+                if(!report.stocklocations.length) {
+                  report.report_status = 'pending';
+                  report.report_active = false;
+                }
                 // create reports
                 StockReport
                   .updateOrCreate( {
@@ -107,13 +111,16 @@ module.exports = {
         moment = require('moment');
 
     // only run if date is above monthly reporting period
-    if ( moment().date() === 1 ) {
+    // if ( moment().date() === 1 ) {
   
       // find active projects
       Project
         .find()
+        .where( { project_start_date: { $lte: moment().endOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
         .where( { project_end_date: { $gte: moment().startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
         .exec( function( err, projects ){
+
+          console.log(projects.length)
 
           // return error
           if ( err ) return res.negotiate( err );
@@ -186,7 +193,7 @@ module.exports = {
 
       });
 
-    } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
+    // } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
 
   },
 

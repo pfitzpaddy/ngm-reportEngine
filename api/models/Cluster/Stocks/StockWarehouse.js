@@ -5,6 +5,8 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var moment = require('moment');
+
 module.exports = {
 
 	// connection
@@ -143,10 +145,13 @@ module.exports = {
 				// return error
 				if ( err ) return cb( err );
 				
-				// add 2017
+        // daterange for warehouses reports
+        var year_start = moment().startOf('year').format('YYYY-MM-DD'),
+            year_end   = moment().endOf('year').format('YYYY-MM-DD')
+
 				projects = [{
-					project_start_date: '2017-01-01',
-					project_end_date: '2017-12-31'
+					project_start_date: year_start,
+					project_end_date:   year_end
 				}];
 
 				// set
@@ -255,6 +260,7 @@ function getStockReportLocations( stockwarehouse, reports, target_locations, cb 
 								sl.report_month = reports[r_index].report_month;
 								sl.report_year = reports[r_index].report_year;
 								delete sl.id;
+                sl.createdOn  = moment().format();
 						// sl
 						reports[r_index].stocklocations.push(sl);
 					}

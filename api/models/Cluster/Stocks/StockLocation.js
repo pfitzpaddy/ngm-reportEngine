@@ -18,7 +18,15 @@ module.exports = {
 		// add a reference to Report
 		report_id: {
 			model: 'stockreport'
-		},
+    },
+    date_inactivated: {
+      // location status
+      type: 'date',
+    },
+    active: {
+      // location status
+      type: 'boolean',
+    },
 		report_month: {
 			type: 'integer',
 			required: true
@@ -65,7 +73,7 @@ module.exports = {
 		email: {
 			type: 'string',
 			required: true
-		},		
+		},
 		// region/country
     adminRpcode: {
 			type: 'string',
@@ -108,7 +116,7 @@ module.exports = {
 		conflict: {
 			type: 'boolean',
 			required: true
-		},	
+		},
 		facility_name: {
 			type: 'string',
 			required: true
@@ -141,9 +149,13 @@ module.exports = {
 		},
 		facility_lat: {
 			type: 'float',
-			required: true
-		},
-		
+      required: true
+    },
+    createdOn: {
+      type: 'date'
+    },
+
+
     // add reference to Beneficiaries
     stocks: {
       collection: 'stock',

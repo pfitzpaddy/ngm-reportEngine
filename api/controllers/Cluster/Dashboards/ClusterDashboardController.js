@@ -507,6 +507,14 @@ var ClusterDashboardController = {
               if ( !d.project_code ) {
                 d.project_code = '-';
               }
+              // project donor
+              if ( d.project_donor ) {
+                  var da = [];
+                  d.project_donor.forEach( function( d,i ){
+                    if (d) da.push( d.project_donor_name );
+                  });
+                  d.donor = da.join(', ');
+              }
               // sum
               var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
               // beneficiaries
@@ -537,6 +545,7 @@ var ClusterDashboardController = {
                     'project_hrp_code',
                     'project_code',
                     'project_title',
+                    'donor',
                     'report_month_number',
                     'report_month',
                     'report_year',
@@ -595,6 +604,7 @@ var ClusterDashboardController = {
                     'project_hrp_code',
                     'project_code',
                     'project_title',
+                    'project_donor',
                     'report_month_number',
                     'report_month',
                     'report_year',
@@ -654,6 +664,7 @@ var ClusterDashboardController = {
                     'project_hrp_code',
                     'project_code',
                     'project_title',
+                    'donor',
                     'report_month_number',
                     'report_month',
                     'report_year',
@@ -711,6 +722,7 @@ var ClusterDashboardController = {
                     'project_hrp_code',
                     'project_code',
                     'project_title',
+                    'project_donor',
                     'report_month_number',
                     'report_month',
                     'report_year',
@@ -807,8 +819,72 @@ var ClusterDashboardController = {
               stocks[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
             });
 
+            var fields = [
+                'cluster',
+                'report_id',
+                'location_id',
+                'stock_warehouse_id',
+                'stock_item_type',
+                'stock_item_name',
+                'report_month',
+                'report_year',
+                'reporting_period',
+                'adminRpcode',
+                'adminRname',
+                'admin0pcode',
+                'admin0name',
+                'organization',
+                'username',
+                'email',
+                'createdAt',
+                'updatedAt',
+                'admin1pcode',
+                'admin1name',
+                'admin2pcode',
+                'admin2name',
+                'conflict',
+                'number_in_stock',
+                'number_in_pipeline',
+                'beneficiaries_covered',
+                'facility_name',
+                'facility_lng',
+                'facility_lat'
+                ];
+
+            var fieldNames = [
+                'cluster',
+                'report_id',
+                'location_id',
+                'stock_warehouse_id',
+                'stock_item_type',
+                'stock_item_name',
+                'report_month',
+                'report_year',
+                'reporting_period',
+                'adminRpcode',
+                'adminRname',
+                'admin0pcode',
+                'admin0name',
+                'organization',
+                'username',
+                'email',
+                'createdAt',
+                'updatedAt',
+                'admin1pcode',
+                'admin1name',
+                'admin2pcode',
+                'admin2name',
+                'conflict',
+                'number_in_stock',
+                'number_in_pipeline',
+                'beneficiaries_covered',
+                'facility_name',
+                'facility_lng',
+                'facility_lat'
+                ];
+
             // return csv
-            json2csv({ data: stocks }, function( err, csv ) {
+            json2csv({ data: stocks, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
               
               // error
               if ( err ) return res.negotiate( err );

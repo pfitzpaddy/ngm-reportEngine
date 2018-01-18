@@ -32,7 +32,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  // -------- NGM -------- 
+  // -------- NGM --------
   // User authentication / password reset
   'GET /login': 'ReportHub/UserController.login',
   'POST /login': 'ReportHub/UserController.login',
@@ -67,8 +67,8 @@ module.exports.routes = {
   'GET /getBeneficiairiesCsv': 'ReportHub/FileController.getBeneficiairiesCsv',
 
 
-  // -------- ETHIOPIA -------- 
-  // -------- CTC -------- 
+  // -------- ETHIOPIA --------
+  // -------- CTC --------
   'GET /ctc/getKoboData': 'Country/Eth/Ctc/CtcController.getKoboData',
   'GET /ctc/latestUpdate': 'Country/Eth/Ctc/CtcDashboard.getLatestUpdate',
   'POST /ctc/menu': 'Country/Eth/Ctc/CtcDashboard.getCtcMenu',
@@ -76,7 +76,7 @@ module.exports.routes = {
   'POST /ctc/case_management/indicator': 'Country/Eth/Ctc/CtcDashboard.getCaseManagementIndicator',
 
 
-  // -------- CLUSTER -------- 
+  // -------- CLUSTER --------
   // Location lists
   'GET /list/organizations': 'ReportHub/ListController.getOrganizations',
   'GET /list/getAdmin1List': 'ReportHub/ListController.getAdmin1List',
@@ -92,18 +92,19 @@ module.exports.routes = {
   'GET /cluster/list/donors': 'Cluster/Lists/ListController.getDonors',
   'GET /cluster/list/indicators': 'Cluster/Lists/ListController.getIndicators',
   'GET /cluster/list/stockitems': 'Cluster/Lists/ListController.getStockItems',
-  
+
   // ADMIN DASHBOARD
   'POST /cluster/admin/indicator': 'Cluster/Dashboards/AdminDashboardController.getClusterAdminIndicator',
 
   // PROJECTS
   'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
   'POST /cluster/project/getProject': 'Cluster/ProjectController.getProjectById',
+  'POST /cluster/project/getProjects': 'Cluster/ProjectController.getProjects',
   'POST /cluster/project/setProject': 'Cluster/ProjectController.setProjectById',
   'POST /cluster/project/removeBudgetItem': 'Cluster/ProjectController.removeBudgetItemById',
   'POST /cluster/project/removeBeneficiary': 'Cluster/ProjectController.removeBeneficiaryById',
   'POST /cluster/project/removeLocation': 'Cluster/ProjectController.removeLocationById',
-  
+  'POST /cluster/project/checkUserExists': 'ReportHub/UserController.checkUserExists',
   'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
 
@@ -134,12 +135,12 @@ module.exports.routes = {
   'POST /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator',
 
 
-  // -------- HEALTH -------- 
+  // -------- HEALTH --------
   // 4W Dashboard
   'POST /health/indicator': 'Cluster/Health/HealthDashboardController.getHealthDetails',
   'POST /health/data/contacts': 'Cluster/Health/HealthDashboardController.getContactListCsv',
 
-  // -------- EPR -------- 
+  // -------- EPR --------
   'GET /epr/getKoboData': 'Country/Afg/Epr/EprController.getKoboData',
   // EPR Dashboard
   'GET /epr/latestUpdate': 'Country/Afg/Epr/EprDashboardController.getlatestUpdate',
@@ -158,7 +159,7 @@ module.exports.routes = {
   'POST /epr/disasters/data': 'Country/Afg/Epr/EprDashboardController.getDisasterData',
 
 
-  // -------- DEWS -------- 
+  // -------- DEWS --------
   'POST /dews/indicator': 'Country/Afg/Dews/DewsController.getIndicator',
   'POST /dews/chart': 'Country/Afg/Dews/DewsController.getChart',
   'POST /dews/calendar': 'Country/Afg/Dews/DewsController.getCalendar',
@@ -168,7 +169,7 @@ module.exports.routes = {
   'POST /dews/map': 'Country/Afg/Dews/DewsController.getMap',
 
 
-  // -------- WATCHKEEPER -------- 
+  // -------- WATCHKEEPER --------
   'POST /wk/calendar': 'Watchkeeper/WatchkeeperController.getCalendar',
   'POST /wk/indicator': 'Watchkeeper/WatchkeeperController.getIndicator',
   'POST /wk/difference': 'Watchkeeper/WatchkeeperController.getDifference',
