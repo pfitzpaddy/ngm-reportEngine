@@ -67,7 +67,7 @@ var AdminDashboardController = {
 
   // stock reports
   getStockIndicator: function( $nin_organizations, params, json2csv, moment, fields, fieldNames, req, res ){
-    
+
     // switch on indicator
     switch( params.indicator ) {
 
@@ -89,7 +89,7 @@ var AdminDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
-            
+
             // return org list
             return res.json( 200, reports[0] );
 
@@ -115,7 +115,7 @@ var AdminDashboardController = {
               // return error
               if (err) return res.negotiate( err );
 
-              // projects 
+              // projects
               projects.forEach(function( d, i ){
 
                 // if not existing
@@ -133,7 +133,7 @@ var AdminDashboardController = {
               // order
               organizations.sort(function(a, b) {
                 return a.organization.localeCompare(b.organization);
-              }); 
+              });
 
               // default
               organizations.unshift({
@@ -170,7 +170,7 @@ var AdminDashboardController = {
           break;
 
       case 'reports_total':
-        
+
         // reports total
         StockReport
           .find()
@@ -202,7 +202,7 @@ var AdminDashboardController = {
                 Stock
                   .count( { report_id: d.id } )
                   .exec(function( err, b ){
-                    
+
                     // return error
                     if (err) return res.negotiate( err );
 
@@ -265,7 +265,7 @@ var AdminDashboardController = {
 
               // if no reports
               if ( length === 0 ) {
-                
+
                 // return empty
                 return res.json( 200, [] );
 
@@ -278,7 +278,7 @@ var AdminDashboardController = {
                   Stock
                     .count( { report_id: d.id } )
                     .exec(function( err, b ){
-                      
+
                       // return error
                       if (err) return res.negotiate( err );
 
@@ -310,7 +310,7 @@ var AdminDashboardController = {
                         if ( params.csv ) {
                           // return csv
                           json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
-                            
+
                             // error
                             if ( err ) return res.negotiate( err );
 
@@ -333,9 +333,9 @@ var AdminDashboardController = {
               // return indicator
               return res.json( 200, { 'value': reports.length });
             }
-            
 
-          });  
+
+          });
 
         break;
 
@@ -367,12 +367,12 @@ var AdminDashboardController = {
 
               // if no reports
               if ( length === 0 ) {
-                
+
                 // return empty
                 return res.json( 200, [] );
 
               } else {
-              
+
                 // reports
                 reports.forEach( function( d, i ){
 
@@ -380,7 +380,7 @@ var AdminDashboardController = {
                   Stock
                     .find( { report_id: d.id } )
                     .exec(function( err, b){
-                      
+
                       // return error
                       if (err) return res.negotiate( err );
 
@@ -413,7 +413,7 @@ var AdminDashboardController = {
                         if ( params.csv ) {
                           // return csv
                           json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
-                            
+
                             // error
                             if ( err ) return res.negotiate( err );
 
@@ -429,15 +429,15 @@ var AdminDashboardController = {
 
                 });
 
-              }  
+              }
 
             } else {
-              
+
               // return indicator
               return res.json( 200, { 'value': reports.length });
             }
 
-          });  
+          });
 
         break;
 
@@ -477,7 +477,7 @@ var AdminDashboardController = {
                 if (err) return res.negotiate( err );
 
                 // return new Project
-                return res.json(200, { 'value': reports.length, 'value_total': total_reports.length });                
+                return res.json(200, { 'value': reports.length, 'value_total': total_reports.length });
 
               });
 
@@ -486,9 +486,9 @@ var AdminDashboardController = {
             break;
 
     }
-  
+
   },
-  
+
   // monthly reports
   getActivityIndicator: function( $nin_organizations, params, json2csv, moment, fields, fieldNames, req, res ){
 
@@ -514,7 +514,7 @@ var AdminDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
-            
+
             // return org list
             return res.json( 200, reports[0] );
 
@@ -541,7 +541,7 @@ var AdminDashboardController = {
               // return error
               if (err) return res.negotiate( err );
 
-              // projects 
+              // projects
               projects.forEach(function( d, i ){
 
                 // if not existing
@@ -559,7 +559,7 @@ var AdminDashboardController = {
               // order
               organizations.sort(function(a, b) {
                 return a.organization.localeCompare(b.organization);
-              }); 
+              });
 
               // default
               organizations.unshift({
@@ -596,7 +596,7 @@ var AdminDashboardController = {
           break;
 
       case 'reports_total':
-        
+
         // reports total
         Report
           .find()
@@ -628,7 +628,7 @@ var AdminDashboardController = {
                 Beneficiaries
                   .count( { report_id: d.id } )
                   .exec(function( err, b ){
-                    
+
                     // return error
                     if (err) return res.negotiate( err );
 
@@ -662,7 +662,7 @@ var AdminDashboardController = {
           });
 
         break;
-      
+
       case 'reports_due':
 
         // reports due
@@ -691,7 +691,7 @@ var AdminDashboardController = {
 
               // if no reports
               if ( length === 0 ) {
-                
+
                 // return empty
                 return res.json( 200, [] );
 
@@ -704,7 +704,7 @@ var AdminDashboardController = {
                   Beneficiaries
                     .count( { report_id: d.id } )
                     .exec(function( err, b){
-                      
+
                       // return error
                       if (err) return res.negotiate( err );
 
@@ -734,10 +734,10 @@ var AdminDashboardController = {
 
                         // csv
                         if ( params.csv ) {
-                          
+
                           // return csv
                           json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
-                            
+
                             // error
                             if ( err ) return res.negotiate( err );
 
@@ -760,9 +760,9 @@ var AdminDashboardController = {
               // return indicator
               return res.json( 200, { 'value': reports.length });
             }
-            
 
-          });  
+
+          });
 
         break;
 
@@ -794,12 +794,12 @@ var AdminDashboardController = {
 
               // if no reports
               if ( length === 0 ) {
-                
+
                 // return empty
                 return res.json( 200, [] );
 
               } else {
-              
+
                 // reports
                 reports.forEach( function( d, i ){
 
@@ -807,7 +807,7 @@ var AdminDashboardController = {
                   Beneficiaries
                     .find( { report_id: d.id } )
                     .exec(function( err, b){
-                      
+
                       // return error
                       if (err) return res.negotiate( err );
 
@@ -838,10 +838,10 @@ var AdminDashboardController = {
 
                         // csv
                         if ( params.csv ) {
-                          
+
                           // return csv
                           json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
-                            
+
                             // error
                             if ( err ) return res.negotiate( err );
 
@@ -857,15 +857,15 @@ var AdminDashboardController = {
 
                 });
 
-              }  
+              }
 
             } else {
-              
+
               // return indicator
               return res.json( 200, { 'value': reports.length });
             }
 
-          });  
+          });
 
         break;
 
@@ -905,7 +905,7 @@ var AdminDashboardController = {
                 if (err) return res.negotiate( err );
 
                 // return new Project
-                return res.json(200, { 'value': reports.length, 'value_total': total_reports.length });                
+                return res.json(200, { 'value': reports.length, 'value_total': total_reports.length });
 
               });
 
@@ -913,6 +913,47 @@ var AdminDashboardController = {
 
             break;
 
+      // raw data export
+      case 'financial_report':
+
+        // fields
+        var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
+            fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
+
+        // get beneficiaries by project
+        BudgetProgress
+          .find()
+          .where( { project_id: { '!': null } } )
+          .where( params.adminRpcode_filter )
+          .where( params.admin0pcode_filter )
+          .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
+          .where( params.organization_filter )
+          .where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
+          .exec( function( err, budget ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return csv
+            json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              if ( params.ocha ) {
+                res.set('Content-Type', 'text/csv');
+                return res.send( 200, csv );
+              } else {
+                return res.json( 200, { data: csv } );
+              }
+
+            });
+
+          });
+
+        break;
     }
 
   }

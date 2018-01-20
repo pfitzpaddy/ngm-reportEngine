@@ -107,6 +107,8 @@ module.exports.routes = {
   'POST /cluster/project/checkUserExists': 'ReportHub/UserController.checkUserExists',
   'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
+  'POST /cluster/project/getFinancialDetails': 'Cluster/ProjectController.getFinancialDetails',
+
 
   // STOCK REPORTS
   'POST /cluster/stock/getReportsList': 'Cluster/Stocks/StockReportController.getReportsList',
