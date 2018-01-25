@@ -138,9 +138,8 @@ module.exports = {
 											d_obj.cases_male_under5 = d_obj.cases_male_under5 ? parseInt(d_obj.cases_male_under5) : 0;
 											d_obj.cases_male_over5 = d_obj.cases_male_over5 ? parseInt(d_obj.cases_male_over5) : 0;
 											// total cases
-											if(!d_obj.cases){
 												d_obj.cases = 0;
-											}
+
 											d_obj.cases += d_obj.cases_female_under5;
 											d_obj.cases += d_obj.cases_female_over5;
 											d_obj.cases += d_obj.cases_male_under5;
@@ -152,9 +151,7 @@ module.exports = {
 											d_obj.deaths_male_under5 = d_obj.deaths_male_under5 ? parseInt(d_obj.deaths_male_under5) : 0;
 											d_obj.deaths_male_over5 = d_obj.deaths_male_over5 ? parseInt(d_obj.deaths_male_over5) : 0;
 											// total cases
-											if(!d_obj.deaths){
 												d_obj.deaths = 0;
-											}
 											d_obj.deaths += d_obj.deaths_female_under5;
 											d_obj.deaths += d_obj.deaths_female_over5;
 											d_obj.deaths += d_obj.deaths_male_under5;
@@ -201,9 +198,8 @@ module.exports = {
 											d_obj.casualties_male_under5 = d_obj.casualties_male_under5 ? parseInt(d_obj.casualties_male_under5) : 0;
 											d_obj.casualties_male_over5 = d_obj.casualties_male_over5 ? parseInt(d_obj.casualties_male_over5) : 0;								
 											// total casualties
-											if(!d_obj.casualties){
 												d_obj.casualties = 0;
-											}
+
 											d_obj.casualties += d_obj.casualties_female_under5;
 											d_obj.casualties += d_obj.casualties_female_over5;
 											d_obj.casualties += d_obj.casualties_male_under5;
@@ -215,9 +211,8 @@ module.exports = {
 											d_obj.deaths_male_under5 = d_obj.deaths_male_under5_001 ? parseInt(d_obj.deaths_male_under5_001) : 0;
 											d_obj.deaths_male_over5 = d_obj.deaths_male_over5_001 ? parseInt(d_obj.deaths_male_over5_001) : 0;
 											// total cases
-											if(!d_obj.deaths){
 												d_obj.deaths = 0;
-											}
+
 											d_obj.deaths += d_obj.deaths_female_under5;
 											d_obj.deaths += d_obj.deaths_female_over5;
 											d_obj.deaths += d_obj.deaths_male_under5;
