@@ -297,7 +297,10 @@ module.exports = {
 		elderly_women:{
 			type: 'integer',
 			defaultsTo: 0
-		},
+    },
+    injury_treatment_same_province:{
+      type: 'boolean'
+    },
 
 		// location
     location_id: {
