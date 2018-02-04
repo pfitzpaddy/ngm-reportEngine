@@ -210,6 +210,16 @@ module.exports = {
     // only run if date is above monthly reporting period
     if ( moment().date() === 1 ) {
 
+  Report
+    .find()
+    .where( { project_id: { '!' : null } } )
+    .where( { report_month: moment().month() } )
+    .where( { report_year: moment().year() } )
+    .where( { report_active: true } )
+    .where( { report_status: 'todo' } )
+    .exec( function( err, reports ){
+
+      if ( err ) return res.negotiate( err );
       // find active reports for the next reporting period
       Location
         .find()
@@ -229,6 +239,37 @@ module.exports = {
           // for each report, group by username
           locations.forEach( function( location, i ) {
 
+            // if username dosnt exist
+            if ( !nStore[ location.email ] ) {
+
+              // add for notification email template
+              nStore[ location.email ] = {
+                email: location.email,
+                username: location.username,
+                report_month: moment().format( 'MMMM' ),
+                reportsStore: []
+              };
+
+            }
+
+            // group reports by report!
+            if ( !nStore[ location.email ].reportsStore[ location.report_id ] ){
+              // add location urls
+              nStore[ location.email ].reportsStore[ location.report_id ] = {
+                country: location.admin0name,
+                cluster: location.cluster,
+                username: location.username,
+                project_title: location.project_title,
+                report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+              };
+            }
+
+          });
+
+          // catching up with project focal points who are not in locations
+          // for each report, group by username
+          reports.forEach( function( location, i ) {
+            location.report_id = location.id;
             // if username dosnt exist
             if ( !nStore[ location.email ] ) {
 
@@ -333,6 +374,7 @@ module.exports = {
           });
 
       });
+    });
 
     } else {
 
