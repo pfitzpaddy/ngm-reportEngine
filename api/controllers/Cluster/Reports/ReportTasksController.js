@@ -76,8 +76,8 @@ module.exports = {
                 // create reports
                 StockReport
                   .updateOrCreate( {
-                      organization_id: report.organization_id, 
-                      report_month: report.report_month, 
+                      organization_id: report.organization_id,
+                      report_month: report.report_month,
                       report_year: report.report_year
                     }, report, function( err, new_report ) {
 
@@ -112,7 +112,7 @@ module.exports = {
 
     // only run if date is above monthly reporting period
     // if ( moment().date() === 1 ) {
-  
+
       // find active projects
       Project
         .find()
@@ -127,7 +127,7 @@ module.exports = {
 
           // counter
           var counter = 0;
-              length = projects.length;     
+              length = projects.length;
 
           // for each project
           projects.forEach( function( project, i ){
@@ -152,9 +152,9 @@ module.exports = {
 
             // create reports
             Report
-              .findOrCreate( { 
-                  project_id: newReport.project_id, 
-                  report_month: newReport.report_month, 
+              .findOrCreate( {
+                  project_id: newReport.project_id,
+                  report_month: newReport.report_month,
                   report_year: newReport.report_year
                 }, newReport )
               .exec( function( err, report ) {
@@ -269,8 +269,8 @@ module.exports = {
 
             // sort
             nStore[ user ].reports.sort(function(a, b) {
-              return a.country.localeCompare(b.country) || 
-                      a.cluster.localeCompare(b.cluster) || 
+              return a.country.localeCompare(b.country) ||
+                      a.cluster.localeCompare(b.cluster) ||
                       a.project_title.localeCompare(b.project_title);
             });
 
@@ -285,7 +285,7 @@ module.exports = {
 
           // for each
           notifications.forEach( function( notification, i ){
-            
+
             // get name
             User
               .findOne()
@@ -314,14 +314,14 @@ module.exports = {
                     to: notifications[i].email,
                     subject: 'ReportHub - Project Reporting Period for ' + moment().format( 'MMMM' ).toUpperCase() + ' Now Open!'
                   }, function(err) {
-                    
+
                     // return error
                     if (err) return res.negotiate( err );
 
                     // add to counter
                     counter++;
                     if ( counter === length ) {
-                      
+
                       // email sent
                       return res.json(200, { 'data': 'success' });
                     }
@@ -335,7 +335,7 @@ module.exports = {
       });
 
     } else {
-      
+
       // return reports
       return res.json( 200, { msg: 'Reporting not open for ' + moment().format( 'MMMM' ) + '!' } );
     }
@@ -354,6 +354,16 @@ module.exports = {
 
     // only run if date is 1 week before monthly reporting period required
     // if ( moment().date() <= 10 ) {
+    Report
+    .find()
+    .where( { project_id: { '!' : null } } )
+    .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
+    .where( { report_active: true } )
+    .where( { report_status: 'todo' } )
+    .sort( 'report_month DESC' )
+    .exec( function( err, reports ){
+
+      if ( err ) return res.negotiate( err );
 
       // find active reports for the next reporting period
       Location
@@ -427,6 +437,60 @@ module.exports = {
 
           });
 
+          // catching up with project focal points who are not in locations
+          // for each report, group by username
+          reports.forEach( function( location, i ) {
+
+            location.report_id = location.id;
+            // if username dosnt exist
+            if ( !nStore[ location.email ] ) {
+              var due_message = 'due SOON';
+              // set due message TODAY
+              if ( moment().date() === due_date ) {
+                due_message = 'due TODAY';
+              }
+              // set due message PENDING
+              if ( moment().date() > due_date ) {
+                due_message = 'OVERDUE';
+              }
+
+              // add for notification email template
+              nStore[ location.email ] = {
+                email: location.email,
+                username: location.username,
+                report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
+                reporting_due_date: moment( location.reporting_due_date ).format( 'DD MMMM, YYYY' ),
+                reporting_due_message: due_message,
+                projectsStore: []
+              };
+            }
+
+            // group reports by report!
+            if ( !nStore[ location.email ].projectsStore[ location.project_id ] ){
+              // add report urls
+              nStore[ location.email ].projectsStore[ location.project_id ] = {
+                country: location.admin0name,
+                cluster: location.cluster,
+                project_title: location.project_title,
+                reports: []
+              }
+
+            }
+
+            // one report per month
+            if ( !nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] ) {
+              // project reports
+              nStore[ location.email ].projectsStore[ location.project_id ].reports.push({
+                report_value: location.report_month,
+                report_month: moment( location.reporting_period ).format( 'MMMM' ),
+                report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+              });
+              // avoids report row per location
+              nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] = [{ report: true }];
+            }
+
+          });
+
           // each user, send only one email!
           for ( var user in nStore ) {
 
@@ -440,8 +504,8 @@ module.exports = {
 
             // sort
             nStore[ user ].projects.sort(function(a, b) {
-              return a.country.localeCompare(b.country) || 
-                      a.cluster.localeCompare(b.cluster) || 
+              return a.country.localeCompare(b.country) ||
+                      a.cluster.localeCompare(b.cluster) ||
                       a.project_title.localeCompare(b.project_title);
             });
 
@@ -486,14 +550,14 @@ module.exports = {
                     to: notifications[i].email,
                     subject: 'ReportHub - Project Reporting Period for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ).toUpperCase() + ' is ' + notifications[i].reporting_due_message + ' !'
                   }, function(err) {
-                    
+
                     // return error
                     if (err) return res.negotiate( err );
 
                     // add to counter
                     counter++;
                     if ( counter === length ) {
-                      
+
                       // email sent
                       return res.json( 200, { 'data': 'success' });
                     }
@@ -505,7 +569,7 @@ module.exports = {
           });
 
         });
-
+      });
       // } else { return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } ); }
 
   }
