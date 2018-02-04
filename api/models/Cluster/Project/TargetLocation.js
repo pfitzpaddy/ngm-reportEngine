@@ -363,7 +363,12 @@ module.exports = {
 									delete r.admin2pcode;
 									delete r.admin2name;
 									delete r.admin3pcode;
-									delete r.admin3name;
+                  delete r.admin3name;
+                  delete r.username,
+                  delete r.name,
+                  delete r.position,
+                  delete r.phone,
+                  delete r.email
 
 					// clone target_location
 					var location,
