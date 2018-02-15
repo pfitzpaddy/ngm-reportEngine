@@ -513,6 +513,7 @@ var ClusterDashboardController = {
                   d.project_donor.forEach( function( d,i ){
                     if (d) da.push( d.project_donor_name );
                   });
+                  da.sort();
                   d.donor = da.join(', ');
               }
               // sum
