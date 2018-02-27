@@ -399,6 +399,7 @@ module.exports = {
     Report
     .find()
     .where( { project_id: { '!' : null } } )
+    .where( { report_year: moment().subtract( 1, 'M' ).year() })
     .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
     .where( { report_active: true } )
     .where( { report_status: 'todo' } )
@@ -411,6 +412,7 @@ module.exports = {
       Location
         .find()
         .where( { report_id: { '!' : null } } )
+        .where( { report_year: moment().subtract( 1, 'M' ).year() })
         .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
         .where( { report_active: true } )
         .where( { report_status: 'todo' } )
