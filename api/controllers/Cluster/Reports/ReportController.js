@@ -546,6 +546,9 @@ module.exports = {
         // for each location
         $report.locations.forEach( function( location, i ){
 
+          Location.update({id: location.id}, { report_status: location.report_status }).exec( function( err, update ){
+
+          if (err) return res.negotiate( err );
           // beneficiaries
           Beneficiaries
             .updateOrCreateEach( { location_id: location.id }, location.beneficiaries, function( err, beneficiaries ){
@@ -632,7 +635,7 @@ module.exports = {
               }
 
           });
-
+        });
         });
 
     });
