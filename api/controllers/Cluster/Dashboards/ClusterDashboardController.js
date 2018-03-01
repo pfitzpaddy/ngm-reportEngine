@@ -25,9 +25,9 @@ var ClusterDashboardController = {
 
   // get params from req
   getParams: function( req, res ){
-    
+
     // request input
-    if ( !req.param('indicator') || 
+    if ( !req.param('indicator') ||
           !req.param('cluster_id') ||
           !req.param('adminRpcode') ||
           !req.param('admin0pcode') ||
@@ -41,7 +41,7 @@ var ClusterDashboardController = {
     }
 
     // return params
-    return {      
+    return {
       csv: req.param('csv') ? req.param('csv') : false,
       ocha: req.param('ocha') ? req.param('ocha') : false,
       list: req.param('list') ? req.param('list') : false,
@@ -78,7 +78,7 @@ var ClusterDashboardController = {
 
   // indicators
   getIndicator: function ( req, res  ) {
-    
+
     // parmas, filters
     var params = ClusterDashboardController.getParams( req, res );
     var filters = ClusterDashboardController.getFilters( params );
@@ -115,7 +115,7 @@ var ClusterDashboardController = {
 
         break;
 
-      
+
       case 'organizations':
 
         // get organizations by project
@@ -140,7 +140,7 @@ var ClusterDashboardController = {
             // orgs
             var organizations = [];
 
-            // projects 
+            // projects
             beneficiaries.forEach(function( d, i ){
 
               // if not existing
@@ -206,12 +206,12 @@ var ClusterDashboardController = {
             // orgs
             var projects = [];
 
-            // projects 
+            // projects
             beneficiaries.forEach(function( d, i ){
 
               // if not existing
               if( !projects[ d.project_id ] ) {
-                // add 
+                // add
                 projects[ d.project_id ] = {};
                 projects[ d.project_id ].project_id = d.project_id;
               }
@@ -255,7 +255,7 @@ var ClusterDashboardController = {
             // orgs
             var users = [];
 
-            // projects 
+            // projects
             beneficiaries.forEach(function( d, i ){
 
               // if not existing
@@ -274,7 +274,7 @@ var ClusterDashboardController = {
 
                 // return csv
                 json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-                  
+
                   // error
                   if ( err ) return res.negotiate( err );
 
@@ -282,7 +282,7 @@ var ClusterDashboardController = {
                   if ( params.ocha ) {
                     res.set('Content-Type', 'text/csv');
                     return res.send( 200, csv );
-                  } else { 
+                  } else {
                     return res.json( 200, { data: csv } );
                   }
 
@@ -304,7 +304,7 @@ var ClusterDashboardController = {
               admin1pcode: '#adm1+code',
               admin1name: '#adm1+name',
               organization: '#org+prog',
-              implementing_partners: '#org+impl', 
+              implementing_partners: '#org+impl',
               category_type_name: '',
               beneficiary_type_name: '',
               boys: '#reached+m+children',
@@ -364,7 +364,7 @@ var ClusterDashboardController = {
               }
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
               data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
-              
+
               // organization
               if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.indexOf( d.organization ) === -1 ){
                 data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.push( d.organization );
@@ -399,8 +399,8 @@ var ClusterDashboardController = {
 
             // sort
             report.sort(function(a, b) {
-              return a.admin1name.localeCompare(b.admin1name) || 
-                      a.category_type_name.localeCompare(b.category_type_name) || 
+              return a.admin1name.localeCompare(b.admin1name) ||
+                      (a.category_type_name && b.category_type_name && a.category_type_name.localeCompare(b.category_type_name)) ||
                       a.beneficiary_type_name.localeCompare(b.beneficiary_type_name)
             });
 
@@ -409,7 +409,7 @@ var ClusterDashboardController = {
 
             // return csv
             json2csv({ data: report, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
+
               // error
               if ( err ) return res.negotiate( err );
 
@@ -417,7 +417,7 @@ var ClusterDashboardController = {
               if ( params.ocha ) {
                 res.set('Content-Type', 'text/csv');
                 return res.send( 200, csv );
-              } else { 
+              } else {
                 return res.json( 200, { data: csv } );
               }
 
@@ -428,7 +428,7 @@ var ClusterDashboardController = {
 
         break;
 
-      
+
       // raw data export
       case 'financial_report':
 
@@ -455,7 +455,7 @@ var ClusterDashboardController = {
 
             // return csv
             json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
+
               // error
               if ( err ) return res.negotiate( err );
 
@@ -463,7 +463,7 @@ var ClusterDashboardController = {
               if ( params.ocha ) {
                 res.set('Content-Type', 'text/csv');
                 return res.send( 200, csv );
-              } else { 
+              } else {
                 return res.json( 200, { data: csv } );
               }
 
@@ -472,7 +472,7 @@ var ClusterDashboardController = {
           });
 
         break;
-      
+
 
       // raw data export
       case 'beneficiaries':
@@ -580,7 +580,7 @@ var ClusterDashboardController = {
                     'girls',
                     'men',
                     'women',
-                    'elderly_men', 
+                    'elderly_men',
                     'elderly_women',
                     'total',
                     'admin1lng',
@@ -639,7 +639,7 @@ var ClusterDashboardController = {
                     'girls',
                     'men',
                     'women',
-                    'elderly_men', 
+                    'elderly_men',
                     'elderly_women',
                     'total',
                     'admin1lng',
@@ -701,7 +701,7 @@ var ClusterDashboardController = {
                     'girls',
                     'men',
                     'women',
-                    'elderly_men', 
+                    'elderly_men',
                     'elderly_women',
                     'total',
                     'admin1lng',
@@ -759,7 +759,7 @@ var ClusterDashboardController = {
                     'girls',
                     'men',
                     'women',
-                    'elderly_men', 
+                    'elderly_men',
                     'elderly_women',
                     'total',
                     'admin1lng',
@@ -773,7 +773,7 @@ var ClusterDashboardController = {
 
               // return csv
               json2csv({ data: beneficiaries, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-                
+
                 // error
                 if ( err ) return res.negotiate( err );
 
@@ -781,7 +781,7 @@ var ClusterDashboardController = {
                 if ( params.ocha ) {
                   res.set('Content-Type', 'text/csv');
                   return res.send( 200, csv );
-                } else { 
+                } else {
                   return res.json( 200, { data: csv } );
                 }
 
@@ -814,7 +814,7 @@ var ClusterDashboardController = {
             if (err) return res.negotiate( err );
 
             // format stocks
-            stocks.forEach(function( d, i ){ 
+            stocks.forEach(function( d, i ){
               stocks[ i ].report_month_number = d.report_month+1;
               stocks[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
               stocks[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
@@ -886,7 +886,7 @@ var ClusterDashboardController = {
 
             // return csv
             json2csv({ data: stocks, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-              
+
               // error
               if ( err ) return res.negotiate( err );
 
@@ -894,7 +894,7 @@ var ClusterDashboardController = {
               if ( params.ocha ) {
                 res.set('Content-Type', 'text/csv');
                 return res.send( 200, csv );
-              } else { 
+              } else {
                 return res.json( 200, { data: csv } );
               }
 
@@ -983,7 +983,7 @@ var ClusterDashboardController = {
 
               // if last location
               if( counter === length ){
-                
+
                 // return markers
                 return res.json(200, { 'data': markers } );
 
@@ -996,7 +996,7 @@ var ClusterDashboardController = {
         break;
 
     }
-    
+
   }
 
 
