@@ -905,6 +905,38 @@ var ClusterDashboardController = {
         break;
 
 
+      // raw data export
+      case 'training_participants':
+
+        // trainings
+        TrainingParticipants
+          .find()
+          .exec( function( err, training_participants ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return csv
+            json2csv({ data: training_participants }, function( err, csv ) {
+              
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              if ( params.ocha ) {
+                res.set('Content-Type', 'text/csv');
+                return res.send( 200, csv );
+              } else { 
+                return res.json( 200, { data: csv } );
+              }
+
+            });
+
+          });
+
+        break;
+
+
       // markers
       case 'markers':
 
