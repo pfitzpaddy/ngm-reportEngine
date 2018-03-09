@@ -400,7 +400,7 @@ var ClusterDashboardController = {
             // sort
             report.sort(function(a, b) {
               return a.admin1name.localeCompare(b.admin1name) ||
-                      a.category_type_name.localeCompare(b.category_type_name) ||
+                      (a.category_type_name && b.category_type_name && a.category_type_name.localeCompare(b.category_type_name)) ||
                       a.beneficiary_type_name.localeCompare(b.beneficiary_type_name)
             });
 
