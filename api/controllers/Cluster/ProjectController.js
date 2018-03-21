@@ -439,6 +439,9 @@ module.exports = {
             // beside project details related collections updates also report's ones
             // TODO make it return promise
             updateUser($project);
+
+            // update submited data fields
+            updateBeneficiaries($project);
             // return Project
             return res.json( 200, $project );
 
@@ -463,8 +466,6 @@ module.exports = {
       var findProject = {
         project_id: $project.id
       }
-      // TODO make it global
-      var Promise = require('bluebird');
 
       Promise.all([
         Project.update( { id: $project.id }, updatedRelationsUser ),
@@ -479,7 +480,29 @@ module.exports = {
           return res.negotiate( err )
         })
         .done();
-    }
+    };
+
+    var updateBeneficiaries = function($project){
+
+      // add fields here to update
+      var updateBeneficiariesFields = {
+        project_title: $project.project_title, 
+        project_donor: $project.project_donor,
+      }
+
+      var findProject = {
+        project_id: $project.id
+      }
+
+      Promise.all([
+      Beneficiaries.update(findProject, updateBeneficiariesFields),
+      // TargetBeneficiaries.update(findProject, updateBeneficiariesFields)
+        ])
+        .catch( function(err) {
+          return res.negotiate( err )
+        })
+        .done();
+    };
   },
 
   // remvoe budget item
