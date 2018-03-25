@@ -528,10 +528,37 @@ var ClusterDashboardController = {
             });
 
             if ( !params.csv ) {
+              // get trainingparticipants
+              TrainingParticipants
+              .find()
+              .where( filters.default )
+              .where( filters.adminRpcode )
+              .where( filters.admin0pcode )
+              .where( filters.admin1pcode )
+              .where( filters.admin2pcode )
+              .where( filters.cluster_id )
+              .where( filters.acbar_partners )
+              .where( filters.organization_tag )
+              .where( filters.beneficiaries )
+              .where( filters.date )
+              .exec( function( err, training_participants ){
 
-              // return org list
-              return res.json( 200, { 'value': total } );
+                // return error
+                if (err) return res.negotiate( err );
+                // format
+                training_participants.forEach(function( d, i ){
+                  
+                  // sum
+                  var sum = d.trainee_men + d.trainee_women;
 
+                  total += sum;
+
+                });
+
+                // return org list
+                return res.json( 200, { 'value': total } );
+              })
+              
             } else {
 
               var fields = [
