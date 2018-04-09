@@ -193,6 +193,14 @@ module.exports = {
 			type: 'string'
 		},
 
+		package_type_id:{
+			type: 'string'
+		},
+
+		package_type_name:{
+			type: 'string'
+		},
+		
 		// delivery (population, service)
 		delivery_type_id: {
 			type: 'string',
