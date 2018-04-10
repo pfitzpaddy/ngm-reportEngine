@@ -179,6 +179,25 @@ module.exports.routes = {
   'POST /wk/data': 'Watchkeeper/WatchkeeperController.getData',
   'POST /wk/chart': 'Watchkeeper/WatchkeeperController.getChart',
 
+ // -------- AF NUTRITION --------
+ 'GET /nutrition/afghanistan/getKoboData': 'Country/Afg/Nutrition/NutritionController.getKoboData',
+ // Nutrition Dashboard
+ 'GET /nutrition/afghanistan/latestUpdate': 'Country/Afg/Nutrition/NutritionDashboardController.getlatestUpdate',
+ // Reports
+ 'GET /nutrition/afghanistan/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionReportsIndicator',
+ 'POST /nutrition/afghanistan/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionReportsIndicator',
+ // Beneficiaries
+ 'GET /nutrition/afghanistan/beneficiaries/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionIndicator',
+ 'POST /nutrition/afghanistan/beneficiaries/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionIndicator',
+ 'GET /nutrition/afghanistan/beneficiaries/data': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionData',
+ 'POST /nutrition/afghanistan/beneficiaries/data': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionData',
+
+ // Edit
+ 'GET /nutrition/afghanistan/reports/edit/:pk/:dataid': 'Country/Afg/Nutrition/NutritionDashboardController.getEditForm',
+
+ // Delete 
+ 'DELETE /nutrition/afghanistan/reports/delete/:pk/:dataid': 'Country/Afg/Nutrition/NutritionDashboardController.deleteForm',
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
