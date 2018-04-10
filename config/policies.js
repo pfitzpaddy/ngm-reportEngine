@@ -73,6 +73,16 @@ module.exports.policies = {
   },
 
   // public
+  'Country/Afg/Nutrition/NutritionController': {
+    '*': true
+  },
+
+  // public
+  'Country/Afg/Nutrition/NutritionDashboardController': {
+    '*': true
+  },
+
+  // public
   'Cluster/Dashboards/AdminDashboardController': {
     '*': true
   },

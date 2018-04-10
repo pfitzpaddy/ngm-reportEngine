@@ -40,7 +40,7 @@
 ################################################
 
 config/local.js
-
+config/kobo.js
 config/email.js
 
 
