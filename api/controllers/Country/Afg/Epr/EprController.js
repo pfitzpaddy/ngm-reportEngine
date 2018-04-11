@@ -5,6 +5,13 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+// secrets
+if (sails.config.kobo) {
+    var kobo_pk = sails.config.kobo.EHA_KOBO_PK;
+    var kobo_url = sails.config.kobo.EHA_KOBO_URL;
+    var kobo_user = sails.config.kobo.EHA_KOBO_USER;
+    var kobo_password = sails.config.kobo.EHA_KOBO_PASSWORD;
+}
 module.exports = {
 
 	// get data from kobo
@@ -46,8 +53,7 @@ module.exports = {
 				// API
 					// https://kc.kobotoolbox.org/api/v1/
 				// view forms
-					// curl -X GET https://kc.humanitarianresponse.info/api/v1/forms -u eha:ehaTeam1234
-				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/106227?format=json -u eha:ehaTeam1234';
+				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/' +  kobo_pk + '?format=json' + ' -u ' + kobo_user + ':' + kobo_password;
 
 		// run curl command
 		exec( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
