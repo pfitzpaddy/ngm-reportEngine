@@ -34,7 +34,6 @@ module.exports = {
 				// API
 				// https://kc.kobotoolbox.org/api/v1/
 				// view forms
-				// curl -X GET https://kc.humanitarianresponse.info/api/v1/forms -u nutritionaf:nutrtition@12345af
                 // cmd = 'curl -X GET ' +  kobo_url + ' -u ' + kobo_user + ':' + kobo_password,
                 cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/' +  kobo_pk + '?format=json' + ' -u ' + kobo_user + ':' + kobo_password,
 
