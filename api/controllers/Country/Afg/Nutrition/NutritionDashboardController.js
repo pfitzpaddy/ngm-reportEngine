@@ -74,12 +74,13 @@ var NutritionDashboard = {
         year: parseInt( req.param('year') ),
         province: req.param('province'),
         district: req.param('district'),
+        organization_tag: req.param('organization_tag'),
         week: req.param('week'),
         start_date: req.param('start_date'),
         end_date: req.param('end_date'),
         current_week: ( parseInt( req.param('year') ) === moment().year() ) ? moment().week() : 53,
       }
-  
+     }
     },
   
     // return filters
@@ -89,16 +90,28 @@ var NutritionDashboard = {
         year: { reporting_year: params.year },
         province: params.province !== 'all' ? { admin1pcode: params.province } : {},
         district: params.district !== 'all' ? { admin2pcode: params.district } : {},
+        organization_tag: params.organization_tag !== 'all' ? { organization_tag: params.organization_tag } : {},
         week: params.week !== 'all' ? { reporting_week: parseInt(params.week) } : {},
         date: { reporting_start_date: { '>=': params.start_date, '<': params.end_date } }
       }
+    },
+
+    // flatten json
+    flatten: function( json ) {
+        var array = [];
+        for( var i in json ) {
+        if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
+            array.push( json[ i ] );
+        }
+        }
+        return array;
     },
   
     // get epr indicators
     getNutritionReportsIndicator: function(req, res) {
 
     // params
-    var params = NutritionDashboard.getParams( req );
+    var params = NutritionDashboard.getParams( req, res );
 
     // filters
     var filters = NutritionDashboard.getFilters( params );
@@ -108,6 +121,7 @@ var NutritionDashboard = {
         .find()
         .where( filters.year )
         .where( filters.week )
+        .where( filters.organization_tag )
         .where( filters.date )
         .exec( function( err, results ){
 
@@ -127,10 +141,50 @@ var NutritionDashboard = {
 
             case 'organizations':
 
+            if ( !params.list ) {
+
                 var value = NutritionDashboard.getDistinct( 'organization_tag', results );
                 return res.json( 200, { 'value': value } );
 
                 break;
+
+            } else {
+                
+                var organizations = [];
+
+                results.forEach(function( d, i ){
+
+                    // if not existing
+                    if( !organizations[ d.organization_tag ] ) {
+                      // add
+                      organizations[ d.organization_tag ] = {};
+                      organizations[ d.organization_tag ].organization_tag = d.organization_tag;
+                      organizations[ d.organization_tag ].organization = d.organization;
+                    }
+      
+                  });
+      
+                  // flatten
+                  if ( organizations ) {
+                    organizations = NutritionDashboard.flatten( organizations );
+                  }
+      
+                  // order
+                  organizations.sort(function(a, b) {
+                    return a.organization.localeCompare(b.organization);
+                  });
+      
+                  // default
+                  organizations.unshift({
+                    organization_tag: 'all',
+                    organization: 'ALL',
+                  });
+
+                  return res.json( 200, organizations );
+
+                  break;
+
+            }
     
             // total reports due
             case 'duplicate_reports':
@@ -238,6 +292,7 @@ var NutritionDashboard = {
         .where( filters.year )
         .where( filters.province )
         .where( filters.district )
+        .where( filters.organization_tag )
         .where( filters.week )
         .where( filters.date )
         .exec( function( err, results ){
@@ -271,6 +326,14 @@ var NutritionDashboard = {
               var value = NutritionDashboard.getDistinct( 'activity_description_id', results );
               return res.json( 200, { 'value': value } );
 
+            // total reports submitted
+            case 'submitted_reports':
+
+                // return number of expected reports
+                var value = NutritionDashboard.getDistinct( 'dataid', results );
+                return res.json( 200, { 'value': value } );
+                
+
             case 'markers':
   
               // markers
@@ -295,6 +358,9 @@ var NutritionDashboard = {
                                 '</div>' +
                                 '<div style="text-align:center">' + d.location_name + '</div>' +
                                 '<div>' + d.reporting_start_date + ' till ' + d.reporting_end_date + '</div>' +
+                                '<div>' +
+                                '<div style="text-align:center">' + d.organization + 
+                                '</div>' +
                               '</div>';
                 // create markers
                 markers['marker' + i] = {
@@ -307,7 +373,54 @@ var NutritionDashboard = {
   
               // return markers
               return res.json( { status:200, data: markers } );
+
+              case 'organizations':
+
+              if ( !params.list ) {
   
+                  var value = NutritionDashboard.getDistinct( 'organization_tag', results );
+                  return res.json( 200, { 'value': value } );
+  
+                  break;
+  
+              } else {
+                  
+                  var organizations = [];
+  
+                  results.forEach(function( d, i ){
+  
+                      // if not existing
+                      if( !organizations[ d.organization_tag ] ) {
+                        // add
+                        organizations[ d.organization_tag ] = {};
+                        organizations[ d.organization_tag ].organization_tag = d.organization_tag;
+                        organizations[ d.organization_tag ].organization = d.organization;
+                      }
+        
+                    });
+        
+                    // flatten
+                    if ( organizations ) {
+                      organizations = NutritionDashboard.flatten( organizations );
+                    }
+        
+                    // order
+                    organizations.sort(function(a, b) {
+                      return a.organization.localeCompare(b.organization);
+                    });
+        
+                    // default
+                    organizations.unshift({
+                      organization_tag: 'all',
+                      organization: 'All',
+                    });
+  
+                    return res.json( 200, organizations );
+                    
+  
+                    break;
+                }
+
             default:
   
               // return number of expected reports
@@ -337,6 +450,7 @@ var NutritionDashboard = {
     .where( filters.year )
     .where( filters.province )
     .where( filters.district )
+    .where( filters.organization_tag )
     .where( filters.week )
     .where( filters.date )
     .exec( function( err, results ){
