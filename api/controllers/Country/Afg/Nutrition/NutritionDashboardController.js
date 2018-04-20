@@ -80,7 +80,7 @@ var NutritionDashboard = {
         end_date: req.param('end_date'),
         current_week: ( parseInt( req.param('year') ) === moment().year() ) ? moment().week() : 53,
       }
-     }
+     
     },
   
     // return filters
