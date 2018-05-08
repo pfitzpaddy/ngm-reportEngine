@@ -144,11 +144,11 @@ module.exports = {
   getAdmin3Facilities: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
-    if ( !req.param( 'cluster_id' ) || !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) || !req.param( 'admin3pcode' ) ) {
-       return res.json( 401, { msg: 'cluster_id, admin0pcode, admin1pcode, & admin3pcode required and must be string' });
+    if ( !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) || !req.param( 'admin3pcode' ) ) {
+       return res.json( 401, { msg: 'admin0pcode, admin1pcode, & admin3pcode required and must be string' });
     }
 
-    var facility_class = req.param( 'cluster_id' ) === 'wash' ? { facility_class: 'health' } : { facility_class: req.param( 'cluster_id' ) };
+    // var facility_class = req.param( 'cluster_id' ) === 'wash' ? { facility_class: 'health' } : { facility_class: req.param( 'cluster_id' ) };
 
     // get list
     Admin3Facilities
@@ -157,8 +157,7 @@ module.exports = {
       .where({ admin1pcode: req.param( 'admin1pcode' ) })
       .where({ admin2pcode: req.param( 'admin2pcode' ) })
       .where({ admin3pcode: req.param( 'admin3pcode' ) })
-      .where( facility_class )
-      .sort('admin3name ASC')
+      .sort('facility_type_name ASC')
       .exec( function( err, admin3 ){
 
         // return error
