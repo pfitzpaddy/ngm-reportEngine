@@ -821,9 +821,17 @@ var AdminDashboardController = {
                       // if benficiaries
                       if ( !b.length ) {
                         // add status
-                        reports[i].status = '#80cbc4';
-                        reports[i].icon = 'adjust';
-                        reports[i].status_title = 'Empty Submission';
+                        TrainingParticipants
+                          .find( { report_id: d.id } )
+                          .exec(function( err, t){
+                            // return error
+                            if (err) return res.negotiate( err );  
+                              if ( !t.length ) {                          
+                                reports[i].status = '#80cbc4';
+                                reports[i].icon = 'adjust';
+                                reports[i].status_title = 'Empty Submission';
+                              }
+                            });
                       }
 
                       // reutrn
