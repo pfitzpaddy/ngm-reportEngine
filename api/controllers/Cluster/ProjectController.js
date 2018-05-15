@@ -128,17 +128,17 @@ module.exports = {
                                .sort(function(a, b){ return a.id > b.id });
                     $project[i].target_locations
                                .sort(function(a, b){
-                                  if (a.facility_type_name){
+                                  if (a.site_type_name){
                                     if(a.admin3name){
-                                      return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','facility_type_name','facility_name']));
+                                      return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_type_name','site_name']));
                                     } else {
-                                      return eval(_comparatorBuilder(['admin1name','admin2name','facility_type_name','facility_name']));
+                                      return eval(_comparatorBuilder(['admin1name','admin2name','site_type_name','site_name']));
                                     }
                                   } else {
                                       if( a.admin3name){
-                                        return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','facility_name']));
+                                        return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_name']));
                                       } else {
-                                        return eval(_comparatorBuilder(['admin1name','admin2name','facility_name']));
+                                        return eval(_comparatorBuilder(['admin1name','admin2name','site_name']));
                                       }
                                     }
                     });
@@ -218,7 +218,7 @@ module.exports = {
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
             setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'activity_type_name', 'activity_description_name', 'delivery_type_name',
             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
-            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','facility_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
 
         };
 
@@ -298,29 +298,29 @@ module.exports = {
 
               // order
               $project.target_locations.sort(function(a, b) {
-                if ( a.facility_type_name ) {
+                if ( a.site_type_name ) {
                   if( a.admin3name ) {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_type_name.localeCompare(b.site_type_name) ||
+                            a.site_name.localeCompare(b.site_name);
                   } else {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_type_name.localeCompare(b.site_type_name) ||
+                            a.site_name.localeCompare(b.site_name);
                   }
                 } else {
                   if( a.admin3name ) {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_name.localeCompare(b.site_name);
                   } else {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_name.localeCompare(b.site_name);
                   }
                 }
               });
@@ -409,29 +409,29 @@ module.exports = {
 
             // order
             $project.target_locations.sort(function(a, b) {
-              if ( a.facility_type_name ) {
+              if ( a.site_type_name ) {
                 if( a.admin3name ) {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_type_name.localeCompare(b.site_type_name) ||
+                          a.site_name.localeCompare(b.site_name);
                 } else {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_type_name.localeCompare(b.site_type_name) ||
+                          a.site_name.localeCompare(b.site_name);
                 }
               } else {
                 if( a.admin3name ) {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_name.localeCompare(b.site_name);
                 } else {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_name.localeCompare(b.site_name);
                 }
               }
             });

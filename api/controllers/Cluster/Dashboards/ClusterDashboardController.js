@@ -230,8 +230,28 @@ var ClusterDashboardController = {
 
         // require
         var users = [],
-            fields = [ 'admin0name', 'cluster', 'organization', 'name', 'position', 'username', 'phone', 'email', 'createdAt' ],
-            fieldNames = [ 'Country', 'Cluster', 'Organization', 'Name', 'Position', 'Username', 'Phone', 'Email', 'Joined ReportHub' ];
+            fields = [
+              'admin0name',
+              'cluster',
+              'organization',
+              'name',
+              'position',
+              'username',
+              'phone',
+              'email',
+              'createdAt'
+            ],
+            fieldNames = [
+              'Country',
+              'Cluster',
+              'Organization',
+              'Name',
+              'Position',
+              'Username',
+              'Phone',
+              'Email',
+              'Joined ReportHub'
+            ];
 
 
         // get organizations by project
@@ -315,8 +335,38 @@ var ClusterDashboardController = {
               elderly_men: '',
               total: '#reached'
             },
-            fields = [ 'cluster', 'admin1pcode', 'admin1name', 'organization', 'implementing_partners', 'category_type_name', 'beneficiary_type_name', 'boys', 'girls', 'men', 'women', 'elderly_men', 'elderly_women', 'total' ],
-            fieldNames = [ 'Cluster', 'Admin1 Pcode', 'Admin1 Name', 'Organizations', 'Implementing Partners', 'Category', 'Beneficiary', 'Boys', 'Girls', 'Men', 'Women', 'Elderly Men', 'Elderly Women', 'Total' ];
+            fields = [
+              'cluster',
+              'admin1pcode',
+              'admin1name',
+              'organization',
+              'implementing_partners',
+              'category_type_name',
+              'beneficiary_type_name',
+              'boys',
+              'girls',
+              'men',
+              'women',
+              'elderly_men',
+              'elderly_women',
+              'total'
+            ],
+            fieldNames = [
+              'Cluster',
+              'Admin1 Pcode',
+              'Admin1 Name',
+              'Organizations',
+              'Implementing Partners',
+              'Category',
+              'Beneficiary',
+              'Boys',
+              'Girls',
+              'Men',
+              'Women',
+              'Elderly Men',
+              'Elderly Women',
+              'Total'
+            ];
 
         // get organizations by project
         Beneficiaries
@@ -433,8 +483,56 @@ var ClusterDashboardController = {
       case 'financial_report':
 
         // fields
-        var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
-            fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
+        var fields = [ 
+              'cluster',
+              'organization',
+              'admin0name',
+              'project_title',
+              'project_description',
+              'project_hrp_code',
+              'project_budget',
+              'project_budget_currency',
+              'project_donor_name',
+              'grant_id',
+              'currency_id',
+              'project_budget_amount_recieved',
+              'contribution_status',
+              'project_budget_date_recieved',
+              'budget_funds_name',
+              'financial_programming_name',
+              'multi_year_funding_name',
+              'funding_2017',
+              'reported_on_fts_name',
+              'fts_record_id',
+              'email',
+              'createdAt',
+              'comments'
+            ],
+            fieldNames = [
+              'Cluster',
+              'Organization',
+              'Country',
+              'Project Title',
+              'Project Description',
+              'HRP Project Code',
+              'Project Budget',
+              'Project Budget Currency',
+              'Project Donor',
+              'Donor Grant ID',
+              'Currency Recieved',
+              'Ammount Received',
+              'Contribution Status',
+              'Date of Payment',
+              'Incoming Funds',
+              'Financial Programming',
+              'Multi-Year Funding',
+              '2017 Funding',
+              'Reported on FTS',
+              'FTS ID',
+              'Email',
+              'createdAt',
+              'Comments'
+            ];
 
         // get beneficiaries by project
         BudgetProgress
@@ -580,6 +678,8 @@ var ClusterDashboardController = {
                     'report_month',
                     'report_year',
                     'reporting_period',
+                    'admin0pcode',
+                    'admin0name',
                     'admin1pcode',
                     'admin1name',
                     'admin2pcode',
@@ -587,8 +687,14 @@ var ClusterDashboardController = {
                     'admin3pcode',
                     'admin3name',
                     'conflict',
-                    'facility_type_name',
-                    'facility_name',
+                    'site_id',
+                    'site_class',
+                    'site_status',
+                    'site_hub_id',
+                    'site_hub_name',
+                    'site_implementation_name',
+                    'site_type_name',
+                    'site_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -620,17 +726,17 @@ var ClusterDashboardController = {
                     'admin2lat',
                     'admin3lng',
                     'admin3lat',
-                    'facility_lng',
-                    'facility_lat'
-                  ];
+                    'site_lng',
+                    'site_lat'
+                  ],
 
-              var fieldNames = [
+                fieldNames = [
                     'project_id',
                     'report_id',
                     'cluster_id',
                     'cluster',
-                    'mpc_purpose_cluster_ids',
-                    'mpc_purpose',
+                    'mpc_purpose_cluster_id',
+                    'mpc_purpose_type_name',
                     'organization',
                     'implementing_partners',
                     'project_hrp_code',
@@ -638,11 +744,13 @@ var ClusterDashboardController = {
                     'project_title',
                     'project_start_date',
                     'project_end_date',
-                    'project_donor',
+                    'donor',
                     'report_month_number',
                     'report_month',
                     'report_year',
                     'reporting_period',
+                    'admin0pcode',
+                    'admin0name',
                     'admin1pcode',
                     'admin1name',
                     'admin2pcode',
@@ -650,8 +758,14 @@ var ClusterDashboardController = {
                     'admin3pcode',
                     'admin3name',
                     'conflict',
-                    'facility_type_name',
-                    'facility_name',
+                    'site_id',
+                    'site_class',
+                    'site_status',
+                    'site_hub_id',
+                    'site_hub_name',
+                    'site_implementation_name',
+                    'site_type_name',
+                    'site_name',
                     'category_type_id',
                     'category_type_name',
                     'beneficiary_type_id',
@@ -665,9 +779,9 @@ var ClusterDashboardController = {
                     'units',
                     'unit_type_id',
                     'unit_type_name',
-                    'transfers',
-                    'delivery_type',
-                    'package_type',
+                    'transfer_type_value',
+                    'mpc_delivery_type_id',
+                    'package_type_id',
                     'households',
                     'families',
                     'boys',
@@ -683,128 +797,9 @@ var ClusterDashboardController = {
                     'admin2lat',
                     'admin3lng',
                     'admin3lat',
-                    'facility_lng',
-                    'facility_lat'
+                    'site_lng',
+                    'site_lat'
                   ];
-
-              // eiewg download fields
-              if ( params.cluster_id === 'eiewg' ) {
-                var fields = [
-                    'project_id',
-                    'report_id',
-                    'cluster_id',
-                    'cluster',
-                    'mpc_purpose_cluster_id',
-                    'organization',
-                    'implementing_partners',
-                    'project_hrp_code',
-                    'project_code',
-                    'project_title',
-                    'donor',
-                    'report_month_number',
-                    'report_month',
-                    'report_year',
-                    'reporting_period',
-                    'admin1pcode',
-                    'admin1name',
-                    'admin2pcode',
-                    'admin2name',
-                    'conflict',
-                    'facility_implementation_name',
-                    'facility_type_name',
-                    'facility_id',
-                    'facility_name',
-                    'facility_hub_id',
-                    'facility_hub_name',
-                    'category_type_id',
-                    'category_type_name',
-                    'beneficiary_type_id',
-                    'beneficiary_type_name',
-                    'activity_type_id',
-                    'activity_type_name',
-                    'activity_description_id',
-                    'activity_description_name',
-                    'delivery_type_id',
-                    'delivery_type_name',
-                    'units',
-                    'unit_type_id',
-                    'unit_type_name',
-                    'transfer_type_value',
-                    'households',
-                    'families',
-                    'boys',
-                    'girls',
-                    'men',
-                    'women',
-                    'elderly_men',
-                    'elderly_women',
-                    'total',
-                    'admin1lng',
-                    'admin1lat',
-                    'admin2lng',
-                    'admin2lat',
-                    'facility_lng',
-                    'facility_lat'
-                  ];
-
-                var fieldNames = [
-                    'project_id',
-                    'report_id',
-                    'cluster_id',
-                    'cluster',
-                    'mpc_purpose_cluster_ids',
-                    'organization',
-                    'implementing_partners',
-                    'project_hrp_code',
-                    'project_code',
-                    'project_title',
-                    'project_donor',
-                    'report_month_number',
-                    'report_month',
-                    'report_year',
-                    'reporting_period',
-                    'admin1pcode',
-                    'admin1name',
-                    'admin2pcode',
-                    'admin2name',
-                    'conflict',
-                    'school_status',
-                    'school_type',
-                    'school_id',
-                    'school_name',
-                    'school_hub_id',
-                    'school_hub_name',
-                    'category_type_id',
-                    'category_type_name',
-                    'beneficiary_type_id',
-                    'beneficiary_type_name',
-                    'activity_type_id',
-                    'activity_type_name',
-                    'activity_description_id',
-                    'activity_description_name',
-                    'delivery_type_id',
-                    'delivery_type_name',
-                    'units',
-                    'unit_type_id',
-                    'unit_type_name',
-                    'transfers',
-                    'households',
-                    'families',
-                    'boys',
-                    'girls',
-                    'men',
-                    'women',
-                    'elderly_men',
-                    'elderly_women',
-                    'total',
-                    'admin1lng',
-                    'admin1lat',
-                    'admin2lng',
-                    'admin2lat',
-                    'facility_lng',
-                    'facility_lat'
-                  ];
-              }
 
               // return csv
               json2csv({ data: beneficiaries, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
@@ -856,9 +851,9 @@ var ClusterDashboardController = {
             });
 
             var fields = [
-                'cluster',
                 'report_id',
                 'location_id',
+                'cluster',
                 'stock_warehouse_id',
                 'stock_item_type',
                 'stock_item_name',
@@ -878,19 +873,21 @@ var ClusterDashboardController = {
                 'admin1name',
                 'admin2pcode',
                 'admin2name',
+                'admin3pcode',
+                'admin3name',
+                'site_lng',
+                'site_lat',
+                'site_name',
                 'conflict',
                 'number_in_stock',
                 'number_in_pipeline',
                 'beneficiaries_covered',
-                'facility_name',
-                'facility_lng',
-                'facility_lat'
-                ];
+              ],
 
-            var fieldNames = [
-                'cluster',
+            fieldNames = [
                 'report_id',
                 'location_id',
+                'cluster',
                 'stock_warehouse_id',
                 'stock_item_type',
                 'stock_item_name',
@@ -910,14 +907,16 @@ var ClusterDashboardController = {
                 'admin1name',
                 'admin2pcode',
                 'admin2name',
+                'admin3pcode',
+                'admin3name',
+                'warehouse_lng',
+                'warehouse_lat',
+                'warehouse_name',
                 'conflict',
                 'number_in_stock',
                 'number_in_pipeline',
                 'beneficiaries_covered',
-                'facility_name',
-                'facility_lng',
-                'facility_lat'
-                ];
+              ];
 
             // return csv
             json2csv({ data: stocks, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
@@ -961,8 +960,113 @@ var ClusterDashboardController = {
             // return error
             if (err) return res.negotiate( err );
 
-            var fields = ['admin0pcode','admin0name','cluster_id','cluster','organization','organization_tag','training_title','training_topics','training_start_date','training_end_date','training_days_number','training_conducted_by','training_supported_by','trainee_affiliation_id','trainee_affiliation_name','trainee_health_worker_id','trainee_health_worker_name','trainee_men','trainee_women','facility_id','facility_implementation_id','facility_type_id','facility_type_name','facility_name','facility_hub_id','facility_hub_name','facility_implementation_name','admin1lng','admin1lat','admin2lng','admin2lat','admin3lat','admin3lng','facility_lng','facility_lat','location_id','conflict','project_id','report_id','training_id','report_month','report_year','reporting_period','project_title','project_description','project_start_date','project_end_date','project_hrp_code','project_code','report_submitted','createdAt','updatedAt'];
-            var fieldNames = ['admin0pcode','admin0name','cluster_id','cluster','organization','organization_tag','training_title','training_topics','training_start_date','training_end_date','training_days_number','training_conducted_by','training_supported_by','trainee_affiliation_id','trainee_affiliation_name','trainee_health_worker_id','trainee_health_worker_name','trainee_men','trainee_women','facility_id','facility_implementation_id','facility_type_id','facility_type_name','facility_name','facility_hub_id','facility_hub_name','facility_implementation_name','admin1lng','admin1lat','admin2lng','admin2lat','admin3lat','admin3lng','facility_lng','facility_lat','location_id','conflict','project_id','report_id','training_id','report_month','report_year','reporting_period','project_title','project_description','project_start_date','project_end_date','project_hrp_code','project_code','report_submitted','createdAt','updatedAt'];
+            var fields = [
+              'project_id',
+              'project_title',
+              'project_description',
+              'project_start_date',
+              'project_end_date',
+              'project_hrp_code',
+              'project_code',
+              'report_id',
+              'report_month',
+              'report_year',
+              'reporting_period',
+              'report_submitted',
+              'admin0pcode',
+              'admin0name',
+              'cluster_id',
+              'cluster',
+              'organization',
+              'organization_tag',
+              'training_id',
+              'training_title',
+              'training_topics',
+              'training_start_date',
+              'training_end_date',
+              'training_days_number',
+              'training_conducted_by',
+              'training_supported_by',
+              'trainee_affiliation_id',
+              'trainee_affiliation_name',
+              'trainee_health_worker_id',
+              'trainee_health_worker_name',
+              'trainee_men',
+              'trainee_women',
+              'site_id',
+              'site_class',
+              'site_status',
+              'site_name',
+              'site_implementation_id',
+              'site_implementation_name',
+              'site_type_id',
+              'site_type_name',
+              'conflict',
+              'admin1lng',
+              'admin1lat',
+              'admin2lng',
+              'admin2lat',
+              'admin3lat',
+              'admin3lng',
+              'site_lng',
+              'site_lat',
+              'createdAt',
+              'updatedAt'
+            ],
+
+          fieldNames = [
+              'project_id',
+              'project_title',
+              'project_description',
+              'project_start_date',
+              'project_end_date',
+              'project_hrp_code',
+              'project_code',
+              'report_id',
+              'report_month',
+              'report_year',
+              'reporting_period',
+              'report_submitted',
+              'admin0pcode',
+              'admin0name',
+              'cluster_id',
+              'cluster',
+              'organization',
+              'organization_tag',
+              'training_id',
+              'training_title',
+              'training_topics',
+              'training_start_date',
+              'training_end_date',
+              'training_days_number',
+              'training_conducted_by',
+              'training_supported_by',
+              'trainee_affiliation_id',
+              'trainee_affiliation_name',
+              'trainee_health_worker_id',
+              'trainee_health_worker_name',
+              'trainee_men',
+              'trainee_women',
+              'site_id',
+              'site_class',
+              'site_status',
+              'site_name',
+              'site_implementation_id',
+              'site_implementation_name',
+              'site_type_id',
+              'site_type_name',
+              'conflict',
+              'admin1lng',
+              'admin1lat',
+              'admin2lng',
+              'admin2lat',
+              'admin3lat',
+              'admin3lng',
+              'site_lng',
+              'site_lat',
+              'createdAt',
+              'updatedAt'
+            ];
             // return csv
 
             training_participants.forEach(function( d, i ){
@@ -1020,8 +1124,8 @@ var ClusterDashboardController = {
 
             // project ids
             beneficiaries.forEach( function( d, i ){
-              if ( !locations[ d.project_id + d.facility_lat + d.facility_lng + d.facility_name ] ) {
-                locations[ d.project_id + d.facility_lat + d.facility_lng + d.facility_name ] = d;
+              if ( !locations[ d.project_id + d.site_lat + d.site_lng + d.site_name ] ) {
+                locations[ d.project_id + d.site_lat + d.site_lng + d.site_name ] = d;
               }
             });
 
@@ -1046,9 +1150,9 @@ var ClusterDashboardController = {
                             message += '<div style="text-align:center">' + d.admin1name + ', ' + d.admin2name + '</div>';
                           }
                           if ( d.cluster_id === 'health' ) {
-                            message += '<div style="text-align:center">' + d.facility_type_name + '</div>';
+                            message += '<div style="text-align:center">' + d.site_type_name + '</div>';
                           }
-                          message +=  '<div style="text-align:center">' + d.facility_name + '</div>'
+                          message +=  '<div style="text-align:center">' + d.site_name + '</div>'
                           + '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
                           + '<div style="text-align:center">' + d.organization + '</div>'
                           + '<div style="text-align:center">' + d.name + '</div>'
@@ -1059,8 +1163,8 @@ var ClusterDashboardController = {
               // create markers
               markers[ 'marker' + counter ] = {
                 layer: 'projects',
-                lat: d.facility_lat,
-                lng: d.facility_lng,
+                lat: d.site_lat,
+                lng: d.site_lng,
                 message: message
               };
 

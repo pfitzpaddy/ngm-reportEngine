@@ -204,8 +204,8 @@ var CtcDashboard = {
 
   },
 
-	// get epr indicators
-	getCtcIndicator: function(req, res) {
+  // get epr indicators
+  getCtcIndicator: function(req, res) {
 
     // params, filters
     var params = CtcDashboard.getParams( req );
@@ -213,7 +213,7 @@ var CtcDashboard = {
 
     // run query
     Assessments
-    	.find()
+      .find()
       .where( filters.region )
       .where( filters.zone )
       .where( filters.woreda )
@@ -226,8 +226,8 @@ var CtcDashboard = {
         // indicator
         switch( params.indicator ){
 
-        	// total reports due
-        	case 'download':
+          // total reports due
+          case 'download':
 
             // return csv
             json2csv({ data: results }, function( err, csv ) {
@@ -239,7 +239,7 @@ var CtcDashboard = {
 
             });
 
-        		break;
+            break;
 
           // total reports due
           case 'calendar':
@@ -260,7 +260,7 @@ var CtcDashboard = {
 
             break;
 
-        	default:
+          default:
             
             // return number of expected reports
             return res.json( 200, { 'value': results.length } );
@@ -272,7 +272,7 @@ var CtcDashboard = {
 
       });
 
-	},
+  },
 
   // get alert indicator
   getCaseManagementIndicator: function(req, res) {
@@ -352,7 +352,7 @@ var CtcDashboard = {
               // message
               var message = '<div class="center card-panel" style="width:300px">' +
                               '<div style="text-align:center;">' +
-                                '<div style="font-size:1.6rem; font-weight:100;">' + d.facility_name + '</div><br/>' + 
+                                '<div style="font-size:1.6rem; font-weight:100;">' + d.site_name + '</div><br/>' + 
                               '</div>' +
                               '<div style="text-align:center">' +
                                 '<span class="count">' + d.case_management_patients + '</span> patients, <span class="count">' + d.case_management_beds + '</span> beds <br/><br/>' + 
@@ -372,8 +372,8 @@ var CtcDashboard = {
               // create markers
               markers[ 'marker' + i ] = {
                 layer: 'case_management',
-                lat: parseFloat( d.facility_lat ),
-                lng: parseFloat( d.facility_lng ),
+                lat: parseFloat( d.site_lat ),
+                lng: parseFloat( d.site_lng ),
                 message: message
               };
             });

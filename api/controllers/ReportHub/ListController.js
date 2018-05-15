@@ -110,7 +110,7 @@ module.exports = {
   },
 
   // get admin2 list by admin0, admin1, admin2name
-  getAdmin2Facilities: function( req, res ) {
+  getAdmin2Sites: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
     if ( !req.param( 'cluster_id' ) || !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) || !req.param( 'admin2name' ) ) {
@@ -121,12 +121,12 @@ module.exports = {
     var admin2filter = req.param( 'admin2pcode' ) === '101' ? { admin2name: req.param( 'admin2name' ) } : { admin2pcode: req.param( 'admin2pcode' ) };
 
     // get list
-    Admin2Facilities
+    Admin2Sites
       .find()
       .where({ admin0pcode: req.param( 'admin0pcode' ) })
       .where({ admin1pcode: req.param( 'admin1pcode' ) })
       .where( admin2filter )
-      .where({ facility_class: req.param( 'cluster_id' ) })
+      .where({ site_class: req.param( 'cluster_id' ) })
       .sort('admin2name ASC')
       .exec( function( err, admin2 ){
 
@@ -141,23 +141,23 @@ module.exports = {
   },
 
   // get admin3 list by admin0, admin1, admin2name, admin3pcode
-  getAdmin3Facilities: function( req, res ) {
+  getAdmin3Sites: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
     if ( !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) || !req.param( 'admin3pcode' ) ) {
        return res.json( 401, { msg: 'admin0pcode, admin1pcode, & admin3pcode required and must be string' });
     }
 
-    // var facility_class = req.param( 'cluster_id' ) === 'wash' ? { facility_class: 'health' } : { facility_class: req.param( 'cluster_id' ) };
+    // var site_class = req.param( 'cluster_id' ) === 'wash' ? { site_class: 'health' } : { site_class: req.param( 'cluster_id' ) };
 
     // get list
-    Admin3Facilities
+    Admin3Sites
       .find()
       .where({ admin0pcode: req.param( 'admin0pcode' ) })
       .where({ admin1pcode: req.param( 'admin1pcode' ) })
       .where({ admin2pcode: req.param( 'admin2pcode' ) })
       .where({ admin3pcode: req.param( 'admin3pcode' ) })
-      .sort('facility_type_name ASC')
+      .sort('site_type_name ASC')
       .exec( function( err, admin3 ){
 
         // return error

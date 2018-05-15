@@ -257,35 +257,35 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
-		facility_id: {
+		site_id: {
 			type: 'string'
 		},
-		facility_class: {
+		site_class: {
 			type: 'string'
 		},
-		facility_status: {
+		site_status: {
 			type: 'string'
 		},
-		facility_implementation_id: {
+		site_implementation_id: {
 			type: 'string'
 		},
-		facility_implementation_name: {
+		site_implementation_name: {
 			type: 'string'
 		},
-		facility_type_id: {
+		site_type_id: {
 			type: 'string'
 		},
-		facility_type_name: {
+		site_type_name: {
 			type: 'string'
 		},
-		facility_name: {
+		site_name: {
 			type: 'string',
 			required: true
 		},
-		facility_hub_id: {
+		site_hub_id: {
 			type: 'string'
 		},
-		facility_hub_name: {
+		site_hub_name: {
 			type: 'string'
 		},
 		conflict: {
@@ -313,11 +313,11 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-		facility_lng: {
+		site_lng: {
 			type: 'float',
 			required: true
 		},
-		facility_lat: {
+		site_lat: {
 			type: 'float',
 			required: true
 		},

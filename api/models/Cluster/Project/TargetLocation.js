@@ -178,7 +178,7 @@ module.exports = {
 			type: 'array'
 		},
 
-		facility_id: {
+		site_id: {
 			type: 'string'
 		},
 
@@ -187,52 +187,57 @@ module.exports = {
 
 
 		// ADD THIS TO ADMIN2FACILITIES AS "EDUCATION" OR "HEALTH"
-		facility_class: {
+		site_class: {
 			type: 'string'
 		},
 
 
 
 		// ADD THIS TO ADMIN2FACILITIES AS OPEN
-		facility_status: {
+		site_status: {
 			type: 'string'
 		},
 
 
 
-		facility_implementation_id: {
+		site_implementation_id: {
 			type: 'string'
 		},
-		facility_implementation_name: {
+		site_implementation_name: {
 			type: 'string'
 		},
-		facility_type_id: {
+		site_type_id: {
 			type: 'string'
 		},
-		facility_type_name: {
+		site_type_name: {
 			type: 'string'
 		},
-		facility_name: {
+		site_name: {
 			type: 'string',
 			required: true
 		},
 
 
 		// //////////////
-		new_facility_id: {
+		new_site_id: {
 			type: 'string'
 		},
-		new_facility_name: {
+		new_site_name: {
 			type: 'string'
 		},
 		// //////////////
-
-
-
-		facility_hub_id: {
+		site_list_select_id: {
 			type: 'string'
 		},
-		facility_hub_name: {
+		site_list_select_name: {
+			type: 'string'
+		},
+
+		// 
+		site_hub_id: {
+			type: 'string'
+		},
+		site_hub_name: {
 			type: 'string'
 		},
 		conflict: {
@@ -260,11 +265,11 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-		facility_lng: {
+		site_lng: {
 			type: 'float',
 			required: true
 		},
-		facility_lat: {
+		site_lat: {
 			type: 'float',
 			required: true
 		},

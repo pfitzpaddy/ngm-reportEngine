@@ -82,8 +82,8 @@ module.exports.routes = {
   'GET /list/getAdmin1List': 'ReportHub/ListController.getAdmin1List',
   'GET /list/getAdmin2List': 'ReportHub/ListController.getAdmin2List',
   'GET /list/getAdmin3List': 'ReportHub/ListController.getAdmin3List',
-  'GET /list/getAdmin2Facilities': 'ReportHub/ListController.getAdmin2Facilities',
-  'GET /list/getAdmin3Facilities': 'ReportHub/ListController.getAdmin3Facilities',
+  'GET /list/getAdmin2Sites': 'ReportHub/ListController.getAdmin2Sites',
+  'GET /list/getAdmin3Sites': 'ReportHub/ListController.getAdmin3sites',
 
 
 
@@ -104,7 +104,7 @@ module.exports.routes = {
   'POST /cluster/project/removeBudgetItem': 'Cluster/ProjectController.removeBudgetItemById',
   'POST /cluster/project/removeBeneficiary': 'Cluster/ProjectController.removeBeneficiaryById',
   'POST /cluster/project/removeLocation': 'Cluster/ProjectController.removeLocationById',
-  'POST /cluster/project/checkUserExists': 'ReportHub/UserController.checkUserExists',
+  // 'POST /cluster/project/checkUserExists': 'ReportHub/UserController.checkUserExists',
   'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'POST /cluster/project/getFinancialDetails': 'Cluster/ProjectController.getFinancialDetails',

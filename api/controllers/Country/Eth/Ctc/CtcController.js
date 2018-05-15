@@ -55,22 +55,22 @@ module.exports = {
 				kobo = JSON.parse( stdout );
 
 				// get location details
-				Admin3Facilities
+				Admin3Sites
 					.find()
 					.where({ 'admin0pcode': 'ET' })
-					.exec(function (err, admin3facilities) {
+					.exec(function (err, admin3sites) {
 
 						// err
 						if ( err ) return res.negotiate( err );
 
 						// for each
-						admin3facilities.forEach(function( d, i ){
+						admin3sites.forEach(function( d, i ){
 
 							// create lookup
 							region[ d.admin1pcode ] = d;
 							zone[ d.admin2pcode ] = d;
 							woreda[ d.admin3pcode ] = d;
-							facilities[ d.facility_id ] = d
+							facilities[ d.site_id ] = d;
 
 						});
 
@@ -121,28 +121,28 @@ module.exports = {
 									admin3lng: woreda[d['reporting/reporting_facility/reporting_woreda']].admin3lng,
 									admin3lat: woreda[d['reporting/reporting_facility/reporting_woreda']].admin3lat,
 									// admin3 (default)
-									facility_lng: woreda[d['reporting/reporting_facility/reporting_woreda']].admin3lng,
-									facility_lat: woreda[d['reporting/reporting_facility/reporting_woreda']].admin3lat,
-									// facility
-									facility_type: d['reporting/reporting_facility/reporting_facility_type'].toUpperCase(),
-									facility_name: d['reporting/reporting_facility/reporting_facility_name'],
-									// parent facility
-									parent_facility_id: d['reporting/reporting_facility/reporting_parent_facility'],
-									parent_facility_name: facilities[d['reporting/reporting_facility/reporting_parent_facility']].facility_name,
-									parent_facility_type: facilities[d['reporting/reporting_facility/reporting_parent_facility']].facility_type,
+									site_lng: woreda[d['reporting/reporting_facility/reporting_woreda']].admin3lng,
+									site_lat: woreda[d['reporting/reporting_facility/reporting_woreda']].admin3lat,
+									// site
+									site_type: d['reporting/reporting_facility/reporting_facility_type'].toUpperCase(),
+									site_name: d['reporting/reporting_facility/reporting_facility_name'],
+									// parent site
+									parent_site_id: d['reporting/reporting_facility/reporting_parent_facility'],
+									parent_site_name: facilities[d['reporting/reporting_facility/reporting_parent_facility']].site_name,
+									parent_site_type: facilities[d['reporting/reporting_facility/reporting_parent_facility']].site_type_name,
 									// submission
 									_submission_time: d['_submission_time']
 								};
 
 								// determine level accuracy
 								if ( d['reporting/reporting_facility/reporting_parent_facility'] ) {
-									assessment_obj.facility_lng = facilities[d['reporting/reporting_facility/reporting_parent_facility']].facility_lng;
-									assessment_obj.facility_lat = facilities[d['reporting/reporting_facility/reporting_parent_facility']].facility_lat;
+									assessment_obj.site_lng = facilities[d['reporting/reporting_facility/reporting_parent_facility']].site_lng;
+									assessment_obj.site_lat = facilities[d['reporting/reporting_facility/reporting_parent_facility']].site_lat;
 								}
 								if ( d['reporting/reporting_gps/facility_gps'] ) {
 									var position = d['reporting/reporting_gps/facility_gps'].split(' ');
-									assessment_obj.facility_lng = position[1];
-									assessment_obj.facility_lat = position[0];
+									assessment_obj.site_lng = position[1];
+									assessment_obj.site_lat = position[0];
 								}
 
 								// case management
@@ -222,4 +222,3 @@ module.exports = {
 	}
 
 };
-
