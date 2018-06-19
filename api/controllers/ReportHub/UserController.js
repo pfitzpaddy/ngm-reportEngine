@@ -5,8 +5,9 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-module.exports = {
+var UserController = {
 
+  // create user
   create: function(req, res) {
 
     // check params
@@ -41,9 +42,24 @@ module.exports = {
 
           // save
           user.save( function(err){
-            //  return user
-            // console.log('User with ID '+user.id+' now has token '+user.token);
-            res.json( 200, user );
+
+            // create userHistory
+            var userHistory = _.clone( user );
+                userHistory.user_id = user.id
+                delete userHistory.id;
+
+            // create user history for tracking!
+            UserHistory
+              .create( userHistory )
+              .exec( function( err, newUserHistory ) {
+                
+                // err
+                if (err) return res.negotiate( err );
+                
+                // return user
+                res.json( 200, user );
+
+              });
           });
 
         });
@@ -118,7 +134,34 @@ module.exports = {
 
   },
 
-  //
+  // get by username for profile
+  getUserByUsername: function(req, res){
+
+    // check params
+    if ( !req.param( 'username' ) ) {
+      return res.json(401, { msg: 'username required' });
+    }
+
+    // new profile
+    var username = req.param( 'username' );
+
+    // users
+    User
+      .findOne()
+      .where( { username: username } )
+      .exec( function( err, user ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // return updated user
+        return res.json( 200, user );
+
+      }); 
+
+  },
+
+  // metrics
   updateLogin: function(req, res){
 
     // check params
@@ -219,16 +262,31 @@ module.exports = {
                 Report.update( findOriginalUser, updatedRelationsUser ),
                 Location.update( findOriginalUser, updatedRelationsUser ),
                 Beneficiaries.update( findOriginalUser, updatedRelationsUser ),
+                Trainings.update( findOriginalUser, updatedRelationsUser ),
+                TrainingParticipants.update( findOriginalUser, updatedRelationsUser ),
                 Stock.update( findOriginalUser, updatedRelationsUser ),
                 StockLocation.update( findOriginalUser, updatedRelationsUser ),
                 StockReport.update( findOriginalUser, updatedRelationsUser ),
                 StockWarehouse.update( findOriginalUser, updatedRelationsUser )
               ])
                 .catch( function(err) {
-                  return res.negotiate( err )
+                  return res.negotiate( err );
                 })
                 .done( function() {
-                  return res.json( 200, { success: true, user: result[0] } )
+
+                  // the following is for tracking of iMMAP staff (for now)
+
+                  // update user programme and track
+                  if ( originalUser.programme_id !== result[0].programme_id || 
+                        originalUser.contract_start_date.toString() !== result[0].contract_start_date.toString() ||
+                        originalUser.contract_end_date.toString() !== result[0].contract_end_date.toString() ||
+                        originalUser.admin0pcode !== result[0].admin0pcode ||
+                        originalUser.site_name !== result[0].site_name ){
+                    // profile details
+                    UserController.updateProfileDetails( req, res, originalUser, result[0] );
+                  } else {
+                    return res.json( 200, { success: true, user: result[0] } );
+                  }
                 });
 
             });
@@ -241,7 +299,25 @@ module.exports = {
 
   },
 
-  //
+  // update the profile details 
+  updateProfileDetails: function(req, res, originalUser, updatedUser){
+
+    // if country changes, make updates and new history
+
+    // if programme / site changes, make updates and new history
+
+    // if dates change (only), make update
+    console.log('contract_start_date')
+    console.log(originalUser.contract_start_date.toString() !== updatedUser.contract_start_date.toString())
+    console.log('contract_end_date')
+    console.log(originalUser.contract_end_date.toString() !== updatedUser.contract_end_date.toString())
+
+    // return updates user
+    return res.json( 200, { success: true, user: updatedUser } );
+
+  },
+
+  // send email for password reset
   passwordResetEmail: function(req, res){
 
     // check params
@@ -331,7 +407,7 @@ module.exports = {
 
   },
 
-  //
+  // password reset
   passwordReset: function(req, res){
 
     // check params
@@ -387,3 +463,5 @@ module.exports = {
   }
 
 };
+
+module.exports = UserController;

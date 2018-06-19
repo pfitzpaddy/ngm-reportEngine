@@ -37,10 +37,13 @@ module.exports.routes = {
   'GET /login': 'ReportHub/UserController.login',
   'POST /login': 'ReportHub/UserController.login',
   'POST /create': 'ReportHub/UserController.create',
-  'POST /update': 'ReportHub/UserController.updateLogin',
+  'POST /update': 'ReportHub/UserController.updateLogin',  
   'POST /profile/update': 'ReportHub/UserController.updateProfile',
   'POST /send-email': 'ReportHub/UserController.passwordResetEmail',
   'POST /password-reset': 'ReportHub/UserController.passwordReset',
+  // user
+  'GET /getUserByUsername': 'ReportHub/UserController.getUserByUsername',
+  'POST /getUserByUsername': 'ReportHub/UserController.getUserByUsername',
 
   // org
   'GET /getOrganization': 'ReportHub/OrganizationController.getOrganization',
@@ -49,6 +52,8 @@ module.exports.routes = {
   'POST /setOrganization': 'ReportHub/OrganizationController.setOrganization',
   'GET /getOrganizationUsers': 'ReportHub/OrganizationController.getOrganizationUsers',
   'POST /getOrganizationUsers': 'ReportHub/OrganizationController.getOrganizationUsers',
+  'GET /getOrganizationIndicator': 'ReportHub/OrganizationController.getOrganizationIndicator',
+  'POST /getOrganizationIndicator': 'ReportHub/OrganizationController.getOrganizationIndicator',
   'GET /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
   'POST /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
 
@@ -82,6 +87,7 @@ module.exports.routes = {
   'GET /list/getAdmin1List': 'ReportHub/ListController.getAdmin1List',
   'GET /list/getAdmin2List': 'ReportHub/ListController.getAdmin2List',
   'GET /list/getAdmin3List': 'ReportHub/ListController.getAdmin3List',
+  'GET /list/getDutyStations': 'ReportHub/ListController.getDutyStations',
   'GET /list/getAdmin2Sites': 'ReportHub/ListController.getAdmin2Sites',
   'GET /list/getAdmin3Sites': 'ReportHub/ListController.getAdmin3sites',
 

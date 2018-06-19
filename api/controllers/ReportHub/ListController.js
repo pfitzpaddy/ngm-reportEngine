@@ -109,6 +109,22 @@ module.exports = {
 
   },
 
+  // return list of duty stations
+  getDutyStations: function( req, res ) {
+
+    DutyStation
+      .find()
+      .exec( function( err, dutystations ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // return new Project
+        return res.json( 200, dutystations );
+
+      });
+  },
+
   // get admin2 list by admin0, admin1, admin2name
   getAdmin2Sites: function( req, res ) {
 

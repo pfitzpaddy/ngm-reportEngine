@@ -12,6 +12,11 @@ module.exports = {
 
 	// attributes
 	attributes: {
+		// master table user id
+    user_id: {
+			type: 'string',
+			required: true
+    },
 		// region/country id
     adminRpcode: {
 			type: 'string',
@@ -112,37 +117,14 @@ module.exports = {
 			unique: true,
 			required: true
 		},
-		anonymous: {
-			type: 'boolean',
-			defaultsTo: false
-		},
 		roles: {
 			type: 'array',
 			defaultsTo: [ "USER" ]
-		},
-		app_home: {
-			type: 'string',
-			defaultsTo: '/cluster/organization/'
-		},
-		menu: {
-			type: 'array',
-			defaultsTo: [{
-        icon: 'zoom_in',
-        liClass: 'teal z-depth-2',
-        aClass: 'white-text',
-        iClass: 'medium material-icons',
-        href: '/cluster/projects/',
-        title: 'MY PROJECTS'
-       }]
 		},
 		visits: {
 			type: 'integer',
 			defaultsTo: 1
 		},
-		gravatar_url: {
-			type: 'string'
-		},
-
 		site_class: {
 			type: 'string'
 		},

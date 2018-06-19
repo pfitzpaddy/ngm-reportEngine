@@ -36,10 +36,61 @@ module.exports = {
   },
 
   // get organization by id
+  getOrganizationIndicator: function( req, res ){
+
+    // set filters
+    var adminRpcode_filter = req.param( 'adminRpcode' ) ? { adminRpcode: req.param( 'adminRpcode' ) } : {},
+        admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: req.param( 'admin0pcode' ) } : {},
+        cluster_id_filter = req.param( 'cluster_id' ) ? { cluster_id: req.param( 'cluster_id' ) } : {},
+        organization_filter = req.param( 'organization' ) ? { organization: req.param( 'organization' ) } : {};
+
+
+    // users
+    User
+      .find()
+      .where( adminRpcode_filter )
+      .where( admin0pcode_filter )
+      .where( cluster_id_filter )
+      .where( organization_filter )
+      .exec( function( err, users ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // indicator
+        switch( req.param( 'indicator' ) ) {
+
+          // distinct countries
+          case 'countries':
+            var countries = _.uniq( users, function( user ) { return user.admin0pcode; });
+            return res.json( 200, { value: countries.length } );
+            break;
+
+          // distinct sectors
+          case 'sectors':
+            var sectors = _.uniq( users, function( user ) { return user.cluster_id; });
+            return res.json( 200, { value: sectors.length } );
+            break;
+
+          // total users
+          case 'total':
+            return res.json( 200, { value: users.length } );
+            break;
+
+          // user list
+          default:
+            return res.json( 200, users );
+        }
+
+      });
+
+  },
+
+  // get organization by id
   getOrganizationUsers: function( req, res ){
 
     // check params
-    if ( !req.param( 'admin0pcode' ) || !req.param( 'cluster_id' ) || !req.param( 'organization' ) ) {
+    if ( !req.param( 'admin0pcode' ) || !req.param( 'organization' ) ) {
       return res.json(401, { msg: 'admin0pcode, cluster_id, organization required' });
     }
 
@@ -48,12 +99,14 @@ module.exports = {
         cluster_id = req.param( 'cluster_id' ),
         organization = req.param( 'organization' );
 
+    // for all cluster_ids
+    var cluster_id_filter = cluster_id ? { cluster_id: cluster_id } : { };
 
     // find
     User
       .find()
       .where( { admin0pcode: admin0pcode } )
-      .where( { cluster_id: cluster_id } )
+      .where( cluster_id_filter )
       .where( { organization: organization } )
       .exec( function( err, users ){
 
@@ -63,7 +116,7 @@ module.exports = {
         // return updated user
         return res.json( 200, users );
 
-      })
+      });
 
   },
 
