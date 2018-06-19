@@ -300,20 +300,135 @@ var UserController = {
   },
 
   // update the profile details 
-  updateProfileDetails: function(req, res, originalUser, updatedUser){
+  updateProfileDetails: function( req, res, originalUser, updatedUser ){
 
-    // if country changes, make updates and new history
+    // if country changes, make updates and add new history
+    if ( originalUser.admin0pcode !== updatedUser.admin0pcode ) {
 
-    // if programme / site changes, make updates and new history
+      // fetch
+      Organization
+        .find()
+        .where( { admin0pcode: updatedUser.admin0pcode } )
+        .exec( function( err, organization ){
+          
+          // generic error
+          if (err) return res.negotiate( err );
 
-    // if dates change (only), make update
-    console.log('contract_start_date')
-    console.log(originalUser.contract_start_date.toString() !== updatedUser.contract_start_date.toString())
-    console.log('contract_end_date')
-    console.log(originalUser.contract_end_date.toString() !== updatedUser.contract_end_date.toString())
+          // if no results, create new organization
+          if ( !organization.length ) {
+            var newOrganizationAdmin0 = _.clone( updatedUser );
+                delete newOrganizationAdmin0.id;
 
-    // return updates user
-    return res.json( 200, { success: true, user: updatedUser } );
+            // create new
+            Organization
+              .create( newOrganizationAdmin0 )
+              .exec( function( err, newOrganization ) {
+                
+                // generic error
+                if (err) return res.negotiate( err );
+
+                // update user country
+                User
+                  .update( { id: updatedUser.id }, { organization_id: newOrganization.id } )
+                  .exec( function( err, newOrgUser ){
+                    
+                    // create new userHistory
+                    var newUserHistory = _.clone( newOrgUser[0] );
+                        newUserHistory.user_id = newUserHistory.id;
+                        delete newUserHistory.id;
+
+                    // create user history for tracking!
+                    UserHistory
+                      .create( newUserHistory )
+                      .exec( function( err, newUserHistory ) {
+                        
+                        // err
+                        if (err) return res.negotiate( err );
+                        
+                        // return user
+                        return res.json( 200, { success: true, user: newOrgUser[0] } );
+
+                      });
+
+
+                  });
+
+              });
+
+          } else {
+
+            // update user country
+            User
+              .update( { id: updatedUser.id }, { organization_id: organization[0].id } )
+              .exec( function( err, updatedOrgUser ){
+
+                // create new userHistory
+                var newUserHistory = _.clone( updatedOrgUser[0] );
+                    newUserHistory.user_id = newUserHistory.id;
+                    delete newUserHistory.id;
+
+                // create user history for tracking!
+                UserHistory
+                  .create( newUserHistory )
+                  .exec( function( err, newUserHistory ) {
+                    
+                    // err
+                    if (err) return res.negotiate( err );
+                    
+                    // return user
+                    return res.json( 200, { success: true, user: updatedOrgUser[0] } );
+
+                  });
+
+              });
+
+          }
+
+        });
+
+    // udpate prgramme or duty station
+    } else if ( originalUser.programme_id !== updatedUser.programme_id ||
+              originalUser.site_name !== updatedUser.site_name ) {
+
+      // create new userHistory
+      var newUserHistory = _.clone( updatedUser );
+          newUserHistory.user_id = newUserHistory.id;
+          delete newUserHistory.id;
+
+      // create user history for tracking!
+      UserHistory
+        .create( newUserHistory )
+        .exec( function( err, newUserHistory ) {
+          
+          // err
+          if (err) return res.negotiate( err );
+          
+          // return user
+          return res.json( 200, { success: true, user: updatedOrgUser[0] } );
+
+        });
+
+    // date updates only require update to UserHistory
+    } else if ( originalUser.contract_start_date.toString() !== updatedUser.contract_start_date.toString() ||
+                  originalUser.contract_end_date.toString() !== updatedUser.contract_end_date.toString() ) {
+      
+      // update userHistory records dates
+      UserHistory
+        .update( { user_id: updatedUser.id }, { contract_end_date: updatedUser.contract_start_date, contract_end_date: updatedUser.contract_end_date } )
+        .exec( function( err, updatedUserHistory ){
+          
+          // err
+          if (err) return res.negotiate( err );
+
+          // return default
+          return res.json( 200, { success: true, user: updatedUser } );
+
+        });
+    } else {
+      
+      // return default
+      return res.json( 200, { success: true, user: updatedUser } );
+    }
 
   },
 
