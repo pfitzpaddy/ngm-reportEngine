@@ -116,6 +116,10 @@ module.exports = {
 			type: 'boolean',
 			defaultsTo: false
 		},
+		status: {
+			type: 'string',
+			defaultsTo: 'active'
+		},
 		roles: {
 			type: 'array',
 			defaultsTo: [ "USER" ]

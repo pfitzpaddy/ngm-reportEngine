@@ -42,7 +42,8 @@ module.exports = {
     var adminRpcode_filter = req.param( 'adminRpcode' ) ? { adminRpcode: req.param( 'adminRpcode' ) } : {},
         admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: req.param( 'admin0pcode' ) } : {},
         cluster_id_filter = req.param( 'cluster_id' ) ? { cluster_id: req.param( 'cluster_id' ) } : {},
-        organization_filter = req.param( 'organization' ) ? { organization: req.param( 'organization' ) } : {};
+        organization_filter = req.param( 'organization' ) ? { organization: req.param( 'organization' ) } : {},
+        status_filter = req.param( 'status' ) ? { status: req.param( 'status' ) } : {};
 
 
     // users
@@ -52,6 +53,7 @@ module.exports = {
       .where( admin0pcode_filter )
       .where( cluster_id_filter )
       .where( organization_filter )
+      .where( status_filter )
       .exec( function( err, users ){
 
         // return error
@@ -96,8 +98,9 @@ module.exports = {
 
     // id params
     var admin0pcode = req.param( 'admin0pcode' ),
-        cluster_id = req.param( 'cluster_id' ),
-        organization = req.param( 'organization' );
+        organization = req.param( 'organization' ),
+        status_filter = req.param( 'status' ) ? { status: req.param( 'status' ) } : {},
+        cluster_id_filter = req.param( 'cluster_id' ) ? { cluster_id: req.param( 'cluster_id' ) } : {};
 
     // for all cluster_ids
     var cluster_id_filter = cluster_id ? { cluster_id: cluster_id } : { };
@@ -105,8 +108,9 @@ module.exports = {
     // find
     User
       .find()
-      .where( { admin0pcode: admin0pcode } )
+      .where( status_filter )
       .where( cluster_id_filter )
+      .where( { admin0pcode: admin0pcode } )
       .where( { organization: organization } )
       .exec( function( err, users ){
 

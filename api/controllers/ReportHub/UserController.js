@@ -12,7 +12,7 @@ var UserController = {
 
     // check params
     if (!req.param( 'user' )) {
-      return res.json(401, { msg: 'user required!' });
+      return res.json(401, { msg: 'User Required!' });
     }
 
     // try to look up user using the provided username/email address
@@ -68,6 +68,28 @@ var UserController = {
 
   },
 
+  // delete user
+  delete: function (req, res) {
+
+    // check params
+    if (!req.param( 'user' )) {
+      return res.json(401, { msg: 'User Required' });
+    }
+
+    User
+      .destroy( { id: req.param( 'user' ).id } )
+      .exec( function( err ){
+        
+        // generic error
+        if ( err ) return res.negotiate( err );
+
+        // user destroyed
+        return res.json( 200, { success: true } );
+
+      });
+
+  },
+
   // Check provided email address and password
   login: function (req, res) {
 
@@ -87,10 +109,13 @@ var UserController = {
     }, function foundUser( err, user ) {
 
       // generic error
-      if (err) return res.negotiate( err );
+      if ( err ) return res.negotiate( err );
 
       // user not found
-      if (!user) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
+      if ( !user ) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
+
+      // user not active
+      if ( user.status !== 'active' ) return res.json({ err: true, msg: 'User No Longer Active! Contact Admin' });
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
@@ -404,7 +429,7 @@ var UserController = {
           if (err) return res.negotiate( err );
           
           // return user
-          return res.json( 200, { success: true, user: updatedOrgUser[0] } );
+          return res.json( 200, { success: true, user: updatedUser } );
 
         });
 
@@ -425,7 +450,7 @@ var UserController = {
 
         });
     } else {
-      
+
       // return default
       return res.json( 200, { success: true, user: updatedUser } );
     }
