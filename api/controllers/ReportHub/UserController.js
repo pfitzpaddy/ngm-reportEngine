@@ -303,8 +303,8 @@ var UserController = {
 
                   // update user programme and track
                   if ( originalUser.programme_id !== result[0].programme_id || 
-                        originalUser.contract_start_date.toString() !== result[0].contract_start_date.toString() ||
-                        originalUser.contract_end_date.toString() !== result[0].contract_end_date.toString() ||
+                        originalUser.contract_start_date && originalUser.contract_start_date.toString() !== result[0].contract_start_date && result[0].contract_start_date.toString() ||
+                        originalUser.contract_end_date && originalUser.contract_end_date.toString() !== result[0].contract_end_date && result[0].contract_end_date.toString() ||
                         originalUser.admin0pcode !== result[0].admin0pcode ||
                         originalUser.site_name !== result[0].site_name ){
                     // profile details
