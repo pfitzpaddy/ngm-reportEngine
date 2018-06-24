@@ -53,6 +53,11 @@ module.exports.policies = {
   },
 
   // public
+  'iMMAP/Products/ProductsController': {
+    'getProductsData': true
+  },
+
+  // public
   'Country/Eth/Ctc/CtcController': {
     '*': true
   },

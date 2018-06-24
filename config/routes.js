@@ -72,6 +72,16 @@ module.exports.routes = {
   'GET /export': 'ReportHub/FileController.export',
   'GET /getBeneficiairiesCsv': 'ReportHub/FileController.getBeneficiairiesCsv',
 
+  
+  // -------- iMMAP --------
+  // -------- Products --------
+  'GET /immap/products/getProductsData': 'iMMAP/Products/ProductsController.getProductsData',
+  'GET /immap/products/latestUpdate': 'iMMAP/Products/ProductsController.getLatestUpdate',
+  'GET /immap/products/getProductsMenu': 'iMMAP/Products/ProductsController.getProductsMenu',
+  'POST /immap/products/getProductsMenu': 'iMMAP/Products/ProductsController.getProductsMenu',
+  'GET /immap/products/indicator': 'iMMAP/Products/ProductsController.getProductsIndicator',
+  'POST /immap/products/indicator': 'iMMAP/Products/ProductsController.getProductsIndicator',
+
 
   // -------- ETHIOPIA --------
   // -------- CTC --------
