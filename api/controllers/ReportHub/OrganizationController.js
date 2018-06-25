@@ -102,9 +102,6 @@ module.exports = {
         status_filter = req.param( 'status' ) ? { status: req.param( 'status' ) } : {},
         cluster_id_filter = req.param( 'cluster_id' ) ? { cluster_id: req.param( 'cluster_id' ) } : {};
 
-    // for all cluster_ids
-    var cluster_id_filter = cluster_id ? { cluster_id: cluster_id } : { };
-
     // find
     User
       .find()
