@@ -58,6 +58,40 @@ module.exports = {
 						admin0lat: 8.308214,
 						admin0zoom: 6
 					}
+				},
+				sectors = {
+					'agriculutre_and_livestock': {
+						product_sector_short: 'AGR',
+						theme: { color: '#ffff00' }
+					},
+					'education':{
+						product_sector_short: 'EDU',
+						theme: { color: '#f06292' }
+					},
+					'emergency_shelter_nfi': {
+						product_sector_short: 'S/NFI',
+						theme: { color: '#ec407a' }
+					},
+					'food': {
+						product_sector_short: 'FOOD',
+						theme: { color: '#fdd835' }
+					},
+					'health': {
+						product_sector_short: 'HEA',
+						theme: { color: '#2196f3' }
+					},
+					'nutrition': {
+						product_sector_short: 'NUT',
+						theme: { color: '#4caf50' }
+					},
+					'protection': {
+						product_sector_short: 'PRT',
+						theme: { color: '#ab47bc' }
+					},
+					'wash': {
+						product_sector_short: 'WASH',
+						theme: { color: '#009688' }
+					}
 				};
 
 				// set cmd
@@ -101,9 +135,12 @@ module.exports = {
 
 					// add product_date
 					obj.timestamp_format = new Date( obj.timestamp ).toUTCString().slice(0, -4);
-					obj.product_sector_id = obj.product_sector.toLowerCase().replace( ' ', '_' );
-					obj.product_type_id = obj.product_type.toLowerCase().replace( ' ', '_' );
+					obj.product_sector_id = obj.product_sector.toLowerCase().split('/').join('').replace( / /g, '_' ).replace( /__/g, '_' );
+					obj.product_type_id = obj.product_type.toLowerCase().replace( / /g, '_' );
 					obj.product_date = new Date( Date.UTC( obj.product_year, months[ obj.product_month ], 1 ) ).toISOString();
+
+					// merge tags
+					_.merge( obj, sectors[ obj.product_sector_id ] );
 
 					// merge data structure
 					_.merge( obj, regions[ obj.country ] );
@@ -229,7 +266,7 @@ module.exports = {
 					// menu
 					menu.push({
 						'id': 'search-project',
-						'icon': 'donut_large',
+						'icon': 'recent_actors',
 						'title': 'Project',
 						'class': 'teal lighten-1 white-text',
 						'rows':[]
@@ -459,13 +496,46 @@ module.exports = {
 
 						break;
 
-					// retun total
-					case 'total':
+					// retun team contributors
+					case 'team':
+
+						// get unique sectors
+						var team = _.uniq( products, function( p ){
+							return p.email;
+						});
 
 						// return products
+						return res.json( 200, { value: team.length } );
+
+						break;
+
+					// retun products
+					case 'products':
+
+						// return total
 						return res.json( 200, { value: products.length } );
 
 						break;
+
+					// retun sectors
+					case 'products_chart':
+
+						// flatten and count
+						var tags = _.chain( products ).map( 'product_type' ).countBy().value();
+						
+						// make chart
+						var i = 0,
+								chart = [],
+								colors = [ '#90caf9','#64b5f6','#42a5f5','#2196f3','#1e88e5','#1976d2', '#1565c0', '#0d47a1' ];
+						for (var key in tags) {
+							chart.push({ name: key, y: tags[key], color: colors[i] } );
+							i++;
+						}
+
+						// return products
+						return res.json( 200, { data: chart } );
+
+						break;				
 
 					// retun sectors
 					case 'sectors':
@@ -480,11 +550,42 @@ module.exports = {
 
 						break;
 
+					// retun sectors
+					case 'sectors_chart':
+
+						// flatten and count
+						var tags = _.chain( products ).map( 'product_sector' ).countBy().value();
+
+						// set object
+						var tags = {}
+						products.forEach( function( d, i ) {
+							if ( !tags[ d.product_sector_id ] ){
+								tags[ d.product_sector_id ] = {
+									name: d.product_sector,
+									y: 0,
+									color: d.theme.color
+								}
+							}
+							tags[ d.product_sector_id ].y++;
+						});
+
+						// make chart
+						var chart = [];
+						for (var key in tags) {
+							chart.push(tags[key]);
+						}
+
+						// return products
+						return res.json( 200, { data: chart } );
+
+						break;
+
 					// retun list
 					case 'calendar':
 
 						// result
 						var result = {};
+						
 						// for each row, format for cal-heatmap
 						products.forEach( function( d, i ) {
 							// timestamp is seconds since 1st Jan 1970
