@@ -100,6 +100,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		profile: {
+			type: 'string'
+		},
+		software: {
+			type: 'string'
+		},
 		phone: {
 			type: 'string',
 			required: true
