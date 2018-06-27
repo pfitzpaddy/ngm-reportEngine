@@ -23,8 +23,8 @@ var AdminDashboardController = {
   getClusterAdminIndicator: function( req, res ){
 
     // request input
-    if ( !req.param( 'report_type' ) || !req.param( 'indicator' ) || !req.param( 'cluster_id' ) || !req.param( 'organization_tag' ) || !req.param( 'adminRpcode' )  || !req.param( 'admin0pcode' ) || !req.param( 'start_date' ) || !req.param( 'end_date' ) ) {
-      return res.json( 401, { err: 'report_type, indicator, cluster_id, adminRpcode, admin0pcode, start_date, end_date required!' });
+    if ( !req.param( 'report_type' ) || !req.param( 'indicator' ) || !req.param( 'cluster_id' ) || !req.param( 'organization_tag' ) || !req.param( 'activity_type_id' ) || !req.param( 'adminRpcode' )  || !req.param( 'admin0pcode' ) || !req.param( 'start_date' ) || !req.param( 'end_date' ) ) {
+      return res.json( 401, { err: 'report_type, indicator, cluster_id, organization_tag, activity_type_id, adminRpcode, admin0pcode, start_date, end_date required!' });
     }
 
     // organizations to exclude totally
@@ -37,6 +37,7 @@ var AdminDashboardController = {
           list: req.param( 'list' ),
           indicator: req.param( 'indicator' ),
           report_type: req.param( 'report_type' ),
+          activity_type_id: req.param( 'activity_type_id' ) === 'all'? {} : { 'activity_type.activity_type_id': req.param( 'activity_type_id' ) },
           organization_tag: req.param( 'organization_tag' ),
           cluster_filter: req.param( 'cluster_id' ) === 'all' || req.param( 'cluster_id' ) === 'acbar' ? {} : { cluster_id: req.param( 'cluster_id' ) },
           acbar_partners_filter: req.param( 'cluster_id' ) === 'acbar' ? { project_acbar_partner: true } : {},
@@ -504,6 +505,7 @@ var AdminDashboardController = {
           .where( params.acbar_partners_filter )
           .where( params.adminRpcode_filter )
           .where( params.admin0pcode_filter )
+          .where( params.activity_type_id )
           .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
           .where( { project_end_date: { '>=': new Date( params.start_date ) } } )
           .where( params.organization_filter )
@@ -533,6 +535,7 @@ var AdminDashboardController = {
             .where( params.acbar_partners_filter )
             .where( params.adminRpcode_filter )
             .where( params.admin0pcode_filter )
+            .where( params.activity_type_id )
             .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
             .where( { project_end_date: { '>=': new Date( params.start_date ) } } )
             .where( params.organization_filter )
@@ -605,6 +608,7 @@ var AdminDashboardController = {
           .where( params.adminRpcode_filter )
           .where( params.admin0pcode_filter )
           .where( { report_active: true } )
+          .where( params.activity_type_id )
           .where( { report_status: [ 'todo', 'complete' ] } )
           .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
           .where( params.organization_filter )
@@ -673,6 +677,7 @@ var AdminDashboardController = {
           .where( params.adminRpcode_filter )
           .where( params.admin0pcode_filter )
           .where( { report_active: true } )
+          .where( params.activity_type_id )
           .where( { report_status: 'todo' } )
           .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
           .where( params.organization_filter )
@@ -776,6 +781,7 @@ var AdminDashboardController = {
           .where( params.adminRpcode_filter )
           .where( params.admin0pcode_filter )
           .where( { report_active: true } )
+          .where( params.activity_type_id )
           .where( { report_status: 'complete' } )
           .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
           .where( params.organization_filter )
@@ -887,6 +893,7 @@ var AdminDashboardController = {
           .where( params.adminRpcode_filter )
           .where( params.admin0pcode_filter )
           .where( { report_active: true } )
+          .where( params.activity_type_id )
           .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
           .where( params.organization_filter )
           .sort('updatedAt DESC')
@@ -903,6 +910,7 @@ var AdminDashboardController = {
               .where( params.adminRpcode_filter )
               .where( params.admin0pcode_filter )
               .where( { report_active: true } )
+              .where( params.activity_type_id )
               .where( { report_status: 'complete' } )
               .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
               .where( params.organization_filter )
@@ -935,6 +943,7 @@ var AdminDashboardController = {
           .where( params.adminRpcode_filter )
           .where( params.admin0pcode_filter )
           .where( params.cluster_filter )
+          .where( params.activity_type_id )
           .where( params.acbar_partners_filter )
           .where( params.organization_filter )
           .where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
