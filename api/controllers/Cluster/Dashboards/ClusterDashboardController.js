@@ -47,6 +47,7 @@ var ClusterDashboardController = {
       list: req.param('list') ? req.param('list') : false,
       indicator: req.param('indicator'),
       cluster_id: req.param('cluster_id'),
+      activity_type_id: req.param( 'activity_type_id' ) ? req.param( 'activity_type_id' ) : 'all',
       adminRpcode: req.param('adminRpcode'),
       admin0pcode: req.param('admin0pcode'),
       organization_tag: req.param('organization_tag'),
@@ -69,6 +70,7 @@ var ClusterDashboardController = {
       admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
       admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
       cluster_id: params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ? {} : { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] },
+      activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
       acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
       organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
       beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
@@ -97,6 +99,7 @@ var ClusterDashboardController = {
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
           .where( filters.cluster_id )
+          .where( filters.activity_type_id )
           .where( filters.acbar_partners )
           .where( filters.organization_tag )
           .where( filters.beneficiaries )
@@ -127,6 +130,7 @@ var ClusterDashboardController = {
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
           .where( filters.cluster_id )
+          .where( filters.activity_type_id )
           .where( filters.acbar_partners )
           .where( filters.organization_tag )
           .where( filters.beneficiaries )
@@ -194,6 +198,7 @@ var ClusterDashboardController = {
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
           .where( filters.cluster_id )
+          .where( filters.activity_type_id )
           .where( filters.acbar_partners )
           .where( filters.organization_tag )
           .where( filters.beneficiaries )
@@ -263,6 +268,7 @@ var ClusterDashboardController = {
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
           .where( filters.cluster_id )
+          .where( filters.activity_type_id )
           .where( filters.acbar_partners )
           .where( filters.organization_tag )
           .where( filters.beneficiaries )
@@ -377,6 +383,7 @@ var ClusterDashboardController = {
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
           .where( filters.cluster_id )
+          .where( filters.activity_type_id )
           .where( filters.acbar_partners )
           .where( filters.organization_tag )
           .where( filters.beneficiaries )
@@ -584,6 +591,7 @@ var ClusterDashboardController = {
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
           .where( filters.cluster_id )
+          .where( filters.activity_type_id )
           .where( filters.acbar_partners )
           .where( filters.organization_tag )
           .where( filters.beneficiaries )
@@ -1113,6 +1121,7 @@ var ClusterDashboardController = {
           .where( filters.admin1pcode )
           .where( filters.admin2pcode )
           .where( filters.cluster_id )
+          .where( filters.activity_type_id )
           .where( filters.acbar_partners )
           .where( filters.organization_tag )
           .where( filters.beneficiaries )
