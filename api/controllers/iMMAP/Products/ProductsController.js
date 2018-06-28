@@ -60,6 +60,10 @@ module.exports = {
 					}
 				},
 				sectors = {
+					'coordination': {
+						product_sector_short: 'COO',
+						theme: { color: '#4a148c' }
+					},
 					'agriculutre_and_livestock': {
 						product_sector_short: 'AGR',
 						theme: { color: '#ffff00' }
