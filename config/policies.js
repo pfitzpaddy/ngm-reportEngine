@@ -58,6 +58,11 @@ module.exports.policies = {
   },
 
   // public
+  'Watchkeeper/WatchkeeperController': {
+    '*': true
+  },  
+
+  // public
   'Country/Eth/Ctc/CtcController': {
     '*': true
   },
