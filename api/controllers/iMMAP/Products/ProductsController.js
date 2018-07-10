@@ -137,7 +137,10 @@ module.exports = {
 						obj[ headers[ column ]] = data.values[ row ][ column ];
 					}
 
-					// add product_date
+					// array
+					obj.product_id = obj.product_id.split(',');
+					obj.product_upload = obj.product_upload.split(',');
+					// formatting
 					obj.timestamp_format = new Date( obj.timestamp ).toUTCString().slice(0, -4);
 					obj.product_sector_id = obj.product_sector.toLowerCase().split('/').join('').replace( / /g, '_' ).replace( /__/g, '_' );
 					obj.product_type_id = obj.product_type.toLowerCase().replace( / /g, '_' );
