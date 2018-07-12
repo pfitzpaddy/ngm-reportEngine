@@ -39,20 +39,27 @@ module.exports = {
   getOrganizationIndicator: function( req, res ){
 
     // set filters
-    var adminRpcode_filter = req.param( 'adminRpcode' ) ? { adminRpcode: req.param( 'adminRpcode' ) } : {},
-        admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: req.param( 'admin0pcode' ) } : {},
-        cluster_id_filter = req.param( 'cluster_id' ) ? { cluster_id: req.param( 'cluster_id' ) } : {},
-        organization_filter = req.param( 'organization' ) ? { organization: req.param( 'organization' ) } : {},
-        status_filter = req.param( 'status' ) ? { status: req.param( 'status' ) } : {};
+    var adminRpcode_filter = !req.param( 'adminRpcode' ) || req.param( 'adminRpcode' ) === 'all' ? {} : { adminRpcode: req.param( 'adminRpcode' ) },
+        admin0pcode_filter = !req.param( 'admin0pcode' ) || req.param( 'admin0pcode' ) === 'all' ? {} : { admin0pcode: req.param( 'admin0pcode' ) },
+        organization_filter = !req.param( 'organization_tag' ) || req.param( 'organization_tag' ) === 'all' ? {} : { organization_tag: req.param( 'organization_tag' ) },
+        project_filter = !req.param( 'project' ) || req.param( 'project' ) === 'all' ? {} : { programme_id: req.param( 'project' ) },
+        cluster_id_filter = !req.param( 'cluster_id' ) || req.param( 'cluster_id' ) === 'all' ? {} : { cluster_id: req.param( 'cluster_id' ) },
+        status_filter = !req.param( 'status' ) || req.param( 'status' ) === 'all' ? {} : { status: req.param( 'status' ) };
 
+
+    console.log(admin0pcode_filter)
+    console.log(organization_filter)
+    console.log(project_filter)
+    console.log(cluster_id_filter)
 
     // users
     User
       .find()
       .where( adminRpcode_filter )
       .where( admin0pcode_filter )
-      .where( cluster_id_filter )
       .where( organization_filter )
+      .where( project_filter )
+      .where( cluster_id_filter )
       .where( status_filter )
       .exec( function( err, users ){
 
