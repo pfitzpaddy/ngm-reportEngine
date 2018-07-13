@@ -228,7 +228,8 @@ module.exports = {
 					
 					// menu
 					menu.push({
-						'id': 'search-country',
+						'search': true,
+						'id': 'search-country-products',
 						'icon': 'person_pin',
 						'title': 'Country',
 						'class': 'teal lighten-1 white-text',
@@ -272,7 +273,8 @@ module.exports = {
 					
 					// menu
 					menu.push({
-						'id': 'search-project',
+						'search': true,
+						'id': 'search-project-products',
 						'icon': 'recent_actors',
 						'title': 'Project',
 						'class': 'teal lighten-1 white-text',
@@ -316,7 +318,8 @@ module.exports = {
 					
 					// menu
 					menu.push({
-						'id': 'search-product_sector_id',
+						'search': true,
+						'id': 'search-product_sector_id-products',
 						'icon': 'donut_large',
 						'title': 'Sector',
 						'class': 'teal lighten-1 white-text',
@@ -360,7 +363,8 @@ module.exports = {
 					
 					// menu
 					menu.push({
-						'id': 'search-product_type_id',
+						'search': true,
+						'id': 'search-product_type_id-products',
 						'icon': 'crop_original',
 						'title': 'Type',
 						'class': 'teal lighten-1 white-text',
@@ -404,7 +408,8 @@ module.exports = {
 					
 					// menu
 					menu.push({
-						'id': 'search-email',
+						'search': true,
+						'id': 'search-email-products',
 						'icon': 'email',
 						'title': 'Email',
 						'class': 'teal lighten-1 white-text',
