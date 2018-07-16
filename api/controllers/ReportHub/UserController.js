@@ -283,7 +283,8 @@ var UserController = {
                 Project.update( findOriginalUser, updatedRelationsUser ),
                 BudgetProgress.update( findOriginalUser, updatedRelationsUser ),
                 TargetBeneficiaries.update( findOriginalUser, updatedRelationsUser ),
-                TargetLocation.update( findOriginalUser, updatedRelationsUser ),
+                // TargetLocation fails due to update triggers
+                // TargetLocation.update( findOriginalUser, updatedRelationsUser ),
                 Report.update( findOriginalUser, updatedRelationsUser ),
                 Location.update( findOriginalUser, updatedRelationsUser ),
                 Beneficiaries.update( findOriginalUser, updatedRelationsUser ),
@@ -302,7 +303,7 @@ var UserController = {
                   // the following is for tracking of iMMAP staff (for now)
 
                   // update user programme and track
-                  if ( originalUser.programme_id !== result[0].programme_id || 
+                  if ( originalUser.programme_id && originalUser.programme_id !== result[0].programme_id || 
                         originalUser.contract_start_date && originalUser.contract_start_date.toString() !== result[0].contract_start_date && result[0].contract_start_date.toString() ||
                         originalUser.contract_end_date && originalUser.contract_end_date.toString() !== result[0].contract_end_date && result[0].contract_end_date.toString() ||
                         originalUser.admin0pcode !== result[0].admin0pcode ||
@@ -326,6 +327,8 @@ var UserController = {
 
   // update the profile details 
   updateProfileDetails: function( req, res, originalUser, updatedUser ){
+
+    console.log('in updateProfileDetails')
 
     // if country changes, make updates and add new history
     if ( originalUser.admin0pcode !== updatedUser.admin0pcode ) {
