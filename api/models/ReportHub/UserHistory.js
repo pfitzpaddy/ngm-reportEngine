@@ -53,12 +53,10 @@ module.exports = {
 			type: 'string'
 		},
 		organization_type: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		organization_name: {
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		organization_tag: {
 			type: 'string',
