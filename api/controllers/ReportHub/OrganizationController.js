@@ -246,7 +246,7 @@ module.exports = {
                   });
 
                   // add all
-                  list.unshift({ cluster: 'All', cluster_id: 'all', admin0pcode: 'all', admin0name: 'All', organization_id: 'all', organization: 'All' });
+                  list.unshift({ cluster: 'All', cluster_id: 'all', admin0pcode: 'all', admin0name: 'All', organization_tag: 'all', organization: 'All' });
 
                   // for each
                   list.forEach( function( d, i ) {
@@ -256,7 +256,7 @@ module.exports = {
                       admin0name = d.admin0name;
                     }
                     // organization
-                    if ( d.organization_id === req.param( 'organization_id' ) ) {
+                    if ( d.organization_tag === req.param( 'organization_tag' ) ) {
                       organization = d.organization;
                     }
 
@@ -275,7 +275,7 @@ module.exports = {
                 }
 
                 // return menu
-                return res.json( 200, { menu: menu, organization: organization, admin0name: admin0name } );
+                return res.json( 200, { organization: organization, admin0name: admin0name, menu: menu } );
 
               });
 
