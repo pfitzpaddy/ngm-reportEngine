@@ -128,32 +128,37 @@ module.exports = {
 
 				// assign data
 				for ( var row = 1; row < data.values.length; row++ ) {
-					
-					// obj to hold row
-					var obj   = {};
-				 
-					// loop each column
-					for( var column=0; column < headers.length; column++ ){
-						obj[ headers[ column ]] = data.values[ row ][ column ];
+
+					// if row has data
+					if ( data.values[ row ][ 0 ]  ) {
+	
+						// obj to hold row
+						var obj = {};
+					 
+						// loop each column
+						for( var column=0; column < headers.length; column++ ){
+							obj[ headers[ column ]] = data.values[ row ][ column ];
+						}
+
+						// array
+						obj.product_id = obj.product_id.split(',');
+						obj.product_upload = obj.product_upload.split(',');
+						// formatting
+						obj.timestamp_format = new Date( obj.timestamp ).toUTCString().slice(0, -4);
+						obj.product_sector_id = obj.product_sector.toLowerCase().split('/').join('').replace( / /g, '_' ).replace( /__/g, '_' );
+						obj.product_type_id = obj.product_type.toLowerCase().replace( / /g, '_' );
+						obj.product_date = new Date( Date.UTC( obj.product_year, months[ obj.product_month ], 1 ) ).toISOString();
+
+						// merge tags
+						_.merge( obj, sectors[ obj.product_sector_id ] );
+
+						// merge data structure
+						_.merge( obj, regions[ obj.country ] );
+
+						// push to products
+						products.push( obj );
+
 					}
-
-					// array
-					obj.product_id = obj.product_id.split(',');
-					obj.product_upload = obj.product_upload.split(',');
-					// formatting
-					obj.timestamp_format = new Date( obj.timestamp ).toUTCString().slice(0, -4);
-					obj.product_sector_id = obj.product_sector.toLowerCase().split('/').join('').replace( / /g, '_' ).replace( /__/g, '_' );
-					obj.product_type_id = obj.product_type.toLowerCase().replace( / /g, '_' );
-					obj.product_date = new Date( Date.UTC( obj.product_year, months[ obj.product_month ], 1 ) ).toISOString();
-
-					// merge tags
-					_.merge( obj, sectors[ obj.product_sector_id ] );
-
-					// merge data structure
-					_.merge( obj, regions[ obj.country ] );
-
-					// push to products
-					products.push( obj );
 
 				}
 
