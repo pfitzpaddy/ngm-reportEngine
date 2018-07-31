@@ -91,7 +91,7 @@ module.exports = {
                 if (err) return res.negotiate( err );
 
                 // country
-                // if ( menu_items.indexOf( 'admin0pcode' ) !== -1 ) {
+                if ( menu_items.indexOf( 'admin0pcode' ) !== -1 ) {
                   
                   // menu
                   menu.push({
@@ -130,10 +130,10 @@ module.exports = {
                     });
                   });
 
-                // }
+                }
 
                 // organization
-                // if ( menu_items.indexOf( 'organization_tag' ) !== -1 ) {
+                if ( menu_items.indexOf( 'organization_tag' ) !== -1 ) {
 
                   // menu
                   menu.push({
@@ -172,7 +172,7 @@ module.exports = {
                     });
                   });
 
-                // }
+                }
 
                 // project
                 if ( menu_items.indexOf( 'project' ) !== -1 ) {
