@@ -8,10 +8,7 @@
 module.exports = {
 
 	// connection
-	connection: 'ngmReportHubServer',
-
-	// strict schema
-	schema: true,
+	connection: 'ngmReportHubServer'
 
 };
 

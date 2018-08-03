@@ -157,23 +157,19 @@ module.exports = {
   },
 
   // get admin3 list by admin0, admin1, admin2name, admin3pcode
-  getAdmin3Sites: function( req, res ) {
+  getAdminSites: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
-    if ( !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) || !req.param( 'admin2pcode' ) || !req.param( 'admin3pcode' ) ) {
-       return res.json( 401, { msg: 'admin0pcode, admin1pcode, & admin3pcode required and must be string' });
+    if ( !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) ) {
+       return res.json( 401, { msg: 'admin0pcode, admin1pcode required and must be string' });
     }
 
-    // var site_class = req.param( 'cluster_id' ) === 'wash' ? { site_class: 'health' } : { site_class: req.param( 'cluster_id' ) };
-
     // get list
-    Admin3Sites
+    AdminSites
       .find()
       .where({ admin0pcode: req.param( 'admin0pcode' ) })
       .where({ admin1pcode: req.param( 'admin1pcode' ) })
-      .where({ admin2pcode: req.param( 'admin2pcode' ) })
-      .where({ admin3pcode: req.param( 'admin3pcode' ) })
-      .sort('site_type_name ASC')
+      .sort( 'site_name ASC' )
       .exec( function( err, admin3 ){
 
         // return error
