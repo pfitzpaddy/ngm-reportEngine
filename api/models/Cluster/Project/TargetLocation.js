@@ -468,6 +468,7 @@ module.exports = {
 								if ( err ) return next( err );
 
 								// counter
+								counter++;
 								if ( counter === length ) {
 									// next!
 									next();
