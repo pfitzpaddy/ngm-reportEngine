@@ -194,14 +194,6 @@ module.exports = {
 			required: true
 		},
 
-		// activity_status
-		activity_status_id: {
-			type: 'string'
-		},
-		activity_status_name: {
-			type: 'string'
-		},
-
 		// activity_type
 		activity_type_id: {
 			type: 'string',
