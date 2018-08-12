@@ -214,6 +214,22 @@ module.exports = {
 			required: true
 		},
 
+		// added new 'W' for NG, activities should be planned better
+		activity_detail_id: {
+			type: 'string'
+		},
+		activity_detail_name: {
+			type: 'string'
+		},
+
+		// indicator that relates to activity for HRP reporting
+		indicator_id: {
+			type: 'string'
+		},
+		indicator_name: {
+			type: 'string'
+		},	
+
 		// mpc delivery
 		mpc_delivery_type_id: {
 			type: 'string'
