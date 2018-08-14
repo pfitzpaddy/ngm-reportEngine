@@ -396,6 +396,7 @@ module.exports = {
               // beneficiaries
               Beneficiaries
                 .find( { location_id: location.id } )
+                .populate( 'boreholes' )
                 .exec( function( err, beneficiaries ){
 
                   // return error
@@ -556,83 +557,94 @@ module.exports = {
               // return error
               if (err) return res.negotiate( err );
 
-              // add locations ( associations included )
-              $report.locations[i].beneficiaries = beneficiaries;
-
-              // sort by id
-              $report.locations[i].beneficiaries.sort( function( a, b ) {
-                return a.id.localeCompare( b.id );
-              });
-
-              // traings
-              if ( location.trainings && location.trainings.length ) {
-
-                // keeps training_participants
-                var originalTrainings = location.trainings;
-
-                // trainings
-                Trainings
-                  .updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
+              // beneficiaries
+              Beneficiaries
+                .find( { location_id: location.id } )
+                .populate( 'boreholes' )
+                .exec( function( err, beneficiaries ){
 
                   // return error
                   if (err) return res.negotiate( err );
 
                   // add locations ( associations included )
-                  $report.locations[i].trainings = trainings;
+                  $report.locations[i].beneficiaries = beneficiaries;
 
                   // sort by id
-                  $report.locations[i].trainings.sort( function( a, b ) {
+                  $report.locations[i].beneficiaries.sort( function( a, b ) {
                     return a.id.localeCompare( b.id );
                   });
 
+                  // traings
+                  if ( location.trainings && location.trainings.length ) {
 
-                  // trainings
-                  var trainingCounter = 0,
-                      trainingLength = trainings.length;
-
-                  // trainings
-                  originalTrainings.forEach( function( training, j ){
-
-                    // set training_ids
-                    training.training_participants.forEach( function( trainee, k ){
-                      training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
-                    });
+                    // keeps training_participants
+                    var originalTrainings = location.trainings;
 
                     // trainings
-                    TrainingParticipants
-                      .updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
+                    Trainings
+                      .updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
 
-                        // return error
-                        if (err) return res.negotiate( err );
+                      // return error
+                      if (err) return res.negotiate( err );
 
-                        // add locations ( associations included )
-                        $report.locations[i].trainings[j].training_participants = trainees;
+                      // add locations ( associations included )
+                      $report.locations[i].trainings = trainings;
 
-                        // trianing
-                        trainingCounter++;
-                        if ( trainingCounter === trainingLength ) {
-                          // counter
-                          counter++;
-                          if ( counter === length ) {
-                            // return report
-                            return res.json( 200, $report );
-                          }
-                        }
+                      // sort by id
+                      $report.locations[i].trainings.sort( function( a, b ) {
+                        return a.id.localeCompare( b.id );
+                      });
+
+
+                      // trainings
+                      var trainingCounter = 0,
+                          trainingLength = trainings.length;
+
+                      // trainings
+                      originalTrainings.forEach( function( training, j ){
+
+                        // set training_ids
+                        training.training_participants.forEach( function( trainee, k ){
+                          training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
+                        });
+
+                        // trainings
+                        TrainingParticipants
+                          .updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
+
+                            // return error
+                            if (err) return res.negotiate( err );
+
+                            // add locations ( associations included )
+                            $report.locations[i].trainings[j].training_participants = trainees;
+
+                            // trianing
+                            trainingCounter++;
+                            if ( trainingCounter === trainingLength ) {
+                              // counter
+                              counter++;
+                              if ( counter === length ) {
+                                // return report
+                                return res.json( 200, $report );
+                              }
+                            }
+
+                          });
 
                       });
 
-                  });
+                    });
+
+                  } else {
+                    // counter
+                    counter++;
+                    if ( counter === length ) {
+                      // return report
+                      return res.json( 200, $report );
+                    }
+                  }
 
                 });
-
-              } else {
-                // counter
-                counter++;
-                if ( counter === length ) {
-                  // return report
-                  return res.json( 200, $report );
-                }
-              }
 
           });
         });

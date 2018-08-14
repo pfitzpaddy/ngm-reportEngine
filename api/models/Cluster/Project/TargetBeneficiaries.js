@@ -185,6 +185,14 @@ module.exports = {
 			required: true
 		},
 
+		// activity detail
+		activity_detail_id: {
+			type: 'string'
+		},
+		activity_detail_name: {
+			type: 'string'
+		},
+
 		// mpc delivery
 		mpc_delivery_type_id: {
 			type: 'string'

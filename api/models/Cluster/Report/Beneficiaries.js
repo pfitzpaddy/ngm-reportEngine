@@ -417,6 +417,20 @@ module.exports = {
 			required: true
 		},
 
+		// activities
+		activity_start_date:{
+			type: 'date'
+		},
+		activity_end_date:{
+			type: 'date'
+		},
+
+		// Boreholes (IRS) association
+		boreholes: {
+      collection: 'borehole',
+      via: 'beneficiary_id'
+    },
+
 
 
 
