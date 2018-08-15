@@ -15,7 +15,7 @@ module.exports = {
 
 	// attributes
 	attributes: {
-		// region/country id
+		// region/country
     adminRpcode: {
 			type: 'string',
 			required: true
@@ -99,17 +99,10 @@ module.exports = {
 			required: true
 		},
 
-		// add a reference to Project
-		// project_id: {
-		// 	model: 'project'
-		// },
-
-		project_id: {
-			type: 'string' //,
-			// required: true
-		},
-
 		// project
+		project_id: {
+			type: 'string'
+		},
 		project_acbar_partner: {
 			type: 'boolean'
 		},
@@ -178,28 +171,16 @@ module.exports = {
 			type: 'array'
 		},
 
+		// based on dtm
 		site_id: {
 			type: 'string'
 		},
-
-
-
-
-
-		// ADD THIS TO ADMIN2FACILITIES AS "EDUCATION" OR "HEALTH"
 		site_class: {
 			type: 'string'
 		},
-
-
-
-		// ADD THIS TO ADMIN2FACILITIES AS OPEN
 		site_status: {
 			type: 'string'
 		},
-
-
-
 		site_implementation_id: {
 			type: 'string'
 		},
@@ -216,16 +197,18 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-
-
-		// //////////////
+		site_hub_id: {
+			type: 'string'
+		},
+		site_hub_name: {
+			type: 'string'
+		},
 		new_site_id: {
 			type: 'string'
 		},
 		new_site_name: {
 			type: 'string'
 		},
-		// //////////////
 		site_list_select_id: {
 			type: 'string'
 		},
@@ -233,16 +216,53 @@ module.exports = {
 			type: 'string'
 		},
 
-		// 
-		site_hub_id: {
-			type: 'string'
+		// to captire DTM 
+		site_population:{
+			type: 'integer',
+			defaultsTo: 0
 		},
-		site_hub_name: {
-			type: 'string'
+		site_households:{
+			type: 'integer',
+			defaultsTo: 0
 		},
-		conflict: {
-			type: 'boolean'
+		households:{
+			type: 'integer',
+			defaultsTo: 0
 		},
+		boys:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		men:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		women:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		elderly_men:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		elderly_women:{
+			type: 'integer',
+			defaultsTo: 0
+    },
+		site_lng: {
+			type: 'float',
+			required: true
+		},
+		site_lat: {
+			type: 'float',
+			required: true
+		},
+
+		// admin
 		admin1lng: {
 			type: 'float',
 			required: true
@@ -265,13 +285,8 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-		site_lng: {
-			type: 'float',
-			required: true
-		},
-		site_lat: {
-			type: 'float',
-			required: true
+		conflict: {
+			type: 'boolean'
 		},
 
 		// flag to manage location updates
@@ -279,8 +294,6 @@ module.exports = {
 			type: 'boolean',
 			defaultsTo: false
 		},
-
-
 
 
 		/*********** 2016 *************/

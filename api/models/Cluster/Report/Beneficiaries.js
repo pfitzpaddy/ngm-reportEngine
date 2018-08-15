@@ -222,6 +222,14 @@ module.exports = {
 			type: 'string'
 		},
 
+		// NG cholera response
+		activity_cholera_response_id: {
+			type: 'string'
+		},
+		activity_cholera_response_name: {
+			type: 'string'
+		},		
+
 		// indicator that relates to activity for HRP reporting
 		indicator_id: {
 			type: 'string'
@@ -383,9 +391,23 @@ module.exports = {
 		site_hub_name: {
 			type: 'string'
 		},
-		conflict: {
-			type: 'boolean'
+		site_households:{
+			type: 'integer',
+			defaultsTo: 0,
 		},
+		site_population:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_lng: {
+			type: 'float',
+			required: true
+		},
+		site_lat: {
+			type: 'float',
+			required: true
+		},
+		
 		admin1lng: {
 			type: 'float',
 			required: true
@@ -408,26 +430,19 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-		site_lng: {
-			type: 'float',
-			required: true
-		},
-		site_lat: {
-			type: 'float',
-			required: true
-		},
-
-		// activities
-		activity_start_date:{
-			type: 'date'
-		},
-		activity_end_date:{
-			type: 'date'
+		conflict: {
+			type: 'boolean'
 		},
 
 		// Boreholes (IRS) association
 		boreholes: {
       collection: 'borehole',
+      via: 'beneficiary_id'
+    },
+
+		// Reticulations (IRS) association
+		reticulations: {
+      collection: 'reticulation',
       via: 'beneficiary_id'
     },
 

@@ -396,7 +396,7 @@ module.exports = {
               // beneficiaries
               Beneficiaries
                 .find( { location_id: location.id } )
-                .populate( 'boreholes' )
+                .populateAll()
                 .exec( function( err, beneficiaries ){
 
                   // return error
@@ -560,7 +560,7 @@ module.exports = {
               // beneficiaries
               Beneficiaries
                 .find( { location_id: location.id } )
-                .populate( 'boreholes' )
+                .populateAll()
                 .exec( function( err, beneficiaries ){
 
                   // return error
