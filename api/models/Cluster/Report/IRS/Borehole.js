@@ -51,12 +51,12 @@ module.exports = {
 			required: true
 		},
 
-		// borehole_free_residual_chlorine_range
-		borehole_free_residual_chlorine_range_id:{
+		// free_residual_chlorine_range
+		free_residual_chlorine_range_id:{
 			type: 'string',
 			required: true
 		},
-		borehole_free_residual_chlorine_range_name:{
+		free_residual_chlorine_range_name:{
 			type: 'string',
 			required: true
 		},

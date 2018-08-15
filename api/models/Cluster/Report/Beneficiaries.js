@@ -434,6 +434,8 @@ module.exports = {
 			type: 'boolean'
 		},
 
+		/******* Water *******/
+
 		// Boreholes (IRS) association
 		boreholes: {
       collection: 'borehole',
@@ -445,6 +447,12 @@ module.exports = {
       collection: 'reticulation',
       via: 'beneficiary_id'
     },
+
+		// Reticulations (IRS) association
+		services: {
+      collection: 'service',
+      via: 'beneficiary_id'
+    },    
 
 
 
