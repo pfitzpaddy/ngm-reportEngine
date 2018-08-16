@@ -8,7 +8,7 @@
 module.exports = {
 
 	// connection
-	connection: 'ngmHealthClusterServer',
+	connection: 'ngmIRSServer',
 
 	// strict schema
 	schema: true,
@@ -19,6 +19,18 @@ module.exports = {
 		// add a reference to Location
 		beneficiary_id: {
 			model: 'beneficiaries'
+		},
+
+		// quantity of service
+		quantity: {
+			type: 'float',
+			defaultsTo: 0
+		},
+
+		// quantity
+		quantity_measurement: {
+			type: 'string',
+			defaultsTo: 'taps_connected'
 		},
 
 		// free_residual_chlorine_range
@@ -39,12 +51,6 @@ module.exports = {
 		water_turbidity_range_name:{
 			type: 'string',
 			required: true
-		},
-
-		// borehole_taps_number_connected
-		taps_number_connected: {
-			type: 'float',
-			defaultsTo: 0
 		},
 
 		// activities
