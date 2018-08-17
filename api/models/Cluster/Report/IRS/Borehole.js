@@ -135,6 +135,7 @@ module.exports = {
 			defaultsTo: 0
 		},
 
+		// popn
 		households:{
 			type: 'integer',
 			defaultsTo: 0

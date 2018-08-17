@@ -28,9 +28,13 @@ module.exports = {
 		},
 
 		// quantity
-		quantity_measurement: {
+		quantity_measurement_id: {
 			type: 'string',
 			defaultsTo: 'm3_per_month'
+		},
+		quantity_measurement_name: {
+			type: 'string',
+			defaultsTo: 'm3/Per Month'
 		},
 
 		// free_residual_chlorine_range
@@ -59,6 +63,7 @@ module.exports = {
 			required: true
 		},
 
+		// popn
 		households:{
 			type: 'integer',
 			defaultsTo: 0

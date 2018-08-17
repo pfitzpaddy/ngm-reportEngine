@@ -30,31 +30,45 @@ module.exports = {
 		// quantity
 		quantity_measurement_id: {
 			type: 'string',
-			defaultsTo: 'taps_connected'
+			defaultsTo: 'm3_per_month'
 		},
 		quantity_measurement_name: {
 			type: 'string',
-			defaultsTo: 'Taps Connected'
+			defaultsTo: 'm3/Per Month'
+		},
+
+		// inputs
+		male:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		female:{
+			type: 'integer',
+			defaultsTo: 0
 		},
 
 		// free_residual_chlorine_range
+		free_residual_chlorine_range_id:{
+			type: 'string'
+		},
+		free_residual_chlorine_range_name:{
+			type: 'string'
+		},
+
+		// from_chlorinated_system
 		from_chlorinated_system_id:{
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		from_chlorinated_system_name:{
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 
 		// water_turbidity_range
 		water_turbidity_range_id:{
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 		water_turbidity_range_name:{
-			type: 'string',
-			required: true
+			type: 'string'
 		},
 
 		// activities

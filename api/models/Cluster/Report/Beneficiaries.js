@@ -436,23 +436,30 @@ module.exports = {
 
 		/******* Water *******/
 
+		// Water (IRS) association
+		water: {
+      collection: 'water',
+      via: 'beneficiary_id'
+    },
+
 		// Boreholes (IRS) association
 		boreholes: {
       collection: 'borehole',
       via: 'beneficiary_id'
     },
 
-		// Reticulations (IRS) association
-		reticulations: {
-      collection: 'reticulation',
-      via: 'beneficiary_id'
-    },
 
-		// Reticulations (IRS) association
-		services: {
-      collection: 'service',
-      via: 'beneficiary_id'
-    },    
+		// // Reticulations (IRS) association
+		// reticulations: {
+  //     collection: 'reticulation',
+  //     via: 'beneficiary_id'
+  //   },
+
+		// // Reticulations (IRS) association
+		// services: {
+  //     collection: 'service',
+  //     via: 'beneficiary_id'
+  //   },    
 
 
 
