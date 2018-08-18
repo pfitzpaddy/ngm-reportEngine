@@ -16,7 +16,7 @@ module.exports = {
 	// attributes
 	attributes: {
 
-		// add a reference to Location
+		// add a reference to beneficiaries
 		beneficiary_id: {
 			model: 'beneficiaries'
 		},

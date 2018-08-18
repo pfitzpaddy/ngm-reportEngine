@@ -16,7 +16,7 @@ module.exports = {
 	// attributes
 	attributes: {
 
-		// add a reference to Location
+		// add a reference to beneficiaries
 		beneficiary_id: {
 			model: 'beneficiaries'
 		},
@@ -27,7 +27,7 @@ module.exports = {
 			defaultsTo: 0
 		},
 
-		// quantity
+		// quantity measurement
 		quantity_measurement_id: {
 			type: 'string',
 			defaultsTo: 'm3_per_month'
@@ -69,6 +69,11 @@ module.exports = {
 		},
 		water_turbidity_range_name:{
 			type: 'string'
+		},
+
+		// stores activity details
+		details: {
+			type: 'array',
 		},
 
 		// activities

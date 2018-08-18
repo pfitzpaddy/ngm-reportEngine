@@ -16,22 +16,22 @@ module.exports = {
 	// attributes
 	attributes: {
 		// region/country
-    adminRpcode: {
+		adminRpcode: {
 			type: 'string',
 			required: true
-    },
-    adminRname: {
+		},
+		adminRname: {
 			type: 'string',
 			required: true
-    },
-    admin0pcode: {
+		},
+		admin0pcode: {
 			type: 'string',
 			required: true
-    },
-    admin0name: {
+		},
+		admin0name: {
 			type: 'string',
 			required: true
-    },
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -124,11 +124,11 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
-    },
-    mpc_purpose_type_id: {
+		},
+		mpc_purpose_type_id: {
 			type: 'string'
-    },
-    mpc_purpose_type_name: {
+		},
+		mpc_purpose_type_name: {
 			type: 'string'
 		},
 		inter_cluster_activities: {
@@ -329,15 +329,15 @@ module.exports = {
 		elderly_women:{
 			type: 'integer',
 			defaultsTo: 0
-    },
-    injury_treatment_same_province:{
-      type: 'boolean'
-    },
+		},
+		injury_treatment_same_province:{
+			type: 'boolean'
+		},
 
 		// location
-    location_id: {
+		location_id: {
 			type: 'string'
-    },
+		},
 		admin1pcode: {
 			type: 'string',
 			required: true
@@ -438,30 +438,15 @@ module.exports = {
 
 		// Water (IRS) association
 		water: {
-      collection: 'water',
-      via: 'beneficiary_id'
-    },
+			collection: 'wateractivities',
+			via: 'beneficiary_id'
+		},
 
 		// Boreholes (IRS) association
 		boreholes: {
-      collection: 'borehole',
-      via: 'beneficiary_id'
-    },
-
-
-		// // Reticulations (IRS) association
-		// reticulations: {
-  //     collection: 'reticulation',
-  //     via: 'beneficiary_id'
-  //   },
-
-		// // Reticulations (IRS) association
-		// services: {
-  //     collection: 'service',
-  //     via: 'beneficiary_id'
-  //   },    
-
-
+			collection: 'borehole',
+			via: 'beneficiary_id'
+		},
 
 
 		/*********** 2016 *************/
@@ -532,49 +517,49 @@ module.exports = {
 
 	// }
 
-  // updateOrCreate
-    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
-  updateOrCreateEach: function( parent, values, cb ){
-    var self = this; // reference for use by callbacks
-    // If no values were specified, return []
-    if (!values.length) cb( false, [] );
+	// updateOrCreate
+		// http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+	updateOrCreateEach: function( parent, values, cb ){
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if (!values.length) cb( false, [] );
 
-    var results = [],
-        counter = 0,
-        length = values.length;
+		var results = [],
+				counter = 0,
+				length = values.length;
 
-    // values
-    values.forEach(function( value ){
+		// values
+		values.forEach(function( value ){
 
-      if( value.id ){
-        self.update({ id: value.id }, value, function( err, update ){
-          if(err) return cb(err, false);
-          results.push( update[0] );
+			if( value.id ){
+				self.update({ id: value.id }, value, function( err, update ){
+					if(err) return cb(err, false);
+					results.push( update[0] );
 
-          counter++;
-          if( counter===length ){
-            cb( false, results );
-          }
-        });
-      }else{
-  			// set based on criteria
-  			for ( key in parent ){
-  				value[ key ] = parent[ key ];
-  			}
-        self.create(value, function( err, create ){
-          if(err) return cb(err, false);
-          results.push( create );
+					counter++;
+					if( counter===length ){
+						cb( false, results );
+					}
+				});
+			}else{
+				// set based on criteria
+				for ( key in parent ){
+					value[ key ] = parent[ key ];
+				}
+				self.create(value, function( err, create ){
+					if(err) return cb(err, false);
+					results.push( create );
 
-          counter++;
-          if( counter===length ){
-            cb( false, results );
-          }
-        });
-      }
+					counter++;
+					if( counter===length ){
+						cb( false, results );
+					}
+				});
+			}
 
-    });
+		});
 
-  }
+	}
 
 };
 
