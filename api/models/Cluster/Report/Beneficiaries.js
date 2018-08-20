@@ -448,6 +448,12 @@ module.exports = {
 			via: 'beneficiary_id'
 		},
 
+		// Water (IRS) association
+		sanitation: {
+			collection: 'sanitationactivities',
+			via: 'beneficiary_id'
+		},
+
 
 		/*********** 2016 *************/
 		// Project details
