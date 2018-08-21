@@ -434,7 +434,7 @@ module.exports = {
 			type: 'boolean'
 		},
 
-		/******* Water *******/
+		/******* WASH NG IRS *******/
 
 		// Water (IRS) association
 		water: {
@@ -448,9 +448,15 @@ module.exports = {
 			via: 'beneficiary_id'
 		},
 
-		// Water (IRS) association
+		// Sanitation (IRS) association
 		sanitation: {
 			collection: 'sanitationactivities',
+			via: 'beneficiary_id'
+		},
+
+		// Hygiene (IRS) association
+		hygiene: {
+			collection: 'hygieneactivities',
 			via: 'beneficiary_id'
 		},
 
