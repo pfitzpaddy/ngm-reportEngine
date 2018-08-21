@@ -23,7 +23,8 @@ module.exports = {
 
 		// quantity of service
 		quantity: {
-			type: 'float'
+			type: 'float',
+			defaultsTo: 0
 		},
 
 		// quantity measurement
@@ -41,11 +42,20 @@ module.exports = {
 		stipend_name: {
 			type: 'string',
 		},
-
-		// stipend amount
 		stipend_amount: {
 			type: 'float',
 		},
+
+		// committee_rotation
+		committee_rotation_id: {
+			type: 'string',
+		},
+		committee_rotation_name: {
+			type: 'string',
+		},
+		committee_rotation_per_month: {
+			type: 'float',
+		},		
 
 		// gender_marking
 		gender_marking_id: {
@@ -59,7 +69,15 @@ module.exports = {
 		lock_installation_id: {
 			type: 'string',
 		},
-		gender_marking_name: {
+		lock_installation_name: {
+			type: 'string',
+		},
+
+		// facility_status
+		facility_status_id: {
+			type: 'string',
+		},
+		facility_status_name: {
 			type: 'string',
 		},
 
