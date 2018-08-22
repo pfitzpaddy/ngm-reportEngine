@@ -37,6 +37,16 @@ module.exports = {
 			defaultsTo: 'Campaigns'
 		},
 
+		// inputs
+		male:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		female:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
 		// stores activity details
 		details: {
 			type: 'array',
