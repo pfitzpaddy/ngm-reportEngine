@@ -293,7 +293,7 @@ module.exports = {
 			type: 'string'
 		},
 
-			// conditional/unconditional
+		// conditional/unconditional
 		cash_amount: {
 			type: 'integer',
 			defaultsTo: 0
@@ -459,6 +459,19 @@ module.exports = {
 			collection: 'hygieneactivities',
 			via: 'beneficiary_id'
 		},
+
+		// Cash (IRS) association
+		cash: {
+			collection: 'cashactivities',
+			via: 'beneficiary_id'
+		},
+
+		// Cash (IRS) association
+		accountability: {
+			collection: 'accountabilityhactivities',
+			via: 'beneficiary_id'
+		},
+
 
 
 		/*********** 2016 *************/
