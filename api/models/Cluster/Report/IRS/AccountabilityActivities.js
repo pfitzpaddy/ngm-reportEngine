@@ -37,6 +37,20 @@ module.exports = {
 			defaultsTo: 'Naira'
 		},
 
+		// complaints
+		complaints_recieved: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		complaints_addressed: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+		complaints_closed: {
+			type: 'integer',
+			defaultsTo: 0
+		},
+
 		// stores activity details
 		details: {
 			type: 'array',

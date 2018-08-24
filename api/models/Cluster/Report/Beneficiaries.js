@@ -468,7 +468,7 @@ module.exports = {
 
 		// Cash (IRS) association
 		accountability: {
-			collection: 'accountabilityhactivities',
+			collection: 'accountabilityactivities',
 			via: 'beneficiary_id'
 		},
 
