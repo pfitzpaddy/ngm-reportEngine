@@ -129,12 +129,6 @@ module.exports = {
 			defaultsTo: 0
 		},
 
-		// borehole_beneficiaries 
-		borehole_beneficiaries: {
-			type: 'float',
-			defaultsTo: 0
-		},
-
 		// popn
 		households:{
 			type: 'integer',
@@ -163,7 +157,13 @@ module.exports = {
 		elderly_women:{
 			type: 'integer',
 			defaultsTo: 0
-    }
+    },
+    
+		// total_beneficiaries 
+		total_beneficiaries: {
+			type: 'integer',
+			defaultsTo: 0
+		},
 
 	}
 
