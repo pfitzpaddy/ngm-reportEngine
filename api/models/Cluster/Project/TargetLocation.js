@@ -216,7 +216,15 @@ module.exports = {
 			type: 'string'
 		},
 
-		// to captire DTM 
+		// DTM 
+		site_population:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		site_households:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 		site_boys:{
 			type: 'integer',
 			defaultsTo: 0,
@@ -240,14 +248,6 @@ module.exports = {
 		site_elderly_women:{
 			type: 'integer',
 			defaultsTo: 0,
-		},
-		site_population:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		site_households:{
-			type: 'integer',
-			defaultsTo: 0
 		},
 		households:{
 			type: 'integer',

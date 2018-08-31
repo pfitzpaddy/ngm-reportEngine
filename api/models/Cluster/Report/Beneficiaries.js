@@ -298,6 +298,8 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+
+		// beneficiaries
 		households:{
 			type: 'integer',
 			defaultsTo: 0
@@ -364,6 +366,8 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
+
+		// DTM
 		site_id: {
 			type: 'string'
 		},
@@ -395,7 +399,14 @@ module.exports = {
 		site_hub_name: {
 			type: 'string'
 		},
-		
+		site_households:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_population:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
 		site_boys:{
 			type: 'integer',
 			defaultsTo: 0,
@@ -417,15 +428,6 @@ module.exports = {
 			defaultsTo: 0,
 		},
 		site_elderly_women:{
-			type: 'integer',
-			defaultsTo: 0,
-		},
-
-		site_households:{
-			type: 'integer',
-			defaultsTo: 0,
-		},
-		site_population:{
 			type: 'integer',
 			defaultsTo: 0,
 		},
