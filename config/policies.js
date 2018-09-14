@@ -53,6 +53,16 @@ module.exports.policies = {
   },
 
   // public
+  'iMMAP/Products/ProductsController': {
+    'getProductsData': true
+  },
+
+  // public
+  'Watchkeeper/WatchkeeperController': {
+    '*': true
+  },  
+
+  // public
   'Country/Eth/Ctc/CtcController': {
     '*': true
   },
@@ -69,6 +79,16 @@ module.exports.policies = {
 
   // public
   'Country/Afg/Epr/EprDashboardController': {
+    '*': true
+  },
+
+  // public
+  'Country/Afg/Nutrition/NutritionController': {
+    '*': true
+  },
+
+  // public
+  'Country/Afg/Nutrition/NutritionDashboardController': {
     '*': true
   },
 

@@ -32,6 +32,28 @@ module.exports = {
 			type: 'string',
 			required: true
     },
+		admin1pcode: {
+			type: 'string',
+			required: true
+		},
+		admin1name: {
+			type: 'string',
+			required: true
+		},
+		admin2pcode: {
+			type: 'string',
+			required: true
+		},
+		admin2name: {
+			type: 'string',
+			required: true
+		},
+		admin3pcode: {
+			type: 'string'
+		},
+		admin3name: {
+			type: 'string'
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -196,63 +218,122 @@ module.exports = {
 			required: true
 		},
 
-		// location
-		admin1pcode: {
+		// dtm
+		site_id: {
+			type: 'string'
+		},
+		site_class: {
+			type: 'string'
+		},
+		site_status: {
+			type: 'string'
+		},
+		site_implementation_id: {
+			type: 'string'
+		},
+		site_implementation_name: {
+			type: 'string'
+		},
+		site_type_id: {
+			type: 'string'
+		},
+		site_type_name: {
+			type: 'string'
+		},
+		site_name: {
 			type: 'string',
 			required: true
 		},
-		admin1name: {
-			type: 'string',
+		site_hub_id: {
+			type: 'string'
+		},
+		site_hub_name: {
+			type: 'string'
+		},
+		new_site_id: {
+			type: 'string'
+		},
+		new_site_name: {
+			type: 'string'
+		},
+		site_list_select_id: {
+			type: 'string'
+		},
+		site_list_select_name: {
+			type: 'string'
+		},
+
+		// to captire DTM 
+		site_population:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		site_households:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		site_boys:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_girls:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_men:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_women:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_elderly_men:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_elderly_women:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		households:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		boys:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		men:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		women:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		elderly_men:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		elderly_women:{
+			type: 'integer',
+			defaultsTo: 0
+    },
+		site_lng: {
+			type: 'float',
 			required: true
 		},
-		admin2pcode: {
-			type: 'string',
+		site_lat: {
+			type: 'float',
 			required: true
 		},
-		admin2name: {
-			type: 'string',
-			required: true
-		},
-		admin3pcode: {
-			type: 'string'
-		},
-		admin3name: {
-			type: 'string'
-		},
-		facility_id: {
-			type: 'string'
-		},
-		facility_class: {
-			type: 'string'
-		},
-		facility_status: {
-			type: 'string'
-		},
-		facility_implementation_id: {
-			type: 'string'
-		},
-		facility_implementation_name: {
-			type: 'string'
-		},
-		facility_type_id: {
-			type: 'string'
-		},
-		facility_type_name: {
-			type: 'string'
-		},
-		facility_name: {
-			type: 'string',
-			required: true
-		},
-		facility_hub_id: {
-			type: 'string'
-		},
-		facility_hub_name: {
-			type: 'string'
-		},
-		conflict: {
-			type: 'boolean'
-		},
+
+		// admin
 		admin1lng: {
 			type: 'float',
 			required: true
@@ -275,18 +356,9 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-		facility_lng: {
-			type: 'float',
-			required: true
+		conflict: {
+			type: 'boolean'
 		},
-		facility_lat: {
-			type: 'float',
-			required: true
-		},
-
-
-
-
 
 
 		/*********** 2016 *************/

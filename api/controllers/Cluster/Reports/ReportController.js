@@ -40,8 +40,8 @@ module.exports = {
             'admin2name',
             'admin3pcode',
             'admin3name',
-            'facility_type_name',
-            'facility_name',
+            'site_type_name',
+            'site_name',
             'report_month',
             'report_year',
             'activity_type_name',
@@ -82,7 +82,7 @@ module.exports = {
             'Admin2 Name',
             'Admin3 Pcode',
             'Admin3 Name',
-            'Facility Type',
+            'Site Type',
             'Location Name',
             'Report Month',
             'Report Year',
@@ -156,7 +156,7 @@ module.exports = {
             'admin2name',
             'admin3pcode',
             'admin3name',
-            'facility_name',
+            'site_name',
             'report_month',
             'report_year',
             'cluster',
@@ -363,29 +363,29 @@ module.exports = {
 
             // sort by location
             $report.locations.sort(function(a, b) {
-              if ( a.facility_type_name ) {
+              if ( a.site_type_name ) {
                 if( a.admin3name ) {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_type_name.localeCompare(b.site_type_name) ||
+                          a.site_name.localeCompare(b.site_name);
                 } else {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_type_name.localeCompare(b.site_type_name) ||
+                          a.site_name.localeCompare(b.site_name);
                 }
               } else {
                 if( a.admin3name ) {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_name.localeCompare(b.site_name);
                 } else {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_name.localeCompare(b.site_name);
                 }
               }
             });
@@ -396,6 +396,7 @@ module.exports = {
               // beneficiaries
               Beneficiaries
                 .find( { location_id: location.id } )
+                .populateAll()
                 .exec( function( err, beneficiaries ){
 
                   // return error
@@ -516,29 +517,29 @@ module.exports = {
 
         // sort by location
         $report.locations.sort(function(a, b) {
-          if ( a.facility_type_name ) {
+          if ( a.site_type_name ) {
             if( a.admin3name ) {
               return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
                       a.admin3name.localeCompare(b.admin3name) ||
-                      a.facility_type_name.localeCompare(b.facility_type_name) ||
-                      a.facility_name.localeCompare(b.facility_name);
+                      a.site_type_name.localeCompare(b.site_type_name) ||
+                      a.site_name.localeCompare(b.site_name);
             } else {
               return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
-                      a.facility_type_name.localeCompare(b.facility_type_name) ||
-                      a.facility_name.localeCompare(b.facility_name);
+                      a.site_type_name.localeCompare(b.site_type_name) ||
+                      a.site_name.localeCompare(b.site_name);
             }
           } else {
             if( a.admin3name ) {
               return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
                       a.admin3name.localeCompare(b.admin3name) ||
-                      a.facility_name.localeCompare(b.facility_name);
+                      a.site_name.localeCompare(b.site_name);
             } else {
               return a.admin1name.localeCompare(b.admin1name) ||
                       a.admin2name.localeCompare(b.admin2name) ||
-                      a.facility_name.localeCompare(b.facility_name);
+                      a.site_name.localeCompare(b.site_name);
             }
           }
         });
@@ -546,6 +547,9 @@ module.exports = {
         // for each location
         $report.locations.forEach( function( location, i ){
 
+          Location.update({id: location.id}, { report_status: $report.report_status }).exec( function( err, update ){
+
+          if (err) return res.negotiate( err );
           // beneficiaries
           Beneficiaries
             .updateOrCreateEach( { location_id: location.id }, location.beneficiaries, function( err, beneficiaries ){
@@ -553,86 +557,97 @@ module.exports = {
               // return error
               if (err) return res.negotiate( err );
 
-              // add locations ( associations included )
-              $report.locations[i].beneficiaries = beneficiaries;
-
-              // sort by id
-              $report.locations[i].beneficiaries.sort( function( a, b ) {
-                return a.id.localeCompare( b.id );
-              });
-
-              // traings
-              if ( location.trainings && location.trainings.length ) {
-
-                // keeps training_participants
-                var originalTrainings = location.trainings;
-
-                // trainings
-                Trainings
-                  .updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
+              // beneficiaries
+              Beneficiaries
+                .find( { location_id: location.id } )
+                .populateAll()
+                .exec( function( err, beneficiaries ){
 
                   // return error
                   if (err) return res.negotiate( err );
 
                   // add locations ( associations included )
-                  $report.locations[i].trainings = trainings;
+                  $report.locations[i].beneficiaries = beneficiaries;
 
                   // sort by id
-                  $report.locations[i].trainings.sort( function( a, b ) {
+                  $report.locations[i].beneficiaries.sort( function( a, b ) {
                     return a.id.localeCompare( b.id );
                   });
 
+                  // traings
+                  if ( location.trainings && location.trainings.length ) {
 
-                  // trainings
-                  var trainingCounter = 0,
-                      trainingLength = trainings.length;
-
-                  // trainings
-                  originalTrainings.forEach( function( training, j ){
-
-                    // set training_ids
-                    training.training_participants.forEach( function( trainee, k ){
-                      training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
-                    });
+                    // keeps training_participants
+                    var originalTrainings = location.trainings;
 
                     // trainings
-                    TrainingParticipants
-                      .updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
+                    Trainings
+                      .updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
 
-                        // return error
-                        if (err) return res.negotiate( err );
+                      // return error
+                      if (err) return res.negotiate( err );
 
-                        // add locations ( associations included )
-                        $report.locations[i].trainings[j].training_participants = trainees;
+                      // add locations ( associations included )
+                      $report.locations[i].trainings = trainings;
 
-                        // trianing
-                        trainingCounter++;
-                        if ( trainingCounter === trainingLength ) {
-                          // counter
-                          counter++;
-                          if ( counter === length ) {
-                            // return report
-                            return res.json( 200, $report );
-                          }
-                        }
+                      // sort by id
+                      $report.locations[i].trainings.sort( function( a, b ) {
+                        return a.id.localeCompare( b.id );
+                      });
+
+
+                      // trainings
+                      var trainingCounter = 0,
+                          trainingLength = trainings.length;
+
+                      // trainings
+                      originalTrainings.forEach( function( training, j ){
+
+                        // set training_ids
+                        training.training_participants.forEach( function( trainee, k ){
+                          training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
+                        });
+
+                        // trainings
+                        TrainingParticipants
+                          .updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
+
+                            // return error
+                            if (err) return res.negotiate( err );
+
+                            // add locations ( associations included )
+                            $report.locations[i].trainings[j].training_participants = trainees;
+
+                            // trianing
+                            trainingCounter++;
+                            if ( trainingCounter === trainingLength ) {
+                              // counter
+                              counter++;
+                              if ( counter === length ) {
+                                // return report
+                                return res.json( 200, $report );
+                              }
+                            }
+
+                          });
 
                       });
 
-                  });
+                    });
+
+                  } else {
+                    // counter
+                    counter++;
+                    if ( counter === length ) {
+                      // return report
+                      return res.json( 200, $report );
+                    }
+                  }
 
                 });
 
-              } else {
-                // counter
-                counter++;
-                if ( counter === length ) {
-                  // return report
-                  return res.json( 200, $report );
-                }
-              }
-
           });
-
+        });
         });
 
     });

@@ -117,7 +117,7 @@ module.exports = {
 			type: 'boolean',
 			required: true
 		},
-		facility_name: {
+		site_name: {
 			type: 'string',
 			required: true
 		},
@@ -143,11 +143,11 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-		facility_lng: {
+		site_lng: {
 			type: 'float',
 			required: true
 		},
-		facility_lat: {
+		site_lat: {
 			type: 'float',
       required: true
     },

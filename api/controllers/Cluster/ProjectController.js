@@ -128,17 +128,17 @@ module.exports = {
                                .sort(function(a, b){ return a.id > b.id });
                     $project[i].target_locations
                                .sort(function(a, b){
-                                  if (a.facility_type_name){
+                                  if (a.site_type_name){
                                     if(a.admin3name){
-                                      return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','facility_type_name','facility_name']));
+                                      return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_type_name','site_name']));
                                     } else {
-                                      return eval(_comparatorBuilder(['admin1name','admin2name','facility_type_name','facility_name']));
+                                      return eval(_comparatorBuilder(['admin1name','admin2name','site_type_name','site_name']));
                                     }
                                   } else {
                                       if( a.admin3name){
-                                        return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','facility_name']));
+                                        return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_name']));
                                       } else {
-                                        return eval(_comparatorBuilder(['admin1name','admin2name','facility_name']));
+                                        return eval(_comparatorBuilder(['admin1name','admin2name','site_name']));
                                       }
                                     }
                     });
@@ -218,7 +218,7 @@ module.exports = {
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
             setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'activity_type_name', 'activity_description_name', 'delivery_type_name',
             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
-            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','facility_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
 
         };
 
@@ -298,29 +298,29 @@ module.exports = {
 
               // order
               $project.target_locations.sort(function(a, b) {
-                if ( a.facility_type_name ) {
+                if ( a.site_type_name ) {
                   if( a.admin3name ) {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_type_name.localeCompare(b.site_type_name) ||
+                            a.site_name.localeCompare(b.site_name);
                   } else {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
-                            a.facility_type_name.localeCompare(b.facility_type_name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_type_name.localeCompare(b.site_type_name) ||
+                            a.site_name.localeCompare(b.site_name);
                   }
                 } else {
                   if( a.admin3name ) {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
                             a.admin3name.localeCompare(b.admin3name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_name.localeCompare(b.site_name);
                   } else {
                     return a.admin1name.localeCompare(b.admin1name) ||
                             a.admin2name.localeCompare(b.admin2name) ||
-                            a.facility_name.localeCompare(b.facility_name);
+                            a.site_name.localeCompare(b.site_name);
                   }
                 }
               });
@@ -409,29 +409,29 @@ module.exports = {
 
             // order
             $project.target_locations.sort(function(a, b) {
-              if ( a.facility_type_name ) {
+              if ( a.site_type_name ) {
                 if( a.admin3name ) {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_type_name.localeCompare(b.site_type_name) ||
+                          a.site_name.localeCompare(b.site_name);
                 } else {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_type_name.localeCompare(b.facility_type_name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_type_name.localeCompare(b.site_type_name) ||
+                          a.site_name.localeCompare(b.site_name);
                 }
               } else {
                 if( a.admin3name ) {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
                           a.admin3name.localeCompare(b.admin3name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_name.localeCompare(b.site_name);
                 } else {
                   return a.admin1name.localeCompare(b.admin1name) ||
                           a.admin2name.localeCompare(b.admin2name) ||
-                          a.facility_name.localeCompare(b.facility_name);
+                          a.site_name.localeCompare(b.site_name);
                 }
               }
             });
@@ -439,6 +439,9 @@ module.exports = {
             // beside project details related collections updates also report's ones
             // TODO make it return promise
             updateUser($project);
+
+            // update submited data fields
+            updateBeneficiaries($project);
             // return Project
             return res.json( 200, $project );
 
@@ -463,8 +466,6 @@ module.exports = {
       var findProject = {
         project_id: $project.id
       }
-      // TODO make it global
-      var Promise = require('bluebird');
 
       Promise.all([
         Project.update( { id: $project.id }, updatedRelationsUser ),
@@ -479,7 +480,29 @@ module.exports = {
           return res.negotiate( err )
         })
         .done();
-    }
+    };
+
+    var updateBeneficiaries = function($project){
+
+      // add fields here to update
+      var updateBeneficiariesFields = {
+        project_title: $project.project_title, 
+        project_donor: $project.project_donor,
+      }
+
+      var findProject = {
+        project_id: $project.id
+      }
+
+      Promise.all([
+      Beneficiaries.update(findProject, updateBeneficiariesFields),
+      // TargetBeneficiaries.update(findProject, updateBeneficiariesFields)
+        ])
+        .catch( function(err) {
+          return res.negotiate( err )
+        })
+        .done();
+    };
   },
 
   // remvoe budget item
@@ -627,6 +650,46 @@ module.exports = {
         });
 
       });
-  }
+  },
 
+  getFinancialDetails: function(req, res){
+        // request input
+        if ( !req.param( 'project_id' ) ) {
+          return res.json( 401, { err: 'project_id required!' } );
+        }
+        // project id
+        var project_id = req.param( 'project_id' );
+
+        // fields
+        var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
+            fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
+
+        // get data by project
+
+        BudgetProgress
+          .find()
+          .where( { project_id: project_id } )
+          .exec( function( err, budget ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return csv
+            json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+
+              // error
+              if ( err ) return res.negotiate( err );
+
+              // success
+              if ( req.params.text ) {
+                res.set('Content-Type', 'text/csv');
+                return res.send( 200, csv );
+              } else {
+                return res.json( 200, { data: csv } );
+              }
+
+            });
+
+          });
+  }
 };

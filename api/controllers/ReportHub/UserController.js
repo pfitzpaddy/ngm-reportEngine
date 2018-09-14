@@ -5,13 +5,14 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-module.exports = {
+var UserController = {
 
+  // create user
   create: function(req, res) {
 
     // check params
     if (!req.param( 'user' )) {
-      return res.json(401, { msg: 'user required!' });
+      return res.json(401, { msg: 'User Required!' });
     }
 
     // try to look up user using the provided username/email address
@@ -41,14 +42,51 @@ module.exports = {
 
           // save
           user.save( function(err){
-            //  return user
-            // console.log('User with ID '+user.id+' now has token '+user.token);
-            res.json( 200, user );
+
+            // create userHistory
+            var userHistory = _.clone( user );
+                userHistory.user_id = user.id
+                delete userHistory.id;
+
+            // create user history for tracking!
+            UserHistory
+              .create( userHistory )
+              .exec( function( err, newUserHistory ) {
+                
+                // err
+                if (err) return res.negotiate( err );
+                
+                // return user
+                res.json( 200, user );
+
+              });
           });
 
         });
 
     });
+
+  },
+
+  // delete user
+  delete: function (req, res) {
+
+    // check params
+    if (!req.param( 'user' )) {
+      return res.json(401, { msg: 'User Required' });
+    }
+
+    User
+      .destroy( { id: req.param( 'user' ).id } )
+      .exec( function( err ){
+        
+        // generic error
+        if ( err ) return res.negotiate( err );
+
+        // user destroyed
+        return res.json( 200, { success: true } );
+
+      });
 
   },
 
@@ -71,10 +109,13 @@ module.exports = {
     }, function foundUser( err, user ) {
 
       // generic error
-      if (err) return res.negotiate( err );
+      if ( err ) return res.negotiate( err );
 
       // user not found
-      if (!user) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
+      if ( !user ) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
+
+      // user not active
+      if ( user.status !== 'active' ) return res.json({ err: true, msg: 'User No Longer Active! Contact Admin' });
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
@@ -118,7 +159,34 @@ module.exports = {
 
   },
 
-  //
+  // get by username for profile
+  getUserByUsername: function(req, res){
+
+    // check params
+    if ( !req.param( 'username' ) ) {
+      return res.json(401, { msg: 'username required' });
+    }
+
+    // new profile
+    var username = req.param( 'username' );
+
+    // users
+    User
+      .findOne()
+      .where( { username: username } )
+      .exec( function( err, user ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // return updated user
+        return res.json( 200, user );
+
+      }); 
+
+  },
+
+  // metrics
   updateLogin: function(req, res){
 
     // check params
@@ -215,20 +283,36 @@ module.exports = {
                 Project.update( findOriginalUser, updatedRelationsUser ),
                 BudgetProgress.update( findOriginalUser, updatedRelationsUser ),
                 TargetBeneficiaries.update( findOriginalUser, updatedRelationsUser ),
-                TargetLocation.update( findOriginalUser, updatedRelationsUser ),
+                // TargetLocation fails due to update triggers
+                // TargetLocation.update( findOriginalUser, updatedRelationsUser ),
                 Report.update( findOriginalUser, updatedRelationsUser ),
                 Location.update( findOriginalUser, updatedRelationsUser ),
                 Beneficiaries.update( findOriginalUser, updatedRelationsUser ),
+                Trainings.update( findOriginalUser, updatedRelationsUser ),
+                TrainingParticipants.update( findOriginalUser, updatedRelationsUser ),
                 Stock.update( findOriginalUser, updatedRelationsUser ),
                 StockLocation.update( findOriginalUser, updatedRelationsUser ),
                 StockReport.update( findOriginalUser, updatedRelationsUser ),
                 StockWarehouse.update( findOriginalUser, updatedRelationsUser )
               ])
                 .catch( function(err) {
-                  return res.negotiate( err )
+                  return res.negotiate( err );
                 })
                 .done( function() {
-                  return res.json( 200, { success: true, user: result[0] } )
+
+                  // the following is for tracking of iMMAP staff (for now)
+
+                  // update user programme and track
+                  if ( originalUser.programme_id && originalUser.programme_id !== result[0].programme_id || 
+                        originalUser.contract_start_date && originalUser.contract_start_date.toString() !== result[0].contract_start_date && result[0].contract_start_date.toString() ||
+                        originalUser.contract_end_date && originalUser.contract_end_date.toString() !== result[0].contract_end_date && result[0].contract_end_date.toString() ||
+                        originalUser.admin0pcode !== result[0].admin0pcode ||
+                        originalUser.site_name !== result[0].site_name ){
+                    // profile details
+                    UserController.updateProfileDetails( req, res, originalUser, result[0] );
+                  } else {
+                    return res.json( 200, { success: true, user: result[0] } );
+                  }
                 });
 
             });
@@ -241,7 +325,142 @@ module.exports = {
 
   },
 
-  //
+  // update the profile details 
+  updateProfileDetails: function( req, res, originalUser, updatedUser ){
+
+    console.log('in updateProfileDetails')
+
+    // if country changes, make updates and add new history
+    if ( originalUser.admin0pcode !== updatedUser.admin0pcode ) {
+
+      // fetch
+      Organization
+        .find()
+        .where( { admin0pcode: updatedUser.admin0pcode } )
+        .exec( function( err, organization ){
+          
+          // generic error
+          if (err) return res.negotiate( err );
+
+          // if no results, create new organization
+          if ( !organization.length ) {
+            var newOrganizationAdmin0 = _.clone( updatedUser );
+                delete newOrganizationAdmin0.id;
+
+            // create new
+            Organization
+              .create( newOrganizationAdmin0 )
+              .exec( function( err, newOrganization ) {
+                
+                // generic error
+                if (err) return res.negotiate( err );
+
+                // update user country
+                User
+                  .update( { id: updatedUser.id }, { organization_id: newOrganization.id } )
+                  .exec( function( err, newOrgUser ){
+                    
+                    // create new userHistory
+                    var newUserHistory = _.clone( newOrgUser[0] );
+                        newUserHistory.user_id = newUserHistory.id;
+                        delete newUserHistory.id;
+
+                    // create user history for tracking!
+                    UserHistory
+                      .create( newUserHistory )
+                      .exec( function( err, newUserHistory ) {
+                        
+                        // err
+                        if (err) return res.negotiate( err );
+                        
+                        // return user
+                        return res.json( 200, { success: true, user: newOrgUser[0] } );
+
+                      });
+
+
+                  });
+
+              });
+
+          } else {
+
+            // update user country
+            User
+              .update( { id: updatedUser.id }, { organization_id: organization[0].id } )
+              .exec( function( err, updatedOrgUser ){
+
+                // create new userHistory
+                var newUserHistory = _.clone( updatedOrgUser[0] );
+                    newUserHistory.user_id = newUserHistory.id;
+                    delete newUserHistory.id;
+
+                // create user history for tracking!
+                UserHistory
+                  .create( newUserHistory )
+                  .exec( function( err, newUserHistory ) {
+                    
+                    // err
+                    if (err) return res.negotiate( err );
+                    
+                    // return user
+                    return res.json( 200, { success: true, user: updatedOrgUser[0] } );
+
+                  });
+
+              });
+
+          }
+
+        });
+
+    // udpate prgramme or duty station
+    } else if ( originalUser.programme_id !== updatedUser.programme_id ||
+              originalUser.site_name !== updatedUser.site_name ) {
+
+      // create new userHistory
+      var newUserHistory = _.clone( updatedUser );
+          newUserHistory.user_id = newUserHistory.id;
+          delete newUserHistory.id;
+
+      // create user history for tracking!
+      UserHistory
+        .create( newUserHistory )
+        .exec( function( err, newUserHistory ) {
+          
+          // err
+          if (err) return res.negotiate( err );
+          
+          // return user
+          return res.json( 200, { success: true, user: updatedUser } );
+
+        });
+
+    // date updates only require update to UserHistory
+    } else if ( originalUser.contract_start_date.toString() !== updatedUser.contract_start_date.toString() ||
+                  originalUser.contract_end_date.toString() !== updatedUser.contract_end_date.toString() ) {
+      
+      // update userHistory records dates
+      UserHistory
+        .update( { user_id: updatedUser.id }, { contract_end_date: updatedUser.contract_start_date, contract_end_date: updatedUser.contract_end_date } )
+        .exec( function( err, updatedUserHistory ){
+          
+          // err
+          if (err) return res.negotiate( err );
+
+          // return default
+          return res.json( 200, { success: true, user: updatedUser } );
+
+        });
+    } else {
+
+      // return default
+      return res.json( 200, { success: true, user: updatedUser } );
+    }
+
+  },
+
+  // send email for password reset
   passwordResetEmail: function(req, res){
 
     // check params
@@ -331,7 +550,7 @@ module.exports = {
 
   },
 
-  //
+  // password reset
   passwordReset: function(req, res){
 
     // check params
@@ -387,3 +606,5 @@ module.exports = {
   }
 
 };
+
+module.exports = UserController;

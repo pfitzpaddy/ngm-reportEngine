@@ -37,10 +37,14 @@ module.exports.routes = {
   'GET /login': 'ReportHub/UserController.login',
   'POST /login': 'ReportHub/UserController.login',
   'POST /create': 'ReportHub/UserController.create',
-  'POST /update': 'ReportHub/UserController.updateLogin',
+  'POST /delete': 'ReportHub/UserController.delete',
+  'POST /update': 'ReportHub/UserController.updateLogin',  
   'POST /profile/update': 'ReportHub/UserController.updateProfile',
   'POST /send-email': 'ReportHub/UserController.passwordResetEmail',
   'POST /password-reset': 'ReportHub/UserController.passwordReset',
+  // user
+  'GET /getUserByUsername': 'ReportHub/UserController.getUserByUsername',
+  'POST /getUserByUsername': 'ReportHub/UserController.getUserByUsername',
 
   // org
   'GET /getOrganization': 'ReportHub/OrganizationController.getOrganization',
@@ -49,6 +53,10 @@ module.exports.routes = {
   'POST /setOrganization': 'ReportHub/OrganizationController.setOrganization',
   'GET /getOrganizationUsers': 'ReportHub/OrganizationController.getOrganizationUsers',
   'POST /getOrganizationUsers': 'ReportHub/OrganizationController.getOrganizationUsers',
+  'GET /getOrganizationMenu': 'ReportHub/OrganizationController.getOrganizationMenu',
+  'POST /getOrganizationMenu': 'ReportHub/OrganizationController.getOrganizationMenu',
+  'GET /getOrganizationIndicator': 'ReportHub/OrganizationController.getOrganizationIndicator',
+  'POST /getOrganizationIndicator': 'ReportHub/OrganizationController.getOrganizationIndicator',
   'GET /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
   'POST /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
 
@@ -66,6 +74,16 @@ module.exports.routes = {
   'GET /export': 'ReportHub/FileController.export',
   'GET /getBeneficiairiesCsv': 'ReportHub/FileController.getBeneficiairiesCsv',
 
+  
+  // -------- iMMAP --------
+  // -------- Products --------
+  'GET /immap/products/getProductsData': 'iMMAP/Products/ProductsController.getProductsData',
+  'GET /immap/products/latestUpdate': 'iMMAP/Products/ProductsController.getLatestUpdate',
+  'GET /immap/products/getProductsMenu': 'iMMAP/Products/ProductsController.getProductsMenu',
+  'POST /immap/products/getProductsMenu': 'iMMAP/Products/ProductsController.getProductsMenu',
+  'GET /immap/products/indicator': 'iMMAP/Products/ProductsController.getProductsIndicator',
+  'POST /immap/products/indicator': 'iMMAP/Products/ProductsController.getProductsIndicator',
+
 
   // -------- ETHIOPIA --------
   // -------- CTC --------
@@ -82,8 +100,8 @@ module.exports.routes = {
   'GET /list/getAdmin1List': 'ReportHub/ListController.getAdmin1List',
   'GET /list/getAdmin2List': 'ReportHub/ListController.getAdmin2List',
   'GET /list/getAdmin3List': 'ReportHub/ListController.getAdmin3List',
-  'GET /list/getAdmin2Facilities': 'ReportHub/ListController.getAdmin2Facilities',
-  'GET /list/getAdmin3Facilities': 'ReportHub/ListController.getAdmin3Facilities',
+  'GET /list/getDutyStations': 'ReportHub/ListController.getDutyStations',
+  'GET /list/getAdminSites': 'ReportHub/ListController.getAdminSites',
 
 
 
@@ -104,9 +122,11 @@ module.exports.routes = {
   'POST /cluster/project/removeBudgetItem': 'Cluster/ProjectController.removeBudgetItemById',
   'POST /cluster/project/removeBeneficiary': 'Cluster/ProjectController.removeBeneficiaryById',
   'POST /cluster/project/removeLocation': 'Cluster/ProjectController.removeLocationById',
-  'POST /cluster/project/checkUserExists': 'ReportHub/UserController.checkUserExists',
+  // 'POST /cluster/project/checkUserExists': 'ReportHub/UserController.checkUserExists',
   'POST /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
+  'POST /cluster/project/getFinancialDetails': 'Cluster/ProjectController.getFinancialDetails',
+
 
   // STOCK REPORTS
   'POST /cluster/stock/getReportsList': 'Cluster/Stocks/StockReportController.getReportsList',
@@ -176,6 +196,25 @@ module.exports.routes = {
   'POST /wk/markers': 'Watchkeeper/WatchkeeperController.getMarkers',
   'POST /wk/data': 'Watchkeeper/WatchkeeperController.getData',
   'POST /wk/chart': 'Watchkeeper/WatchkeeperController.getChart',
+
+ // -------- AF NUTRITION --------
+ 'GET /nutrition/afghanistan/getKoboData': 'Country/Afg/Nutrition/NutritionController.getKoboData',
+ // Nutrition Dashboard
+ 'GET /nutrition/afghanistan/latestUpdate': 'Country/Afg/Nutrition/NutritionDashboardController.getlatestUpdate',
+ // Reports
+ 'GET /nutrition/afghanistan/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionReportsIndicator',
+ 'POST /nutrition/afghanistan/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionReportsIndicator',
+ // Beneficiaries
+ 'GET /nutrition/afghanistan/beneficiaries/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionIndicator',
+ 'POST /nutrition/afghanistan/beneficiaries/indicator': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionIndicator',
+ 'GET /nutrition/afghanistan/beneficiaries/data': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionData',
+ 'POST /nutrition/afghanistan/beneficiaries/data': 'Country/Afg/Nutrition/NutritionDashboardController.getNutritionData',
+
+ // Edit
+ 'GET /nutrition/afghanistan/reports/edit/:pk/:dataid': 'Country/Afg/Nutrition/NutritionDashboardController.getEditForm',
+
+ // Delete 
+ 'DELETE /nutrition/afghanistan/reports/delete/:pk/:dataid': 'Country/Afg/Nutrition/NutritionDashboardController.deleteForm',
 
   /***************************************************************************
   *                                                                          *

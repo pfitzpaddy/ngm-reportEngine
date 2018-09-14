@@ -109,6 +109,9 @@ module.exports = {
 		project_acbar_partner: {
 			type: 'boolean'
 		},
+		project_hrp_project: {
+			type: 'boolean'
+		},
 		project_hrp_code: {
 			type: 'string',
 			required: true
@@ -337,7 +340,7 @@ function getProjectReports( project ) {
 	// dates
 	var project_start = moment( project.project_start_date ).startOf( 'M' ),
 			project_end = moment( project.project_end_date ).endOf( 'M' ),
-			reports_start = moment( '2017-01-01' ),
+			reports_start = moment(project.project_start_date).startOf('Y')>=moment('2017-01-01')?moment(project.project_start_date).startOf('Y'):moment('2017-01-01'),
 			reports_end = moment().endOf( 'M' );
 
 	// variables

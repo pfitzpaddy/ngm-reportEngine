@@ -185,6 +185,14 @@ module.exports = {
 			required: true
 		},
 
+		// activity detail
+		activity_detail_id: {
+			type: 'string'
+		},
+		activity_detail_name: {
+			type: 'string'
+		},
+
 		// mpc delivery
 		mpc_delivery_type_id: {
 			type: 'string'
@@ -193,6 +201,14 @@ module.exports = {
 			type: 'string'
 		},
 
+		package_type_id:{
+			type: 'string'
+		},
+
+		package_type_name:{
+			type: 'string'
+		},
+		
 		// delivery (population, service)
 		delivery_type_id: {
 			type: 'string',
@@ -268,7 +284,10 @@ module.exports = {
 		elderly_women:{
 			type: 'integer',
 			defaultsTo: 0
-		},
+    },
+    injury_treatment_same_province:{
+      type: 'boolean'
+    },
 
 		// target locations
 		admin1pcode: {

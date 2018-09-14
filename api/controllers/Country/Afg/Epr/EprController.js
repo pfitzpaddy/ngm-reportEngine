@@ -5,6 +5,13 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+// secrets
+if (sails.config.kobo) {
+    var kobo_pk = sails.config.kobo.EHA_KOBO_PK;
+    var kobo_url = sails.config.kobo.EHA_KOBO_URL;
+    var kobo_user = sails.config.kobo.EHA_KOBO_USER;
+    var kobo_password = sails.config.kobo.EHA_KOBO_PASSWORD;
+}
 module.exports = {
 
 	// get data from kobo
@@ -46,8 +53,7 @@ module.exports = {
 				// API
 					// https://kc.kobotoolbox.org/api/v1/
 				// view forms
-					// curl -X GET https://kc.humanitarianresponse.info/api/v1/forms -u eha:ehaTeam1234
-				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/106227?format=json -u eha:ehaTeam1234';
+				cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/' +  kobo_pk + '?format=json' + ' -u ' + kobo_user + ':' + kobo_password;
 
 		// run curl command
 		exec( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
@@ -138,9 +144,8 @@ module.exports = {
 											d_obj.cases_male_under5 = d_obj.cases_male_under5 ? parseInt(d_obj.cases_male_under5) : 0;
 											d_obj.cases_male_over5 = d_obj.cases_male_over5 ? parseInt(d_obj.cases_male_over5) : 0;
 											// total cases
-											if(!d_obj.cases){
 												d_obj.cases = 0;
-											}
+
 											d_obj.cases += d_obj.cases_female_under5;
 											d_obj.cases += d_obj.cases_female_over5;
 											d_obj.cases += d_obj.cases_male_under5;
@@ -152,9 +157,7 @@ module.exports = {
 											d_obj.deaths_male_under5 = d_obj.deaths_male_under5 ? parseInt(d_obj.deaths_male_under5) : 0;
 											d_obj.deaths_male_over5 = d_obj.deaths_male_over5 ? parseInt(d_obj.deaths_male_over5) : 0;
 											// total cases
-											if(!d_obj.deaths){
 												d_obj.deaths = 0;
-											}
 											d_obj.deaths += d_obj.deaths_female_under5;
 											d_obj.deaths += d_obj.deaths_female_over5;
 											d_obj.deaths += d_obj.deaths_male_under5;
@@ -201,9 +204,8 @@ module.exports = {
 											d_obj.casualties_male_under5 = d_obj.casualties_male_under5 ? parseInt(d_obj.casualties_male_under5) : 0;
 											d_obj.casualties_male_over5 = d_obj.casualties_male_over5 ? parseInt(d_obj.casualties_male_over5) : 0;								
 											// total casualties
-											if(!d_obj.casualties){
 												d_obj.casualties = 0;
-											}
+
 											d_obj.casualties += d_obj.casualties_female_under5;
 											d_obj.casualties += d_obj.casualties_female_over5;
 											d_obj.casualties += d_obj.casualties_male_under5;
@@ -215,9 +217,8 @@ module.exports = {
 											d_obj.deaths_male_under5 = d_obj.deaths_male_under5_001 ? parseInt(d_obj.deaths_male_under5_001) : 0;
 											d_obj.deaths_male_over5 = d_obj.deaths_male_over5_001 ? parseInt(d_obj.deaths_male_over5_001) : 0;
 											// total cases
-											if(!d_obj.deaths){
 												d_obj.deaths = 0;
-											}
+
 											d_obj.deaths += d_obj.deaths_female_under5;
 											d_obj.deaths += d_obj.deaths_female_over5;
 											d_obj.deaths += d_obj.deaths_male_under5;

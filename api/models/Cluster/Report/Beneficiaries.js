@@ -16,22 +16,22 @@ module.exports = {
 	// attributes
 	attributes: {
 		// region/country
-    adminRpcode: {
+		adminRpcode: {
 			type: 'string',
 			required: true
-    },
-    adminRname: {
+		},
+		adminRname: {
 			type: 'string',
 			required: true
-    },
-    admin0pcode: {
+		},
+		admin0pcode: {
 			type: 'string',
 			required: true
-    },
-    admin0name: {
+		},
+		admin0name: {
 			type: 'string',
 			required: true
-    },
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -124,11 +124,11 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
-    },
-    mpc_purpose_type_id: {
+		},
+		mpc_purpose_type_id: {
 			type: 'string'
-    },
-    mpc_purpose_type_name: {
+		},
+		mpc_purpose_type_name: {
 			type: 'string'
 		},
 		inter_cluster_activities: {
@@ -214,6 +214,30 @@ module.exports = {
 			required: true
 		},
 
+		// added new 'W' for NG, activities should be planned better
+		activity_detail_id: {
+			type: 'string'
+		},
+		activity_detail_name: {
+			type: 'string'
+		},
+
+		// NG cholera response
+		activity_cholera_response_id: {
+			type: 'string'
+		},
+		activity_cholera_response_name: {
+			type: 'string'
+		},		
+
+		// indicator that relates to activity for HRP reporting
+		indicator_id: {
+			type: 'string'
+		},
+		indicator_name: {
+			type: 'string'
+		},	
+
 		// mpc delivery
 		mpc_delivery_type_id: {
 			type: 'string'
@@ -222,6 +246,14 @@ module.exports = {
 			type: 'string'
 		},
 
+		package_type_id:{
+			type: 'string'
+		},
+
+		package_type_name:{
+			type: 'string'
+		},
+		
 		// delivery (population, service)
 		delivery_type_id: {
 			type: 'string',
@@ -261,11 +293,13 @@ module.exports = {
 			type: 'string'
 		},
 
-			// conditional/unconditional
+		// conditional/unconditional
 		cash_amount: {
 			type: 'integer',
 			defaultsTo: 0
 		},
+
+		// beneficiaries
 		households:{
 			type: 'integer',
 			defaultsTo: 0
@@ -298,11 +332,18 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		total_beneficiaries:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		injury_treatment_same_province:{
+			type: 'boolean'
+		},
 
 		// location
-    location_id: {
+		location_id: {
 			type: 'string'
-    },
+		},
 		admin1pcode: {
 			type: 'string',
 			required: true
@@ -325,40 +366,80 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
-		facility_id: {
+
+		// DTM
+		site_id: {
 			type: 'string'
 		},
-		facility_class: {
+		site_class: {
 			type: 'string'
 		},
-		facility_status: {
+		site_status: {
 			type: 'string'
 		},
-		facility_implementation_id: {
+		site_implementation_id: {
 			type: 'string'
 		},
-		facility_implementation_name: {
+		site_implementation_name: {
 			type: 'string'
 		},
-		facility_type_id: {
+		site_type_id: {
 			type: 'string'
 		},
-		facility_type_name: {
+		site_type_name: {
 			type: 'string'
 		},
-		facility_name: {
+		site_name: {
 			type: 'string',
 			required: true
 		},
-		facility_hub_id: {
+		site_hub_id: {
 			type: 'string'
 		},
-		facility_hub_name: {
+		site_hub_name: {
 			type: 'string'
 		},
-		conflict: {
-			type: 'boolean'
+		site_households:{
+			type: 'integer',
+			defaultsTo: 0,
 		},
+		site_population:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_boys:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_girls:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_men:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_women:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_elderly_men:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_elderly_women:{
+			type: 'integer',
+			defaultsTo: 0,
+		},
+		site_lng: {
+			type: 'float',
+			required: true
+		},
+		site_lat: {
+			type: 'float',
+			required: true
+		},
+		
 		admin1lng: {
 			type: 'float',
 			required: true
@@ -381,15 +462,47 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
-		facility_lng: {
-			type: 'float',
-			required: true
-		},
-		facility_lat: {
-			type: 'float',
-			required: true
+		conflict: {
+			type: 'boolean'
 		},
 
+		/******* WASH NG IRS *******/
+
+		// Water (IRS) association
+		water: {
+			collection: 'wateractivities',
+			via: 'beneficiary_id'
+		},
+
+		// Boreholes (IRS) association
+		boreholes: {
+			collection: 'borehole',
+			via: 'beneficiary_id'
+		},
+
+		// Sanitation (IRS) association
+		sanitation: {
+			collection: 'sanitationactivities',
+			via: 'beneficiary_id'
+		},
+
+		// Hygiene (IRS) association
+		hygiene: {
+			collection: 'hygieneactivities',
+			via: 'beneficiary_id'
+		},
+
+		// Cash (IRS) association
+		cash: {
+			collection: 'cashactivities',
+			via: 'beneficiary_id'
+		},
+
+		// Cash (IRS) association
+		accountability: {
+			collection: 'accountabilityactivities',
+			via: 'beneficiary_id'
+		},
 
 
 
@@ -461,49 +574,49 @@ module.exports = {
 
 	// }
 
-  // updateOrCreate
-    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
-  updateOrCreateEach: function( parent, values, cb ){
-    var self = this; // reference for use by callbacks
-    // If no values were specified, return []
-    if (!values.length) cb( false, [] );
+	// updateOrCreate
+		// http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+	updateOrCreateEach: function( parent, values, cb ){
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if (!values.length) cb( false, [] );
 
-    var results = [],
-        counter = 0,
-        length = values.length;
+		var results = [],
+				counter = 0,
+				length = values.length;
 
-    // values
-    values.forEach(function( value ){
+		// values
+		values.forEach(function( value ){
 
-      if( value.id ){
-        self.update({ id: value.id }, value, function( err, update ){
-          if(err) return cb(err, false);
-          results.push( update[0] );
+			if( value.id ){
+				self.update({ id: value.id }, value, function( err, update ){
+					if(err) return cb(err, false);
+					results.push( update[0] );
 
-          counter++;
-          if( counter===length ){
-            cb( false, results );
-          }
-        });
-      }else{
-  			// set based on criteria
-  			for ( key in parent ){
-  				value[ key ] = parent[ key ];
-  			}
-        self.create(value, function( err, create ){
-          if(err) return cb(err, false);
-          results.push( create );
+					counter++;
+					if( counter===length ){
+						cb( false, results );
+					}
+				});
+			}else{
+				// set based on criteria
+				for ( key in parent ){
+					value[ key ] = parent[ key ];
+				}
+				self.create(value, function( err, create ){
+					if(err) return cb(err, false);
+					results.push( create );
 
-          counter++;
-          if( counter===length ){
-            cb( false, results );
-          }
-        });
-      }
+					counter++;
+					if( counter===length ){
+						cb( false, results );
+					}
+				});
+			}
 
-    });
+		});
 
-  }
+	}
 
 };
 
