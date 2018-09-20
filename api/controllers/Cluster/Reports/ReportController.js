@@ -547,107 +547,120 @@ module.exports = {
         // for each location
         $report.locations.forEach( function( location, i ){
 
-          Location.update({id: location.id}, { report_status: $report.report_status }).exec( function( err, update ){
+          // Location.update({id: location.id}, { report_status: $report.report_status }).exec( function( err, update ){
 
-          if (err) return res.negotiate( err );
-          // beneficiaries
-          Beneficiaries
-            .updateOrCreateEach( { location_id: location.id }, location.beneficiaries, function( err, beneficiaries ){
+          // update report_status
+          location.report_status = $report.report_status;         
 
-              // return error
-              if (err) return res.negotiate( err );
+          // update or create
+          Location
+            .updateOrCreate( location, function( err, update ){
 
-              // beneficiaries
-              Beneficiaries
-                .find( { location_id: location.id } )
-                .populateAll()
-                .exec( function( err, beneficiaries ){
+            if (err) return res.negotiate( err );
 
-                  // return error
-                  if (err) return res.negotiate( err );
+            // set id ( updateOrCreate ) 
+            location.id = update.id;
+         
+            // beneficiaries
+            Beneficiaries
+              .updateOrCreateEach( { location_id: location.id }, location.beneficiaries, function( err, beneficiaries ){
 
-                  // add locations ( associations included )
-                  $report.locations[i].beneficiaries = beneficiaries;
+                // return error
+                if (err) return res.negotiate( err );
 
-                  // sort by id
-                  $report.locations[i].beneficiaries.sort( function( a, b ) {
-                    return a.id.localeCompare( b.id );
-                  });
+                // beneficiaries
+                Beneficiaries
+                  .find( { location_id: location.id } )
+                  .populateAll()
+                  .exec( function( err, beneficiaries ){
 
-                  // traings
-                  if ( location.trainings && location.trainings.length ) {
+                    // return error
+                    if (err) return res.negotiate( err );
 
-                    // keeps training_participants
-                    var originalTrainings = location.trainings;
+                    // add locations ( associations included )
+                    $report.locations[i].beneficiaries = beneficiaries;
 
-                    // trainings
-                    Trainings
-                      .updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
-
-                      // return error
-                      if (err) return res.negotiate( err );
-
-                      // add locations ( associations included )
-                      $report.locations[i].trainings = trainings;
-
-                      // sort by id
-                      $report.locations[i].trainings.sort( function( a, b ) {
-                        return a.id.localeCompare( b.id );
-                      });
-
-
-                      // trainings
-                      var trainingCounter = 0,
-                          trainingLength = trainings.length;
-
-                      // trainings
-                      originalTrainings.forEach( function( training, j ){
-
-                        // set training_ids
-                        training.training_participants.forEach( function( trainee, k ){
-                          training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
-                        });
-
-                        // trainings
-                        TrainingParticipants
-                          .updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
-
-                            // return error
-                            if (err) return res.negotiate( err );
-
-                            // add locations ( associations included )
-                            $report.locations[i].trainings[j].training_participants = trainees;
-
-                            // trianing
-                            trainingCounter++;
-                            if ( trainingCounter === trainingLength ) {
-                              // counter
-                              counter++;
-                              if ( counter === length ) {
-                                // return report
-                                return res.json( 200, $report );
-                              }
-                            }
-
-                          });
-
-                      });
-
+                    // sort by id
+                    $report.locations[i].beneficiaries.sort( function( a, b ) {
+                      return a.id.localeCompare( b.id );
                     });
 
-                  } else {
-                    // counter
-                    counter++;
-                    if ( counter === length ) {
-                      // return report
-                      return res.json( 200, $report );
-                    }
-                  }
+                    // traings
+                    if ( location.trainings && location.trainings.length ) {
 
-                });
+                      // keeps training_participants
+                      var originalTrainings = location.trainings;
+
+                      // trainings
+                      Trainings
+                        .updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
+
+                        // return error
+                        if (err) return res.negotiate( err );
+
+                        // add locations ( associations included )
+                        $report.locations[i].trainings = trainings;
+
+                        // sort by id
+                        $report.locations[i].trainings.sort( function( a, b ) {
+                          return a.id.localeCompare( b.id );
+                        });
+
+
+                        // trainings
+                        var trainingCounter = 0,
+                            trainingLength = trainings.length;
+
+                        // trainings
+                        originalTrainings.forEach( function( training, j ){
+
+                          // set training_ids
+                          training.training_participants.forEach( function( trainee, k ){
+                            training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
+                          });
+
+                          // trainings
+                          TrainingParticipants
+                            .updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
+
+                              // return error
+                              if (err) return res.negotiate( err );
+
+                              // add locations ( associations included )
+                              $report.locations[i].trainings[j].training_participants = trainees;
+
+                              // trianing
+                              trainingCounter++;
+                              if ( trainingCounter === trainingLength ) {
+                                // counter
+                                counter++;
+                                if ( counter === length ) {
+                                  // return report
+                                  return res.json( 200, $report );
+                                }
+                              }
+
+                            });
+
+                        });
+
+                      });
+
+                    } else {
+                      // counter
+                      counter++;
+                      if ( counter === length ) {
+                        // return report
+                        return res.json( 200, $report );
+                      }
+                    }
+
+                  });
+
+            });
 
           });
-        });
+
         });
 
     });

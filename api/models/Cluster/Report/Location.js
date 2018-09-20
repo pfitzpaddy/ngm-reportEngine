@@ -371,6 +371,25 @@ module.exports = {
 
 	},
 
+  // updateOrCreate
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+  updateOrCreate: function( values, cb ){
+    var self = this; // reference for use by callbacks
+    // If no values were specified, return []
+    if (!values) cb( false, [] );
+
+    if( values.id ){
+    	// update returns array, need the object
+      self.update({ id: values.id }, values, function( err, update ){
+				if(err) return cb(err, false);
+				cb( false, update[0] );
+      });
+    }else{
+      self.create(values, cb);
+    }
+
+  },
+
 	// create new report locations based on project target_locations
 	createNewReportLocations: function( report, target_locations, cb ){
     var self = this; // reference for use by callbacks
