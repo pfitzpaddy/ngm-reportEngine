@@ -16,22 +16,22 @@ module.exports = {
 	// attributes
 	attributes: {
 		// region/country
-    adminRpcode: {
+		adminRpcode: {
 			type: 'string',
 			required: true
-    },
-    adminRname: {
+		},
+		adminRname: {
 			type: 'string',
 			required: true
-    },
-    admin0pcode: {
+		},
+		admin0pcode: {
 			type: 'string',
 			required: true
-    },
-    admin0name: {
+		},
+		admin0name: {
 			type: 'string',
 			required: true
-    },
+		},
 		admin1pcode: {
 			type: 'string',
 			required: true
@@ -151,11 +151,11 @@ module.exports = {
 		},
 		mpc_purpose_cluster_id: {
 			type: 'string'
-    },
-    mpc_purpose_type_id: {
+		},
+		mpc_purpose_type_id: {
 			type: 'string'
-    },
-    mpc_purpose_type_name: {
+		},
+		mpc_purpose_type_name: {
 			type: 'string'
 		},
 		inter_cluster_activities: {
@@ -264,14 +264,6 @@ module.exports = {
 		},
 
 		// to captire DTM 
-		site_population:{
-			type: 'integer',
-			defaultsTo: 0
-		},
-		site_households:{
-			type: 'integer',
-			defaultsTo: 0
-		},
 		site_boys:{
 			type: 'integer',
 			defaultsTo: 0,
@@ -296,6 +288,16 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0,
 		},
+		site_population:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		site_households:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+
+		// beneficiaries
 		households:{
 			type: 'integer',
 			defaultsTo: 0
@@ -323,7 +325,7 @@ module.exports = {
 		elderly_women:{
 			type: 'integer',
 			defaultsTo: 0
-    },
+		},
 		site_lng: {
 			type: 'float',
 			required: true
@@ -371,55 +373,74 @@ module.exports = {
 
 	},
 
+	// updateOrCreate
+		// http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+	updateOrCreate: function( values, cb ){
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if (!values) cb( false, [] );
+
+		if( values.id ){
+			// update returns array, need the object
+			self.update({ id: values.id }, values, function( err, update ){
+				if(err) return cb(err, false);
+				cb( false, update[0] );
+			});
+		}else{
+			self.create(values, cb);
+		}
+
+	},
+
 	// create new report locations based on project target_locations
 	createNewReportLocations: function( report, target_locations, cb ){
-    var self = this; // reference for use by callbacks
-    // If no values were specified, return []
-    if ( !report || !target_locations.length ) cb( false, [] );
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if ( !report || !target_locations.length ) cb( false, [] );
 
-    // var
-    var results = [],
-        counter = 0,
-        length = target_locations.length,
-        _under = require('underscore');
+		// var
+		var results = [],
+				counter = 0,
+				length = target_locations.length,
+				_under = require('underscore');
 
-    // clone report
-    var target_report = _under.clone( report );
-            target_report.report_id = report.id.valueOf();
-            delete target_report.id;
-            delete target_report.admin1pcode;
-            delete target_report.admin1name;
-            delete target_report.admin2pcode;
-            delete target_report.admin2name;
-            delete target_report.admin3pcode;
-            delete target_report.admin3name;
+		// clone report
+		var target_report = _under.clone( report );
+						target_report.report_id = report.id.valueOf();
+						delete target_report.id;
+						delete target_report.admin1pcode;
+						delete target_report.admin1name;
+						delete target_report.admin2pcode;
+						delete target_report.admin2name;
+						delete target_report.admin3pcode;
+						delete target_report.admin3name;
 
-    // values
-    target_locations.forEach(function( t_location ){
+		// values
+		target_locations.forEach(function( t_location ){
 
 			// clone target_location
 			var l = _under.clone( t_location );
-			    l.target_location_reference_id = t_location.id;
-			    delete l.id;
+					l.target_location_reference_id = t_location.id;
+					delete l.id;
 
-      // merge reporting location
-      var location = _under.extend( {}, target_report, l );
+			// merge reporting location
+			var location = _under.extend( {}, target_report, l );
 
-      // find or create
+			// find or create
 			self
-        .findOrCreate( {
-            project_id: target_report.project_id,
-            report_month: target_report.report_month,
-            report_year: target_report.report_year,
-            target_location_reference_id: t_location.id
-          }, location )
-        .exec( function( err, result ) {
+				.findOrCreate( {
+						project_id: target_report.project_id,
+						report_month: target_report.report_month,
+						report_year: target_report.report_year,
+						target_location_reference_id: t_location.id
+					}, location )
+				.exec( function( err, result ) {
 
-        	// err
-        	if ( err ) return cb( err, false );
+					// err
+					if ( err ) return cb( err, false );
 
-        	// results
-        	results.push( result );
+					// results
+					results.push( result );
 
 					// counter
 					counter++
