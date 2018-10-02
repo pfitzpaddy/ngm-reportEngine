@@ -349,6 +349,12 @@ module.exports = {
 			type: 'boolean'
 		},
 
+		// store kit details
+		kit_details: {
+			type: 'array'
+
+		},
+
 		// location
 		location_id: {
 			type: 'string'
