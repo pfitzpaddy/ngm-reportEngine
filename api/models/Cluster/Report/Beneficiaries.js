@@ -193,6 +193,15 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		distribution_start_date: {
+			type: 'date'
+		},
+		distribution_end_date: {
+			type: 'date'
+		},
+		distribution_status: {
+			type: 'string'
+		},
 
 		// activity_type
 		activity_type_id: {
@@ -338,6 +347,12 @@ module.exports = {
 		},
 		injury_treatment_same_province:{
 			type: 'boolean'
+		},
+
+		// store kit details
+		kit_details: {
+			type: 'array'
+
 		},
 
 		// location
