@@ -679,7 +679,8 @@ module.exports = {
 		// location_reference_id 're-links' association after any updates
 			 // when updating target locations in project details (this affects monthly report)
 		Beneficiaries
-			.update({ id: $id }, { location_id: null })
+			// .update({ id: $id }, { location_id: null })
+			.destroy({ id: $id })
 			.exec(function( err, b ){
 
 				// return error
