@@ -198,7 +198,7 @@ var ClusterDashboardController = {
 							}
 						]).toArray(function (err, results) {
 							if (err) return res.serverError(err);
-							return res.json( 200, { 'value': results[0].total } );
+							return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 						});
 					});	
 				}
@@ -229,7 +229,7 @@ var ClusterDashboardController = {
 						}
 					]).toArray(function (err, results) {
 						if (err) return res.serverError(err);
-						return res.json( 200, { 'value': results[0].total } );
+						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
 				});	
 				
