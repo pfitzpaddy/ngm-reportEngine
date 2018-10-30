@@ -216,6 +216,18 @@ module.exports.routes = {
  // Delete 
  'DELETE /nutrition/afghanistan/reports/delete/:pk/:dataid': 'Country/Afg/Nutrition/NutritionDashboardController.deleteForm',
 
+	// -------- AF DROUGHT ------------
+	// Latest Update Beneficiaries
+	'POST /drought/afghanistan/latestUpdate': 'Country/Afg/Drought/DroughtDashboardController.getlatestUpdate',
+	// Reports
+	'GET /drought/afghanistan/indicator': 'Country/Afg/Drought/DroughtDashboardController.getDroughtReportsIndicator',
+	'POST /drought/afghanistan/indicator': 'Country/Afg/Drought/DroughtDashboardController.getDroughtReportsIndicator',
+	// Beneficiaries
+	'GET /drought/afghanistan/beneficiaries/indicator': 'Country/Afg/Drought/DroughtDashboardController.getDroughtIndicator',
+	'POST /drought/afghanistan/beneficiaries/indicator': 'Country/Afg/Drought/DroughtDashboardController.getDroughtIndicator',
+	'GET /drought/afghanistan/beneficiaries/data': 'Country/Afg/Drought/DroughtDashboardController.getDroughtData',
+	'POST /drought/afghanistan/beneficiaries/data': 'Country/Afg/Drought/DroughtDashboardController.getDroughtData',
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
