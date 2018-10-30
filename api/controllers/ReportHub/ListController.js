@@ -81,7 +81,7 @@ module.exports = {
 
   },
 
-  // get admin2 list by admin0, admin1
+  // get admin3 list by admin0
   getAdmin3List: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
@@ -108,6 +108,42 @@ module.exports = {
       });
 
   },
+
+  // get admin4 list by admin0pcode, admin1pcode
+  getAdmin4List: function( req, res ) {
+
+    // !admin0pcode || !admin1pcode
+    if ( !req.param( 'admin0pcode' ) ) {
+       return res.json( 401, { msg: 'admin0pcode, admin1pcode required and must be string' });
+    }
+
+    // set
+    var admin0pcode = req.param( 'admin0pcode' );
+    var admin1pcode = req.param( 'admin1pcode' );
+
+    // set default to Cox Bazar
+    if ( admin0pcode === 'BD' && !admin1pcode ) {
+      admin1pcode = '20';
+    } 
+
+    // get list
+    Admin4
+      .find()
+      .where({ admin0pcode: admin0pcode })
+      .where({ admin1pcode: admin1pcode })
+      .sort('admin4name ASC')
+      .exec( function( err, admin4 ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // return new Project
+        return res.json( 200, admin4 );
+
+      });
+
+  },
+
 
   // return list of duty stations
   getDutyStations: function( req, res ) {

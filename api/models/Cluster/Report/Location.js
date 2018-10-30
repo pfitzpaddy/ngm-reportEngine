@@ -54,6 +54,12 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
+		admin4pcode: {
+			type: 'string'
+		},
+		admin4name: {
+			type: 'string'
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -356,6 +362,12 @@ module.exports = {
 			type: 'float'
 		},
 		admin3lat: {
+			type: 'float'
+		},
+		admin4lng: {
+			type: 'float'
+		},
+		admin4lat: {
 			type: 'float'
 		},
 		conflict: {

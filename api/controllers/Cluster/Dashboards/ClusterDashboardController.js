@@ -699,6 +699,8 @@ var ClusterDashboardController = {
 										'admin2name',
 										'admin3pcode',
 										'admin3name',
+										'admin4pcode',
+										'admin4name',
 										'conflict',
 										'site_id',
 										'site_class',
@@ -741,6 +743,8 @@ var ClusterDashboardController = {
 										'admin2lat',
 										'admin3lng',
 										'admin3lat',
+										'admin4lng',
+										'admin4lat',
 										'site_lng',
 										'site_lat'
 									],
@@ -772,6 +776,8 @@ var ClusterDashboardController = {
 									'admin2name',
 									'admin3pcode',
 									'admin3name',
+									'admin4pcode',
+									'admin4name',
 									'conflict',
 									'site_id',
 									'site_class',
@@ -814,6 +820,8 @@ var ClusterDashboardController = {
 									'admin2lat',
 									'admin3lng',
 									'admin3lat',
+									'admin4lng',
+									'admin4lat',
 									'site_lng',
 									'site_lat'
 								];
@@ -892,6 +900,8 @@ var ClusterDashboardController = {
 								'admin2name',
 								'admin3pcode',
 								'admin3name',
+								'admin4pcode',
+								'admin4name',
 								'site_lng',
 								'site_lat',
 								'site_name',
@@ -926,6 +936,8 @@ var ClusterDashboardController = {
 								'admin2name',
 								'admin3pcode',
 								'admin3name',
+								'admin4pcode',
+								'admin4name',
 								'warehouse_lng',
 								'warehouse_lat',
 								'warehouse_name',
@@ -1025,6 +1037,8 @@ var ClusterDashboardController = {
 							'admin2lat',
 							'admin3lat',
 							'admin3lng',
+							'admin4lat',
+							'admin4lng',
 							'site_lng',
 							'site_lat',
 							'createdAt',
@@ -1079,6 +1093,8 @@ var ClusterDashboardController = {
 							'admin2lat',
 							'admin3lat',
 							'admin3lng',
+							'admin4lat',
+							'admin4lng',
 							'site_lng',
 							'site_lat',
 							'createdAt',
@@ -1547,10 +1563,11 @@ var ClusterDashboardController = {
 										cluster:'$cluster',
 										organization:'$organization',
 										project_title:'$project_title',
-										admin3name:'$admin3name',
 										admin0name:'$admin0name',
 										admin1name:'$admin1name',
 										admin2name:'$admin2name',
+										admin3name:'$admin3name',
+										admin4name:'$admin4name',
 										cluster_id:'$cluster_id',
 										site_type_name:'$site_type_name',
 										site_name:'$site_name',
@@ -1576,15 +1593,15 @@ var ClusterDashboardController = {
 									var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d._id.cluster + '</h5>'
 															+ '<h5 style="text-align:center; font-size:1.3rem; font-weight:100;">' + d._id.organization + ' | ' + d._id.project_title + '</h5>'
 															+ '<div style="text-align:center">' + d._id.admin0name + '</div>'
-															if ( d._id.admin3name ) {
+															if ( d._id.admin4name ) {
+																message += '<div style="text-align:center">' + d._id.admin1name + ', ' + d._id.admin2name + ', ' + d._id.admin3name + ', ' + d._id.admin4name + '</div>';
+															} else if ( d._id.admin3name ) {
 																message += '<div style="text-align:center">' + d._id.admin1name + ', ' + d._id.admin2name + ', ' + d._id.admin3name + '</div>';
 															} else {
 																message += '<div style="text-align:center">' + d._id.admin1name + ', ' + d._id.admin2name + '</div>';
 															}
-															if ( d._id.cluster_id === 'health' ) {
-																message += '<div style="text-align:center">' + d._id.site_type_name + '</div>';
-															}
-															message +=  '<div style="text-align:center">' + d._id.site_name + '</div>'
+															message += '<div style="text-align:center">' + d._id.site_type_name + '</div>'
+															+ '<div style="text-align:center">' + d._id.site_name + '</div>'
 															+ '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
 															+ '<div style="text-align:center">' + d._id.organization + '</div>'
 															+ '<div style="text-align:center">' + d._id.name + '</div>'

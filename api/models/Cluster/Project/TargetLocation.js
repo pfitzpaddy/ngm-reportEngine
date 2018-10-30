@@ -54,6 +54,12 @@ module.exports = {
 		admin3name: {
 			type: 'string'
 		},
+		admin4pcode: {
+			type: 'string'
+		},
+		admin4name: {
+			type: 'string'
+		},
 		organization_id: {
 			type: 'string',
 			required: true
@@ -309,6 +315,12 @@ module.exports = {
 		admin3lat: {
 			type: 'float'
 		},
+		admin4lng: {
+			type: 'float'
+		},
+		admin4lat: {
+			type: 'float'
+		},
 		conflict: {
 			type: 'boolean'
 		},
@@ -406,6 +418,8 @@ module.exports = {
 									delete r.admin2name;
 									delete r.admin3pcode;
                   delete r.admin3name;
+									delete r.admin4pcode;
+                  delete r.admin4name;
                   delete r.username,
                   delete r.name,
                   delete r.position,
