@@ -119,6 +119,12 @@ module.exports = {
 		admin4name: {
 			type: 'string'
 		},
+		admin5pcode: {
+			type: 'string'
+		},
+		admin5name: {
+			type: 'string'
+		},
 		conflict: {
 			type: 'boolean',
 			required: true
@@ -153,6 +159,12 @@ module.exports = {
 			type: 'float'
 		},
 		admin4lat: {
+			type: 'float'
+		},
+		admin5lng: {
+			type: 'float'
+		},
+		admin5lat: {
 			type: 'float'
 		},
 		site_lng: {

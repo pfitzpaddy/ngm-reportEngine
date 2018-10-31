@@ -101,6 +101,7 @@ module.exports.routes = {
   'GET /list/getAdmin2List': 'ReportHub/ListController.getAdmin2List',
   'GET /list/getAdmin3List': 'ReportHub/ListController.getAdmin3List',
   'GET /list/getAdmin4List': 'ReportHub/ListController.getAdmin4List',
+  'GET /list/getAdmin5List': 'ReportHub/ListController.getAdmin5List',
   'GET /list/getDutyStations': 'ReportHub/ListController.getDutyStations',
   'GET /list/getAdminSites': 'ReportHub/ListController.getAdminSites',
 
