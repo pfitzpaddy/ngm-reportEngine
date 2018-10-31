@@ -701,6 +701,8 @@ var ClusterDashboardController = {
 										'admin3name',
 										'admin4pcode',
 										'admin4name',
+										'admin5pcode',
+										'admin5name',
 										'conflict',
 										'site_id',
 										'site_class',
@@ -722,6 +724,10 @@ var ClusterDashboardController = {
 										'activity_status_name',
 										'delivery_type_id',
 										'delivery_type_name',
+										'distribution_start_date',
+										'distribution_end_date',
+										'partial_kits',
+										'kit_details',
 										'units',
 										'unit_type_id',
 										'unit_type_name',
@@ -745,6 +751,8 @@ var ClusterDashboardController = {
 										'admin3lat',
 										'admin4lng',
 										'admin4lat',
+										'admin5lng',
+										'admin5lat',
 										'site_lng',
 										'site_lat'
 									],
@@ -778,6 +786,8 @@ var ClusterDashboardController = {
 									'admin3name',
 									'admin4pcode',
 									'admin4name',
+									'admin5pcode',
+									'admin5name',
 									'conflict',
 									'site_id',
 									'site_class',
@@ -799,6 +809,10 @@ var ClusterDashboardController = {
 									'activity_status_name',
 									'delivery_type_id',
 									'delivery_type_name',
+									'distribution_start_date',
+									'distribution_end_date',
+									'partial_kits',
+									'kit_details',
 									'units',
 									'unit_type_id',
 									'unit_type_name',
@@ -822,6 +836,8 @@ var ClusterDashboardController = {
 									'admin3lat',
 									'admin4lng',
 									'admin4lat',
+									'admin5lng',
+									'admin5lat',
 									'site_lng',
 									'site_lat'
 								];
@@ -902,6 +918,8 @@ var ClusterDashboardController = {
 								'admin3name',
 								'admin4pcode',
 								'admin4name',
+								'admin5pcode',
+								'admin5name',
 								'site_lng',
 								'site_lat',
 								'site_name',
@@ -938,6 +956,8 @@ var ClusterDashboardController = {
 								'admin3name',
 								'admin4pcode',
 								'admin4name',
+								'admin5pcode',
+								'admin5name',
 								'warehouse_lng',
 								'warehouse_lat',
 								'warehouse_name',
@@ -1039,6 +1059,8 @@ var ClusterDashboardController = {
 							'admin3lng',
 							'admin4lat',
 							'admin4lng',
+							'admin5lat',
+							'admin5lng',
 							'site_lng',
 							'site_lat',
 							'createdAt',
@@ -1095,6 +1117,8 @@ var ClusterDashboardController = {
 							'admin3lng',
 							'admin4lat',
 							'admin4lng',
+							'admin5lat',
+							'admin5lng',
 							'site_lng',
 							'site_lat',
 							'createdAt',
@@ -1568,6 +1592,7 @@ var ClusterDashboardController = {
 										admin2name:'$admin2name',
 										admin3name:'$admin3name',
 										admin4name:'$admin4name',
+										admin5name:'$admin5name',
 										cluster_id:'$cluster_id',
 										site_type_name:'$site_type_name',
 										site_name:'$site_name',
@@ -1593,7 +1618,9 @@ var ClusterDashboardController = {
 									var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d._id.cluster + '</h5>'
 															+ '<h5 style="text-align:center; font-size:1.3rem; font-weight:100;">' + d._id.organization + ' | ' + d._id.project_title + '</h5>'
 															+ '<div style="text-align:center">' + d._id.admin0name + '</div>'
-															if ( d._id.admin4name ) {
+															if ( d._id.admin5name ) {
+																message += '<div style="text-align:center">' + d._id.admin1name + ', ' + d._id.admin2name + ', ' + d._id.admin3name + ', ' + d._id.admin4name + ', ' + d._id.admin5name + '</div>';
+															} else if ( d._id.admin4name ) {
 																message += '<div style="text-align:center">' + d._id.admin1name + ', ' + d._id.admin2name + ', ' + d._id.admin3name + ', ' + d._id.admin4name + '</div>';
 															} else if ( d._id.admin3name ) {
 																message += '<div style="text-align:center">' + d._id.admin1name + ', ' + d._id.admin2name + ', ' + d._id.admin3name + '</div>';
