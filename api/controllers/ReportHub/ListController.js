@@ -121,10 +121,17 @@ module.exports = {
     var admin0pcode = req.param( 'admin0pcode' );
     var admin1pcode = req.param( 'admin1pcode' );
 
-    // set default to Cox Bazar
-    if ( admin0pcode === 'BD' && !admin1pcode ) {
-      admin1pcode = '20';
-    } 
+    // Set default to Cox Bazar
+    if ( !admin1pcode ) {
+      switch( admin0pcode ) {
+        case 'BD':
+          admin1pcode = '20';
+          break;
+        case 'CB':
+          admin1pcode = '202290';
+          break;
+      }
+    }
 
     // get list
     Admin4
@@ -156,10 +163,17 @@ module.exports = {
     var admin0pcode = req.param( 'admin0pcode' );
     var admin1pcode = req.param( 'admin1pcode' );
 
-    // set default to Cox Bazar
-    if ( admin0pcode === 'CB' && !admin1pcode ) {
-      admin1pcode = '202290';
-    } 
+    // Set default to Cox Bazar
+    if ( !admin1pcode ) {
+      switch( admin0pcode ) {
+        case 'BD':
+          admin1pcode = '20';
+          break;
+        case 'CB':
+          admin1pcode = '202290';
+          break;
+      }
+    }
 
     // get list
     Admin5
