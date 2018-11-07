@@ -235,6 +235,41 @@ var ClusterDashboardController = {
 				
 				break;
 
+			// count
+			case 'locations':
+				Beneficiaries.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						},
+						{
+							$group: {
+								_id: {
+									project_id: '$project_id',
+									site_lat: '$site_lat',
+									site_lng: '$site_lng',
+									site_name: '$site_name'
+								}
+							}
+						},
+						{
+							$group: {
+								_id: 1,
+								total: {
+								$sum: 1
+								}
+							}
+						}
+					]).toArray(function (err, results) {
+						if (err) return res.serverError(err);
+						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+					});
+				});	
+				
+				break;	
+
 			case 'contacts':
 
 				// require
