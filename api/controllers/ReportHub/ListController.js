@@ -90,12 +90,33 @@ module.exports = {
     // }
 
     // admin0pcode
-    var admin0pcode_filter = req.param( 'admin0pcode' ) ? { admin0pcode: req.param( 'admin0pcode' ) } : {};
+    var admin0pcode,
+        admin1pcode,
+        admin0pcode_filter = {},
+        admin1pcode_filter = {};
+
+    // set
+    admin0pcode = req.param( 'admin0pcode' );
+    admin1pcode = req.param( 'admin1pcode' );
+    admin0pcode_filter = admin0pcode ? { admin0pcode: admin0pcode } : {};
+    admin1pcode_filter = admin1pcode ? { admin1pcode: admin1pcode } : {};
+
+    // Ukraine has too many points
+    if ( !admin1pcode ) {
+      switch( admin0pcode ) {
+        case 'UA':
+          admin1pcode_filter = { admin1pcode: 'UA44' };
+          break;
+        default:
+          admin1pcode_filter = {};
+      }
+    }
 
     // get list
     Admin3
       .find()
       .where( admin0pcode_filter )
+      .where( admin1pcode_filter)
       .sort('admin3name ASC')
       .exec( function( err, admin3 ){
 
@@ -129,6 +150,9 @@ module.exports = {
           break;
         case 'CB':
           admin1pcode = '202290';
+          break;
+        case 'UA':
+          admin1pcode = 'UA44';
           break;
       }
     }
