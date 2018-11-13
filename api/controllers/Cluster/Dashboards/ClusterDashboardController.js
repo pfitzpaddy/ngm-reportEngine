@@ -22,87 +22,7 @@ var ClusterDashboardController = {
 		}
 		return array;
 	},
-	sumBeneficiaries:function (data,beneficiaries) {
-		var men_lookup =['men', 'elderly_men'];
-		var women_lookup=['women','elderly_women']
-		
-		for (var b_key in beneficiaries){
-			if ( typeof (beneficiaries[b_key]) === 'number'){
-				
-				
-				if(!data.childTotal){
-					data.childTotal = 0;
-				}
-				if(!data.adultTotal){
-					data.adultTotal = 0;
-				}
-				if(!data.elderTotal){
-					data.elderTotal = 0;
-				}
-
-				if (!data.elderly_women) {
-					data.elderly_women = 0;
-				}
-				if (!data.elderly_men) {
-					data.elderly_men = 0;
-				}
-				
-				if (!data.women) {
-					data.women = 0;
-				}
-				if (!data.men) {
-					data.men = 0;
-				}
-				if (!data.boys) {
-					data.boys = 0;
-				}
-				if (!data.girls) {
-					data.girls = 0;
-				}
-
-				if (b_key === 'boys') {
-					data.boys += beneficiaries[b_key];
-					data.childTotal += beneficiaries[b_key];
-				}
-				if (b_key === 'girls') {
-					data.girls += beneficiaries[b_key];
-					data.childTotal += beneficiaries[b_key];
-				}
-				if (b_key === 'men') {
-					data.men += beneficiaries[b_key];
-					data.adultTotal += beneficiaries[b_key];
-				}
-				if (b_key === 'women') {
-					data.women += beneficiaries[b_key];
-					data.adultTotal += beneficiaries[b_key];
-				}
-				if (b_key === 'elderly_men') {
-					data.elderly_men += beneficiaries[b_key];
-					data.elderTotal += beneficiaries[b_key];
-				}
-				if (b_key === 'elderly_women') {
-					data.elderly_women += beneficiaries[b_key];
-					data.elderTotal += beneficiaries[b_key];
-				}
-
-
-			}
-		}
-			
-		
-		return data
-	},
-	getBeneficiaries: function (data, beneficiaries){
-		
-		if (beneficiaries.length) {
-			beneficiaries.forEach(function (b, i) {
-				data = ClusterDashboardController.sumBeneficiaries(data, b);
-			});
-		}		
-		return data
-
-	},
-
+	
 	// get params from req
 	getParams: function( req, res ){
 
@@ -1827,13 +1747,27 @@ var ClusterDashboardController = {
 							};
 						// beneficiaries
 						
-						$beneficiaries = {};
+										
 						Beneficiaries.native(function (err, results) {
 							if(err) return res.serverError(err);
 			
 							results.aggregate([
 								{
 									$match : filterObject
+								},
+								{
+									$group: {
+										_id: null,
+										men: { $sum: "$men" },
+										women: { $sum: "$women" },
+										elderly_men: { $sum: "$elderly_men" },
+										elderly_women: { $sum: "$elderly_women" },
+										boys: { $sum: "$boys" },
+										girls: { $sum: "$girls" },
+										childTotal: { $sum: { $add: ["$boys", "$girls"] } },
+										adultTotal: { $sum: { $add: ["$men", "$women"] } },
+										elderTotal: { $sum: { $add: ["$elderly_men", "$elderly_women"] } }
+									}
 								}
 							]).toArray(function (err, beneficiaries) {
 								if (err) return res.serverError(err);								
@@ -1842,7 +1776,7 @@ var ClusterDashboardController = {
 								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
 
 
-								$beneficiaries = ClusterDashboardController.getBeneficiaries($beneficiaries, beneficiaries);
+								$beneficiaries = beneficiaries[0];
 
 
 								switch (req.param('chart_for')) {
@@ -1870,7 +1804,7 @@ var ClusterDashboardController = {
 										// highcharts boys
 										result.data[1].y = boysPerCent;
 										result.data[1].label = $beneficiaries.childTotal;
-										$beneficiaries = {};
+										
 										return res.json(200, result);
 
 										break;
@@ -1899,7 +1833,7 @@ var ClusterDashboardController = {
 										// // highcharts women
 										result.data[1].y = womensPerCent;
 										result.data[1].label = $beneficiaries.adultTotal;
-										$beneficiaries = {};
+										
 										return res.json(200, result);
 
 										break;
@@ -1924,7 +1858,7 @@ var ClusterDashboardController = {
 											// // highcharts elderly_women
 											result.data[1].y = 0;
 											result.data[1].label = 0;
-											$beneficiaries = {};
+											
 											return res.json(200, result);
 
 										} else {
@@ -1949,7 +1883,7 @@ var ClusterDashboardController = {
 											// // highcharts boys
 											result.data[1].y = elwomensPerCent;
 											result.data[1].label = $beneficiaries.elderTotal;
-											$beneficiaries = {};
+											
 											return res.json(200, result);
 
 										}
@@ -1961,10 +1895,11 @@ var ClusterDashboardController = {
 
 			
 								})
-							})
+							})					
 						
 										
 				break;
+				
 
 		}
 
