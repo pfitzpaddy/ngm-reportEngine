@@ -215,6 +215,12 @@ module.exports = {
 		stock_status_name: {
 			type: 'string'
 		},
+		stock_targeted_groups_id:{
+			type:'string'
+		},
+		stock_targeted_groups_name: {
+			type: 'string'
+		},
 		beneficiaries_covered:{
 			type: 'integer',
 			required: true
