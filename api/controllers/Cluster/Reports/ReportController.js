@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-
+var async = require('async');
 
 module.exports = {
 
@@ -359,7 +359,7 @@ module.exports = {
 
 						// counter
 						var counter = 0,
-								length = $report.locations.length;
+							length  = $report.locations.length;
 
 						// sort by location
 						$report.locations.sort(function(a, b) {
@@ -389,37 +389,49 @@ module.exports = {
 								}
 							}
 						});
+						
+						// get unique locations
+						var location_ids = _.chain($report.locations).pluck('id').uniq().value();
 
-						// for each location
-						$report.locations.forEach( function( location, i ){
-
-							// beneficiaries
-							Beneficiaries
-								.find( { location_id: location.id } )
-								.populateAll()
-								.exec( function( err, beneficiaries ){
-
-									// return error
-									if (err) return res.negotiate( err );
-
-									// add locations ( associations included )
-									$report.locations[i].beneficiaries = beneficiaries;
-
-									// sort by id
-									$report.locations[i].beneficiaries.sort( function( a, b ) {
-										return a.id.localeCompare( b.id );
-									});
-
-									// Trainings
-									Trainings
-										.find( { location_id: location.id } )
+						// get beneficiaries, trainings rows
+						Beneficiaries
+							.find( { location_id: location_ids } )
+							.populateAll()
+							.exec( function( err, beneficiaries ){
+								if (err) return res.negotiate( err );
+								Trainings
+										.find( { location_id: location_ids } )
 										.exec( function( err, trainings ){
-
-											// return error
 											if (err) return res.negotiate( err );
+											// parallelize locations processing
+											async.eachOfLimit(	$report.locations, 
+															 	500, // max locations in parallel
+															 	queryAsync.bind(null, beneficiaries, trainings),
+																function(err){
+																	if (err) return res.negotiate( err );
+																	return res.json( 200, $report );
+																}
+															 );
+										});
+							});
+						
+						// to run for each location
+						var queryAsync = function(beneficiaries, trainings, location, i, callback){
 
 											// add locations ( associations included )
-											$report.locations[i].trainings = trainings;
+											$report.locations[i].beneficiaries = beneficiaries.filter(function (b) {
+												return b.location_id === location.id;
+											});
+
+											// sort by id
+											$report.locations[i].beneficiaries.sort( function( a, b ) {
+												return a.id.localeCompare( b.id );
+											});
+
+											// add locations ( associations included )
+											$report.locations[i].trainings = trainings.filter(function (b) {
+												return b.location_id === location.id;
+											});
 
 											// sort by id
 											$report.locations[i].trainings.sort( function( a, b ) {
@@ -431,56 +443,40 @@ module.exports = {
 
 												// counter
 												var trainingsCounter = 0,
-														trainingsLength = $report.locations[i].trainings.length;
+													trainingsLength  = $report.locations[i].trainings.length;
 
 												// trainings
-												$report.locations[i].trainings.forEach(function( training, j ){
+												// get unique trainings
+												var trainings_ids = _.chain($report.locations[i].trainings).pluck('id').uniq().value();
 
 													// Trainings
 													TrainingParticipants
-														.find( { training_id: training.id } )
+														.find( { training_id: trainings_ids } )
 														.exec( function( err, trainees ){
 
-															// return error
-															if (err) return res.negotiate( err );
+															if (err) return callback(err);
+															$report.locations[i].trainings.forEach(function( training, j ){
 
-															// add locations ( associations included )
-															$report.locations[i].trainings[j].training_participants = trainees;
+																// add locations ( associations included )
+																$report.locations[i].trainings[j].training_participants = trainees.filter(function (b) {
+																			return b.training_id === training.id;
+																		});;
 
-															// sort by id
-															$report.locations[i].trainings[j].training_participants.sort( function( a, b ) {
-																return a.id.localeCompare( b.id );
+																// sort by id
+																$report.locations[i].trainings[j].training_participants.sort( function( a, b ) {
+																	return a.id.localeCompare( b.id );
+																});
+
 															});
 
-															trainingsCounter++;
-															if ( trainingsCounter == trainingsLength ) {
-																// counter
-																counter++;
-																if ( counter === length ) {
-																	// return report
-																	return res.json( 200, $report );
-																}
-															}
-
-														});
-
-												});
-
+															// notify completion
+															callback(null);
+													});
 											} else {
-												// counter
-												counter++;
-												if ( counter === length ) {
-													// return report
-													return res.json( 200, $report );
-												}
+												// notify completion
+												callback(null);
 											}
-
-										});
-
-							});
-
-						});
-
+										}
 				});
 
 			});

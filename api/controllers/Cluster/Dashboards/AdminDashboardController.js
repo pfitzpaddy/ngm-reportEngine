@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var async = require('async');
+
 // flatten json
 function flatten( json ) {
   var array = [];
