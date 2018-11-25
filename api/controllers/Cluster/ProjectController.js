@@ -8,6 +8,7 @@
 var json2csv = require('json2csv');
 var Promise  = require('bluebird');
 var moment   = require('moment');
+var async    = require('async');
 
 module.exports = {
 
