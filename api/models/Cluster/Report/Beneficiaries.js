@@ -4,6 +4,8 @@
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
+var 		   ObjectId = require('mongodb').ObjectID;
+const BulkHasOperations = function (b) { return b && b.s && b.s.currentBatch && b.s.currentBatch.operations && b.s.currentBatch.operations.length > 0; }
 
 module.exports = {
 
@@ -665,8 +667,40 @@ module.exports = {
 			}
 
 		});
+	},
 
+	updateOrCreateEachBulk: function( values, status, cb ){
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if (!values.length) cb( false, [] );
+
+		self.native(function(err, collection) {
+			if(err) return cb(err, false);
+			
+			var bulk = collection.initializeUnorderedBulkOp();
+			// add operation per location, per beneficiary 
+			values.forEach(function( value,i ){
+				value.beneficiaries.forEach(function(b,j){
+					// set report status
+					values[i].beneficiaries[j].report_status = status;
+					b.report_status 					 	 = status;
+					if (b.id) {
+						bulk.find( {_id:ObjectId(b.id)} ).updateOne({ $set: b });
+					} else {
+						b.location_id = value.id;
+						bulk.insert(b)
+					}
+				})
+			});
+
+			// run update
+			if (BulkHasOperations(bulk)){ 
+				bulk.execute(function(err, results) {
+					if(err) return cb(err, false);
+					cb( false, [] );
+				});
+			} else cb( false, [] );
+		})		
 	}
-
 };
 

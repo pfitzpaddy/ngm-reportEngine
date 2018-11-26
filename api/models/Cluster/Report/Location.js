@@ -5,6 +5,9 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var 		   ObjectId = require('mongodb').ObjectID;
+const BulkHasOperations = function (b) { return b && b.s && b.s.currentBatch && b.s.currentBatch.operations && b.s.currentBatch.operations.length > 0; }
+
 module.exports = {
 
 	// connection
@@ -414,6 +417,94 @@ module.exports = {
 			self.create(values, cb);
 		}
 
+	},
+
+	// update locations, use this if a new created location_id is needed, for entire location change to: {$set: value}
+	updateOrCreateEachLoop: function( values, status, cb ){
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if (!values) cb( false, [] );
+		var counter = 0,
+			 length = values.length;
+		values.forEach(function( value, i ){
+			values[i].report_status = status.report_status;
+			value.report_status 	= status.report_status;
+
+			if( value.id ){
+				// update returns array, need the object
+				self.update({ id: value.id }, {	report_status:status.report_status }, function( err, update ){
+					if(err) return cb(err, false);
+					values[i].id = update[0].id;
+					counter++;
+						if( counter===length ){
+							cb( false, values );
+						}
+				});
+			}else{
+				// never runs, as locations was created on targetlocation stage
+				self.create( value, function( err, update ){
+					if(err) return cb(err, false);
+					values[i].id = update[0].id;
+					counter++;
+						if( counter===length ){
+							cb( false, values );
+						}
+				});
+			}
+		});
+	},
+
+	// bulk update locations, set report status, for entire location change to: {$set: value}
+	updateOrCreateEachBulk: function( values, status, cb ){
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if (!values) cb( false, [] );
+
+		self.native(function(err, collection) {
+			if (err) return cb(err, false);
+			
+			var bulk = collection.initializeUnorderedBulkOp();
+			values.forEach(function( value, i ){
+				// add operation per location, per beneficiary
+				values[i].report_status = status;
+				value.report_status 	= status;
+				if (value.id) {
+					bulk.find( {_id:ObjectId(value.id)} ).updateOne({ $set: { report_status:status.report_status } });
+				} else {
+					// never runs, as locations was created on targetlocation stage
+					bulk.insert(value)
+				}			
+			});
+
+			// run update
+			if (BulkHasOperations(bulk)){
+				bulk.execute(function(err, result){
+					if (err) return cb(err, false);
+					cb( false, values );
+				});
+			} else cb( false, [] );
+							
+		});
+	},
+
+	// using mongodb update, looks like slower than bulk update
+	updateOrCreateEachStatus: function( values, id, status, cb ){
+		var self = this; // reference for use by callbacks
+		// If no values were specified, return []
+		if (!values) cb( false, [] );
+
+		self.native(function(err, collection) {
+			if (err) return cb(err, false);
+
+			collection.update({report_id: id}, {$set:{report_status:status}}, {multi: true}, function(err){
+				if (err) return cb(err, false);
+				values.forEach(function( value, i ){
+					values[i].report_status = status;
+				});
+
+				cb( false, values );
+			})
+		});
 	},
 
 	// create new report locations based on project target_locations

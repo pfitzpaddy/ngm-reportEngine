@@ -492,8 +492,8 @@ module.exports = {
 		}
 
 		// get report
-		var $report = req.param( 'report' ),
-				$locations = req.param( 'report' ).locations;
+		var $report    = req.param( 'report' ),
+			$locations = req.param( 'report' ).locations;
 
 		// update report
 		Report
@@ -509,7 +509,7 @@ module.exports = {
 
 				// counter
 				var counter = 0,
-						length = $report.locations.length;
+					length  = $report.locations.length;
 
 				// sort by location
 				$report.locations.sort(function(a, b) {
@@ -540,46 +540,39 @@ module.exports = {
 					}
 				});
 
-				// for each location
-				$report.locations.forEach( function( location, i ){
+				Location
+					.updateOrCreateEachBulk( $report.locations, $report.report_status, function( err, update ){						
+					// .updateOrCreateEachStatus( $report.locations, $report.id, $report.report_status, function( err, update ){							
 
-					// Location.update({id: location.id}, { report_status: $report.report_status }).exec( function( err, update ){
+					$report.locations = update;
+					// beneficiaries
+					Beneficiaries
+						.updateOrCreateEachBulk( $report.locations, $report.report_status, function( err, beneficiaries ){
 
-					location.report_status = $report.report_status;
+							// return error
+							if (err) return res.negotiate( err );
+							// beneficiaries
+							var location_ids = _.chain($report.locations).pluck('id').uniq().value();
 
-					// update or create
-					Location
-						.updateOrCreate( location, function( err, update ){							
+							Beneficiaries
+								.find( { location_id: location_ids } )
+								.populateAll()
+								.exec( function( err, beneficiaries ){
+									// return error
+									if (err) return res.negotiate( err );
 
-						if (err) return res.negotiate( err );
+									// add locations ( associations included )
+									$report.locations.forEach(function(location, i){
 
-						location.id = update.id;
-
-						// beneficiaries
-						Beneficiaries
-							.updateOrCreateEach( { location_id: location.id }, location.beneficiaries, function( err, beneficiaries ){
-
-								// return error
-								if (err) return res.negotiate( err );
-
-								// beneficiaries
-								Beneficiaries
-									.find( { location_id: location.id } )
-									.populateAll()
-									.exec( function( err, beneficiaries ){
-
-										// return error
-										if (err) return res.negotiate( err );
-
-										// add locations ( associations included )
-										$report.locations[i].beneficiaries = beneficiaries;
+										$report.locations[i].beneficiaries = beneficiaries.filter(function (b) {
+											return b.location_id === location.id;
+										});
 
 										// sort by id
 										$report.locations[i].beneficiaries.sort( function( a, b ) {
 											return a.id.localeCompare( b.id );
 										});
-
-										// traings
+										// trainings
 										if ( location.trainings && location.trainings.length ) {
 
 											// keeps training_participants
@@ -603,7 +596,7 @@ module.exports = {
 
 												// trainings
 												var trainingCounter = 0,
-														trainingLength = trainings.length;
+													trainingLength  = trainings.length;
 
 												// trainings
 												originalTrainings.forEach( function( training, j ){
@@ -648,12 +641,10 @@ module.exports = {
 												return res.json( 200, $report );
 											}
 										}
-
-									});
+									})
+								});
 
 						});
-
-					});
 
 				});
 
