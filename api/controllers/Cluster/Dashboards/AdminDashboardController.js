@@ -30,7 +30,7 @@ var AdminDashboardController = {
     }
 
     // organizations to exclude totally
-    var $nin_organizations = [ 'immap', 'arcs' ];
+		var $nin_organizations = [ 'immap', 'arcs' ];
 
     // variables
     var params = {
@@ -486,8 +486,11 @@ var AdminDashboardController = {
 
             });
 
-            break;
-
+						break;
+			case 'progress_beneficiaries':
+				return res.json(200, {})
+				break;
+						
     }
 
   },
@@ -972,7 +975,128 @@ var AdminDashboardController = {
 
           });
 
-        break;
+				break;
+			
+			case 'progress_beneficiaries':
+
+				function nFormatter (num) {
+					if (num >= 1000000000) {
+						return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'G';
+					}
+					if (num >= 1000000) {
+						return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+					}
+					if (num >= 1000) {
+						return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+					}
+					return num;
+				}
+				function filter(){
+					return{
+						adminRpcode_Native: req.param('adminRpcode') === 'hq' ? {} : { adminRpcode: req.param('adminRpcode').toUpperCase() },
+						admin0pcode_Native: req.param('admin0pcode') === 'all' ? {} : { admin0pcode: req.param('admin0pcode').toUpperCase() },						
+						// cluster_id_Native: (req.param('cluster_id') === 'all' || req.param('cluster_id') === 'rnr_chapter' || req.param('cluster_id') === 'acbar')
+						// 	? {}
+						// 	: (req.param('cluster_id') !== 'cvwg')
+						// 		? { $or: [{ cluster_id: req.param('cluster_id') }, { mpc_purpose_cluster_id: { $regex: req.param('cluster_id') } }] }
+						// 		: { $or: [{ cluster_id: req.param('cluster_id') }, { mpc_purpose_cluster_id: { $regex: req.param('cluster_id') } }, { activity_description_id: { $regex: 'cash' } }] },
+						cluster_id_Native: (req.param('cluster_id') === 'all' ) ? {} : { cluster_id: req.param('cluster_id') },
+						organization_tag_Native: req.param('organization_tag') === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: req.param('organization_tag') },
+						project_startDateNative: { project_start_date: { $lte: new Date(req.param('end_date')) }},
+						project_endDateNative: { project_end_date: { $gte: new Date(req.param('start_date')) }},
+						default_native: { project_id: { $ne: null }},
+						activity_typeNative: req.param('activity_type_id') === 'all' ? {} : { 'activity_type.activity_type_id': req.param('activity_type_id') }
+						// organization_default_Native: { organization_tag: { $nin: $nin_organizations } }
+					}
+				}
+				var filters = filter(params);
+				var filterObject = _.extend({},
+					filters.default_native,
+					filters.adminRpcode_Native,
+					filters.admin0pcode_Native,
+					filters.cluster_id_Native,
+					filters.activity_typeNative,
+					filters.organization_tag_Native,					
+					filters.project_startDateNative,
+					filters.project_endDateNative)
+										
+				TargetBeneficiaries.native(function (err, results_target_beneficiaries) {
+					if (err) return res.serverError(err);
+					results_target_beneficiaries.aggregate([
+						{ $match: filterObject},{
+							$group: {
+								_id:'$project_id',
+								project_id: { $first: '$project_id'},
+								project_title: { $first: '$project_title'},
+								cluster_id: { $first: '$cluster_id' },
+								cluster: { $first: '$cluster' },
+								organization_tag: { $first:'$organization_tag'},
+								organization_id: { $first: '$organization_id' },
+								organization: { $first: '$organization' },								
+								target_total:{ $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }								
+							}
+						}
+					]).toArray(function (err, target_beneficiaries) {
+						
+						Beneficiaries.native(function (err, results_report_benefciaries) {
+							if (err) return res.serverError(err);
+							results_report_benefciaries.aggregate([
+								{ $match: filterObject }, {
+									$group: {
+										_id: '$project_id',
+										project_id: { $first: '$project_id'},
+										project_title: { $first: '$project_title' },
+										cluster_id: { $first: '$cluster_id' },
+										cluster: { $first: '$cluster' },
+										organization_tag: { $first: '$organization_tag' },
+										organization_id: { $first: '$organization_id' },
+										organization: { $first: '$organization' },
+										report_total: { $sum: { $add: ["$men", "$women", "$boys", "$girls", "$elderly_men", "$elderly_women"] } }
+									}
+								}
+							]).toArray(function (err, report_beneficairies) {								
+								
+								for(var i=0 ;i<report_beneficairies.length;i++){
+									for(var j=0;j<target_beneficiaries.length;j++){
+										if (target_beneficiaries[j]._id === report_beneficairies[i]._id){
+											target_beneficiaries[j].report_total = report_beneficairies[i].report_total;
+										}
+									}									
+								}
+								target_beneficiaries.forEach( function (el,i) {
+									if(!el.report_total){
+										el.report_total =0;
+										if (el.target_total < 1){
+											el.progress_percentage = "N/A";
+										}else{
+											el.progress_percentage = 0;
+										}
+									} else{
+										if (el.target_total<1){
+											el.progress_percentage = "N/A";
+										}else{
+											el.progress_percentage = (el.report_total/el.target_total)*100;
+										}
+									}
+									if (!el.report_total_format || !el.target_total_format){
+										if (el.target_total<1){
+											el.target_total_format = "N/A"
+										}else{
+											el.target_total_format = nFormatter(el.target_total);
+										}
+										el.report_total_format = nFormatter(el.report_total);
+									}
+																	
+								});													
+								return res.json(200, target_beneficiaries);
+							})
+						})
+					})
+					
+
+				})
+				
+				break;
     }
 
   }
