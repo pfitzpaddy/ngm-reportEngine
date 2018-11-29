@@ -1816,7 +1816,7 @@ var ClusterDashboardController = {
 										var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
 										var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
 										var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-
+									
 										// // assign data left
 										result.label.left.label.label = mensPerCent;
 										result.label.left.subLabel.label = $beneficiaries.men;
@@ -1827,11 +1827,11 @@ var ClusterDashboardController = {
 										result.label.right.label.label = womensPerCent;
 										result.label.right.subLabel.label = $beneficiaries.women;
 
-										// // highcharts men
-										result.data[0].y = mensPerCent;
-										result.data[0].label = $beneficiaries.adultTotal;
 										// // highcharts women
-										result.data[1].y = womensPerCent;
+										result.data[0].y = womensPerCent;
+										result.data[0].label = $beneficiaries.adultTotal;
+										// // highcharts men
+										result.data[1].y = mensPerCent;
 										result.data[1].label = $beneficiaries.adultTotal;
 										
 										return res.json(200, result);
@@ -1851,11 +1851,11 @@ var ClusterDashboardController = {
 											result.label.right.label.label = 0;
 											result.label.right.subLabel.label = 0;
 
-											// // highcharts elderly_men
+											// // highcharts elderly_women
 											result.data[0].y = 100;
 											result.data[0].label = 0;
 											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_women
+											// // highcharts elderly_men
 											result.data[1].y = 0;
 											result.data[1].label = 0;
 											
@@ -1866,7 +1866,7 @@ var ClusterDashboardController = {
 											var elmensPerCent = ($beneficiaries.elderly_men / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
 											var elwomensPerCent = ($beneficiaries.elderly_women / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
 											var totalPerCent = ($beneficiaries.elderTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-
+											
 											// // assign data left
 											result.label.left.label.label = elmensPerCent;
 											result.label.left.subLabel.label = $beneficiaries.elderly_men;
@@ -1877,11 +1877,11 @@ var ClusterDashboardController = {
 											result.label.right.label.label = elwomensPerCent;
 											result.label.right.subLabel.label = $beneficiaries.elderly_women;
 
-											// // highcharts girls
-											result.data[0].y = elmensPerCent;
+											// // highcharts elderWomen
+											result.data[0].y = elwomensPerCent;
 											result.data[0].label = $beneficiaries.elderTotal;
-											// // highcharts boys
-											result.data[1].y = elwomensPerCent;
+											// // highcharts elderMen
+											result.data[1].y = elmensPerCent;
 											result.data[1].label = $beneficiaries.elderTotal;
 											
 											return res.json(200, result);
