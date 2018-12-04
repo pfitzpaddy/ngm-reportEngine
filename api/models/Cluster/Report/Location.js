@@ -471,8 +471,10 @@ module.exports = {
 				if (value.id) {
 					bulk.find( {_id:ObjectId(value.id)} ).updateOne({ $set: { report_status:status.report_status } });
 				} else {
-					// never runs, as locations was created on targetlocation stage
+					// runs only for add new location functionality in monthly report
+					value._id = new ObjectId()
 					bulk.insert(value)
+					values[i].id = value._id;
 				}			
 			});
 
