@@ -359,6 +359,179 @@ module.exports = {
 
 						// counter
 						var counter = 0,
+								length = $report.locations.length;
+
+						// sort by location
+						$report.locations.sort(function(a, b) {
+							if ( a.site_type_name ) {
+								if( a.admin3name ) {
+									return a.admin1name.localeCompare(b.admin1name) ||
+													a.admin2name.localeCompare(b.admin2name) ||
+													a.admin3name.localeCompare(b.admin3name) ||
+													a.site_type_name.localeCompare(b.site_type_name) ||
+													a.site_name.localeCompare(b.site_name);
+								} else {
+									return a.admin1name.localeCompare(b.admin1name) ||
+													a.admin2name.localeCompare(b.admin2name) ||
+													a.site_type_name.localeCompare(b.site_type_name) ||
+													a.site_name.localeCompare(b.site_name);
+								}
+							} else {
+								if( a.admin3name ) {
+									return a.admin1name.localeCompare(b.admin1name) ||
+													a.admin2name.localeCompare(b.admin2name) ||
+													a.admin3name.localeCompare(b.admin3name) ||
+													a.site_name.localeCompare(b.site_name);
+								} else {
+									return a.admin1name.localeCompare(b.admin1name) ||
+													a.admin2name.localeCompare(b.admin2name) ||
+													a.site_name.localeCompare(b.site_name);
+								}
+							}
+						});
+
+						// for each location
+						$report.locations.forEach( function( location, i ){
+
+							// beneficiaries
+							Beneficiaries
+								.find( { location_id: location.id } )
+								.populateAll()
+								.exec( function( err, beneficiaries ){
+
+									// return error
+									if (err) return res.negotiate( err );
+
+									// add locations ( associations included )
+									$report.locations[i].beneficiaries = beneficiaries;
+
+									// sort by id
+									$report.locations[i].beneficiaries.sort( function( a, b ) {
+										return a.id.localeCompare( b.id );
+									});
+
+									// Trainings
+									Trainings
+										.find( { location_id: location.id } )
+										.exec( function( err, trainings ){
+
+											// return error
+											if (err) return res.negotiate( err );
+
+											// add locations ( associations included )
+											$report.locations[i].trainings = trainings;
+
+											// sort by id
+											$report.locations[i].trainings.sort( function( a, b ) {
+												return a.id.localeCompare( b.id );
+											});
+
+											// if length
+											if ( $report.locations[i].trainings && $report.locations[i].trainings.length) {
+
+												// counter
+												var trainingsCounter = 0,
+														trainingsLength = $report.locations[i].trainings.length;
+
+												// trainings
+												$report.locations[i].trainings.forEach(function( training, j ){
+
+													// Trainings
+													TrainingParticipants
+														.find( { training_id: training.id } )
+														.exec( function( err, trainees ){
+
+															// return error
+															if (err) return res.negotiate( err );
+
+															// add locations ( associations included )
+															$report.locations[i].trainings[j].training_participants = trainees;
+
+															// sort by id
+															$report.locations[i].trainings[j].training_participants.sort( function( a, b ) {
+																return a.id.localeCompare( b.id );
+															});
+
+															trainingsCounter++;
+															if ( trainingsCounter == trainingsLength ) {
+																// counter
+																counter++;
+																if ( counter === length ) {
+																	// return report
+																	return res.json( 200, $report );
+																}
+															}
+
+														});
+
+												});
+
+											} else {
+												// counter
+												counter++;
+												if ( counter === length ) {
+													// return report
+													return res.json( 200, $report );
+												}
+											}
+
+										});
+
+							});
+
+						});
+
+				});
+
+			});
+
+	},
+
+	// get all Reports by project id
+	getReportByIdBulk: function( req, res ) {
+
+		// request input
+		if ( !req.param( 'id' ) ) {
+			return res.json(401, { err: 'id required!' });
+		}
+
+		// report for UI
+		var $report = {};
+
+		// get report by organization_id
+		Report
+			.findOne( { id: req.param( 'id' ) } )
+			.exec( function( err, report ){
+
+				// return error
+				if (err) return res.negotiate( err );
+
+				// clone project to update
+				$report = report;
+
+				// if no reports
+				if ( !$report ) {
+					return res.json( 200, [] );
+				}
+
+				// get report by organization_id
+				Location
+					.find( { report_id: $report.id } )
+					.exec( function( err, locations ){
+
+						// return error
+						if (err) return res.negotiate( err );
+
+						// add locations ( associations included )
+						$report.locations = locations;
+
+						// if no reports
+						if ( !$report.locations.length ) {
+							return res.json( 200, $report );
+						}
+
+						// counter
+						var counter = 0,
 							length  = $report.locations.length;
 
 						// sort by location
@@ -492,6 +665,200 @@ module.exports = {
 		}
 
 		// get report
+		var $report = req.param( 'report' ),
+				$locations = req.param( 'report' ).locations;
+
+		// update report
+		Report
+			.update( { id: $report.id }, $report )
+			.exec( function( err, report ){
+
+				// return error
+				if ( err ) return res.json({ err: true, error: err });
+
+				// set updated
+				$report = report[0];
+				$report.locations = $locations;
+
+				// counter
+				var counter = 0,
+						length = $report.locations.length;
+
+				// sort by location
+				$report.locations.sort(function(a, b) {
+					if ( a.site_type_name ) {
+						if( a.admin3name ) {
+							return a.admin1name.localeCompare(b.admin1name) ||
+											a.admin2name.localeCompare(b.admin2name) ||
+											a.admin3name.localeCompare(b.admin3name) ||
+											a.site_type_name.localeCompare(b.site_type_name) ||
+											a.site_name.localeCompare(b.site_name);
+						} else {
+							return a.admin1name.localeCompare(b.admin1name) ||
+											a.admin2name.localeCompare(b.admin2name) ||
+											a.site_type_name.localeCompare(b.site_type_name) ||
+											a.site_name.localeCompare(b.site_name);
+						}
+					} else {
+						if( a.admin3name ) {
+							return a.admin1name.localeCompare(b.admin1name) ||
+											a.admin2name.localeCompare(b.admin2name) ||
+											a.admin3name.localeCompare(b.admin3name) ||
+											a.site_name.localeCompare(b.site_name);
+						} else {
+							return a.admin1name.localeCompare(b.admin1name) ||
+											a.admin2name.localeCompare(b.admin2name) ||
+											a.site_name.localeCompare(b.site_name);
+						}
+					}
+				});
+
+				// for each location
+				$report.locations.forEach( function( location, i ){
+
+					// Location.update({id: location.id}, { report_status: $report.report_status }).exec( function( err, update ){
+
+					location.report_status = $report.report_status;
+
+					// update or create
+					Location
+						.updateOrCreate( location, function( err, update ){							
+
+						if (err) return res.negotiate( err );
+
+						location.id = update.id;
+
+						// beneficiaries
+						Beneficiaries
+							.updateOrCreateEach( { location_id: location.id }, location.beneficiaries, function( err, beneficiaries ){
+
+								// return error
+								if (err) return res.negotiate( err );
+
+								// beneficiaries
+								Beneficiaries
+									.find( { location_id: location.id } )
+									.populateAll()
+									.exec( function( err, beneficiaries ){
+
+										// return error
+										if (err) return res.negotiate( err );
+
+										// add locations ( associations included )
+										$report.locations[i].beneficiaries = beneficiaries;
+
+										// sort by id
+										$report.locations[i].beneficiaries.sort( function( a, b ) {
+											return a.id.localeCompare( b.id );
+										});
+
+										// traings
+										if ( location.trainings && location.trainings.length ) {
+
+											// keeps training_participants
+											var originalTrainings = location.trainings;
+
+											// trainings
+											Trainings
+												.updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
+
+												// return error
+												if (err) return res.negotiate( err );
+
+												// add locations ( associations included )
+												$report.locations[i].trainings = trainings;
+
+												// sort by id
+												$report.locations[i].trainings.sort( function( a, b ) {
+													return a.id.localeCompare( b.id );
+												});
+
+
+												// trainings
+												var trainingCounter = 0,
+														trainingLength = trainings.length;
+
+												// trainings
+												originalTrainings.forEach( function( training, j ){
+
+													// set training_ids
+													training.training_participants.forEach( function( trainee, k ){
+														training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
+													});
+
+													// trainings
+													TrainingParticipants
+														.updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
+
+															// return error
+															if (err) return res.negotiate( err );
+
+															// add locations ( associations included )
+															$report.locations[i].trainings[j].training_participants = trainees;
+
+															// trianing
+															trainingCounter++;
+															if ( trainingCounter === trainingLength ) {
+																// counter
+																counter++;
+																if ( counter === length ) {
+																	// return report
+																	return res.json( 200, $report );
+																}
+															}
+
+														});
+
+												});
+
+											});
+
+										} else {
+											// counter
+											counter++;
+											if ( counter === length ) {
+												// return report
+												return res.json( 200, $report );
+											}
+										}
+
+									});
+
+						});
+
+					});
+
+				});
+
+		});
+
+	},
+	
+	// set report details by report id
+	setReportByIdBulk: function( req, res ) {
+
+		// measure time #TODO delete
+		// var hrstart = process.hrtime()
+		// measure time end
+
+		// request input guards
+		if ( !req.param( 'report' ) ) {
+			return res.json(401, { err: 'report required!' });
+		}
+
+		// check that report locations prop is []
+		if (!Array.isArray(req.param( 'report' ).locations)){
+			return res.json(401, { err: 'locations array required!' });
+		}
+
+		// check that locations beneficiaries prop is []
+		req.param( 'report' ).locations.forEach(function( value,i ){
+			if (!Array.isArray(value.beneficiaries)){
+				return res.json(401, { err: 'beneficiaries array required!' });
+			}
+		})
+		
+		// get report
 		var $report    = req.param( 'report' ),
 			$locations = req.param( 'report' ).locations;
 
@@ -546,21 +913,40 @@ module.exports = {
 
 					$report.locations = update;
 					// beneficiaries
+
+					// measure time #TODO delete
+					// var hrstart_b = process.hrtime()
+					// measure time end 
+
 					Beneficiaries
 						.updateOrCreateEachBulk( $report.locations, $report.report_status, function( err, beneficiaries ){
+
+							// measure time #TODO delete
+							// hrend_b = process.hrtime(hrstart_b)
+							// console.info('Execution time (beneficiaries): %ds %dms', hrend_b[0], hrend_b[1] / 1000000)
+							// measure time end 
 
 							// return error
 							if (err) return res.negotiate( err );
 							// beneficiaries
 							var location_ids = _.chain($report.locations).pluck('id').uniq().value();
 
+							// measure time #TODO delete
+							// var hrstart_bf = process.hrtime()
+							// measure time end
+
 							Beneficiaries
 								.find( { location_id: location_ids } )
-								.populateAll()
+								// .populateAll()
 								.exec( function( err, beneficiaries ){
 									// return error
 									if (err) return res.negotiate( err );
 
+									// measure time #TODO delete
+									// hrend_bf = process.hrtime(hrstart_bf)
+									// console.info('Execution time (find beneficiaries): %ds %dms', hrend_bf[0], hrend_bf[1] / 1000000)
+									// measure time end
+									
 									// add locations ( associations included )
 									$report.locations.forEach(function(location, i){
 
@@ -622,6 +1008,12 @@ module.exports = {
 																// counter
 																counter++;
 																if ( counter === length ) {
+
+																	// measure time #TODO delete
+																	// hrend = process.hrtime(hrstart)
+																	// console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
+																	// measure time end
+																	
 																	// return report
 																	return res.json( 200, $report );
 																}
@@ -638,6 +1030,12 @@ module.exports = {
 											counter++;
 											if ( counter === length ) {
 												// return report
+												
+												// measure time #TODO delete
+												// hrend = process.hrtime(hrstart)
+												// console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
+												// measure time end
+
 												return res.json( 200, $report );
 											}
 										}

@@ -4,6 +4,7 @@
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
+var 				  _ = require('lodash');
 var 		   ObjectId = require('mongodb').ObjectID;
 const BulkHasOperations = function (b) { return b && b.s && b.s.currentBatch && b.s.currentBatch.operations && b.s.currentBatch.operations.length > 0; }
 
@@ -576,7 +577,7 @@ module.exports = {
 			type: 'string'
 		},
 		beneficiary_type: {
-			type: 'string'
+			type: 'array'
 		},
 		penta3_vacc_male_under1:{
 			type: 'integer'
@@ -673,34 +674,163 @@ module.exports = {
 		var self = this; // reference for use by callbacks
 		// If no values were specified, return []
 		if (!values.length) cb( false, [] );
+		var nBeneficiaries	   = 0,
+			countBeneficiaries = 0,
+			isError = false;
+		
+		// count n of beneficiaries to do ops on, 
+		values.forEach(function( value,i ){
+			// checked for [] before, but still
+			if(Array.isArray(value.beneficiaries)){
+				nBeneficiaries = nBeneficiaries + value.beneficiaries.length
+			}
+		});
+		// if there are beneficiaries to perform ops on
+		if(nBeneficiaries){
+			self.native(function(err, collection) {
+				if(err) return cb(err, false);
+				
+				var bulk = collection.initializeUnorderedBulkOp();
+				// add bulk operation per location, per beneficiary
 
-		self.native(function(err, collection) {
-			if(err) return cb(err, false);
-			
-			var bulk = collection.initializeUnorderedBulkOp();
-			// add operation per location, per beneficiary 
-			values.forEach(function( value,i ){
-				value.beneficiaries.forEach(function(b,j){
-					// set report status
-					values[i].beneficiaries[j].report_status = status;
-					b.report_status 					 	 = status;
-					if (b.id) {
-						bulk.find( {_id:ObjectId(b.id)} ).updateOne({ $set: b });
-					} else {
-						b.location_id = value.id;
-						bulk.insert(b)
+				// measure time #TODO delete
+				// var hrstart = process.hrtime()
+				// measure time end
+
+				values.forEach(function( value,i ){
+					value.beneficiaries.forEach(function(b,j){
+						// set report status
+						values[i].beneficiaries[j].report_status = status;
+						b.report_status 					 	 = status;
+						
+						// validate each obj with sails model
+						// if omitted will insert any incoming object into collection, but much faster
+						// takes time #TODO: consider without validation
+						self.validate(b,function(err){
+							// return only first err callback for async ops
+							if(isError) return;
+							if(err&&isError===false){isError=true; return cb(err, false)};
+
+							// if(err) return cb(err, false);
+							
+							// if id exists update or create
+							if (b.id) {
+								bulk.find( {_id:ObjectId(b.id)} ).updateOne({ $set: b });
+							} else {
+								b.location_id = value.id;
+								// generate beneficiary id for associations reference
+								b._id = new ObjectId()
+								values[i].beneficiaries[j].id = b._id.toString();
+								bulk.insert(b)
+							}
+
+							countBeneficiaries++;
+
+							if (countBeneficiaries === nBeneficiaries) {
+
+								// measure time #TODO delete
+								// var hrend = process.hrtime(hrstart)
+								// console.info('Execution time (validate): %ds %dms', hrend[0], hrend[1] / 1000000)
+								// measure time end
+
+								if (BulkHasOperations(bulk)){ 
+									bulk.execute(function(err, results) {
+										if(err) return cb(err, false);
+
+										// measure time #TODO delete
+										// var hrstart = process.hrtime()
+										// measure time end
+
+										// update associations
+										self.updateOrCreateAssociations(values, function(err){
+											if(err) return cb(err, false);
+
+											// measure time #TODO delete
+											// hrend = process.hrtime(hrstart)
+											// console.info('Execution time (associations): %ds %dms', hrend[0], hrend[1] / 1000000)
+											// measure time end
+
+											cb( false, [] );
+										})
+									});
+								} else return cb( false, [] );
+							}
+						});
+					});
+				});
+			})
+		// if no beneficiaries
+		} else return cb(false,[]);
+	},
+
+	updateOrCreateAssociations: function(values,cb){
+		var self = this;
+		// filter beneficiaries model attributes for associations
+		associationsObject = _.pick(self.attributes, Object.keys(self.attributes).filter(function(key){return self.attributes[key].hasOwnProperty("collection");}));
+		// flatten to array e.g. [{association:'boreholes', collection:'borehole', via: 'beneficiary_id'},{association:'sanitation', collection:'sanitationactivities', via: 'beneficiary_id'}]
+		var associations = [];
+		_.forIn(associationsObject,function(v,k){
+			association = {association:k, collection: associationsObject[k].collection, via:associationsObject[k].via }
+			associations.push(association)
+		});
+		var nAssociations  		= 0, 
+			counterAssociations = 0;
+		// total number of associations records to do ops on
+		values.forEach(function(l,i){
+			l.beneficiaries.forEach(function(b){
+				associations.forEach(function(a){
+					if(Array.isArray(b[a.association])){nAssociations = nAssociations + b[a.association].length;}
+				});		
+			});
+		});
+		// look for association in the beneficiary record and perform operation on it
+		values.forEach(function(l,i){
+			l.beneficiaries.forEach(function(b){
+				// for each defined association in the model
+				associations.forEach(function(a){
+					// guard, check if association is an array
+					if(Array.isArray(b[a.association])){
+						// null all associations for a beneficiary like sails does, e.g. needed for deleted records updates
+						// relinks foreign key on update phase if record not deleted
+						sails.models[a.collection].update({beneficiary_id:b.id}, {beneficiary_id:null}).exec(function(err){
+							if(err) return cb(err);
+							if (nAssociations){
+								b[a.association].forEach(function(record){
+									// set foreign key (beneficiary_id) reference type ObjectId
+									record[a.via] = b.id;
+									// console.log(record)
+									if(record.id){
+										sails.models[a.collection].update({ id: record.id }, record, function( err ){
+											// TODO return only one cb on err
+											if(err) return cb(err);
+											// for debug #TODO delete 
+											// console.log('updated');
+											counterAssociations++;
+											if( counterAssociations===nAssociations ){
+												cb( false );
+											}
+										});
+									}else{
+										sails.models[a.collection].create(record, function( err ){
+											// TODO return only one cb on err
+											if(err) return cb(err);
+											// for debug #TODO delete 
+											// console.log('created')
+											counterAssociations++;
+											if( counterAssociations===nAssociations ){
+												cb( false );
+											}
+										});
+									}
+								})
+							}
+						})
 					}
 				})
-			});
-
-			// run update
-			if (BulkHasOperations(bulk)){ 
-				bulk.execute(function(err, results) {
-					if(err) return cb(err, false);
-					cb( false, [] );
-				});
-			} else cb( false, [] );
-		})		
+			})
+		})
+		// return if no associations
+		if(!nAssociations) return cb(false);
 	}
 };
 
