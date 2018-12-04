@@ -486,11 +486,27 @@ module.exports = {
 	// set report details by report id
 	setReportById: function( req, res ) {
 
-		// request input
+		// measure time #TODO delete
+		var hrstart = process.hrtime()
+		// measure time end
+
+		// request input guards
 		if ( !req.param( 'report' ) ) {
 			return res.json(401, { err: 'report required!' });
 		}
 
+		// check that report locations prop is []
+		if (!Array.isArray(req.param( 'report' ).locations)){
+			return res.json(401, { err: 'locations array required!' });
+		}
+
+		// check that locations beneficiaries prop is []
+		req.param( 'report' ).locations.forEach(function( value,i ){
+			if (!Array.isArray(value.beneficiaries)){
+				return res.json(401, { err: 'beneficiaries array required!' });
+			}
+		})
+		
 		// get report
 		var $report    = req.param( 'report' ),
 			$locations = req.param( 'report' ).locations;
@@ -546,21 +562,40 @@ module.exports = {
 
 					$report.locations = update;
 					// beneficiaries
+
+					// measure time #TODO delete
+					var hrstart_b = process.hrtime()
+					// measure time end 
+
 					Beneficiaries
 						.updateOrCreateEachBulk( $report.locations, $report.report_status, function( err, beneficiaries ){
+
+							// measure time #TODO delete
+							hrend_b = process.hrtime(hrstart_b)
+							console.info('Execution time (beneficiaries): %ds %dms', hrend_b[0], hrend_b[1] / 1000000)
+							// measure time end 
 
 							// return error
 							if (err) return res.negotiate( err );
 							// beneficiaries
 							var location_ids = _.chain($report.locations).pluck('id').uniq().value();
 
+							// measure time #TODO delete
+							var hrstart_bf = process.hrtime()
+							// measure time end
+
 							Beneficiaries
 								.find( { location_id: location_ids } )
-								.populateAll()
+								// .populateAll()
 								.exec( function( err, beneficiaries ){
 									// return error
 									if (err) return res.negotiate( err );
 
+									// measure time #TODO delete
+									hrend_bf = process.hrtime(hrstart_bf)
+									console.info('Execution time (find beneficiaries): %ds %dms', hrend_bf[0], hrend_bf[1] / 1000000)
+									// measure time end
+									
 									// add locations ( associations included )
 									$report.locations.forEach(function(location, i){
 
@@ -622,6 +657,12 @@ module.exports = {
 																// counter
 																counter++;
 																if ( counter === length ) {
+
+																	// measure time #TODO delete
+																	hrend = process.hrtime(hrstart)
+																	console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
+																	// measure time end
+																	
 																	// return report
 																	return res.json( 200, $report );
 																}
@@ -638,6 +679,12 @@ module.exports = {
 											counter++;
 											if ( counter === length ) {
 												// return report
+												
+												// measure time #TODO delete
+												hrend = process.hrtime(hrstart)
+												console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
+												// measure time end
+
 												return res.json( 200, $report );
 											}
 										}
