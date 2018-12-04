@@ -700,7 +700,6 @@ module.exports = {
 				values.forEach(function( value,i ){
 					value.beneficiaries.forEach(function(b,j){
 						// set report status
-						values[i].beneficiaries[j].report_status = status;
 						b.report_status 					 	 = status;
 						
 						// validate each obj with sails model
@@ -720,7 +719,6 @@ module.exports = {
 								b.location_id = value.id;
 								// generate beneficiary id for associations reference
 								b._id = new ObjectId()
-								values[i].beneficiaries[j].id = b._id.toString();
 								bulk.insert(b)
 							}
 
@@ -736,7 +734,15 @@ module.exports = {
 								if (BulkHasOperations(bulk)){ 
 									bulk.execute(function(err, results) {
 										if(err) return cb(err, false);
-
+										// replace if _id with id like sails
+										values.forEach(function( value,i ){
+											value.beneficiaries.forEach(function(b,j){
+												if(b._id){
+													values[i].beneficiaries[j].id = b._id.toString();
+													delete b._id;
+												}
+											})
+										})
 										// measure time #TODO delete
 										// var hrstart = process.hrtime()
 										// measure time end

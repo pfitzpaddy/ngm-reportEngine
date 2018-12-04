@@ -466,7 +466,6 @@ module.exports = {
 			var bulk = collection.initializeUnorderedBulkOp();
 			values.forEach(function( value, i ){
 				// add operation per location, per beneficiary
-				values[i].report_status = status;
 				value.report_status 	= status;
 				if (value.id) {
 					bulk.find( {_id:ObjectId(value.id)} ).updateOne({ $set: { report_status:status.report_status } });
@@ -474,7 +473,6 @@ module.exports = {
 					// runs only for add new location functionality in monthly report
 					value._id = new ObjectId()
 					bulk.insert(value)
-					values[i].id = value._id;
 				}			
 			});
 
@@ -482,6 +480,13 @@ module.exports = {
 			if (BulkHasOperations(bulk)){
 				bulk.execute(function(err, result){
 					if (err) return cb(err, false);
+					// replace if _id with id as sails
+					values.forEach(function( value, i ){
+						if (value._id){
+							value.id = value._id.toString();
+							delete value._id;
+						}
+					})
 					cb( false, values );
 				});
 			} else cb( false, [] );
