@@ -838,7 +838,7 @@ module.exports = {
 	setReportByIdBulk: function( req, res ) {
 
 		// measure time #TODO delete
-		var hrstart = process.hrtime()
+		// var hrstart = process.hrtime()
 		// measure time end
 
 		// request input guards
@@ -915,15 +915,15 @@ module.exports = {
 					// beneficiaries
 
 					// measure time #TODO delete
-					var hrstart_b = process.hrtime()
+					// var hrstart_b = process.hrtime()
 					// measure time end 
 
 					Beneficiaries
 						.updateOrCreateEachBulk( $report.locations, $report.report_status, function( err, beneficiaries ){
 
 							// measure time #TODO delete
-							hrend_b = process.hrtime(hrstart_b)
-							console.info('Execution time (beneficiaries): %ds %dms', hrend_b[0], hrend_b[1] / 1000000)
+							// hrend_b = process.hrtime(hrstart_b)
+							// console.info('Execution time (beneficiaries): %ds %dms', hrend_b[0], hrend_b[1] / 1000000)
 							// measure time end 
 
 							// return error
@@ -932,7 +932,7 @@ module.exports = {
 							var location_ids = _.chain($report.locations).pluck('id').uniq().value();
 
 							// measure time #TODO delete
-							var hrstart_bf = process.hrtime()
+							// var hrstart_bf = process.hrtime()
 							// measure time end
 
 							Beneficiaries
@@ -943,8 +943,8 @@ module.exports = {
 									if (err) return res.negotiate( err );
 
 									// measure time #TODO delete
-									hrend_bf = process.hrtime(hrstart_bf)
-									console.info('Execution time (find beneficiaries): %ds %dms', hrend_bf[0], hrend_bf[1] / 1000000)
+									// hrend_bf = process.hrtime(hrstart_bf)
+									// console.info('Execution time (find beneficiaries): %ds %dms', hrend_bf[0], hrend_bf[1] / 1000000)
 									// measure time end
 									
 									// add locations ( associations included )
@@ -1010,8 +1010,8 @@ module.exports = {
 																if ( counter === length ) {
 
 																	// measure time #TODO delete
-																	hrend = process.hrtime(hrstart)
-																	console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
+																	// hrend = process.hrtime(hrstart)
+																	// console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
 																	// measure time end
 																	
 																	// return report
@@ -1032,8 +1032,8 @@ module.exports = {
 												// return report
 												
 												// measure time #TODO delete
-												hrend = process.hrtime(hrstart)
-												console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
+												// hrend = process.hrtime(hrstart)
+												// console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
 												// measure time end
 
 												return res.json( 200, $report );

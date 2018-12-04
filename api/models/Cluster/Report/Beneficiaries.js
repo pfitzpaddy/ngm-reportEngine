@@ -694,7 +694,7 @@ module.exports = {
 				// add bulk operation per location, per beneficiary
 
 				// measure time #TODO delete
-				var hrstart = process.hrtime()
+				// var hrstart = process.hrtime()
 				// measure time end
 
 				values.forEach(function( value,i ){
@@ -729,8 +729,8 @@ module.exports = {
 							if (countBeneficiaries === nBeneficiaries) {
 
 								// measure time #TODO delete
-								var hrend = process.hrtime(hrstart)
-								console.info('Execution time (validate): %ds %dms', hrend[0], hrend[1] / 1000000)
+								// var hrend = process.hrtime(hrstart)
+								// console.info('Execution time (validate): %ds %dms', hrend[0], hrend[1] / 1000000)
 								// measure time end
 
 								if (BulkHasOperations(bulk)){ 
@@ -738,7 +738,7 @@ module.exports = {
 										if(err) return cb(err, false);
 
 										// measure time #TODO delete
-										var hrstart = process.hrtime()
+										// var hrstart = process.hrtime()
 										// measure time end
 
 										// update associations
@@ -746,8 +746,8 @@ module.exports = {
 											if(err) return cb(err, false);
 
 											// measure time #TODO delete
-											hrend = process.hrtime(hrstart)
-											console.info('Execution time (associations): %ds %dms', hrend[0], hrend[1] / 1000000)
+											// hrend = process.hrtime(hrstart)
+											// console.info('Execution time (associations): %ds %dms', hrend[0], hrend[1] / 1000000)
 											// measure time end
 
 											cb( false, [] );
@@ -803,7 +803,8 @@ module.exports = {
 										sails.models[a.collection].update({ id: record.id }, record, function( err ){
 											// TODO return only one cb on err
 											if(err) return cb(err);
-											console.log('updated');
+											// for debug #TODO delete 
+											// console.log('updated');
 											counterAssociations++;
 											if( counterAssociations===nAssociations ){
 												cb( false );
@@ -813,7 +814,8 @@ module.exports = {
 										sails.models[a.collection].create(record, function( err ){
 											// TODO return only one cb on err
 											if(err) return cb(err);
-											console.log('created')
+											// for debug #TODO delete 
+											// console.log('created')
 											counterAssociations++;
 											if( counterAssociations===nAssociations ){
 												cb( false );
