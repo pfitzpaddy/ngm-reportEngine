@@ -4,7 +4,7 @@
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
-var 				  _ = require('lodash');
+// var 				  _ = require('lodash');
 var 		   ObjectId = require('mongodb').ObjectID;
 const BulkHasOperations = function (b) { return b && b.s && b.s.currentBatch && b.s.currentBatch.operations && b.s.currentBatch.operations.length > 0; }
 
@@ -689,7 +689,10 @@ module.exports = {
 		if(nBeneficiaries){
 			self.native(function(err, collection) {
 				if(err) return cb(err, false);
-				
+
+				// simple association finder, check waterline valuesParser if more advanced functionality needed
+				var associationProps = Object.keys(self.attributes).filter(function(key){return self.attributes[key].hasOwnProperty("collection");});
+
 				var bulk = collection.initializeUnorderedBulkOp();
 				// add bulk operation per location, per beneficiary
 
@@ -700,8 +703,8 @@ module.exports = {
 				values.forEach(function( value,i ){
 					value.beneficiaries.forEach(function(b,j){
 						// set report status
-						b.report_status 					 	 = status;
-						
+						b.report_status = status;
+
 						// validate each obj with sails model
 						// if omitted will insert any incoming object into collection, but much faster
 						// takes time #TODO: consider without validation
@@ -710,16 +713,17 @@ module.exports = {
 							if(isError) return;
 							if(err&&isError===false){isError=true; return cb(err, false)};
 
-							// if(err) return cb(err, false);
-							
+							// obj without associations
+							var _b = _.omit(b,associationProps);
+
 							// if id exists update or create
-							if (b.id) {
-								bulk.find( {_id:ObjectId(b.id)} ).updateOne({ $set: b });
+							if (_b.id) {
+								bulk.find( {_id:ObjectId(_b.id)} ).updateOne({ $set: _b });
 							} else {
-								b.location_id = value.id;
+								b.location_id = _b.location_id  = value.id;
 								// generate beneficiary id for associations reference
-								b._id = new ObjectId()
-								bulk.insert(b)
+								b._id = _b._id  = new ObjectId()
+								bulk.insert(_b)
 							}
 
 							countBeneficiaries++;

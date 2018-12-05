@@ -937,7 +937,7 @@ module.exports = {
 
 							Beneficiaries
 								.find( { location_id: location_ids } )
-								// .populateAll()
+								.populateAll()
 								.exec( function( err, beneficiaries ){
 									// return error
 									if (err) return res.negotiate( err );
