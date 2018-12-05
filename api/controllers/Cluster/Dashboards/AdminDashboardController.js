@@ -741,11 +741,12 @@ var AdminDashboardController = {
                           reports.forEach( function( d, i ){
 
                                 // add status
+                                reports[i].id     = reports[i]._id.toString();
                                 reports[i].status = '#e57373'
                                 reports[i].status_title = 'Due';
                                 reports[i].icon = 'watch_later';
                                 reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
-                                reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i].id;
+                                reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
                                 // if benficiaries
                                 if ( non_empty_reports.indexOf(d._id.toString())>-1) {
                                   // add status
@@ -882,11 +883,12 @@ var AdminDashboardController = {
                                                   reports.forEach( function( d, i ){
 
                                                         // add status
+                                                        reports[i].id           = reports[i]._id.toString();
                                                         reports[i].status       = '#4db6ac'
                                                         reports[i].status_title = 'Complete';
                                                         reports[i].icon         = 'check_circle';
                                                         reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
-                                                        reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i].id;
+                                                        reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
 
                                                         // if benficiaries
                                                         if ( non_empty_reports.indexOf(d._id.toString())<0&&non_empty_train_reports.indexOf(d._id.toString())<0  ) {
