@@ -471,6 +471,16 @@ module.exports = {
 					bulk.find( {_id:ObjectId(value.id)} ).updateOne({ $set: { report_status:status.report_status } });
 				} else {
 					// runs only for add new location functionality in monthly report
+
+					// date fields
+					var dateProps = Object.keys(self.attributes).filter(function(key){return self.attributes[key].type === 'date';});
+					// and cast to date
+					dateProps.forEach(function(d){
+						if( value[d] ){
+							value[d] = new Date(value[d]);
+						}
+					});
+
 					value._id = new ObjectId()
 					bulk.insert(value)
 				}			

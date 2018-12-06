@@ -691,7 +691,11 @@ module.exports = {
 				if(err) return cb(err, false);
 
 				// simple association finder, check waterline valuesParser if more advanced functionality needed
-				var associationProps = Object.keys(self.attributes).filter(function(key){return self.attributes[key].hasOwnProperty("collection");});
+				var associationProps = Object.keys(self.attributes)
+											 .filter(function(key){return self.attributes[key].hasOwnProperty("collection");});
+				// date fields
+				var dateProps 		 = Object.keys(self.attributes)
+											 .filter(function(key){return self.attributes[key].type === 'date';});
 
 				var bulk = collection.initializeUnorderedBulkOp();
 				// add bulk operation per location, per beneficiary
@@ -704,6 +708,13 @@ module.exports = {
 					value.beneficiaries.forEach(function(b,j){
 						// set report status
 						b.report_status = status;
+
+						// cast date fields to date
+						dateProps.forEach(function(d){
+							if( b[d] ){
+								b[d] = new Date(b[d]);
+							}
+						});
 
 						// validate each obj with sails model
 						// if omitted will insert any incoming object into collection, but much faster
