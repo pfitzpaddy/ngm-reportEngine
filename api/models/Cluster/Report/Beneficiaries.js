@@ -258,6 +258,14 @@ module.exports = {
 			type: 'string'
 		},
 
+		//mpc mechanism
+		mpc_mechanism_type_id:{
+			type: 'string'
+		},
+		mpc_mechanism_type_name: {
+			type: 'string'
+		},
+
 		package_type_id:{
 			type: 'string'
 		},
