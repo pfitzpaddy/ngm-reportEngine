@@ -70,6 +70,7 @@ var DroughtDashboard = {
 				cluster: req.param('cluster'),
 				province: req.param('province'),
 				district: req.param('district'),
+				urgency: req.param('urgency'),
 				status_plan: req.param('status_plan'),
 				organization_tag: req.param('organization_tag'),
 				month: req.param('month'),
@@ -83,6 +84,15 @@ var DroughtDashboard = {
     // return filters
     getFilters: function( params ){
 			// filters
+
+			var beneficiaryTypeArray = ['drought_affected_non_displaced', 'drought_affected_displaced', 'natural_disaster_affected_drought'];
+			if (params.urgency === 'emergency'){
+				beneficiaryTypeArray = ['drought_affected_non_displaced', 'drought_affected_displaced'];
+			} else if (params.urgency === 'non_emergency'){
+				beneficiaryTypeArray = ['natural_disaster_affected_drought'];
+			} else {
+				beneficiaryTypeArray;
+			}
 			
       return {
 				year: { report_year: params.year },
@@ -94,7 +104,8 @@ var DroughtDashboard = {
 				organization_tag: params.organization_tag !== 'all' ? { organization_tag: { '!': ['immap'] }, organization_tag: [params.organization_tag]}:{organization_tag:{'!':['immap']}},
 				month: params.month !== 'all' ? { report_month: parseInt(params.month) } : {},
 				date: { reporting_start_date: { '>=': params.start_date, '<': params.end_date } },
-				beneficiary_type: params.status_plan === 'all' ? { beneficiary_type_id: { contains:'drought_affected_'}}:{beneficiary_type_id: 'drought_affected_'+params.status_plan},
+				// beneficiary_type: params.status_plan === 'all' ? { beneficiary_type_id: { contains:'drought_affected_'}}:{beneficiary_type_id: 'drought_affected_'+params.status_plan},
+				beneficiary_type: params.status_plan === 'all' ? { beneficiary_type_id: { $in: beneficiaryTypeArray } } : { beneficiary_type_id: params.status_plan },
 				// beneficiary_type: params.status_plan === 'all' ? { beneficiary_type_id: { '!': ['drought_affected_displaced'] }, beneficiary_type_id:['drought_affected_non_displaced'] } : { beneficiary_type_id: 'drought_affected_' + params.status_plan }
 				// exclude: { organization_tag: { '!=': 'immap' } }
       }
