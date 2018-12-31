@@ -468,6 +468,7 @@ module.exports = {
 				// add operation per location, per beneficiary
 				value.report_status 	= status;
 				if (value.id) {
+					value.updatedAt = new Date();
 					bulk.find( {_id:ObjectId(value.id)} ).updateOne({ $set: { report_status:status.report_status } });
 				} else {
 					// runs only for add new location functionality in monthly report
@@ -480,7 +481,7 @@ module.exports = {
 							value[d] = new Date(value[d]);
 						}
 					});
-
+					value.updatedAt = value.createdAt = new Date();
 					value._id = new ObjectId()
 					bulk.insert(value)
 				}			

@@ -737,11 +737,13 @@ module.exports = {
 
 							// if id exists update or create
 							if (_b.id) {
+								b.updatedAt = _b.updatedAt = new Date();
 								bulk.find( {_id:ObjectId(_b.id)} ).updateOne({ $set: _b });
 							} else {
 								b.location_id = _b.location_id  = value.id;
 								// generate beneficiary id for associations reference
 								b._id = _b._id  = new ObjectId()
+								b.updatedAt = _b.updatedAt =  b.createdAt = _b.createdAt = new Date();
 								bulk.insert(_b)
 							}
 
