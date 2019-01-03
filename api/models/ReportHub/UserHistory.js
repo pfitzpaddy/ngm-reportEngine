@@ -169,13 +169,13 @@ module.exports = {
 	beforeCreate: function ( user, next ) {
 
 		// encrypts the password/confirmation to be stored in the db
-		require( 'bcrypt' ).hash( user.password, 10, function passwordEncrypted( err, encryptedPassword ) {
+		// require( 'bcrypt' ).hash( user.password, 10, function passwordEncrypted( err, encryptedPassword ) {
 			
 			// return error
-			if ( err ) return next( err );
+			// if ( err ) return next( err );
 				
 			// encrypt password
-			user.password = encryptedPassword;
+			// user.password = encryptedPassword;
 
 			// check if org exists
 	    Organization
@@ -227,7 +227,7 @@ module.exports = {
 				  
 				});
 
-		});			
+		// });	
 
 	},
 
