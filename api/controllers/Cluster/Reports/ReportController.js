@@ -495,12 +495,26 @@ module.exports = {
 			return res.json(401, { err: 'id required!' });
 		}
 
+		if (req.param( 'previous' )) var prev = true;
+
+		if(!prev){
+			query={
+				id: req.param( 'id' )
+			}
+		} else{
+			query= {
+				project_id: req.param('project_id'),
+				report_month: req.param('month'),
+				report_year: req.param('year') 
+			}
+		}
+
 		// report for UI
 		var $report = {};
 
 		// get report by organization_id
 		Report
-			.findOne( { id: req.param( 'id' ) } )
+			.findOne( query )
 			.exec( function( err, report ){
 
 				// return error
@@ -529,6 +543,7 @@ module.exports = {
 						if ( !$report.locations.length ) {
 							return res.json( 200, $report );
 						}
+
 
 						// counter
 						var counter = 0,
