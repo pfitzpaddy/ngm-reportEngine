@@ -312,6 +312,12 @@ module.exports = {
         // indicator
         switch( req.param( 'indicator' ) ) {
 
+          // distinct organizations
+          case 'organizations':
+            var organizations = _.uniq( users, function( user ) { return user.organization; });
+            return res.json( 200, { value: organizations.length } );
+            break;
+
           // distinct countries
           case 'countries':
             var countries = _.uniq( users, function( user ) { return user.admin0pcode; });
