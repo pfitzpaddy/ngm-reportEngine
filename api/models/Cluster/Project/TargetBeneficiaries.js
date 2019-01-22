@@ -193,6 +193,14 @@ module.exports = {
 			type: 'string'
 		},
 
+		// indicator that relates to activity for HRP reporting
+		indicator_id: {
+			type: 'string'
+		},
+		indicator_name: {
+			type: 'string'
+		},
+
 		// mpc delivery
 		mpc_delivery_type_id: {
 			type: 'string'
