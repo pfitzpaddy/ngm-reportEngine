@@ -5,6 +5,7 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+    "async": "^2.6.1",
     "deep-assign": "^2.0.0",
     "ejs": "~0.8.4",
     "grunt": "0.4.2",
@@ -32,7 +33,7 @@
     "sails-disk": "~0.10.0",
     "sails-hook-email": "^0.12.1",
     "sails-mongo": "^0.11.4",
-    "sails-postgresql": "~0.10.16",
+    "sails-postgresql": "^0.11.4",
     "underscore": "^1.8.3"
   },
   "scripts": {
