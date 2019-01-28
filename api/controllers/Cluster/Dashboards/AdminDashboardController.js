@@ -605,6 +605,36 @@ var AdminDashboardController = {
 
           break;
 
+      case 'projects_total':
+
+        // Projects total
+        Report
+          .find()
+          .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
+          .where( params.adminRpcode_filter )
+          .where( params.admin0pcode_filter )
+          .where( { report_active: true } )
+          .where( params.activity_type_id )
+          .where( { report_status: [ 'todo', 'complete' ] } )
+          .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
+          .where( params.organization_filter )
+          .sort('updatedAt DESC')
+          .exec( function( err, reports ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // filter by project_id
+            var projects = _.countBy( reports, 'project_id' );
+
+            // return indicator
+            return res.json( 200, { 'value': Object.keys( projects ).length });
+
+          });
+
+        break;
+
       case 'reports_total':
 
         // reports total
