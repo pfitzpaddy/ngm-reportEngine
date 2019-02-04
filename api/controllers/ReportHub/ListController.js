@@ -269,15 +269,19 @@ module.exports = {
   getAdminSites: function( req, res ) {
 
     // !admin0pcode || !admin1pcode
-    if ( !req.param( 'admin0pcode' ) || !req.param( 'admin1pcode' ) ) {
+    if ( !req.param( 'admin0pcode' ) && ( req.param( 'admin0pcode' ) !== 'CB' && !req.param( 'admin1pcode' ) ) ) {
        return res.json( 401, { msg: 'admin0pcode, admin1pcode required and must be string' });
     }
+
+    // filters
+    var admin0filter = { admin0pcode: req.param( 'admin0pcode' ) }
+    var admin1filter = req.param( 'admin1pcode' ) ? { admin1pcode: req.param( 'admin1pcode' ) } : {}
 
     // get list
     AdminSites
       .find()
-      .where({ admin0pcode: req.param( 'admin0pcode' ) })
-      .where({ admin1pcode: req.param( 'admin1pcode' ) })
+      .where( admin0filter )
+      .where( admin1filter )
       .sort( 'site_name ASC' )
       .exec( function( err, admin3 ){
 
