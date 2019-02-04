@@ -277,6 +277,12 @@ module.exports = {
     var admin0filter = { admin0pcode: req.param( 'admin0pcode' ) }
     var admin1filter = req.param( 'admin1pcode' ) ? { admin1pcode: req.param( 'admin1pcode' ) } : {}
 
+    // if !== CB and missing admin1
+    if ( req.param( 'admin0pcode') !== 'CB' && !req.param( 'admin1pcode' ) ) {
+        // return new Project
+        return res.json( 200, [] ); 
+    }
+
     // get list
     AdminSites
       .find()
