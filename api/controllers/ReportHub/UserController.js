@@ -578,7 +578,7 @@ var UserController = {
           // update newPassword
           // require( 'bcrypt' ).hash( req.param( 'reset' ).newPassword, 10, function passwordEncrypted( err, encryptedPassword ) {
           var bcrypt = require('bcrypt-nodejs');
-          bcrypt.hash( user.password, bcrypt.genSaltSync( 10 ), null, function passwordEncrypted( err, encryptedPassword ) {
+          bcrypt.hash( req.param( 'reset' ).newPassword, bcrypt.genSaltSync( 10 ), null, function passwordEncrypted( err, encryptedPassword ) {
 
             // err
             if ( err ) return res.json({ err: true, msg: 'Reset password error' } );
