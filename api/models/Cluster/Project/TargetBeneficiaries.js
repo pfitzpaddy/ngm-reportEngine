@@ -304,6 +304,9 @@ module.exports = {
     injury_treatment_same_province:{
       type: 'boolean'
     },
+    remarks:{
+      type: 'string'
+    },
 
 		// target locations
 		admin1pcode: {
