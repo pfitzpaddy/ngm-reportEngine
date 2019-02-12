@@ -304,6 +304,19 @@ module.exports = {
     injury_treatment_same_province:{
       type: 'boolean'
     },
+
+		// store partial kits
+		partial_kits: {
+			type: 'array'
+
+		},
+
+		// store kit details
+		kit_details: {
+			type: 'array'
+
+		},
+
     remarks:{
       type: 'string'
     },
