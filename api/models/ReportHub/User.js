@@ -212,13 +212,14 @@ module.exports = {
 			// check if org exists
 	    Organization
 	    	.find()
-	    	.where( { admin0pcode: user.admin0pcode, cluster_id: user.cluster_id, organization: user.organization } )
+	    	// .where( { admin0pcode: user.admin0pcode, cluster_id: user.cluster_id, organization: user.organization } )
+	    	.where( { admin0pcode: user.admin0pcode, organization: user.organization } )
 	    	.exec(function ( err, organization ){
 			  	
 				  // error
 				  if ( err ) return next( err );
 
-				  // if org dosnt exist, create
+				  // if org exists, add
 				  if( organization.length ){
 
 				  	// organization_id
@@ -227,7 +228,7 @@ module.exports = {
 						// next!
 						next();
 
-						// exists
+						// else create
 				  } else{
 
 				  	// create org_id
@@ -240,8 +241,8 @@ module.exports = {
 				  		organization_name: user.organization_name,
 				  		organization_tag: user.organization_tag,
 				  		organization: user.organization,
-				  		cluster_id: user.cluster_id,
-				  		cluster: user.cluster
+				  		// cluster_id: user.cluster_id,
+				  		// cluster: user.cluster
 				  	}).exec(function (err, created){
 							
 							// return error
@@ -272,7 +273,8 @@ module.exports = {
     // get user by email
     User
     	.find()
-    	.where({ admin0pcode: user.admin0pcode, cluster: user.cluster, organization_id: user.organization_id })
+    	// .where({ admin0pcode: user.admin0pcode, cluster: user.cluster, organization_id: user.organization_id })
+    	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id })
     	.sort('createdAt ASC')
     	.exec( function( err, admin ){
 
