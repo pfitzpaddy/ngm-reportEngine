@@ -6,11 +6,12 @@
 		</style>
 	</head>
 	<body>
-		<p>Hi <%= username %>,</p>
+		<p>Hi <%= org_names %></p>
 		<p>
 			A new user has registered to your organization. The details are provided below;
 			<ul>
-				<li><b>Username: </b><%= newusername %></li>
+				<li><b>Sector: </b><%= sector %></li>
+				<li><b>Username: </b><%= username %></li>
 				<li><b>Name: </b><%= name %></li>
 				<li><b>Position: </b><%= position %></li>
 				<li><b>Phone: </b><%= phone %></li>
@@ -18,9 +19,11 @@
 				<br/>
 			</ul>	
 		</p>
-
 		<p>
-			If you do not recognize this user as a member of your organization please reply to this email immediately.
+			If you do not recognize this user as a member of your organization, please disable them from your organization from the user <a title="Profile <%= username %>" href="<%= url %>">Profile Page</a>.
+		</p>
+		<p>
+			Alternatively, please feel free to respond to this email to inform the ReportHub team.
 		</p>
 
 		<p><br/><%= sendername %></p>

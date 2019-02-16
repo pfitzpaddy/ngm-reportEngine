@@ -251,6 +251,9 @@ module.exports = {
 							// organization_id
 							user.organization_id = created.id;
 
+							// set the first user as ORG!
+							user.roles.push('ORG');
+
 							// next!
 							next();						
 
@@ -268,12 +271,14 @@ module.exports = {
 	afterCreate: function ( user, next ) {
 
 		// file system
-		var fs = require('fs');
+		var fs = require('fs'),
+				org_names = '',
+				org_emails = '',
+				org_admin = [];
 
     // get user by email
     User
     	.find()
-    	// .where({ admin0pcode: user.admin0pcode, cluster: user.cluster, organization_id: user.organization_id })
     	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id })
     	.sort('createdAt ASC')
     	.exec( function( err, admin ){
@@ -287,18 +292,36 @@ module.exports = {
 			  // if more then 1 user for that org
 				if ( admin.length > 1 ) {
 
+					// get ORGs
+					org_admin = admin.filter(function( user ) {
+						return user.roles.indexOf( 'ORG' ) !== -1; 
+					});
+
+					// set admin
+					admin = org_admin.length ? org_admin : admin;
+
+					// set emails
+					admin.forEach(function( d, i ) {
+						org_names += d.name + ', ';
+						org_emails += d.email + ',';
+					});
+					// remove last comma
+					org_names = org_names.slice( 0, -1 );
+					org_emails = org_emails.slice( 0, -1 );
+
 	        // send email
 	        sails.hooks.email.send( 'new-user', {
-	            username: admin[0].username,
-	            newusername: user.username,
-	            name: user.name,
-	            cluster: user.cluster,
+	            org_names: org_names,
+	            sector: user.cluster,
+	            username: user.username,
+	            name: name,
 	            position: user.position,
 	            phone: user.phone,
 	            email: user.email,
+	            url: 'https://reporthub.immap.org/desk/#/profile/' + user.username,
 	            sendername: 'ReportHub'
 	          }, {
-	            to: admin[0].email,
+	            to: org_emails,
 	            subject: 'ReportHub - New ' + admin[0].organization + ' User !'
 	          }, function(err) {
 		
