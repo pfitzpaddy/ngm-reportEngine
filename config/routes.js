@@ -117,6 +117,12 @@ module.exports.routes = {
   'POST /cluster/admin/indicator': 'Cluster/Dashboards/AdminDashboardController.getClusterAdminIndicator',
 
   // PROJECTS
+  
+  // sectors
+  'POST /cluster/project/getProjectSectors': 'Cluster/ProjectController.getProjectSectors',
+  'GET /cluster/project/getProjectSectors': 'Cluster/ProjectController.getProjectSectors',
+
+  // details
   'POST /cluster/project/getProjectsList': 'Cluster/ProjectController.getProjectsList',
   'POST /cluster/project/getProject': 'Cluster/ProjectController.getProjectById',
   'POST /cluster/project/getProjects': 'Cluster/ProjectController.getProjects',

@@ -36,6 +36,34 @@ module.exports = {
 
   },
 
+  // get distinct sectors 
+  getProjectSectors: function( req, res ) {
+    
+    // organization_id required
+    if ( !req.param('organization_id') ) {
+      return res.json(401, { err: 'organization_id required!' });
+    }
+
+    // get project by organization_id & status
+    Project
+      .find( { organization_id: req.param( 'organization_id' ) } )
+      .exec( function( err, projects ){
+
+        // return error
+        if (err) return res.negotiate( err );
+
+        // uniq cluster_id
+        var distinct_sectors = _.uniq( projects, function( x ){
+          return x.cluster_id;
+        });
+
+        // else
+        return res.json( 200, distinct_sectors );
+
+      });
+
+  },
+
   // get projects summary
   getProjects: function(req, res){
 
