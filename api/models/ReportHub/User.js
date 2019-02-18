@@ -314,7 +314,7 @@ module.exports = {
 	            org_names: org_names,
 	            sector: user.cluster,
 	            username: user.username,
-	            name: name,
+	            name: user.name,
 	            position: user.position,
 	            phone: user.phone,
 	            email: user.email,
