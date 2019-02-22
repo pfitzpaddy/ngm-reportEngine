@@ -5,6 +5,13 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var fs = require('fs')
+var os = require('os');
+var path = require('path');
+
+const { google } = require('googleapis');
+
+
 module.exports = {
 
 	//
@@ -26,6 +33,359 @@ module.exports = {
 
 	},
 
+	// save file to local
+	uploadLocal: function  (req, res) {
+
+		//	call to /upload via GET is 
+
+		if(req.method === 'GET') return res.json({ 'status':'GET not allowed' });
+		
+		var uploadPath = sails.config.documents.UPLOAD_PATH;
+		// skipper
+		req.file('file').upload({ dirname:uploadPath },function onUploadComplete (err, files) {
+			if (err) return res.serverError(err);
+
+			//	if error return and send 500 error with error
+			fileDescriptor = {
+				fileid_local : path.parse(files[0].fd).base,
+				filename_extension : path.extname(files[0].fd),
+				fileid_local_name : path.parse(files[0].fd).name,
+				mime_type : files[0].type,
+				filename : files[0].filename,
+			}
+
+			// set variable metadata TODO: refactor
+			if (req.body.project_id){
+				fileDescriptor.project_id = req.body.project_id;
+			}
+			if (req.body.username){
+				fileDescriptor.fileowner = req.body.username;
+			}
+			if (req.session.session_user && req.session.session_user.username){
+				fileDescriptor.fileowner = req.session.session_user.username;
+			}
+			if (req.body.admin0pcode){
+				fileDescriptor.admin0pcode = req.body.admin0pcode;
+			}
+			if (req.session.session_user && req.session.session_user.admin0pcode){
+				fileDescriptor.admin0pcode = req.session.session_user.admin0pcode;
+			}
+			if (req.body.organization_tag){
+				fileDescriptor.organization_tag = req.body.organization_tag;
+			}
+			if (req.session.session_user && req.session.session_user.organization_tag){
+				fileDescriptor.organization_tag = req.session.session_user.organization_tag;
+			}
+
+			// save docs metadata
+			Documents.create(fileDescriptor).exec(function(err, doc) {
+				if (err) {
+					res.json(err.status, {err: err});
+					fs.unlink(files[0].fd)
+					return;
+				}
+				if (doc) {
+					res.json({ status:200, file:doc });
+				}
+			  });
+
+
+		});
+
+	},
+
+	// return array of project documents
+	listProjectDocuments: function(req,res) {
+		if (!req.param('project_id')){
+			return res.json(401, {err: 'fileid required!'});
+		}
+		Documents.find( { project_id: req.param('project_id') } )
+				 .then( docs => res.json( 200, docs ))
+				 .catch( err => res.negotiate(err) )
+	},
+
+	// download local file
+	getLocalProjectDocument: function(req,res){
+		if (!req.param('fileid')){
+			return res.json(401, {err: 'fileid required!'});
+		}
+		console.log(sails.config.documents.UPLOAD_PATH)
+		Documents.findOne( { fileid_local: req.param('fileid') } )
+					.then(doc => {
+						doc = doc || {fileid_local:"NOTFOUND"};
+						return res.download(sails.config.documents.UPLOAD_PATH + "/" + doc.fileid_local, doc.filename)
+					})
+					.catch( err => res.negotiate(err) )
+					
+	},
+
+	// delete local file
+	deleteLocalDocument: function(req,res){
+		if (!req.param('fileid')){
+			return res.json(401, {err: 'fileid required!'});
+		}
+		fs.unlink(sails.config.documents.UPLOAD_PATH + "/" + req.param('fileid'), function(err){
+            if(err) return res.json( 404, { "deleted" : false });
+			Documents.destroy({fileid_local:req.param('fileid')}, function(err, d ){
+				if (err) {
+					return res.negotiate( err );
+				}
+				return res.json( 200, { "deleted" : true });
+			})
+        });
+		
+	},
+	// delete permanently
+	deleteGDriveFilePermanently: function(req, res){
+
+		if (!req.param('fileid')){
+			return res.json(401, {err: 'fileid required!'});
+		}
+		var privatkey = sails.config.documents.CREDENTIALS;
+		var folderId = sails.config.documents.GDRIVE_FOLDER_ID;
+		var uploadPath = sails.config.documents.UPLOAD_PATH;
+
+		jwtClient = new google.auth.JWT(
+			privatkey.client_email,
+			null,
+			privatkey.private_key,
+			['https://www.googleapis.com/auth/drive']);
+
+		// prepare gdrive client
+		var drive = google.drive({
+			version: 'v3',
+			auth: jwtClient
+		});
+		// upload to gdrive
+		drive.files.delete({
+			fileId: req.param('fileid')
+			}, function (err, file) {
+				if (err) {
+					// Handle error
+					return res.negotiate( err );
+				} else {
+					Documents.destroy({fileid:req.param('fileid')}, function(err){
+						if (err) {
+							return res.negotiate( err );
+						}
+						return res.json( 200, { "deleted" : true });
+					})
+				}
+			})
+	},
+
+	// move to gdrive trash or remove permissions and delete metadata in db
+	deleteGDriveFile: function(req, res){
+
+		if (!req.param('fileid')){
+			return res.json(401, {err: 'fileid required!'});
+		}
+		var privatkey = sails.config.documents.CREDENTIALS;
+		var folderId = sails.config.documents.GDRIVE_FOLDER_ID;
+		var trashFolderId = sails.config.documents.GDRIVE_TRASH_FOLDER_ID;
+		var uploadPath = sails.config.documents.UPLOAD_PATH;
+
+		jwtClient = new google.auth.JWT(
+			privatkey.client_email,
+			null,
+			privatkey.private_key,
+			['https://www.googleapis.com/auth/drive']);
+
+		// prepare gdrive client
+		var drive = google.drive({
+			version: 'v3',
+			auth: jwtClient
+		});
+		// // trash files, move to gdrive trash
+		// drive.files.update({
+		// 	fileId: req.param('fileid'),
+		// 	requestBody: {
+		// 		  trashed: true
+		// 		}
+		// 	}, function (err, file) {
+
+		// or move to trash folder and delete permission, not possible to view
+		drive.files.update({
+				fileId: req.param('fileid'),
+				addParents: trashFolderId,
+				removeParents: folderId
+			}, function (err, file) {
+			if (err) {
+				// Handle error
+				return res.negotiate( err );
+			} else {
+				drive.permissions.delete({
+					fileId: req.param('fileid'),
+					permissionId: 'anyone'
+					}, function (err, permissions) {
+					if (err) {
+						// Handle error
+						return res.negotiate( err );
+					} else {
+						// remove metadata from rh
+						Documents.destroy({ fileid:req.param('fileid') }, function(err){
+							if (err) {
+								return res.negotiate( err );
+							}
+							return res.json( 200, { "deleted" : true });
+						})
+					}
+				})
+			}
+		})
+	},
+
+	// upload files to google drive
+	uploadGDrive: function  (req, res) {
+
+		if(req.method === 'GET') return res.json({ 'status':'GET not allowed' });
+
+		// get configuration data
+		var privatkey = sails.config.documents.CREDENTIALS;
+		var folderId = sails.config.documents.GDRIVE_FOLDER_ID;
+		var uploadPath = sails.config.documents.UPLOAD_PATH;
+
+		// save to disk
+		req.file('file').upload({ dirname:uploadPath },function onUploadComplete (err, files) {
+			
+			// prepare authentication client
+			jwtClient = new google.auth.JWT(
+				privatkey.client_email,
+				null,
+				privatkey.private_key,
+				['https://www.googleapis.com/auth/drive']);
+		   
+			// prepare gdrive client
+			var drive = google.drive({
+				version: 'v3',
+				auth: jwtClient
+			});
+					
+			// set file gdrive metadata 
+			var fileMetadata = {
+				parents: [folderId],
+				name: files[0].filename,
+				mimeType: files[0].type
+			};
+
+			if (req.body.project_id){
+				fileMetadata.description = "project_id: " + req.body.project_id;
+			}
+
+			// set file media from file on disk
+			var media = {
+				mimeType: files[0].type,
+				body: fs.createReadStream(files[0].fd)
+			};
+			
+			// set permissions
+			permission = {
+				role:"reader",
+				type:"anyone",
+				allowFileDiscovery: true
+			};
+			
+			// upload to gdrive
+			drive.files.create({
+				resource: fileMetadata,			
+				media: media,
+				}, function (err, file) {
+					if (err) {
+						res.negotiate( err );
+						fs.unlink(files[0].fd)
+						return;
+					} else {
+						// create permission on file or share entire folder on gdrive ( not working on create )
+						drive.permissions.create({ fileId: file.data.id, resource: permission }, function (err, permission){
+							if (err) {
+								res.negotiate( err );
+								fs.unlink(files[0].fd)
+								return;
+							}
+							// save and respond
+							saveFileMetadata(file, function(err, doc){
+								// delete from local
+								fs.unlink(files[0].fd);
+								if (err) {
+									return res.json(err.status, {err: err});
+								}
+								if (doc) {
+									return res.json({ status:200, file:doc });
+								}
+								
+							})
+						})
+
+					}
+				})
+
+			var saveFileMetadata = function(file,cb){
+
+				// set metadata 
+				fileDescriptor = {
+					fileid_local : path.parse(files[0].fd).base,
+					// filename_extension : path.extname(files[0].fd),
+					// fileid_local_name : path.parse(files[0].fd).name,
+					fileid: file.data.id,
+					mime_type : file.data.mimeType,
+					filename : file.data.name,
+					filename_extension : path.extname(file.data.name),
+				}
+
+				// set variable metadata TODO: refactor
+				setFileMetaOptionalParam(fileDescriptor);
+				
+				// save metadata
+				Documents.create( fileDescriptor ).exec(function(err, doc) {
+					if (err) {
+						cb(err);
+						// return res.json(err.status, {err: err});
+					}
+					if (doc) {
+						cb(false, doc)
+						// return res.json({ status:200, file:doc });
+					}
+				});
+
+			}
+
+			var setFileMetaOptionalParam = function(fileDescriptor){
+
+				// set variable metadata TODO: refactor
+				if (req.body.project_id){
+					fileDescriptor.project_id = req.body.project_id;
+				}
+				if (req.body.username){
+					fileDescriptor.fileowner = req.body.username;
+				}
+				if (req.session.session_user && req.session.session_user.username){
+					fileDescriptor.fileowner = req.session.session_user.username;
+				}
+				if (req.body.admin0pcode){
+					fileDescriptor.admin0pcode = req.body.admin0pcode;
+				}
+				if (req.session.session_user && req.session.session_user.admin0pcode){
+					fileDescriptor.admin0pcode = req.session.session_user.admin0pcode;
+				}
+				if (req.body.organization_tag){
+					fileDescriptor.organization_tag = req.body.organization_tag;
+				}
+				if (req.session.session_user && req.session.session_user.organization_tag){
+					fileDescriptor.organization_tag = req.session.session_user.organization_tag;
+				}
+
+				return fileDescriptor
+			}
+		});
+		
+	},
+	
+	// return google link to download zipped folder
+	getProjectDocuments: function(req, res){
+		return res.json(200, {});
+
+
+	},
 	//
 	process: function  (req, res) {
 

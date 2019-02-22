@@ -74,7 +74,22 @@ module.exports.routes = {
   'GET /export': 'ReportHub/FileController.export',
   'GET /getBeneficiairiesCsv': 'ReportHub/FileController.getBeneficiairiesCsv',
 
+  // Documents
+  'GET /listProjectDocuments/:project_id': 'ReportHub/FileController.listProjectDocuments',
   
+  'POST /uploadGDrive': 'ReportHub/FileController.uploadGDrive',
+  'POST /uploadLocal': 'ReportHub/FileController.uploadLocal',
+
+  'GET /getProjectDocuments/:project_id': 'ReportHub/FileController.getProjectDocuments',
+
+  'DELETE /deleteGDriveFile/:fileid': 'ReportHub/FileController.deleteGDriveFile',
+  // 'DELETE /deleteGDriveFilePermanently/:fileid': 'ReportHub/FileController.deleteGDriveFilePermanently',
+
+  // for local files
+  'GET /getProjectDocument/:fileid': 'ReportHub/FileController.getLocalProjectDocument',
+  'DELETE /deleteLocalDocument/:fileid': 'ReportHub/FileController.deleteLocalDocument',
+
+
   // -------- iMMAP --------
   // -------- Products --------
   'GET /immap/products/getProductsData': 'iMMAP/Products/ProductsController.getProductsData',

@@ -141,6 +141,9 @@ var UserController = {
 
           // add token
           user.token = jwtToken.issueToken({ sid: user.id });
+          
+          // save user data on session
+          req.session.session_user = user;
 
           // save updates
           user.save( function( err ) {
