@@ -43,6 +43,7 @@ config/local.js
 config/kobo.js
 config/email.js
 config/google.js
+config/documents.js
 
 
 
