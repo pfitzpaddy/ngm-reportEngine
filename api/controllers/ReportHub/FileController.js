@@ -245,8 +245,12 @@ module.exports = {
 		var folderId = sails.config.documents.GDRIVE_FOLDER_ID;
 		var uploadPath = sails.config.documents.UPLOAD_PATH;
 
+		var timeout = sails.config.documents.REQUEST_TIMEOUT_UPLOAD || 10*60*1000;
+		req.setTimeout(timeout);
+
 		// save to disk
 		req.file('file').upload({ dirname:uploadPath },function onUploadComplete (err, files) {
+			if (err) return res.serverError(err);
 			
 			// prepare authentication client
 			jwtClient = new google.auth.JWT(
@@ -391,8 +395,9 @@ module.exports = {
 			var fetch = require('node-fetch');
 			var TAKE_OUT_API_KEY = sails.config.documents.TAKE_OUT_API_KEY || 'PROVIDE_KEY';
 			var serverUrl = sails.config.documents.TAKE_OUT_SERVER_URL || 'https://takeout-pa.clients6.google.com/v1/exports';
-			var pollTime  = 1000;
-			req.setTimeout(10*60*1000);
+			var pollTime  = sails.config.documents.ZIP_JOB_POLL_TIME || 1000;
+			var timeout = sails.config.documents.REQUEST_TIMEOUT_ZIP || 10*60*1000;
+			req.setTimeout(timeout);
 
 		} catch (err) {
 			return resError(res,req,err);
