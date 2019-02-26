@@ -245,8 +245,12 @@ module.exports = {
 		var folderId = sails.config.documents.GDRIVE_FOLDER_ID;
 		var uploadPath = sails.config.documents.UPLOAD_PATH;
 
+		var timeout = sails.config.documents.REQUEST_TIMEOUT_UPLOAD || 10*60*1000;
+		req.setTimeout(timeout);
+
 		// save to disk
 		req.file('file').upload({ dirname:uploadPath },function onUploadComplete (err, files) {
+			if (err) return res.serverError(err);
 			
 			// prepare authentication client
 			jwtClient = new google.auth.JWT(
@@ -382,9 +386,75 @@ module.exports = {
 	
 	// return google link to download zipped folder
 	getProjectDocuments: function(req, res){
-		return res.json(200, {});
 
+		if (!req.param('project_id')){
+			return res.badRequest({ error: { message:'project_id REQUIRED' } });
+		}
 
+		try {
+			var fetch = require('node-fetch');
+			var TAKE_OUT_API_KEY = sails.config.documents.TAKE_OUT_API_KEY || 'PROVIDE_KEY';
+			var serverUrl = sails.config.documents.TAKE_OUT_SERVER_URL || 'https://takeout-pa.clients6.google.com/v1/exports';
+			var pollTime  = sails.config.documents.ZIP_JOB_POLL_TIME || 1000;
+			var timeout = sails.config.documents.REQUEST_TIMEOUT_ZIP || 10*60*1000;
+			req.setTimeout(timeout);
+
+		} catch (err) {
+			return resError(res,req,err);
+		}
+
+		Documents.find({ project_id : req.param('project_id') }, { fields: { 'fileid': 1 } }).then(documents => {
+			if (!documents.length) return res.json( 200, { message: 'NO DOCUMENTS FOUND' } )
+			
+			var files = []
+
+			// construct array of file ids for request
+			_.forEach(documents, document => {
+				if (document.fileid){
+					obj = { 'id': document.fileid }
+					files.push(obj)
+				}
+			})
+
+			// request to start a zip job
+			fetch( serverUrl + '?key=' + TAKE_OUT_API_KEY, { 
+				method: 'POST',
+				headers: { 'origin': 'https://drive.google.com', 'content-type': 'application/json' },
+				body:    JSON.stringify({"archiveFormat":null,"archivePrefix":null,"conversions":null,"items": files,"locale":null}),
+			})
+			.then(res => res.json())
+			.then(json => {
+				// catch api key operational error
+				if (json.error){
+					return res.serverError({ error:json.error });
+				}
+				// poll every pollTime for status
+				var intervalObj = setInterval( () => {
+					fetch( serverUrl + '/' + json.exportJob.id + '?key=' + TAKE_OUT_API_KEY, { 
+					method: 'GET',
+					headers: { 'origin': 'https://drive.google.com', 'content-type': 'application/json' },
+					})
+					.then(res => res.json())
+					.then(json => {
+						// catch api key operational error
+						if (json.error){
+							clearInterval(intervalObj);
+							return res.serverError({error:json.error});
+						}
+						// if in response archive storagePath take it and stop polling
+						if (json.exportJob && json.exportJob.archives && json.exportJob.archives[0].storagePath){
+							download_url = json.exportJob.archives[0].storagePath;
+							clearInterval(intervalObj);
+							return res.json( 200, { download_url : download_url } )
+						}
+					}).catch(err => { clearInterval(intervalObj); return resError(res, req, err); });
+				}, pollTime )
+			}).catch(err => resError(res, req, err));
+		}).catch(err => resError(res, req, err));
+
+		function resError (res, req, err){
+			return res.serverError({ error:{ message:"SERVER ERROR", type: err.type, original_message: err.message } });
+		}
 	},
 	//
 	process: function  (req, res) {
