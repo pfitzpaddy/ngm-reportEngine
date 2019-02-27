@@ -231,61 +231,6 @@ module.exports = {
 
 	},
 
-	// after create ensure not malicious user
-	afterCreate: function ( user, next ) {
-
-		// file system
-		var fs = require('fs');
-
-    // get user by email
-    User
-    	.find()
-    	.where({ admin0pcode: user.admin0pcode, cluster: user.cluster, organization_id: user.organization_id })
-    	.sort('createdAt ASC')
-    	.exec( function( err, admin ){
-
-				// return
-			  if ( err ) return next( err );
-
-			  // if no config file, return, else send email ( PROD )
-			  if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) return next();
-
-			  // if more then 1 user for that org
-				if ( admin.length > 1 ) {
-
-	        // send email
-	        sails.hooks.email.send( 'new-user', {
-	            username: admin[0].username,
-	            newusername: user.username,
-	            name: user.name,
-	            cluster: user.cluster,
-	            position: user.position,
-	            phone: user.phone,
-	            email: user.email,
-	            sendername: 'ReportHub'
-	          }, {
-	            to: admin[0].email,
-	            subject: 'ReportHub - New ' + admin[0].organization + ' User !'
-	          }, function(err) {
-		
-							// return
-						  if ( err ) return next( err );
-
-					  	// next
-							next();
-
-	          });
-
-	    	} else {
-
-			  	// next
-					next();
-
-	    	}
-
-      });
-
-	}
 
 };
 
