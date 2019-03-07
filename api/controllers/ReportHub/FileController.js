@@ -97,9 +97,63 @@ module.exports = {
 	// return array of project documents
 	listProjectDocuments: function(req,res) {
 		if (!req.param('project_id')){
-			return res.json(401, {err: 'fileid required!'});
+			return res.json(401, {err: 'project_id required!'});
 		}
 		Documents.find( { project_id: req.param('project_id') } )
+				 .then( docs => res.json( 200, docs ))
+				 .catch( err => res.negotiate(err) )
+	},
+
+	// return array of report documents
+	listReportDocuments: function(req,res) {
+		if (!req.param('report_id')){
+			return res.json(401, {err: 'report_id required!'});
+		}
+		Documents.find( { report_id: req.param('report_id') } )
+				 .then( docs => res.json( 200, docs ))
+				 .catch( err => res.negotiate(err) )
+	},
+
+	// return array of documents
+	listDocuments: function(req,res) {
+
+		allowed_params = ['project_id','report_id','organization_tag','cluster_id','admin0pcode','adminRpcode', 'start_date', 'end_date', 'type'];
+		
+		// types of documents
+		types = { M:'monthly', P: 'project', W: 'weekly', C: 'custom' };
+
+		// query params value for all docs
+		ALL   = 'all' ;
+
+		var params = req.allParams();
+
+		// at least 1 param present
+		if(!_.keys(params).filter(v=>allowed_params.includes(v)).length){
+			  return res.json(401, { error : { message: allowed_params.join(', ') + ' required!' } });
+		}
+
+		// check here if user allowed for action with incoming query params
+		// TODO: middleware if the action allowed 
+
+		var filter = {
+			adminRpcode: params.adminRpcode ? params.adminRpcode : null,
+			admin0pcode: params.admin0pcode ? params.admin0pcode : null,
+			cluster_id: params.cluster_id ? params.cluster_id : null,
+			organization_tag: params.organization_tag ? params.organization_tag : null,
+			project_id: params.project_id ? params.project_id : null,
+			report_id: params.report_id ? params.report_id : null,
+			reporting_period: params.type===types.M && params.start_date && params.end_date ? 
+								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null,
+			project_start_date: params.type===types.P && params.start_date && params.end_date ? 
+								{ '<=' : new Date( params.end_date ) } : null,
+			project_end_date: params.type===types.P && params.start_date && params.end_date ? 
+								{ '>=' : new Date( params.start_date ) } : null,
+		}
+
+		// remove key:value from filter query if value is null or all
+		filter = _.omit(filter, (v,k,o)=>v===null||v===ALL)
+
+		Documents.find( filter )
 				 .then( docs => res.json( 200, docs ))
 				 .catch( err => res.negotiate(err) )
 	},
@@ -275,6 +329,10 @@ module.exports = {
 			if (req.body.project_id){
 				fileMetadata.description = "project_id: " + req.body.project_id;
 			}
+			if (req.body.report_id){
+				fileMetadata.description ? fileMetadata.description += ", ":"";
+				fileMetadata.description += "report_id: " + req.body.report_id;
+			}
 
 			// set file media from file on disk
 			var media = {
@@ -358,6 +416,18 @@ module.exports = {
 				// set variable metadata TODO: refactor
 				if (req.body.project_id){
 					fileDescriptor.project_id = req.body.project_id;
+				}
+				if (req.body.report_id){
+					fileDescriptor.report_id = req.body.report_id;
+				}
+				if (req.body.project_start_date){
+					fileDescriptor.project_start_date = req.body.project_start_date;
+				}
+				if (req.body.project_end_date){
+					fileDescriptor.project_end_date = req.body.project_end_date;
+				}
+				if (req.body.reporting_period){
+					fileDescriptor.reporting_period = req.body.reporting_period;
 				}
 				if (req.body.username){
 					fileDescriptor.fileowner = req.body.username;

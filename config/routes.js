@@ -76,7 +76,9 @@ module.exports.routes = {
 
   // Documents
   'GET /listProjectDocuments/:project_id': 'ReportHub/FileController.listProjectDocuments',
-  
+  'GET /listReportDocuments/:report_id': 'ReportHub/FileController.listReportDocuments',
+  'GET /listDocuments': 'ReportHub/FileController.listDocuments',
+
   'POST /uploadGDrive': 'ReportHub/FileController.uploadGDrive',
   'POST /uploadLocal': 'ReportHub/FileController.uploadLocal',
 
