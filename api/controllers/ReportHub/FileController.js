@@ -500,7 +500,7 @@ module.exports = {
 	},
 	// return zipped report documents link
 	getReportDocuments: function( req, res, filter ){
-		if (!req.param('project_id')){
+		if (!req.param('report_id')){
 			return res.badRequest({ error: { message:'report_id REQUIRED' } });
 		}
 		filter = { report_id : req.param('report_id') }
