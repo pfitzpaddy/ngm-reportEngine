@@ -356,13 +356,13 @@ module.exports = {
 					fileDescriptor.report_id = req.body.report_id;
 				}
 				if (req.body.project_start_date){
-					fileDescriptor.project_start_date = req.body.project_start_date;
+					fileDescriptor.project_start_date = new Date(req.body.project_start_date);
 				}
 				if (req.body.project_end_date){
-					fileDescriptor.project_end_date = req.body.project_end_date;
+					fileDescriptor.project_end_date = new Date(req.body.project_end_date);
 				}
 				if (req.body.reporting_period){
-					fileDescriptor.reporting_period = req.body.reporting_period;
+					fileDescriptor.reporting_period = new Date(req.body.reporting_period);
 				}
 				if (req.body.username){
 					fileDescriptor.fileowner = req.body.username;
@@ -370,8 +370,11 @@ module.exports = {
 				if (req.session.session_user && req.session.session_user.username){
 					fileDescriptor.fileowner = req.session.session_user.username;
 				}
+				if (req.body.adminRpcode){
+					fileDescriptor.adminRpcode = req.body.adminRpcode.toUpperCase();
+				}
 				if (req.body.admin0pcode){
-					fileDescriptor.admin0pcode = req.body.admin0pcode;
+					fileDescriptor.admin0pcode = req.body.admin0pcode.toUpperCase();
 				}
 				if (req.session.session_user && req.session.session_user.admin0pcode){
 					fileDescriptor.admin0pcode = req.session.session_user.admin0pcode;
