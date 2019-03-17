@@ -94,76 +94,11 @@ module.exports = {
 
 	},
 
-	// return array of project documents
-	listProjectDocuments: function(req,res) {
-		if (!req.param('project_id')){
-			return res.json(401, {err: 'project_id required!'});
-		}
-		Documents.find( { project_id: req.param('project_id') } )
-				 .then( docs => res.json( 200, docs ))
-				 .catch( err => res.negotiate(err) )
-	},
-
-	// return array of report documents
-	listReportDocuments: function(req,res) {
-		if (!req.param('report_id')){
-			return res.json(401, {err: 'report_id required!'});
-		}
-		Documents.find( { report_id: req.param('report_id') } )
-				 .then( docs => res.json( 200, docs ))
-				 .catch( err => res.negotiate(err) )
-	},
-
-	// return array of documents
-	listDocuments: function(req,res) {
-
-		allowed_params = ['project_id','report_id','organization_tag','cluster_id','admin0pcode','adminRpcode', 'start_date', 'end_date', 'type'];
-		
-		// types of documents
-		types = { M:'monthly', P: 'project', W: 'weekly', C: 'custom' };
-
-		// query params value for all docs
-		ALL   = 'all' ;
-
-		var params = req.allParams();
-
-		// at least 1 param present
-		if(!_.keys(params).filter(v=>allowed_params.includes(v)).length){
-			  return res.json(401, { error : { message: allowed_params.join(', ') + ' required!' } });
-		}
-
-		// check here if user allowed for action with incoming query params
-		// TODO: middleware if the action allowed 
-
-		var filter = {
-			adminRpcode: params.adminRpcode ? params.adminRpcode : null,
-			admin0pcode: params.admin0pcode ? params.admin0pcode : null,
-			cluster_id: params.cluster_id ? params.cluster_id : null,
-			organization_tag: params.organization_tag ? params.organization_tag : null,
-			project_id: params.project_id ? params.project_id : null,
-			report_id: params.report_id ? params.report_id : null,
-			reporting_period: params.type===types.M && params.start_date && params.end_date ? 
-								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null,
-			project_start_date: params.type===types.P && params.start_date && params.end_date ? 
-								{ '<=' : new Date( params.end_date ) } : null,
-			project_end_date: params.type===types.P && params.start_date && params.end_date ? 
-								{ '>=' : new Date( params.start_date ) } : null,
-		}
-
-		// remove key:value from filter query if value is null or all
-		filter = _.omit(filter, (v,k,o)=>v===null||v===ALL)
-
-		Documents.find( filter )
-				 .then( docs => res.json( 200, docs ))
-				 .catch( err => res.negotiate(err) )
-	},
-
 	// download local file
 	getLocalProjectDocument: function(req,res){
 		if (!req.param('fileid')){
 			return res.json(401, {err: 'fileid required!'});
 		}
-		console.log(sails.config.documents.UPLOAD_PATH)
 		Documents.findOne( { fileid_local: req.param('fileid') } )
 					.then(doc => {
 						doc = doc || {fileid_local:"NOTFOUND"};
@@ -298,14 +233,14 @@ module.exports = {
 		var privatkey = sails.config.documents.CREDENTIALS;
 		var folderId = sails.config.documents.GDRIVE_FOLDER_ID;
 		var uploadPath = sails.config.documents.UPLOAD_PATH;
-
+		var maxBytes = sails.config.documents.MAX_BYTES || 15000000; 
 		var timeout = sails.config.documents.REQUEST_TIMEOUT_UPLOAD || 10*60*1000;
 		req.setTimeout(timeout);
+		var hrstart = process.hrtime()
 
 		// save to disk
-		req.file('file').upload({ dirname:uploadPath },function onUploadComplete (err, files) {
+		req.file('file').upload({ dirname:uploadPath, maxBytes:maxBytes },function onUploadComplete (err, files) {
 			if (err) return res.serverError(err);
-			
 			// prepare authentication client
 			jwtClient = new google.auth.JWT(
 				privatkey.client_email,
@@ -421,13 +356,13 @@ module.exports = {
 					fileDescriptor.report_id = req.body.report_id;
 				}
 				if (req.body.project_start_date){
-					fileDescriptor.project_start_date = req.body.project_start_date;
+					fileDescriptor.project_start_date = new Date(req.body.project_start_date);
 				}
 				if (req.body.project_end_date){
-					fileDescriptor.project_end_date = req.body.project_end_date;
+					fileDescriptor.project_end_date = new Date(req.body.project_end_date);
 				}
 				if (req.body.reporting_period){
-					fileDescriptor.reporting_period = req.body.reporting_period;
+					fileDescriptor.reporting_period = new Date(req.body.reporting_period);
 				}
 				if (req.body.username){
 					fileDescriptor.fileowner = req.body.username;
@@ -435,8 +370,11 @@ module.exports = {
 				if (req.session.session_user && req.session.session_user.username){
 					fileDescriptor.fileowner = req.session.session_user.username;
 				}
+				if (req.body.adminRpcode){
+					fileDescriptor.adminRpcode = req.body.adminRpcode.toUpperCase();
+				}
 				if (req.body.admin0pcode){
-					fileDescriptor.admin0pcode = req.body.admin0pcode;
+					fileDescriptor.admin0pcode = req.body.admin0pcode.toUpperCase();
 				}
 				if (req.session.session_user && req.session.session_user.admin0pcode){
 					fileDescriptor.admin0pcode = req.session.session_user.admin0pcode;
@@ -454,12 +392,125 @@ module.exports = {
 		
 	},
 	
-	// return google link to download zipped folder
-	getProjectDocuments: function(req, res){
+	// get documents` request params and validate
+	_getParams: function( req, res ){
 
+		allowed_params = [ 'project_id','report_id','organization_tag','cluster_id','admin0pcode','adminRpcode', 'start_date', 'end_date', 'type' ];
+		
+		// types of documents
+		types = { monthly:'monthly', project: 'project', weekly: 'weekly', custom: 'custom', all: 'all' };
+
+		// query params value for all docs
+		ALL   = 'all' ;
+
+		var params = req.allParams();
+		params.types = types;
+		params.ALL = ALL;
+
+		// at least 1 param present
+		if (!_.keys(params).filter(v=>allowed_params.includes(v)).length){
+			res.json(401, { error : { message: allowed_params.join(', ') + ' required!' } });
+			return false
+		} else if (  params.type && !Object.values(types).includes(params.type) ) {
+			res.json(401, { error : { message: Object.values(types).join(', ') + ' types required!' } });
+			return false
+		} else {
+
+			// check here if user allowed for action with incoming query params
+			// TODO: middleware if the action allowed
+
+			return params
+		}
+	},
+
+	// construct filter for documents
+	_getFilter: function( params ){
+
+		var filter = {
+			adminRpcode: params.adminRpcode ? params.adminRpcode.toUpperCase() : null,
+			admin0pcode: params.admin0pcode ? params.admin0pcode.toUpperCase() : null,
+			cluster_id: params.cluster_id ? params.cluster_id : null,
+			organization_tag: params.organization_tag ? params.organization_tag : null,
+			project_id: params.project_id ? params.project_id : null,
+			report_id: params.report_id ? params.report_id : null,
+			reporting_period: params.type===params.types.monthly && params.start_date && params.end_date ? 
+								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null,
+			project_start_date: params.type===params.types.project && params.start_date && params.end_date ? 
+								{ '<=' : new Date( params.end_date ) } : null,
+			project_end_date: params.type===params.types.project && params.start_date && params.end_date ? 
+								{ '>=' : new Date( params.start_date ) } : null,
+		}
+
+		// remove key:value from filter query if value is null or all
+		filter = _.omit(filter, (v,k,o)=>v===null||v===params.ALL)
+
+		return filter
+	},
+
+	// return array of documents meta by query params
+	listDocuments: function(req,res) {
+
+		params = this._getParams( req, res )
+
+		if (params){
+			filter = this._getFilter( params )
+			Documents.find( filter )
+					.then( docs => res.json( 200, docs ))
+					.catch( err => res.negotiate(err) )
+		}
+	},
+
+	// return array of project meta documents
+	listProjectDocuments: function(req,res) {
+		if (!req.param('project_id')){
+			return res.json(401, {err: 'project_id required!'});
+		}
+		Documents.find( { project_id: req.param('project_id') } )
+				 .then( docs => res.json( 200, docs ))
+				 .catch( err => res.negotiate(err) )
+	},
+
+	// return array of report meta documents
+	listReportDocuments: function(req,res) {
+		if (!req.param('report_id')){
+			return res.json(401, {err: 'report_id required!'});
+		}
+		Documents.find( { report_id: req.param('report_id') } )
+				 .then( docs => res.json( 200, docs ))
+				 .catch( err => res.negotiate(err) )
+	},
+
+	// return zipped documents link by query params
+	getDocuments: function( req, res ){
+		params = this._getParams( req, res )
+		if (params) {
+			filter = this._getFilter(params)
+			this._getZippedDocuments( req, res, filter )}
+	},
+
+	// return zipped project documents link
+	getProjectDocuments: function( req, res, filter ){
 		if (!req.param('project_id')){
 			return res.badRequest({ error: { message:'project_id REQUIRED' } });
 		}
+		filter = { project_id : req.param('project_id') }
+
+		this._getZippedDocuments( req, res, filter )
+
+	},
+	// return zipped report documents link
+	getReportDocuments: function( req, res, filter ){
+		if (!req.param('project_id')){
+			return res.badRequest({ error: { message:'report_id REQUIRED' } });
+		}
+		filter = { report_id : req.param('report_id') }
+
+		this._getZippedDocuments( req, res, filter )
+
+	},
+
+	// return google link to download zipped folder
+	_getZippedDocuments: function( req, res, filter ){
 
 		try {
 			var fetch = require('node-fetch');
@@ -473,7 +524,7 @@ module.exports = {
 			return resError(res,req,err);
 		}
 
-		Documents.find({ project_id : req.param('project_id') }, { fields: { 'fileid': 1 } }).then(documents => {
+		Documents.find( filter , { fields: { 'fileid': 1 } }).then(documents => {
 			if (!documents.length) return res.json( 200, { message: 'NO DOCUMENTS FOUND' } )
 			
 			var files = []
@@ -526,6 +577,7 @@ module.exports = {
 			return res.serverError({ error:{ message:"SERVER ERROR", type: err.type, original_message: err.message } });
 		}
 	},
+	
 	//
 	process: function  (req, res) {
 

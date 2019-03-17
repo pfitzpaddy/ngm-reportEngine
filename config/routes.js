@@ -83,6 +83,9 @@ module.exports.routes = {
   'POST /uploadLocal': 'ReportHub/FileController.uploadLocal',
 
   'GET /getProjectDocuments/:project_id': 'ReportHub/FileController.getProjectDocuments',
+  'GET /getReportDocuments/:report_id': 'ReportHub/FileController.getReportDocuments',
+  'GET /getDocuments': 'ReportHub/FileController.getDocuments',
+
 
   'DELETE /deleteGDriveFile/:fileid': 'ReportHub/FileController.deleteGDriveFile',
   // 'DELETE /deleteGDriveFilePermanently/:fileid': 'ReportHub/FileController.deleteGDriveFilePermanently',
