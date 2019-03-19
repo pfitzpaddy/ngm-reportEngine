@@ -452,8 +452,9 @@ module.exports = {
 								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null
 		}
 
+		params.ALL_UC = params.ALL.toUpperCase()
 		// remove key:value from filter query if value is null or all
-		filter = _.omit(filter, (v,k,o)=>v===null||v===params.ALL)
+		filter = _.omit(filter, (v,k,o)=>v===null||v===params.ALL||v===params.ALL_UC)
 
 		return filter
 	},
