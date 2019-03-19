@@ -367,30 +367,35 @@ module.exports = {
 				if (req.body.username){
 					fileDescriptor.fileowner = req.body.username;
 				}
-				if (req.session.session_user && req.session.session_user.username){
-					fileDescriptor.fileowner = req.session.session_user.username;
-				}
 				if (req.body.adminRpcode){
 					fileDescriptor.adminRpcode = req.body.adminRpcode.toUpperCase();
 				}
 				if (req.body.admin0pcode){
 					fileDescriptor.admin0pcode = req.body.admin0pcode.toUpperCase();
 				}
-				if (req.session.session_user && req.session.session_user.admin0pcode){
-					fileDescriptor.admin0pcode = req.session.session_user.admin0pcode;
-				}
 				if (req.body.organization_tag){
 					fileDescriptor.organization_tag = req.body.organization_tag;
-				}
-				if (req.session.session_user && req.session.session_user.organization_tag){
-					fileDescriptor.organization_tag = req.session.session_user.organization_tag;
 				}
 				if (req.body.cluster_id){
 					fileDescriptor.cluster_id = req.body.cluster_id;
 				}
-				if (req.session.session_user && req.session.session_user.cluster_id){
-					fileDescriptor.cluster_id = req.session.session_user.cluster_id;
-				}
+
+				// set user's meta, who does action ( TODO: action permissions )
+				if (req.session.session_user && req.session.session_user.username){
+					fileDescriptor.fileowner = req.session.session_user.username;
+				}	
+				// if (req.session.session_user && req.body.adminRpcode){
+				// 	fileDescriptor.adminRpcode = req.session.session_user.adminRpcode.toUpperCase();
+				// }
+				// if (req.session.session_user && req.session.session_user.admin0pcode){
+				// 	fileDescriptor.admin0pcode = req.session.session_user.admin0pcode.toUpperCase();
+				// }				
+				// if (req.session.session_user && req.session.session_user.organization_tag){
+				// 	fileDescriptor.organization_tag = req.session.session_user.organization_tag;
+				// }				
+				// if (req.session.session_user && req.session.session_user.cluster_id){
+				// 	fileDescriptor.cluster_id = req.session.session_user.cluster_id;
+				// }
 
 				return fileDescriptor
 			}
