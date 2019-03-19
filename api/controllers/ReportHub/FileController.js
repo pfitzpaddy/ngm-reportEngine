@@ -417,8 +417,11 @@ module.exports = {
 		if (!_.keys(params).filter(v=>allowed_params.includes(v)).length){
 			res.json(401, { error : { message: allowed_params.join(', ') + ' required!' } });
 			return false
-		} else if (  params.type && !Object.values(types).includes(params.type) ) {
+		} else if ( params.type && !Object.values(types).includes(params.type) ) {
 			res.json(401, { error : { message: Object.values(types).join(', ') + ' types required!' } });
+			return false
+		} else if ( params.type && !Date.parse(params.start_date) || !Date.parse(params.end_date) ) {
+			res.json(401, { error : { message: 'start_date, end_date required!' } });
 			return false
 		} else {
 
@@ -445,6 +448,8 @@ module.exports = {
 								{ '<=' : new Date( params.end_date ) } : null,
 			project_end_date: params.type===params.types.project && params.start_date && params.end_date ? 
 								{ '>=' : new Date( params.start_date ) } : null,
+			createdAt: params.type===params.types.all ? 
+								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null
 		}
 
 		// remove key:value from filter query if value is null or all
