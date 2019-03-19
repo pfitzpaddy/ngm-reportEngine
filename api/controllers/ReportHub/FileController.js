@@ -348,7 +348,7 @@ module.exports = {
 
 			var setFileMetaOptionalParam = function(fileDescriptor){
 
-				// set variable metadata TODO: refactor
+				// set variable metadata TODO: refactor ( use schema )
 				if (req.body.project_id){
 					fileDescriptor.project_id = req.body.project_id;
 				}
@@ -384,6 +384,12 @@ module.exports = {
 				}
 				if (req.session.session_user && req.session.session_user.organization_tag){
 					fileDescriptor.organization_tag = req.session.session_user.organization_tag;
+				}
+				if (req.body.cluster_id){
+					fileDescriptor.cluster_id = req.body.cluster_id;
+				}
+				if (req.session.session_user && req.session.session_user.cluster_id){
+					fileDescriptor.cluster_id = req.session.session_user.cluster_id;
 				}
 
 				return fileDescriptor
