@@ -367,30 +367,35 @@ module.exports = {
 				if (req.body.username){
 					fileDescriptor.fileowner = req.body.username;
 				}
-				if (req.session.session_user && req.session.session_user.username){
-					fileDescriptor.fileowner = req.session.session_user.username;
-				}
 				if (req.body.adminRpcode){
 					fileDescriptor.adminRpcode = req.body.adminRpcode.toUpperCase();
 				}
 				if (req.body.admin0pcode){
 					fileDescriptor.admin0pcode = req.body.admin0pcode.toUpperCase();
 				}
-				if (req.session.session_user && req.session.session_user.admin0pcode){
-					fileDescriptor.admin0pcode = req.session.session_user.admin0pcode;
-				}
 				if (req.body.organization_tag){
 					fileDescriptor.organization_tag = req.body.organization_tag;
-				}
-				if (req.session.session_user && req.session.session_user.organization_tag){
-					fileDescriptor.organization_tag = req.session.session_user.organization_tag;
 				}
 				if (req.body.cluster_id){
 					fileDescriptor.cluster_id = req.body.cluster_id;
 				}
-				if (req.session.session_user && req.session.session_user.cluster_id){
-					fileDescriptor.cluster_id = req.session.session_user.cluster_id;
-				}
+
+				// set user's meta, who does action ( TODO: action permissions )
+				if (req.session.session_user && req.session.session_user.username){
+					fileDescriptor.fileowner = req.session.session_user.username;
+				}	
+				// if (req.session.session_user && req.body.adminRpcode){
+				// 	fileDescriptor.adminRpcode = req.session.session_user.adminRpcode.toUpperCase();
+				// }
+				// if (req.session.session_user && req.session.session_user.admin0pcode){
+				// 	fileDescriptor.admin0pcode = req.session.session_user.admin0pcode.toUpperCase();
+				// }				
+				// if (req.session.session_user && req.session.session_user.organization_tag){
+				// 	fileDescriptor.organization_tag = req.session.session_user.organization_tag;
+				// }				
+				// if (req.session.session_user && req.session.session_user.cluster_id){
+				// 	fileDescriptor.cluster_id = req.session.session_user.cluster_id;
+				// }
 
 				return fileDescriptor
 			}
@@ -417,8 +422,11 @@ module.exports = {
 		if (!_.keys(params).filter(v=>allowed_params.includes(v)).length){
 			res.json(401, { error : { message: allowed_params.join(', ') + ' required!' } });
 			return false
-		} else if (  params.type && !Object.values(types).includes(params.type) ) {
+		} else if ( params.type && !Object.values(types).includes(params.type) ) {
 			res.json(401, { error : { message: Object.values(types).join(', ') + ' types required!' } });
+			return false
+		} else if ( params.type && !Date.parse(params.start_date) || !Date.parse(params.end_date) ) {
+			res.json(401, { error : { message: 'start_date, end_date required!' } });
 			return false
 		} else {
 
@@ -445,10 +453,13 @@ module.exports = {
 								{ '<=' : new Date( params.end_date ) } : null,
 			project_end_date: params.type===params.types.project && params.start_date && params.end_date ? 
 								{ '>=' : new Date( params.start_date ) } : null,
+			createdAt: params.type===params.types.all ? 
+								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null
 		}
 
+		params.ALL_UC = params.ALL.toUpperCase()
 		// remove key:value from filter query if value is null or all
-		filter = _.omit(filter, (v,k,o)=>v===null||v===params.ALL)
+		filter = _.omit(filter, (v,k,o)=>v===null||v===params.ALL||v===params.ALL_UC)
 
 		return filter
 	},
