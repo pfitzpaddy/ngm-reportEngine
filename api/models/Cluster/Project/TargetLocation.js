@@ -183,6 +183,24 @@ module.exports = {
 			type: 'array'
 		},
 
+		//CO
+		strategic_objective_id:{
+			type: 'string'
+
+		},
+		strategic_objective_name:{
+			type: 'string'
+
+		},
+		sector_objective_id:{
+			type:'string'
+
+		},
+		sector_objective_name:{
+			type:'string'
+
+		},
+
 		// based on dtm
 		site_id: {
 			type: 'string'

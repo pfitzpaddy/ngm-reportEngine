@@ -147,10 +147,29 @@ module.exports = {
 			type: 'array'
 		},
 
+		//CO
+		strategic_objective_id:{
+			type: 'string'
+
+		},
+		strategic_objective_name:{
+			type: 'string'
+
+		},
+		sector_objective_id:{
+			type:'string'
+
+		},
+		sector_objective_name:{
+			type:'string'
+
+		},
+
 		// category
 		category_type_id: {
 			type: 'string'
 		},
+
 		category_type_name: {
 			type: 'string'
 		},
