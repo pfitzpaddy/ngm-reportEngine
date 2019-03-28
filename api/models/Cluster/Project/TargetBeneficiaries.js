@@ -184,6 +184,19 @@ module.exports = {
 			required: true
 		},
 
+
+		// beneficiary category
+
+		beneficiary_category_id: {
+			type: 'string'
+		},
+
+		beneficiary_category_name: {
+			type: 'string'
+
+			
+		},
+
 		// activity_type
 		activity_type_id: {
 			type: 'string',
