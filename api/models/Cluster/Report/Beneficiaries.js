@@ -146,6 +146,24 @@ module.exports = {
 			type: 'array'
 		},
 
+		//CO
+		strategic_objective_id:{
+			type: 'string'
+
+		},
+		strategic_objective_name:{
+			type: 'string'
+
+		},
+		sector_objective_id:{
+			type:'string'
+
+		},
+		sector_objective_name:{
+			type:'string'
+
+		},
+
 		// report
 		report_id: {
 			type: 'string',
@@ -196,6 +214,19 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
+		// beneficiary category
+
+		beneficiary_category_id: {
+			type: 'string'
+		},
+
+		beneficiary_category_name: {
+			type: 'string'
+
+			
+		},
+		
 		distribution_start_date: {
 			type: 'date'
 		},

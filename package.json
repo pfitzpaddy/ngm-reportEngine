@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "async": "^2.6.1",
+    "bcrypt-nodejs": "0.0.3",
     "deep-assign": "^2.0.0",
     "ejs": "~0.8.4",
     "googleapis": "^37.2.0",

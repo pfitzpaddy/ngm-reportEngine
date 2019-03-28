@@ -183,6 +183,8 @@ module.exports = {
 			type: 'array'
 		},
 
+		
+
 		// based on dtm
 		site_id: {
 			type: 'string'
