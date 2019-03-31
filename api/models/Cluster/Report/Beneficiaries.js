@@ -153,10 +153,16 @@ module.exports = {
 		strategic_objective_name:{
 			type: 'string'
 		},
+		strategic_objective_description:{
+			type: 'string'
+		},
 		sector_objective_id:{
 			type:'string'
 		},
 		sector_objective_name:{
+			type:'string'
+		},
+		sector_objective_description:{
 			type:'string'
 		},
 		strategic_objective_descriptions: {
