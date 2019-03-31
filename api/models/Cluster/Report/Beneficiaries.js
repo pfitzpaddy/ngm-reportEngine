@@ -141,27 +141,26 @@ module.exports = {
 			type: 'array'
 		},
 
-		// SOs
+		// SOs ( afg only )
 		strategic_objectives: {
 			type: 'array'
 		},
 
-		//CO
+		// SOs ( new implementation )
 		strategic_objective_id:{
 			type: 'string'
-
 		},
 		strategic_objective_name:{
 			type: 'string'
-
 		},
 		sector_objective_id:{
 			type:'string'
-
 		},
 		sector_objective_name:{
 			type:'string'
-
+		},
+		strategic_objective_descriptions: {
+			type: 'array'
 		},
 
 		// report
