@@ -176,6 +176,8 @@ module.exports.routes = {
   // STOCK / ACTIVITY REPORTS TASKS
   'GET /cluster/report/setStocksToDo': 'Cluster/Reports/ReportTasksController.setStocksToDo',
   'GET /cluster/report/setReportsToDo': 'Cluster/Reports/ReportTasksController.setReportsToDo',
+  'GET /cluster/report/setReportsToDoPreviousMonth': 'Cluster/Reports/ReportTasksController.setReportsToDoPreviousMonth',
+
   'GET /cluster/report/setReportsOpen': 'Cluster/Reports/ReportTasksController.setReportsOpen',
   'GET /cluster/report/setReportsReminder': 'Cluster/Reports/ReportTasksController.setReportsReminder',
 
