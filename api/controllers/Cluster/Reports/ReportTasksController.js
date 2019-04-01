@@ -197,6 +197,99 @@ module.exports = {
 
   },
 
+  setReportsToDoPreviousMonth: function( req, res ) {
+
+    // libs
+    var _under = require('underscore'),
+        moment = require('moment');
+
+    // only run if date is above monthly reporting period
+    // if ( moment().date() === 1 ) {
+
+      // find active projects
+      Project
+        .find()
+        .where( { project_start_date: { $lte: moment().subtract(1, 'month' ).endOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
+        .where( { project_end_date: { $gte: moment().subtract(1, 'month' ).startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
+        .exec( function( err, projects ){
+
+          console.log(projects.length)
+
+          // return error
+          if ( err ) return res.negotiate( err );
+
+          // counter
+          var counter = 0;
+              length = projects.length;
+
+          // for each project
+          projects.forEach( function( project, i ){
+
+            // create report
+            var r = {
+              project_id: projects[i].id,
+              report_status: 'todo',
+              report_active: true,
+              report_month: moment().subtract(1, 'month' ).month(),
+              report_year: moment().subtract(1, 'month' ).year(),
+              reporting_period: moment().subtract(1, 'month' ).set( 'date', 1 ).format(),
+              reporting_due_date: moment().subtract(1, 'month' ).add( 1, 'M' ).set( 'date', 10 ).format()
+            };
+
+            // clone project
+            var p = _under.clone( projects[i] );
+                    delete p.id;
+
+            // create report
+            var newReport = _under.extend( {}, r, p );
+
+            // create reports
+            Report
+              .findOrCreate( {
+                  project_id: newReport.project_id,
+                  report_month: newReport.report_month,
+                  report_year: newReport.report_year
+                }, newReport )
+              .exec( function( err, report ) {
+
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                // get target_locations
+                TargetLocation
+                  .find()
+                  .where( { project_id: r.project_id } )
+                  .exec( function( err, target_locations ){
+
+                    // return error
+                    if ( err ) return res.negotiate( err );
+
+                    // create report locations
+                    Location
+                      .createNewReportLocations( report, target_locations, function( err, locations ){
+
+                        // return error
+                        if ( err ) return res.negotiate( err );
+
+                        // counter
+                        counter++;
+                        if ( counter === length ) {
+                          return res.json( 200, { msg: 'success' } );
+                        }
+
+                    });
+
+                });
+            });
+
+          });
+
+      });
+
+    // } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
+
+  },
+
   // send notification for new reporting period
     // run this on return of above method on 1st day of the month
   setReportsOpen: function( req, res ) {
