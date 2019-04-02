@@ -46,11 +46,11 @@ module.exports = {
 		},
 		cluster_id: {
 			type: 'string',
-			required: true
+			// required: true
 		},
 		cluster: {
 			type: 'string',
-			required: true
+			// required: true
 		},
 		username: {
 			type: 'string'
