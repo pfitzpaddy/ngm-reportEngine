@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl http://reporthub.immap.org/api/cluster/report/setReportsReminder
+curl https://reporthub.immap.org/api/cluster/report/setReportsReminder

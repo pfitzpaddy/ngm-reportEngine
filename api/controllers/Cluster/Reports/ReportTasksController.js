@@ -18,7 +18,7 @@ module.exports = {
     var reports = [];
 
     // only run if date is above monthly reporting period
-    if ( moment().date() === 1 ) {
+    // if ( moment().date() === 1 ) {
 
       Organization
         .find({ organization_tag: { '!': null } })
@@ -98,7 +98,95 @@ module.exports = {
 
         });
 
-    } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
+    // } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
+
+  },
+
+  // set stock reports ToDo from previous month
+  setStocksToDoPreviousMonth: function( req, res ) {
+
+    // tools
+    var moment = require('moment');
+    // variables
+    var reports = [];
+
+      Organization
+        .find({ organization_tag: { '!': null } })
+        .exec( function( err, organizations ){
+
+          // return error
+          if ( err ) return res.negotiate( err );
+
+          // counters
+          var counter = 0,
+              length = organizations.length;
+
+          // organizations
+          organizations.forEach(function( d ){
+
+            // create report
+            var report = {
+              report_status: 'todo',
+              report_active: true,
+              report_month: moment().subtract( 1, 'month' ).month(),
+              report_year: moment().subtract( 1, 'month' ).year(),
+              reporting_period: moment().subtract(1, 'month' ).set('date', 1).format(),
+              reporting_due_date: moment().subtract(1, 'month' ).add( 1, 'M' ).set('date', 10 ).format(),
+              stocklocations: []
+            };
+
+            // merge with organization
+            report = _.merge( {}, report, d );
+            report.organization_id = report.id;
+            delete report.id;
+
+            // warehouses
+            StockWarehouse
+              .find( { organization_id: report.organization_id } )
+              .exec(function(err, warehouses){
+
+                // return error
+                if ( err ) return res.negotiate( err );
+
+                // remove ids
+                warehouses.forEach( function( warehouse, i ) {
+                  warehouses[i].stock_warehouse_id = warehouse.id;
+                  warehouses[i].report_month = report.report_month;
+                  warehouses[i].report_year = report.report_year;
+                  delete warehouses[i].id;
+                });
+
+                // set locations
+                report.stocklocations = warehouses;
+
+                if(!report.stocklocations.length) {
+                  report.report_status = 'pending';
+                  report.report_active = false;
+                }
+                // create reports
+                StockReport
+                  .updateOrCreate( {
+                      organization_id: report.organization_id,
+                      report_month: report.report_month,
+                      report_year: report.report_year
+                    }, report, function( err, new_report ) {
+
+                    // return error
+                    if ( err ) return res.negotiate( err );
+
+                    // counter
+                    counter++;
+                    if ( counter === length ) {
+                      return res.json( 200, { msg: 'success' } );
+                    }
+
+                });
+
+            });
+
+          });
+
+        });
 
   },
 
