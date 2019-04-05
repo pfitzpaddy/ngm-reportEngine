@@ -267,6 +267,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		site_name_alternative: {
+			type: 'string'
+		},
 		site_hub_id: {
 			type: 'string'
 		},
