@@ -441,7 +441,7 @@ module.exports = {
                 cluster: location.cluster,
                 username: location.username,
                 project_title: location.project_title,
-                report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+                report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
               };
             }
 
@@ -472,7 +472,7 @@ module.exports = {
                 cluster: location.cluster,
                 username: location.username,
                 project_title: location.project_title,
-                report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+                report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
               };
             }
 
@@ -654,7 +654,7 @@ module.exports = {
               nStore[ location.email ].projectsStore[ location.project_id ].reports.push({
                 report_value: location.report_month,
                 report_month: moment( location.reporting_period ).format( 'MMMM' ),
-                report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+                report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
               });
               // avoids report row per location
               nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] = [{ report: true }];
@@ -710,7 +710,7 @@ module.exports = {
                 nStore[ location.email ].projectsStore[ location.project_id ].reports.push({
                   report_value: location.report_month,
                   report_month: moment( location.reporting_period ).format( 'MMMM' ),
-                  report_url: req.protocol + '://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+                  report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
                 });
                 // avoids report row per location
                 nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] = [{ report: true }];
