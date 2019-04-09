@@ -166,7 +166,7 @@ module.exports = {
 			type:'string'
 		},
 		strategic_objective_descriptions: {
-			type: 'array'
+			type: 'json'
 		},
 
 		// report
