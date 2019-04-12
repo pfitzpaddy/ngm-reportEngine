@@ -119,6 +119,14 @@ module.exports = {
 			type: 'string'
 		},
 
+		// location group
+		location_group_id: {
+			type: 'string',
+		},
+		location_group_name: {
+			type: 'string',
+		},
+
 		// project
 		project_id: {
 			type: 'string',
@@ -179,24 +187,9 @@ module.exports = {
 		project_donor: {
 			type: 'array'
 		},
-		activity_type: {
-			type: 'array',
-			required: true
-		},
-		activity_description: {
-			type: 'array'
-		},
 
 		// SOs
 		strategic_objectives: {
-			type: 'array'
-		},
-
-		// target beneficiaries
-		category_type: {
-			type: 'array'
-		},
-		beneficiary_type: {
 			type: 'array'
 		},
 

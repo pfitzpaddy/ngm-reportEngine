@@ -267,103 +267,38 @@ module.exports = {
     }
 
     // project for UI
-    var $project = {};
+    var project = {};
 
-    // get project by organization_id
-    Project
-      .findOne( { id: req.param('id') } )
-      .exec( function( err, project ){
+    // either that or drop the whole schema
+    var Promise = require('bluebird');
 
-        // return error
-        if ( err ) return res.negotiate( err );
+    // promise
+    Promise.all([
+      Project.find( { id: req.param('id') } ),
+      BudgetProgress.find( { project_id: req.param('id') } ),
+      TargetBeneficiaries.find( { project_id: req.param('id') } ),
+      TargetLocation.find( { project_id: req.param('id') } )
+    ])
+    .catch( function( err ) {
+      return res.negotiate( err );
+    })
+    .then( function( result ) {
 
-        if ( !project ) return res.json( 200, [] );
+      // gather results
+      var project = result[ 0 ][ 0 ];
+      var budgetprogress = result[ 1 ];
+      var target_beneficiaries = result[ 2 ];
+      var target_locations = result[ 3 ];
 
-        // clone project to update
-        $project = project;
+      // create project
+      project.project_budget_progress = budgetprogress;
+      project.target_beneficiaries = target_beneficiaries;
+      project.target_locations = target_locations;
 
-        // budget
-        BudgetProgress
-          .find({ project_id: $project.id })
-          .exec( function( err, budgetprogress ){
+      // return Project
+      return res.json( 200, project );
 
-          // return error
-          if (err) return res.json({ err: true, error: err });
-
-          // set
-          $project.project_budget_progress = budgetprogress;
-
-          // order dates
-          $project.project_budget_progress.sort(function(a, b) {
-            return a.id > b.id;
-          });
-
-          // target beneficiaries
-          TargetBeneficiaries
-            .find({ project_id: $project.id })
-            .exec( function( err, target_beneficiaries ){
-
-            // return error
-            if (err) return res.json({ err: true, error: err });
-
-            // set
-            $project.target_beneficiaries = target_beneficiaries;
-
-            // sort by id
-            $project.target_beneficiaries.sort( function( a, b ) {
-              return a.id.localeCompare( b.id );
-            });
-
-            // target beneficiaries
-            TargetLocation
-              .find({ project_id: $project.id })
-              .exec( function( err, target_locations ){
-
-              // return error
-              if (err) return res.json({ err: true, error: err });
-
-              // set
-              $project.target_locations = target_locations;
-
-              // order
-              $project.target_locations.sort(function(a, b) {
-                if ( a.site_type_name ) {
-                  if( a.admin3name ) {
-                    return a.admin1name.localeCompare(b.admin1name) ||
-                            a.admin2name.localeCompare(b.admin2name) ||
-                            a.admin3name.localeCompare(b.admin3name) ||
-                            a.site_type_name.localeCompare(b.site_type_name) ||
-                            a.site_name.localeCompare(b.site_name);
-                  } else {
-                    return a.admin1name.localeCompare(b.admin1name) ||
-                            a.admin2name.localeCompare(b.admin2name) ||
-                            a.site_type_name.localeCompare(b.site_type_name) ||
-                            a.site_name.localeCompare(b.site_name);
-                  }
-                } else {
-                  if( a.admin3name ) {
-                    return a.admin1name.localeCompare(b.admin1name) ||
-                            a.admin2name.localeCompare(b.admin2name) ||
-                            a.admin3name.localeCompare(b.admin3name) ||
-                            a.site_name.localeCompare(b.site_name);
-                  } else {
-                    return a.admin1name.localeCompare(b.admin1name) ||
-                            a.admin2name.localeCompare(b.admin2name) ||
-                            a.site_name.localeCompare(b.site_name);
-                  }
-                }
-              });
-
-              // return Project
-              return res.json( 200, $project );
-
-            });
-
-          });
-
-        });
-
-      });
+    });
 
   },
 
@@ -437,33 +372,62 @@ module.exports = {
             $project.target_locations = target_locations;
 
             // order
-            $project.target_locations.sort(function(a, b) {
-              if ( a.site_type_name ) {
-                if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) ||
-                          a.admin2name.localeCompare(b.admin2name) ||
-                          a.admin3name.localeCompare(b.admin3name) ||
-                          a.site_type_name.localeCompare(b.site_type_name) ||
-                          a.site_name.localeCompare(b.site_name);
-                } else {
-                  return a.admin1name.localeCompare(b.admin1name) ||
-                          a.admin2name.localeCompare(b.admin2name) ||
-                          a.site_type_name.localeCompare(b.site_type_name) ||
-                          a.site_name.localeCompare(b.site_name);
-                }
-              } else {
-                if( a.admin3name ) {
-                  return a.admin1name.localeCompare(b.admin1name) ||
-                          a.admin2name.localeCompare(b.admin2name) ||
-                          a.admin3name.localeCompare(b.admin3name) ||
-                          a.site_name.localeCompare(b.site_name);
-                } else {
-                  return a.admin1name.localeCompare(b.admin1name) ||
-                          a.admin2name.localeCompare(b.admin2name) ||
-                          a.site_name.localeCompare(b.site_name);
-                }
-              }
-            });
+            // $project.target_locations.sort(function(a, b) {
+            //   if ( a.site_type_name ) {
+            //     if( a.report_group_id ) {
+            //       return a.report_group_id.localeCompare(b.site_type_name) ||
+            //               a.site_type_name.localeCompare(b.site_type_name) ||
+            //               a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.admin3name.localeCompare(b.admin3name) ||
+            //               a.admin4name.localeCompare(b.admin4name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     } else if( a.admin4name ) {
+            //       return a.site_type_name.localeCompare(b.site_type_name) ||
+            //               a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.admin3name.localeCompare(b.admin3name) ||
+            //               a.admin4name.localeCompare(b.admin4name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     } else if ( a.admin3name ) {
+            //       return a.site_type_name.localeCompare(b.site_type_name) ||
+            //               a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.admin3name.localeCompare(b.admin3name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     } else {
+            //       return a.site_type_name.localeCompare(b.site_type_name) ||
+            //               a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     }
+            //   } else {
+            //     if( a.report_group_id ) {
+            //       return a.report_group_id.localeCompare(b.site_type_name) ||
+            //               a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.admin3name.localeCompare(b.admin3name) ||
+            //               a.admin4name.localeCompare(b.admin4name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     } else if( a.admin4name ) {
+            //       return a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.admin3name.localeCompare(b.admin3name) ||
+            //               a.admin4name.localeCompare(b.admin4name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     } else if( a.admin3name ) {
+            //       return a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.admin3name.localeCompare(b.admin3name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     } else {
+            //       return a.admin1name.localeCompare(b.admin1name) ||
+            //               a.admin2name.localeCompare(b.admin2name) ||
+            //               a.site_name.localeCompare(b.site_name);
+            //     }
+            //   }                
+            // });
+
             // project user contact details
             // beside project details related collections updates also report's ones
             // TODO make it return promise
@@ -532,6 +496,7 @@ module.exports = {
         })
         .done();
     };
+  
   },
 
   // remvoe budget item
@@ -614,111 +579,71 @@ module.exports = {
     // project id
     var project_id = req.param( 'project_id' );
 
-    // set project by project id
-    Project.destroy( { id: project_id } )
-      .exec( function( err ){
+    // either that or drop the whole schema
+    var Promise = require('bluebird');
+
+    // promise
+    Promise.all([
+      Project.destroy( { id: project_id } ),
+      TargetBeneficiaries.destroy( { project_id: project_id } ),
+      TargetLocation.destroy( { project_id: project_id } ),
+      BudgetProgress.destroy( { project_id: project_id } ),
+      Report.destroy( { project_id: project_id } ),
+      Location.destroy( { project_id: project_id } ),
+      Beneficiaries.destroy( { project_id: project_id } ),
+      Trainings.destroy( { project_id: project_id } ),
+      TrainingParticipants.destroy( { project_id: project_id } )
+    ])
+    .catch( function( err ) {
+      return res.negotiate( err );
+    })
+    .then( function( result ) {
+
+      // return
+      return res.json( 200, { msg: 'Project ' + project_id + ' has been deleted!' } );
+
+    });
+  },
+
+  getFinancialDetails: function(req, res){
+    // request input
+    if ( !req.param( 'project_id' ) ) {
+      return res.json( 401, { err: 'project_id required!' } );
+    }
+    // project id
+    var project_id = req.param( 'project_id' );
+
+    // fields
+    var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
+        fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
+
+    // get data by project
+
+    BudgetProgress
+      .find()
+      .where( { project_id: project_id } )
+      .exec( function( err, budget ){
 
         // return error
-        if ( err ) return res.json({ err: true, error: err });
+        if (err) return res.negotiate( err );
 
-        // target beneficiaries
-        TargetBeneficiaries.destroy( { project_id: project_id } )
-          .exec( function( err ){
+        // return csv
+        json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
 
-            // return error
-            if ( err ) return res.json({ err: true, error: err });
+          // error
+          if ( err ) return res.negotiate( err );
 
-            // target locations
-            TargetLocation.destroy( { project_id: project_id } )
-              .exec( function( err ){
-
-              // return error
-              if ( err ) return res.json({ err: true, error: err });
-
-              // budget progress
-              BudgetProgress.destroy( { project_id: project_id } )
-                .exec( function( err ){
-
-                  // return error
-                  if ( err ) return res.json({ err: true, error: err });
-
-                  // location
-                  Report.destroy( { project_id: project_id } )
-                    .exec( function( err ){
-
-                      // return error
-                      if ( err ) return res.json({ err: true, error: err });
-
-                      // location
-                      Location.destroy( { project_id: project_id } )
-                        .exec( function( err ){
-
-                          // return error
-                          if ( err ) return res.json({ err: true, error: err });
-
-                          // beneficiaries
-                          Beneficiaries.destroy( { project_id: project_id } )
-                            .exec( function( err ){
-
-                              // return error
-                              if ( err ) return res.json({ err: true, error: err });
-
-                                // else
-                                return res.json( 200, { msg: 'Project ' + project_id + ' has been deleted!' } );
-
-                              });
-
-                          });
-
-                      });
-
-                  });
-
-              });
+          // success
+          if ( req.params.text ) {
+            res.set('Content-Type', 'text/csv');
+            return res.send( 200, csv );
+          } else {
+            return res.json( 200, { data: csv } );
+          }
 
         });
 
       });
-  },
-
-  getFinancialDetails: function(req, res){
-        // request input
-        if ( !req.param( 'project_id' ) ) {
-          return res.json( 401, { err: 'project_id required!' } );
-        }
-        // project id
-        var project_id = req.param( 'project_id' );
-
-        // fields
-        var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
-            fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
-
-        // get data by project
-
-        BudgetProgress
-          .find()
-          .where( { project_id: project_id } )
-          .exec( function( err, budget ){
-
-            // return error
-            if (err) return res.negotiate( err );
-
-            // return csv
-            json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-
-              // error
-              if ( err ) return res.negotiate( err );
-
-              // success
-              if ( req.params.text ) {
-                res.set('Content-Type', 'text/csv');
-                return res.send( 200, csv );
-              } else {
-                return res.json( 200, { data: csv } );
-              }
-
-            });
-
-          });
   }
+  
 };

@@ -144,28 +144,9 @@ module.exports = {
 		activity_description: {
 			type: 'array'
 		},
-
+		
 		// SOs
 		strategic_objectives: {
-			type: 'array'
-		},
-
-		// target beneficiaries
-		category_type: {
-			type: 'array'
-		},
-		beneficiary_type: {
-			type: 'array'
-		},
-
-		// target locations
-		admin1pcode: {
-			type: 'array'
-		},
-		admin2pcode: {
-			type: 'array'
-		},
-		admin3pcode: {
 			type: 'array'
 		},
 
@@ -203,6 +184,15 @@ module.exports = {
     //   collection: 'location',
     //   via: 'report_id'
     // },
+
+    // location groups
+		location_groups_check: {
+			type: 'boolean'
+		},
+
+		location_groups: {
+			type: 'array'
+		},    
 
     notes: {
     	type: 'string'

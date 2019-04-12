@@ -181,37 +181,6 @@ module.exports = {
 		inter_cluster_activities: {
 			type: 'array'
 		},
-		activity_type: {
-			type: 'array',
-			required: true
-		},
-		activity_description: {
-			type: 'array'
-		},
-
-		// SOs
-		strategic_objectives: {
-			type: 'array'
-		},
-
-		// target beneficiaries
-		category_type: {
-			type: 'array'
-		},
-		beneficiary_type: {
-			type: 'array'
-		},
-
-		// target locations
-		admin1pcode: {
-			type: 'array'
-		},
-		admin2pcode: {
-			type: 'array'
-		},
-		admin3pcode: {
-			type: 'array'
-		},
 
 		// budget item
 		project_donor_id: {

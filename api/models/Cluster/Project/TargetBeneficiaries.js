@@ -358,18 +358,6 @@ module.exports = {
       type: 'string'
     },
 
-		// target locations
-		admin1pcode: {
-			type: 'array'
-		},
-		admin2pcode: {
-			type: 'array'
-		},
-		admin3pcode: {
-			type: 'array'
-		},
-
-
 
 
 		/*********** 2017 *************/
