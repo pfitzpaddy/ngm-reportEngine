@@ -302,6 +302,47 @@ module.exports = {
 
   },
 
+  // set project details ( UNDER CONSTRUCTION )
+  setProjectByIdNew: function(req, res) {
+
+    // request input
+    if (!req.param('project')) {
+      return res.json(401, { err: 'project required!' });
+    }
+
+    // get project
+    var project = req.param('project'),
+        project_budget_progress = req.param('project').project_budget_progress,
+        target_beneficiaries = req.param('project').target_beneficiaries,
+        target_locations = req.param('project').target_locations;
+    
+    // update project status if new
+    if( project.project_status === 'new' ){
+      project.project_status = 'active';
+    }
+
+    // either that or drop the whole schema
+    var Promise = require('bluebird');
+
+    // promise
+    Promise.all([
+      Project.updateOrCreate( project )
+    ])
+    .catch( function( err ) {
+      return res.negotiate( err );
+    })
+    .then( function( result ) {
+
+      // gather results
+      var project = result[ 0 ];
+
+      // return Project
+      return res.json( 200, project );
+
+    });
+
+  },
+
   // set project details
   setProjectById: function(req, res) {
 
@@ -645,5 +686,5 @@ module.exports = {
 
       });
   }
-  
+
 };

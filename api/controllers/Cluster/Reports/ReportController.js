@@ -319,6 +319,27 @@ module.exports = {
 
 	},
 
+	// update to complete
+	getReportOnlyById: function( req, res ) {
+		
+		// request input guards
+		if ( !req.param( 'id' ) ) {
+			return res.json(401, { err: 'id required!' });
+		}
+
+		Report
+			.findOne( { id: req.param( 'id' ) } )
+			.exec(function( err, report ){
+
+				// return error
+				if ( err ) return res.json({ err: true, error: err });
+
+				// return reports
+				return res.json( 200, report );
+
+			});
+	},	
+
 	// get all Reports by project id
 	getReportById: function( req, res ) {
 
@@ -358,63 +379,6 @@ module.exports = {
     	
     	// set locations
     	report.locations = locations;
-
-			// sort by location
-			// report.locations.sort(function(a, b) {
-   //      if ( a.site_type_name ) {
-   //        if( a.report_group_id ) {
-   //          return a.report_group_id.localeCompare(b.site_type_name) ||
-   //                  a.site_type_name.localeCompare(b.site_type_name) ||
-   //                  a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.admin3name.localeCompare(b.admin3name) ||
-   //                  a.admin4name.localeCompare(b.admin4name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        } else if( a.admin4name ) {
-   //          return a.site_type_name.localeCompare(b.site_type_name) ||
-   //                  a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.admin3name.localeCompare(b.admin3name) ||
-   //                  a.admin4name.localeCompare(b.admin4name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        } else if ( a.admin3name ) {
-   //          return a.site_type_name.localeCompare(b.site_type_name) ||
-   //                  a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.admin3name.localeCompare(b.admin3name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        } else {
-   //          return a.site_type_name.localeCompare(b.site_type_name) ||
-   //                  a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        }
-   //      } else {
-   //        if( a.report_group_id ) {
-   //          return a.report_group_id.localeCompare(b.site_type_name) ||
-   //                  a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.admin3name.localeCompare(b.admin3name) ||
-   //                  a.admin4name.localeCompare(b.admin4name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        } else if( a.admin4name ) {
-   //          return a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.admin3name.localeCompare(b.admin3name) ||
-   //                  a.admin4name.localeCompare(b.admin4name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        } else if( a.admin3name ) {
-   //          return a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.admin3name.localeCompare(b.admin3name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        } else {
-   //          return a.admin1name.localeCompare(b.admin1name) ||
-   //                  a.admin2name.localeCompare(b.admin2name) ||
-   //                  a.site_name.localeCompare(b.site_name);
-   //        }
-   //      }                
-   //    });
 
     	// report locations
     	report.locations.forEach( function( location, i ){
@@ -677,7 +641,7 @@ module.exports = {
 	},
 
 	// set report details by report id ( UNDER CONSTRUCTION )
-	setReportById: function( req, res ) {
+	setReportByIdNew: function( req, res ) {
 
 		// request input guards
 		if ( !req.param( 'report' ) ) {
@@ -1013,6 +977,27 @@ module.exports = {
 
 		});
 
+	},
+
+	// update to complete
+	updateReportStatus: function( req, res ) {
+		
+		// request input guards
+		if ( !req.param( 'report_id' ) && !req.param( 'report_status' ) ) {
+			return res.json(401, { err: 'report_id, report_status required!' });
+		}
+
+		Report
+			.update( { id: req.param( 'report_id' ) }, req.param( 'update' ) )
+			.exec(function( err, report ){
+
+				// return error
+				if ( err ) return res.json({ err: true, error: err });
+
+				// return reports
+				return res.json( 200, report );
+
+			});
 	},
 
 	// remove

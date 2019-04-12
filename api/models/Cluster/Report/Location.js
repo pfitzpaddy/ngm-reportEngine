@@ -123,6 +123,9 @@ module.exports = {
 		location_group_id: {
 			type: 'string',
 		},
+		location_group_type: {
+			type: 'string',
+		},
 		location_group_name: {
 			type: 'string',
 		},
