@@ -286,7 +286,6 @@ var UserController = {
                 Project.update( findOriginalUser, updatedRelationsUser ),
                 BudgetProgress.update( findOriginalUser, updatedRelationsUser ),
                 TargetBeneficiaries.update( findOriginalUser, updatedRelationsUser ),
-                // TargetLocation fails due to update triggers
                 TargetLocation.update( findOriginalUser, updatedRelationsUser ),
                 Report.update( findOriginalUser, updatedRelationsUser ),
                 Location.update( findOriginalUser, updatedRelationsUser ),
