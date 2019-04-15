@@ -670,8 +670,8 @@ module.exports = {
 		// promise
     Promise.all([
       Report.update( { id: report.id }, report ),
-      Location.updateOrCreateEachBulk( report.locations, report.report_status ),
-			Beneficiaries.updateOrCreateEachBulk( report.locations, report.report_status )
+      Location.updateOrCreateEachBulk( report.locations, report.report_status ).exec(cb),
+			Beneficiaries.updateOrCreateEachBulk( report.locations, report.report_status ).exec(cb)
     ])
     .catch( function( err ) {
       return res.negotiate( err )

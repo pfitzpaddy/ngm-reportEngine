@@ -5,12 +5,104 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var Promise = require('bluebird');
+var util = require('util');
 var json2csv = require('json2csv');
-var Promise  = require('bluebird');
-var moment   = require('moment');
-var async    = require('async');
+var moment = require('moment');
+var async = require('async');
+var _under = require('underscore');
+  
+// project controller
+var ProjectController = {
 
-module.exports = {
+  // TASKS
+
+  // return reports for a project
+  getProjectReports: function( project ) {
+
+    // dates
+    var project_start = moment( project.project_start_date ).startOf( 'M' ),
+        project_end = moment( project.project_end_date ).endOf( 'M' ),
+        reports_start = moment(project.project_start_date).startOf('Y')>=moment('2017-01-01')?moment(project.project_start_date).startOf('Y'):moment('2017-01-01'),
+        reports_end = moment().endOf( 'M' );
+
+    // variables
+    var reports = [],
+        s_date = project_start, // reports_start, // project_start.format('YYYY-MM-DD') > reports_start.format('YYYY-MM-DD') ? project_start : reports_start,
+        e_date = reports_end; // project_end.format('YYYY-MM-DD') < reports_end.format( 'YYYY-MM-DD' ) ? project_end : reports_end;
+
+    // number of reports
+    var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
+
+    // for each report month
+    for ( m = 0; m < reports_duration; m++ ) {
+
+      // report_status pending if dates before project start date
+      var report_status = moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format() >= project_start.format() ? 'todo' : 'pending';
+      
+      // create report
+      var report = {
+        project_id: project.id,
+        report_status: report_status,
+        report_active: true,
+        report_month: moment( s_date ).add( m, 'M' ).month(),
+        report_year: moment( s_date ).add( m, 'M' ).year(),
+        reporting_period: moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format(),
+        reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 10 ).format()
+      };
+
+      // clone project
+      var p = JSON.parse( JSON.stringify( project ) );
+      delete p.id;
+
+      // add report with p to reports
+      reports.push( _under.extend( {}, p, report ) );
+
+    }
+
+    // return the reports for the project period
+    return reports;
+
+  },
+
+  // return locations for reports
+  getProjectReportLocations: function( project, reports, target_locations ){
+
+    // report locations
+    var locations = [];
+
+    // forEach report
+    reports.forEach(function( report, i ){
+
+      // clone report
+      var r = JSON.parse( JSON.stringify( report ) );
+
+      // prepare report for cloning
+      r.report_id = r.id.valueOf();
+      delete r.id;
+
+      // forEach target location
+      target_locations.forEach(function( target_location, i ){
+        
+        // prepare report for cloning
+        var l = JSON.parse( JSON.stringify( target_location ) );
+        l.target_location_reference_id = l.id.valueOf();
+        delete l.id;
+
+        // push to locations
+        locations.push( _under.extend( {}, r, l ) );
+
+      });
+
+    });
+
+    // return locations
+    return locations;
+
+  },
+
+
+  // REST APIs
 
   // get all Projects by organization
   getProjectsList: function(req, res) {
@@ -269,13 +361,9 @@ module.exports = {
     // project for UI
     var project = {};
 
-    // either that or drop the whole schema
-    var Promise = require('bluebird');
-
     // promise
     Promise.all([
       Project.find( { id: req.param('id') } ),
-      BudgetProgress.find( { project_id: req.param('id') } ),
       TargetBeneficiaries.find( { project_id: req.param('id') } ),
       TargetLocation.find( { project_id: req.param('id') } )
     ])
@@ -286,12 +374,10 @@ module.exports = {
 
       // gather results
       var project = result[ 0 ][ 0 ];
-      var budgetprogress = result[ 1 ];
-      var target_beneficiaries = result[ 2 ];
-      var target_locations = result[ 3 ];
+      var target_beneficiaries = result[ 1 ];
+      var target_locations = result[ 2 ];
 
       // create project
-      project.project_budget_progress = budgetprogress;
       project.target_beneficiaries = target_beneficiaries;
       project.target_locations = target_locations;
 
@@ -303,47 +389,6 @@ module.exports = {
   },
 
   // set project details ( UNDER CONSTRUCTION )
-  setProjectByIdNew: function(req, res) {
-
-    // request input
-    if (!req.param('project')) {
-      return res.json(401, { err: 'project required!' });
-    }
-
-    // get project
-    var project = req.param('project'),
-        project_budget_progress = req.param('project').project_budget_progress,
-        target_beneficiaries = req.param('project').target_beneficiaries,
-        target_locations = req.param('project').target_locations;
-    
-    // update project status if new
-    if( project.project_status === 'new' ){
-      project.project_status = 'active';
-    }
-
-    // either that or drop the whole schema
-    var Promise = require('bluebird');
-
-    // promise
-    Promise.all([
-      Project.updateOrCreate( project )
-    ])
-    .catch( function( err ) {
-      return res.negotiate( err );
-    })
-    .then( function( result ) {
-
-      // gather results
-      var project = result[ 0 ];
-
-      // return Project
-      return res.json( 200, project );
-
-    });
-
-  },
-
-  // set project details
   setProjectById: function(req, res) {
 
     // request input
@@ -352,192 +397,181 @@ module.exports = {
     }
 
     // get project
-    var $project = req.param('project'),
-        $status = req.param('project').project_status,
-        $project_budget_progress = req.param('project').project_budget_progress,
-        $target_beneficiaries = req.param('project').target_beneficiaries,
-        $target_locations = req.param('project').target_locations;
+    var project = req.param('project');
+    // var budget_progress = req.param('project').budget_progress;
+    var target_beneficiaries = req.param('project').target_beneficiaries;
+    var target_locations = req.param('project').target_locations;
+
     // update project status if new
-    if( $status === 'new' ){
-      $project.project_status = 'active';
+    if( project.project_status === 'new' ){
+      project.project_status = 'active';
     }
 
-    // update or create
-    Project
-      .updateOrCreate( $project, function( err, project ){
+    // find project
+    var findProject = {
+      project_id: project.id
+    }
 
-      // return error
-      if (err) return res.json({ err: true, error: err });
+    // user object to update tables
+    var updateUser = {
+      username: project.username,
+      name: project.name,
+      position: project.position,
+      phone: project.phone,
+      email: project.email
+    }
 
-      // clone project to update
-      $project = project;
+    // promise
+    Promise.all([
+      Project.updateOrCreate( { id: project.id }, project ),
+      BudgetProgress.update( findProject, updateUser ),
+      // target_beneficiaries
+      // target_locations
+      // report
+      // location
+      Beneficiaries.update( findProject, updateUser ),
+      Trainings.update( findProject, updateUser ),
+      TrainingParticipants.update( findProject, updateUser )
+    ])
+    .catch( function( err ) {
+      return res.negotiate( err );
+    })
+    .then( function( update_result ) {
 
-      // target beneficiaries
-      BudgetProgress
-        .updateOrCreateEach( { project_id: $project.id }, $project_budget_progress, function( err, project_budget_progress ){
+      // results
+      var project_update;
+      if ( util.isArray( update_result[ 0 ] ) ) {
+        // update
+        project_update = update_result[ 0 ][ 0 ];
+      } else {
+        // create
+        project_update = update_result[ 0 ];
+        // set project id
+        findProject = {
+          project_id: project_update.id
+        }
+      }
+      project_update.target_beneficiaries = [];
+      project_update.target_locations = [];
 
-        // return error
-        if (err) return res.json({ err: true, error: err });
-
-        // set
-        $project.project_budget_progress = project_budget_progress;
-
-        // order dates
-        $project.project_budget_progress.sort(function(a, b) {
-          return a.id > b.id;
+      // async
+      var async_counter = 0;
+      var async_requests = 3;
+      
+      // async loop target_beneficiaries
+      async.each( target_beneficiaries, function ( d, next ) {
+        TargetBeneficiaries.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
+          if( util.isArray( result ) ) {
+            // update
+            project_update.target_beneficiaries.push( result[0] );
+          } else { 
+            // create
+            project_update.target_beneficiaries.push( result );
+          }
+          next();
         });
-
-        // target beneficiaries
-        TargetBeneficiaries
-          .updateOrCreateEach( { project_id: $project.id }, $target_beneficiaries, function( err, target_beneficiaries ){
-
-          // return error
-          if (err) return res.json({ err: true, error: err });
-
-          // set
-          $project.target_beneficiaries = target_beneficiaries;
-
-          // sort by id
-          $project.target_beneficiaries.sort( function( a, b ) {
-            return a.id.localeCompare( b.id );
-          });
-
-          // target beneficiaries
-          TargetLocation
-            .updateOrCreateEach( { project_id: $project.id }, $target_locations, function( err, target_locations ){
-
-            // return error
-            if (err) return res.json({ err: true, error: err });
-
-            // set
-            $project.target_locations = target_locations;
-
-            // order
-            // $project.target_locations.sort(function(a, b) {
-            //   if ( a.site_type_name ) {
-            //     if( a.report_group_id ) {
-            //       return a.report_group_id.localeCompare(b.site_type_name) ||
-            //               a.site_type_name.localeCompare(b.site_type_name) ||
-            //               a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.admin3name.localeCompare(b.admin3name) ||
-            //               a.admin4name.localeCompare(b.admin4name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     } else if( a.admin4name ) {
-            //       return a.site_type_name.localeCompare(b.site_type_name) ||
-            //               a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.admin3name.localeCompare(b.admin3name) ||
-            //               a.admin4name.localeCompare(b.admin4name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     } else if ( a.admin3name ) {
-            //       return a.site_type_name.localeCompare(b.site_type_name) ||
-            //               a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.admin3name.localeCompare(b.admin3name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     } else {
-            //       return a.site_type_name.localeCompare(b.site_type_name) ||
-            //               a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     }
-            //   } else {
-            //     if( a.report_group_id ) {
-            //       return a.report_group_id.localeCompare(b.site_type_name) ||
-            //               a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.admin3name.localeCompare(b.admin3name) ||
-            //               a.admin4name.localeCompare(b.admin4name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     } else if( a.admin4name ) {
-            //       return a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.admin3name.localeCompare(b.admin3name) ||
-            //               a.admin4name.localeCompare(b.admin4name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     } else if( a.admin3name ) {
-            //       return a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.admin3name.localeCompare(b.admin3name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     } else {
-            //       return a.admin1name.localeCompare(b.admin1name) ||
-            //               a.admin2name.localeCompare(b.admin2name) ||
-            //               a.site_name.localeCompare(b.site_name);
-            //     }
-            //   }                
-            // });
-
-            // project user contact details
-            // beside project details related collections updates also report's ones
-            // TODO make it return promise
-            updateUser($project);
-
-            // update submited data fields
-            updateBeneficiaries($project);
-            // return Project
-            return res.json( 200, $project );
-
-          });
-
-        });
-
+      }, function ( err ) {
+        if ( err ) return err;
+        // ++
+        async_counter++;
+        // return
+        if ( async_counter === async_requests ) {
+          returnProject( res, project_update );
+        }
       });
+
+      // async loop target_locations
+      async.each( target_locations, function ( d, next ) {
+        TargetLocation.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
+          if( util.isArray( result ) ) {
+            // update
+            project_update.target_locations.push( result[0] );
+          } else { 
+            // create
+            project_update.target_locations.push( result );
+          }
+          next();
+        });
+      }, function ( err ) {
+        if ( err ) return err;
+        // ++
+        async_counter++;
+        // return
+        if ( async_counter === async_requests ) {
+          returnProject( res, project_update );
+        }
+      });
+      
+      // reports holder
+      var reports = [];
+      
+      // generate reports for duration of project_update
+      var project_reports = ProjectController.getProjectReports( project_update );
+
+      // async loop project_reports
+      async.each( project_reports, function ( d, next ) {
+        // Report.updateOrCreate( findProject, { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
+        Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
+          if( !report ) { report = { id: null } }
+          Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
+            if( util.isArray( result ) ) {
+              // update
+              reports.push( result[0] );
+            } else { 
+              // create
+              reports.push( result );
+            }
+            next();
+          });
+
+          // if (!report) {
+          //   Report.create(d).exec(function( err, result ){
+          //     reports.push( result );
+          //     next();  
+          //   });
+          // } else {
+          //   Report.update({ id: report.id }, d).exec(function( err, result ){
+          //     reports.push( result[0] );
+          //     next();  
+          //   });            
+          // }
+
+        });
+      }, function ( err ) {
+        if ( err ) return err;
+       
+        // generate locations for each report ( requires report_id )
+        var locations = ProjectController.getProjectReportLocations( project_update, reports, project_update.target_locations );
+        
+        // async loop project_update locations
+        async.each( locations, function ( d, next ) {
+          // Location.updateOrCreate( findProject, { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
+          Location.findOne( { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
+            if( !location ) { location = { id: null } }
+            Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, result ){
+              // no need to return locations
+              next();
+            });
+          });
+        }, function ( err ) {
+          if ( err ) return err;
+          // ++
+          async_counter++;
+          // return
+          if ( async_counter === async_requests ) {
+            returnProject( res, project_update );
+          }
+        });
+      });
+
+      // return the project_update
+      var returnProject = function( res, project ) {
+        // return Project
+        return res.json( 200, project );
+      }
 
     });
 
-    var updateUser = function($project){
-      // user object to update tables
-      var updatedRelationsUser = {
-        username: $project.username,
-        name: $project.name,
-        position: $project.position,
-        phone: $project.phone,
-        email: $project.email
-      }
-
-      var findProject = {
-        project_id: $project.id
-      }
-
-      Promise.all([
-        Project.update( { id: $project.id }, updatedRelationsUser ),
-        BudgetProgress.update( findProject, updatedRelationsUser ),
-        TargetBeneficiaries.update( findProject, updatedRelationsUser ),
-        //TargetLocation.update( findProject, updatedRelationsUser ),
-        Report.update( findProject, updatedRelationsUser ),
-        //Location.update( findProject, updatedRelationsUser ),
-        Beneficiaries.update( findProject, updatedRelationsUser ),
-      ])
-        .catch( function(err) {
-          return res.negotiate( err )
-        })
-        .done();
-    };
-
-    var updateBeneficiaries = function($project){
-
-      // add fields here to update
-      var updateBeneficiariesFields = {
-        project_title: $project.project_title, 
-        project_donor: $project.project_donor,
-      }
-
-      var findProject = {
-        project_id: $project.id
-      }
-
-      Promise.all([
-      Beneficiaries.update(findProject, updateBeneficiariesFields),
-      // TargetBeneficiaries.update(findProject, updateBeneficiariesFields)
-        ])
-        .catch( function(err) {
-          return res.negotiate( err )
-        })
-        .done();
-    };
-  
   },
 
   // remvoe budget item
@@ -588,25 +622,28 @@ module.exports = {
 
   // remove target location
   removeLocationById: function( req, res ) {
+    
     // request input
     if ( !req.param( 'id' ) ) {
       return res.json({ err: true, error: 'id required!' });
     }
 
+    // get id
     var id = req.param( 'id' );
 
-    // target location
-    TargetLocation
-      .update( { id: id }, { project_id: null, update_location: true } )
-      .exec( function( err, result ){
+    // promise
+    Promise.all([
+      TargetLocation.destroy( { id: id } ),
+      Location.destroy( { target_location_reference_id: id } )
+    ])
+    .catch( function( err ) {
+      return res.negotiate( err );
+    })
+    .then( function( result ) {
+      // return Project
+      return res.json( 200, { msg: 'Success!' } );
+    });
 
-        // return error
-        if ( err ) return res.json({ err: true, error: err });
-
-        // return Project
-        return res.json( 200, { msg: 'Success!' } );
-
-      });
   },
 
   // delete project
@@ -619,9 +656,6 @@ module.exports = {
 
     // project id
     var project_id = req.param( 'project_id' );
-
-    // either that or drop the whole schema
-    var Promise = require('bluebird');
 
     // promise
     Promise.all([
@@ -688,3 +722,5 @@ module.exports = {
   }
 
 };
+
+module.exports = ProjectController;

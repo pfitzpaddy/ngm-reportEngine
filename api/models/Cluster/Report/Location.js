@@ -399,60 +399,22 @@ module.exports = {
 
 	},
 
-	// updateOrCreate
-		// http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
-	updateOrCreate: function( values, cb ){
-		var self = this; // reference for use by callbacks
-		// If no values were specified, return []
-		if (!values) cb( false, [] );
+  // updateOrCreate
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+  updateOrCreate: function( parent, criteria, values ){
+    var self = this; // reference for use by callbacks
 
-		if( values.id ){
-			// update returns array, need the object
-			self.update({ id: values.id }, values, function( err, update ){
-				if(err) return cb(err, false);
-				cb( false, update[0] );
-			});
-		}else{
-			self.create(values, cb);
-		}
+    // if exists
+    if( criteria.id ){
+      return self.update( criteria, values );
+    }else{
+			// set relation
+			for ( key in parent ){ values[ key ] = parent[ key ]; }
+      return self.create( values );
+    }
 
-	},
-
-	// update locations, use this if a new created location_id is needed, for entire location change to: {$set: value}
-	updateOrCreateEachLoop: function( values, status, cb ){
-		var self = this; // reference for use by callbacks
-		// If no values were specified, return []
-		if (!values) cb( false, [] );
-		var counter = 0,
-			 length = values.length;
-		values.forEach(function( value, i ){
-			values[i].report_status = status.report_status;
-			value.report_status 	= status.report_status;
-
-			if( value.id ){
-				// update returns array, need the object
-				self.update({ id: value.id }, {	report_status:status.report_status }, function( err, update ){
-					if(err) return cb(err, false);
-					values[i].id = update[0].id;
-					counter++;
-						if( counter===length ){
-							cb( false, values );
-						}
-				});
-			}else{
-				// never runs, as locations was created on targetlocation stage
-				self.create( value, function( err, update ){
-					if(err) return cb(err, false);
-					values[i].id = update[0].id;
-					counter++;
-						if( counter===length ){
-							cb( false, values );
-						}
-				});
-			}
-		});
-	},
-
+  },
+  
 	// bulk update locations, set report status, for entire location change to: {$set: value}
 	updateOrCreateEachBulk: function( values, status, cb ){
 		var self = this; // reference for use by callbacks

@@ -347,10 +347,10 @@ module.exports = {
 		},
 
 		// flag to manage location updates
-		update_location: {
-			type: 'boolean',
-			defaultsTo: false
-		},
+		// update_location: {
+		// 	type: 'boolean',
+		// 	defaultsTo: false
+		// },
 
 
 		/*********** 2016 *************/
@@ -365,197 +365,18 @@ module.exports = {
 
   // updateOrCreate
     // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
-  updateOrCreateEach: function( parent, values, cb ){
+  updateOrCreate: function( parent, criteria, values ){
     var self = this; // reference for use by callbacks
-    // If no values were specified, return []
-    if (!values.length) cb( false, [] );
 
-    var results = [],
-        counter = 0,
-        length = values.length;
+    // if exists
+    if( criteria.id ){
+      return self.update( criteria, values );
+    }else{
+			// set relation
+			for ( key in parent ){ values[ key ] = parent[ key ]; }
+      return self.create( values );
+    }
 
-    // values
-    values.forEach(function( value ){
-
-      if( value.id ){
-        self.update({ id: value.id }, value, function( err, update ){
-          if(err) return cb(err, false);
-          results.push( update[0] );
-
-          counter++;
-          if( counter===length ){
-            cb( false, results );
-          }
-        });
-      }else{
-  			// set based on criteria
-  			for ( key in parent ){
-  				value[ key ] = parent[ key ];
-  			}
-        self.create(value, function( err, create ){
-          if(err) return cb(err, false);
-          results.push( create );
-
-          counter++;
-          if( counter===length ){
-            cb( false, results );
-          }
-        });
-      }
-
-    });
-
-  },
-
-	// update report locations
-	afterCreate: function( target_location, next ) {
-
-		// variables
-		var _under = require('underscore');
-
-		// find reports
-		Report
-			.find()
-			.where({ project_id: target_location.project_id })
-			.exec( function( err, reports ){
-
-				// return error
-				if ( err ) return next( err );
-
-				// counter
-				var counter = 0,
-						length = reports.length;
-
-				// forEach
-				reports.forEach(function( report, i ){
-
-					// clone report
-					var r = _under.clone( report );
-									r.report_id = r.id.valueOf();
-									delete r.id;
-									delete r.admin1pcode;
-									delete r.admin1name;
-									delete r.admin2pcode;
-									delete r.admin2name;
-									delete r.admin3pcode;
-                  delete r.admin3name;
-									delete r.admin4pcode;
-                  delete r.admin4name;
-									delete r.admin5pcode;
-                  delete r.admin5name;
-                  delete r.username,
-                  delete r.name,
-                  delete r.position,
-                  delete r.phone,
-                  delete r.email
-
-					// clone target_location
-					var location,
-							l = _under.clone( target_location );
-							l.target_location_reference_id = l.id;
-							delete l.id;
-
-					// merge reporting location
-					location = _under.extend( l, r );
-
-					// create reporting location
-					Location
-						.create( location )
-						.exec(function( err, result ){
-
-							// return error
-							if ( err ) return next( err );
-
-							counter++
-							if ( counter === length ) {
-								next();
-							}
-
-					});
-
-				});
-
-		});
-
-	},
-
-	// update report locations
-	afterUpdate: function( target_location, next ) {
-
-		// no edits, return
-		if ( !target_location.update_location ) return next();
-
-		// variables
-		var _under = require('underscore');
-
-
-		// --------- UPDATE LOCATIONS ---------
-		// update location
-		if ( target_location.project_id ) {
-
-			// clone target_location
-			var l = _under.clone( target_location );
-							l.target_location_reference_id = l.id;
-							delete l.id;
-
-			// target location reference id
-			Location
-				.update( { target_location_reference_id: l.target_location_reference_id }, l )
-				.exec( function( err, result ){
-
-					// return error
-					if ( err ) return next( err );
-
-					// next!
-					next();
-
-			});
-
-		}
-
-
-		// --------- REMOVE LOCATIONS ---------
-		// remove location from reports!
-		if ( !target_location.project_id ) {
-
-	    // get report by organization_id
-	    Location
-	      .update( { target_location_reference_id: target_location.id }, { report_id: null } )
-	      .exec( function( err, location_results ){
-
-					// return error
-					if ( err ) return next( err );
-
-					// counter
-					var counter = 0,
-							length = location_results.length;
-
-					// for each report location
-					location_results.forEach( function( location, i ) {
-
-						// beneficiaries
-						Beneficiaries
-							.update( { location_id: location.id }, { location_id: null } )
-							.exec( function( err, beneficiaries_result ){
-
-								// return error
-								if ( err ) return next( err );
-
-								// counter
-								counter++;
-								if ( counter === length ) {
-									// next!
-									next();
-								}
-
-						});
-
-					});
-
-	    });
-
-		}
-
-	}
+  }
 
 };
