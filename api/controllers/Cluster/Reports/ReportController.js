@@ -320,7 +320,7 @@ module.exports = {
 	},
 
 	// update to complete
-	getReportOnlyById: function( req, res ) {
+	getReportDetailsById: function( req, res ) {
 		
 		// request input guards
 		if ( !req.param( 'id' ) ) {
