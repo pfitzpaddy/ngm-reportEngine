@@ -5,9 +5,27 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+// libs
+var Promise = require('bluebird');
+var util = require('util');
 var async = require('async');
+var moment = require( 'moment' );
+var _under = require('underscore');
 
-module.exports = {
+var ReportController = {
+
+  // TASKS
+
+  // parse results from sails
+  set_result: function( result ) {
+    if( util.isArray( result ) ) {
+      // update ( array )
+      return result[0];
+    } else { 
+      // create ( object )
+      return result;
+    }
+  },
 
 	// request as csv
 	getReportCsv: function( req, res ) {
@@ -235,10 +253,6 @@ module.exports = {
 			return res.json( 401, { err: 'filter required!' });
 		}
 
-		// either that or drop the whole schema
-    var Promise = require('bluebird');
-    var moment = require( 'moment' );
-
 		// promise
     Promise.all([
       Report.find( req.param( 'filter' ) ).sort( 'report_month ASC' ),
@@ -253,67 +267,69 @@ module.exports = {
     	var reports = result[ 0 ];
     	var beneficiaries = result[ 1 ];
 
-    	// report locations
-    	reports.forEach( function( report, i ){
+	    // async loop reports
+	    async.each( reports, function ( report, next ) {
 
 				// add status empty
-				reports[i].icon = 'adjust'
-				reports[i].status = '#80cbc4';
-				reports[i].status_title = 'Empty Submission';
+				report.icon = 'adjust'
+				report.status = '#80cbc4';
+				report.status_title = 'Empty Submission';
 
 				// if report is 'todo' and past due date!
-				if ( reports[i].report_status === 'todo' && moment().isSameOrBefore( moment( reports[i].reporting_due_date ) ) ) {
+				if ( report.report_status === 'todo' && moment().isSameOrBefore( moment( report.reporting_due_date ) ) ) {
 
 					// add status todo but ok
-					reports[i].status = '#4db6ac';
-					reports[i].icon = 'watch_later';
-					reports[i].status_title = 'ToDo';
+					report.status = '#4db6ac';
+					report.icon = 'watch_later';
+					report.status_title = 'ToDo';
 
 				}
 				
 				// if report is 'todo' and past due date!
-				if ( reports[i].report_status === 'todo' && moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
+				if ( report.report_status === 'todo' && moment().isAfter( moment( report.reporting_due_date ) ) ) {
 
 					// set to red (overdue!)
-					reports[i].icon = 'watch_later';
-					reports[i].status = '#e57373'
-					reports[i].status_title = 'Due';
+					report.icon = 'watch_later';
+					report.status = '#e57373'
+					report.status_title = 'Due';
 
 				}	
 
-				// for each
-    		beneficiaries.forEach( function( beneficiary, j ) {
+	    	// async loop beneficiaries
+	    	async.each( beneficiaries, function ( beneficiary, b_next ) {
     			
     			// beneficiaries exist for this report
     			if ( report.id === beneficiary.report_id ) {
 
 						// if no benficiaries and submitted
-						if ( reports[i].report_status === 'complete' ) {
+						if ( report.report_status === 'complete' ) {
 							// add status
-							reports[i].status = '#4db6ac';
-							reports[i].icon = 'watch_later';
-							reports[i].status_title = 'Complete';
+							report.icon = 'watch_later';
+							report.status = '#4db6ac';
+							report.status_title = 'Complete';
 						}
 						
 						// if report is 'todo' and past due date!
-						if ( reports[i].report_status === 'todo' &&  moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
-
+						if ( report.report_status === 'todo' &&  moment().isAfter( moment( report.reporting_due_date ) ) ) {
 							// if beneficiaries ( report has been updated )
 							if ( beneficiary ) {
-								reports[i].status = '#fff176';
-								reports[i].status_title = 'Pending';
+								report.icon = 'watch_later';
+								report.status = '#fff176';
+								report.status_title = 'Pending';
 							}
-
 						}
 
     			}
-
-    		});
-
-    	});
-
-			// return
-			return res.json( 200, reports );
+    			b_next();
+	    	}, function ( err ) {
+		      if ( err ) return err;
+					next();
+		    });
+	    }, function ( err ) {
+	      if ( err ) return err;
+				// return
+				return res.json( 200, reports );
+	    });
 
     });
 
@@ -338,6 +354,7 @@ module.exports = {
 				return res.json( 200, report );
 
 			});
+	
 	},	
 
 	// get all Reports by project id
@@ -354,12 +371,9 @@ module.exports = {
 			location_filter = { report_id: req.param( 'id' ), location_group_id: req.param( 'location_group_id') }
 		}
 
-		// either that or drop the whole schema
-    var Promise = require('bluebird');
-
 		// promise
     Promise.all([
-      Report.find( { id: req.param( 'id' ) } ),
+      Report.findOne( { id: req.param( 'id' ) } ),
       Location.find( location_filter ),
       Beneficiaries.find( { report_id: req.param( 'id' ) } ).populateAll(),
       Trainings.find( { report_id: req.param( 'id' ) } ),
@@ -371,611 +385,234 @@ module.exports = {
     .then( function( result ) {
 
     	// gather results
-    	var report = result[ 0 ][ 0 ];
+    	var report = result[ 0 ];
     	var locations = result[ 1 ];
     	var beneficiaries = result[ 2 ];
     	var trainings = result[ 3 ];
     	var training_participants = result[ 4 ];
-    	
-    	// set locations
-    	report.locations = locations;
 
-    	// report locations
-    	report.locations.forEach( function( location, i ){
+    	// placeholder
+    	report.locations = [];
+
+	    // async loop target_beneficiaries
+	    async.each( locations, function ( location, next ) {
+
+	    	// counter
+	    	var locations_counter = 0;
+	    	var locations_features = 2;
 
     		// set holders
-    		report.locations[i].beneficiaries = [];
-    		report.locations[i].trainings = [];
+    		location.beneficiaries = [];
+    		location.trainings = [];
+
+	    	// set next in locations array
+	    	var set_next = function ( location ){
+	    		locations_counter++;
+					if( locations_counter === locations_features ){
+						report.locations.push( location );
+						next();
+					}
+	    	}
 
     		// beneficiaries
     		if ( beneficiaries.length ){
-	    		beneficiaries.forEach( function( beneficiary, j ) {
+    			async.each( beneficiaries, function ( beneficiary, b_next ) {
 	    			if ( location.id === beneficiary.location_id ) {
 	    				// push
-	    				report.locations[i].beneficiaries.push( beneficiary );
+	    				location.beneficiaries.push( beneficiary );
 	    			}
-	    		});
-	    	}
+    				// next
+    				b_next();
+	    		}, function ( err ) {
+			    	// error
+			      if ( err ) return err;
+			      // increment counter
+			      set_next( location );
+			    });
+	    	} else {
+		      // increment counter
+		      set_next( location );
+    		}
 
     		// trainings
     		if ( trainings.length ){
-	    		trainings.forEach( function( training, j ) {
+	    		async.each( trainings, function ( training, t_next ) {
 	    			if ( location.id === training.location_id ) {
-	    				// push
-	    				report.locations[i].trainings.push( training );
-
 	    				// set holders
-	    				report.locations[i].trainings[j].training_participants = [];
-
+	    				training.training_participants = [];
 	    				// participants
 	    				if ( training_participants.length ){
-	    					training_participants.forEach( function( training_participant, k ) {
+								async.each( training_participants, function ( training_participant, tp_next ) { 						
 	    						if ( training.id === training_participant.training_id ){
-	    							report.locations[i].trainings[j].push( training_participant );
+	    							training.training_participants.push( training_participant );
 	    						}
-	    					});
+	    						// next
+	    						tp_next();
+	    					}, function ( err ) {
+						    	// error
+						      if ( err ) return err;
+			    				// push
+			    				location.trainings.push( training );
+									// next
+    							t_next();
+								});
+	    				} else {
+		    				// push
+		    				location.trainings.push( training );
 	    				}
+	    			} else {
+	    				// next
+	    				t_next();
 	    			}
-	    		});
+	    		}, function ( err ) {
+			    	// error
+			      if ( err ) return err;
+			      // increment counter
+			      set_next( location );
+					});
+    		} else {
+		      // increment counter
+		      set_next( location );
     		}
 
-    	});
-
-  		// return
-			return res.json( 200, report );
+	    }, function ( err ) {
+      	if ( err ) return err;
+				return res.json( 200, report );
+	    });
 
     });
 
 	},
 
-	// get all Reports by project id
-	getReportByIdBulk: function( req, res ) {
-
-		// request input
-		if ( !req.param( 'id' ) ) {
-			return res.json(401, { err: 'id required!' });
-		}
-
-		if (req.param( 'previous' )) var prev = true;
-
-		if(!prev){
-			query={
-				id: req.param( 'id' )
-			}
-		} else{
-			query= {
-				project_id: req.param('project_id'),
-				report_month: req.param('month'),
-				report_year: req.param('year') 
-			}
-		}
-
-		// report for UI
-		var $report = {};
-
-		// get report by organization_id
-		Report
-			.findOne( query )
-			.exec( function( err, report ){
-
-				// return error
-				if (err) return res.negotiate( err );
-
-				// clone project to update
-				$report = report;
-
-				// if no reports
-				if ( !$report ) {
-					return res.json( 200, [] );
-				}
-
-				// get report by organization_id
-				Location
-					.find( { report_id: $report.id } )
-					.exec( function( err, locations ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// add locations ( associations included )
-						$report.locations = locations;
-
-						// if no reports
-						if ( !$report.locations.length ) {
-							return res.json( 200, $report );
-						}
-
-
-						// counter
-						var counter = 0,
-							length  = $report.locations.length;
-
-						// sort by location
-						// $report.locations.sort(function(a, b) {
-      //         if ( a.site_type_name ) {
-      //           if( a.report_group_id ) {
-      //             return a.report_group_id.localeCompare(b.site_type_name) ||
-      //                     a.site_type_name.localeCompare(b.site_type_name) ||
-      //                     a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.admin3name.localeCompare(b.admin3name) ||
-      //                     a.admin4name.localeCompare(b.admin4name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           } else if( a.admin4name ) {
-      //             return a.site_type_name.localeCompare(b.site_type_name) ||
-      //                     a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.admin3name.localeCompare(b.admin3name) ||
-      //                     a.admin4name.localeCompare(b.admin4name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           } else if ( a.admin3name ) {
-      //             return a.site_type_name.localeCompare(b.site_type_name) ||
-      //                     a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.admin3name.localeCompare(b.admin3name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           } else {
-      //             return a.site_type_name.localeCompare(b.site_type_name) ||
-      //                     a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           }
-      //         } else {
-      //           if( a.report_group_id ) {
-      //             return a.report_group_id.localeCompare(b.site_type_name) ||
-      //                     a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.admin3name.localeCompare(b.admin3name) ||
-      //                     a.admin4name.localeCompare(b.admin4name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           } else if( a.admin4name ) {
-      //             return a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.admin3name.localeCompare(b.admin3name) ||
-      //                     a.admin4name.localeCompare(b.admin4name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           } else if( a.admin3name ) {
-      //             return a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.admin3name.localeCompare(b.admin3name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           } else {
-      //             return a.admin1name.localeCompare(b.admin1name) ||
-      //                     a.admin2name.localeCompare(b.admin2name) ||
-      //                     a.site_name.localeCompare(b.site_name);
-      //           }
-      //         }                
-      //       });
-						
-						// get unique locations
-						var location_ids = _.chain($report.locations).pluck('id').uniq().value();
-
-						// get beneficiaries, trainings rows
-						Beneficiaries
-							.find( { location_id: location_ids } )
-							.populateAll()
-							.exec( function( err, beneficiaries ){
-								if (err) return res.negotiate( err );
-								Trainings
-										.find( { location_id: location_ids } )
-										.exec( function( err, trainings ){
-											if (err) return res.negotiate( err );
-											// parallelize locations processing
-											async.eachOfLimit(	$report.locations, 
-															 	500, // max locations in parallel
-															 	queryAsync.bind(null, beneficiaries, trainings),
-																function(err){
-																	if (err) return res.negotiate( err );
-																	return res.json( 200, $report );
-																}
-															 );
-										});
-							});
-						
-						// to run for each location
-						var queryAsync = function(beneficiaries, trainings, location, i, callback){
-
-											// add locations ( associations included )
-											$report.locations[i].beneficiaries = beneficiaries.filter(function (b) {
-												return b.location_id === location.id;
-											});
-
-											// sort by id
-											$report.locations[i].beneficiaries.sort( function( a, b ) {
-												return a.id.localeCompare( b.id );
-											});
-
-											// add locations ( associations included )
-											$report.locations[i].trainings = trainings.filter(function (b) {
-												return b.location_id === location.id;
-											});
-
-											// sort by id
-											$report.locations[i].trainings.sort( function( a, b ) {
-												return a.id.localeCompare( b.id );
-											});
-
-											// if length
-											if ( $report.locations[i].trainings && $report.locations[i].trainings.length) {
-
-												// counter
-												var trainingsCounter = 0,
-													trainingsLength  = $report.locations[i].trainings.length;
-
-												// trainings
-												// get unique trainings
-												var trainings_ids = _.chain($report.locations[i].trainings).pluck('id').uniq().value();
-
-													// Trainings
-													TrainingParticipants
-														.find( { training_id: trainings_ids } )
-														.exec( function( err, trainees ){
-
-															if (err) return callback(err);
-															$report.locations[i].trainings.forEach(function( training, j ){
-
-																// add locations ( associations included )
-																$report.locations[i].trainings[j].training_participants = trainees.filter(function (b) {
-																			return b.training_id === training.id;
-																		});;
-
-																// sort by id
-																$report.locations[i].trainings[j].training_participants.sort( function( a, b ) {
-																	return a.id.localeCompare( b.id );
-																});
-
-															});
-
-															// notify completion
-															callback(null);
-													});
-											} else {
-												// notify completion
-												callback(null);
-											}
-										}
-				});
-
-			});
-
-	},
-
-	// set report details by report id ( UNDER CONSTRUCTION )
-	setReportByIdNew: function( req, res ) {
+	// set report details by report id
+	setReportById: function( req, res ) {
 
 		// request input guards
 		if ( !req.param( 'report' ) ) {
 			return res.json(401, { err: 'report required!' });
 		}
-
-		// check that report locations prop is []
-		if (!Array.isArray(req.param( 'report' ).locations)){
-			return res.json(401, { err: 'locations array required!' });
-		}
-
-		// check that locations beneficiaries prop is []
-		req.param( 'report' ).locations.forEach(function( value,i ){
-			if (!Array.isArray(value.beneficiaries)){
-				return res.json(401, { err: 'beneficiaries array required!' });
-			}
-		});
 
 		// get report
 		var report = req.param( 'report' );
 		var locations = req.param( 'report' ).locations;
 
-		// either that or drop the whole schema
-    var Promise = require('bluebird');
+    // find
+    var findProject = {
+      project_id: report.project_id
+    }
+    var findReport = {
+      report_id: report.id
+    }
+    var findLocation;
+    var findTraining;
 
-		// promise
-    Promise.all([
-      Report.update( { id: report.id }, report ),
-      Location.updateOrCreateEachBulk( report.locations, report.report_status ).exec(cb),
-			Beneficiaries.updateOrCreateEachBulk( report.locations, report.report_status ).exec(cb)
-    ])
-    .catch( function( err ) {
-      return res.negotiate( err )
-    })
-    .then( function( result ) {
-
-    	// gather results
-    	var report = result[ 0 ][ 0 ];
-    	var locations = result[ 1 ];
-    	var beneficiaries = result[ 2 ];
-    	// var trainings = result[ 3 ];
-    	// var training_participants = result[ 4 ];
-
-    	// set locations
-    	report.locations = locations;
-
-    	// report locations
-    	report.locations.forEach( function( location, i ){
-
-    		// set holders
-    		report.locations[i].beneficiaries = [];
-    		report.locations[i].trainings = [];
-
-    		// beneficiaries
-    		if ( beneficiaries.length ){
-	    		beneficiaries.forEach( function( beneficiary, j ) {
-	    			if ( location.id === beneficiary.location_id ) {
-	    				report.locations[i].beneficiaries.push( beneficiary );
-	    			}
-	    		});
-	    	}
-
-    		// trainings
-    		// if ( trainings.length ){
-	    	// 	trainings.forEach( function( training, j ) {
-	    	// 		if ( location.id === training.location_id ) {
-	    	// 			report.locations[i].trainings.push( training );
-
-	    	// 			// set holders
-	    	// 			report.locations[i].trainings[j].training_participants = [];
-
-	    	// 			// participants
-	    	// 			if ( training_participants.length ){
-	    	// 				training_participants.forEach( function( training_participant, k ) {
-	    	// 					if ( training.id === training_participant.training_id ){
-	    	// 						report.locations[i].trainings[j].push( training_participant );
-	    	// 					}
-	    	// 				});
-	    	// 			}
-	    	// 		}
-
-	    	// 	});
-    		// }
-
-    	});
-
-    	// return
-    	return res.json( 200, report );
-
-    });
-
-	},
-	
-	// set report details by report id
-	setReportByIdBulk: function( req, res ) {
-
-		// measure time #TODO delete
-		// var hrstart = process.hrtime()
-		// measure time end
-
-		// request input guards
-		if ( !req.param( 'report' ) ) {
-			return res.json(401, { err: 'report required!' });
-		}
-
-		// check that report locations prop is []
-		if (!Array.isArray(req.param( 'report' ).locations)){
-			return res.json(401, { err: 'locations array required!' });
-		}
-
-		// check that locations beneficiaries prop is []
-		req.param( 'report' ).locations.forEach(function( value,i ){
-			if (!Array.isArray(value.beneficiaries)){
-				return res.json(401, { err: 'beneficiaries array required!' });
-			}
-		});
-		
-		// get report
-		var $report    = req.param( 'report' ),
-			$locations = req.param( 'report' ).locations;
-
-		// update report
+		// get report by organization_id
 		Report
-			.update( { id: $report.id }, $report )
+			.update( { id: report.id }, report )
 			.exec( function( err, report ){
 
 				// return error
-				if ( err ) return res.json({ err: true, error: err });
+				if (err) return res.negotiate( err );
 
-				// set updated
-				$report = report[0];
-				$report.locations = $locations;
+				// update / create locations
+				report = report[0];
+				report.locations = [];
 
-				// counter
-				var counter = 0,
-					length  = $report.locations.length;
+	      // async loop report locations
+	      async.each( locations, function ( location, next ) {
 
-				// sort by location
-				// $report.locations.sort(function(a, b) {
-    //       if ( a.site_type_name ) {
-    //         if( a.report_group_id ) {
-    //           return a.report_group_id.localeCompare(b.site_type_name) ||
-    //                   a.site_type_name.localeCompare(b.site_type_name) ||
-    //                   a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.admin3name.localeCompare(b.admin3name) ||
-    //                   a.admin4name.localeCompare(b.admin4name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         } else if( a.admin4name ) {
-    //           return a.site_type_name.localeCompare(b.site_type_name) ||
-    //                   a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.admin3name.localeCompare(b.admin3name) ||
-    //                   a.admin4name.localeCompare(b.admin4name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         } else if ( a.admin3name ) {
-    //           return a.site_type_name.localeCompare(b.site_type_name) ||
-    //                   a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.admin3name.localeCompare(b.admin3name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         } else {
-    //           return a.site_type_name.localeCompare(b.site_type_name) ||
-    //                   a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         }
-    //       } else {
-    //         if( a.report_group_id ) {
-    //           return a.report_group_id.localeCompare(b.site_type_name) ||
-    //                   a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.admin3name.localeCompare(b.admin3name) ||
-    //                   a.admin4name.localeCompare(b.admin4name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         } else if( a.admin4name ) {
-    //           return a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.admin3name.localeCompare(b.admin3name) ||
-    //                   a.admin4name.localeCompare(b.admin4name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         } else if( a.admin3name ) {
-    //           return a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.admin3name.localeCompare(b.admin3name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         } else {
-    //           return a.admin1name.localeCompare(b.admin1name) ||
-    //                   a.admin2name.localeCompare(b.admin2name) ||
-    //                   a.site_name.localeCompare(b.site_name);
-    //         }
-    //       }
-    //     });
+	      	// set counter
+		    	var locations_counter = 0;
+		    	var locations_features = 2;
 
-				Location
-					.updateOrCreateEachBulk( $report.locations, $report.report_status, function( err, update ){						
-					// .updateOrCreateEachStatus( $report.locations, $report.id, $report.report_status, function( err, update ){							
+	    		// set beneficiaries / trainings
+					var beneficiaries = location.beneficiaries;
+					var trainings = location.trainings;
 
-					$report.locations = update;
-					// beneficiaries
+		    	// set next in locations array
+		    	var set_next = function ( location ){
+		    		locations_counter++;
+						if( locations_counter === locations_features ){
+							report.locations.push( location );
+							next();
+						}
+		    	}
 
-					// measure time #TODO delete
-					// var hrstart_b = process.hrtime()
-					// measure time end 
+					// update or create
+	        Location.updateOrCreate( _under.extend( {}, findProject, findReport ), { id: location.id }, location ).exec(function( err, result ){
+	        	
+	        	// set result, update / create beneficiaries, trainings
+	        	location = ReportController.set_result( result );
+	        	findLocation = { location_id: location.id }
+		    		location.beneficiaries = [];
+		    		location.trainings = [];
 
-					Beneficiaries
-						.updateOrCreateEachBulk( $report.locations, $report.report_status, function( err, beneficiaries ){
+			      // async loop report beneficiaries
+			      async.each( beneficiaries, function ( beneficiary, b_next ) {
+							// update or create
+			        Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation ), { id: beneficiary.id }, beneficiary ).exec(function( err, result ){
+			        	location.beneficiaries.push( ReportController.set_result( result ) );
+			        	b_next();
+			        });
+			      }, function ( err ) {
+			        if ( err ) return err;
+				      // increment counter
+				      set_next( location );
+			      });
 
-							// measure time #TODO delete
-							// hrend_b = process.hrtime(hrstart_b)
-							// console.info('Execution time (beneficiaries): %ds %dms', hrend_b[0], hrend_b[1] / 1000000)
-							// measure time end 
+			     
+			      // async loop report beneficiaries
+			      async.each( trainings, function ( training, t_next ) {
 
-							// return error
-							if (err) return res.negotiate( err );
-							// beneficiaries
-							var location_ids = _.chain($report.locations).pluck('id').uniq().value();
+			      	// set beneficiaries / trainings
+							var training_participants = training.training_participants;
 
-							// measure time #TODO delete
-							// var hrstart_bf = process.hrtime()
-							// measure time end
+							// update or create
+			        Trainings.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation ), { id: training.id }, training ).exec(function( err, result ){
+			        	
+			        	// set result, update / create beneficiaries, trainings
+			        	training = ReportController.set_result( result );
+			        	findTraining = { training_id: training.id }
+			        	training.training_participants = [];
+			        	
+			        	// if training_participants
+			        	if ( training_participants && training_participants.length ) {
+				      		// async loop report beneficiaries
+				      		async.each( training_participants, function ( training_participant, tp_next ) {
+										// update or create
+						        TrainingParticipants.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTraining ), { id: training_participant.id }, training_participant ).exec(function( err, result ){
+						        	training.training_participants.push( ReportController.set_result( result ) );
+						        });
+				        		tp_next();
+					        }, function ( err ) {
+						        if ( err ) return err;
+						        // push
+						        location.trainings.push( training );
+							      // increment counter
+							      t_next();
+						      });
+					      } else {
+					      	// push results
+					      	location.trainings.push( training );
+						      // increment counter
+						      t_next();
+					      }
 
-							Beneficiaries
-								.find( { location_id: location_ids } )
-								.populateAll()
-								.exec( function( err, beneficiaries ){
-									// return error
-									if (err) return res.negotiate( err );
-
-									// measure time #TODO delete
-									// hrend_bf = process.hrtime(hrstart_bf)
-									// console.info('Execution time (find beneficiaries): %ds %dms', hrend_bf[0], hrend_bf[1] / 1000000)
-									// measure time end
-									
-									// add locations ( associations included )
-									$report.locations.forEach(function(location, i){
-
-										$report.locations[i].beneficiaries = beneficiaries.filter(function (b) {
-											return b.location_id === location.id;
-										});
-
-										// sort by id
-										$report.locations[i].beneficiaries.sort( function( a, b ) {
-											return a.id.localeCompare( b.id );
-										});
-										// trainings
-										if ( location.trainings && location.trainings.length ) {
-
-											// keeps training_participants
-											var originalTrainings = location.trainings;
-
-											// trainings
-											Trainings
-												.updateOrCreateEach( { location_id: location.id }, location.trainings, function( err, trainings ){
-
-												// return error
-												if (err) return res.negotiate( err );
-
-												// add locations ( associations included )
-												$report.locations[i].trainings = trainings;
-
-												// sort by id
-												$report.locations[i].trainings.sort( function( a, b ) {
-													return a.id.localeCompare( b.id );
-												});
+					    });
+			      }, function ( err ) {
+			        if ( err ) return err;
+				      // increment counter
+				      set_next( location );
+			      });
 
 
-												// trainings
-												var trainingCounter = 0,
-													trainingLength  = trainings.length;
+	        });
+	      }, function ( err ) {
+	      	if ( err ) return err;
+					return res.json( 200, report );
+	      });     
 
-												// trainings
-												originalTrainings.forEach( function( training, j ){
-
-													// set training_ids
-													training.training_participants.forEach( function( trainee, k ){
-														training.training_participants[k].training_id = $report.locations[i].trainings[j].id;
-													});
-
-													// trainings
-													TrainingParticipants
-														.updateOrCreateEach( { training_id: $report.locations[i].trainings[j].id }, training.training_participants, function( err, trainees ){
-
-															// return error
-															if (err) return res.negotiate( err );
-
-															// add locations ( associations included )
-															$report.locations[i].trainings[j].training_participants = trainees;
-
-															// trianing
-															trainingCounter++;
-															if ( trainingCounter === trainingLength ) {
-																// counter
-																counter++;
-																if ( counter === length ) {
-
-																	// measure time #TODO delete
-																	// hrend = process.hrtime(hrstart)
-																	// console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
-																	// measure time end
-																	
-																	// return report
-																	return res.json( 200, $report );
-																}
-															}
-
-														});
-
-												});
-
-											});
-
-										} else {
-											// counter
-											counter++;
-											if ( counter === length ) {
-												// return report
-												
-												// measure time #TODO delete
-												// hrend = process.hrtime(hrstart)
-												// console.info('Execution time (all): %ds %dms', hrend[0], hrend[1] / 1000000)
-												// measure time end
-
-												return res.json( 200, $report );
-											}
-										}
-									})
-								});
-
-						});
-
-				});
-
-		});
+    });
 
 	},
 
@@ -998,6 +635,7 @@ module.exports = {
 				return res.json( 200, report );
 
 			});
+	
 	},
 
 	// remove
@@ -1039,28 +677,17 @@ module.exports = {
 		// get report
 		var $id = req.param( 'id' );
 
-		// destroy
-		Trainings
-			.destroy({ id: $id })
-			.exec(function( err, b ){
-
-				// return error
-				if ( err ) return res.json({ err: true, error: err });
-
-				// destroy
-				TrainingParticipants
-					.destroy({ training_id: $id })
-					.exec(function( err, b ){
-
-						// return error
-						if ( err ) return res.json({ err: true, error: err });
-
-						// return reports
-						return res.json( 200, { msg: 'success' } );
-
-					});
-
-			});
+		// promise
+    Promise.all([
+      Trainings.destroy({ id: $id }),
+      TrainingParticipants.destroy({ training_id: $id })
+    ])
+    .catch( function( err ) {
+      return res.negotiate( err );
+    })
+    .then( function( result ) {
+    	return res.json( 200, { msg: 'success' } );
+    });
 
 	},
 
@@ -1091,3 +718,5 @@ module.exports = {
 	},
 
 };
+
+module.exports = ReportController;
