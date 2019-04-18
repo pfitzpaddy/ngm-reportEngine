@@ -1692,8 +1692,10 @@ var ClusterDashboardController = {
 															} else {
 																message += '<div style="text-align:center">' + d._id.admin1name + ', ' + d._id.admin2name + '</div>';
 															}
-															message += '<div style="text-align:center">' + d._id.site_type_name + '</div>'
-															+ '<div style="text-align:center">' + d._id.site_name + '</div>'
+															if ( d._id.site_type_name ){
+																message += '<div style="text-align:center">' + d._id.site_type_name + '</div>'
+															}
+															message += '<div style="text-align:center">' + d._id.site_name + '</div>'
 															+ '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">CONTACT</h5>'
 															+ '<div style="text-align:center">' + d._id.organization + '</div>'
 															+ '<div style="text-align:center">' + d._id.name + '</div>'
