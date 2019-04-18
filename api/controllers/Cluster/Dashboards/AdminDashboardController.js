@@ -174,6 +174,33 @@ var AdminDashboardController = {
 
           break;
 
+      case 'warehouses_total':
+
+        StockReport
+          .find( {}, { fields: {_id: 1} } )
+          .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
+          .where( params.adminRpcode_filter )
+          .where( params.admin0pcode_filter )
+          .where( { report_status: [ 'todo', 'complete' ] } )
+          .where( { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
+          .where( params.organization_filter )
+          .where( { report_active: true } )
+          .exec( function( err, reports ) {
+            if (err) return res.negotiate(err);
+            reports = reports.map(report => report.id);
+            StockLocation
+                .find({ report_id: reports }, { fields: { stock_warehouse_id: 1 } })
+                .exec(function(err, locations) {
+                  if (err) return res.negotiate(err);
+                  locations = _.uniq(locations.map(location => location.stock_warehouse_id));
+                  count = locations.length;
+                  return res.json( 200, { 'value': count });
+                })
+          })
+
+        break;
+
       case 'reports_total':
 
         // reports total
