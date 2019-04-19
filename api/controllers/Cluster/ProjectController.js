@@ -88,7 +88,49 @@ var ProjectController = {
   },
 
   // return locations for reports
-  getProjectReportLocations: function( project, reports, target_locations ){
+  getProjectReportLocationsAsync: function( reports, target_locations ){
+
+    // report locations
+    var locations = [];
+
+    // async loop target_beneficiaries
+    async.each( reports, function ( report, next ) {
+
+      // clone report
+      var r = JSON.parse( JSON.stringify( report ) );
+
+      // prepare report for cloning
+      r.report_id = r.id.valueOf();
+      delete r.id;
+
+      // async loop target_beneficiaries
+      async.each( target_locations, function ( target_location, tl_next ) {
+
+        // prepare report for cloning
+        var l = JSON.parse( JSON.stringify( target_location ) );
+        l.target_location_reference_id = l.id.valueOf();
+        delete l.id;
+
+        // push to locations
+        locations.push( _under.extend( {}, r, l ) );
+
+        // tl next
+        tl_next();
+
+      }, function ( err ) {
+        if ( err ) return err;
+        next();
+      });
+
+    }, function ( err ) {
+      if ( err ) return err;
+      return locations;
+    });
+
+  },
+
+  // return locations for reports
+  getProjectReportLocations: function( reports, target_locations ){
 
     // report locations
     var locations = [];
@@ -529,26 +571,69 @@ var ProjectController = {
         });
       }, function ( err ) {
         if ( err ) return err;
-       
-        // generate locations for each report ( requires report_id )
-        var locations = ProjectController.getProjectReportLocations( project_update, reports, project_update.target_locations );
-        
 
-        // ASYNC REQUEST 3.1
-        // async loop project_update locations
-        async.each( locations, function ( d, next ) {
-          // Location.updateOrCreate( findProject, { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
-          Location.findOne( { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
-            if( !location ) { location = { id: null } }
-            Location.updateOrCreate( _under.extend( {}, findProject, { report_id: d.report_id } ), { id: location.id }, d ).exec(function( err, result ){
-              // no need to return locations
-              next();
-            });
+
+        // generate locations for each report ( requires report_id )
+        // var locations = ProjectController.getProjectReportLocations( reports, project_update.target_locations );
+
+
+        var locations = [];
+
+        // async loop target_beneficiaries
+        async.each( reports, function ( report, next ) {
+
+          // clone report
+          var r = JSON.parse( JSON.stringify( report ) );
+
+          // prepare report for cloning
+          r.report_id = r.id.valueOf();
+          delete r.id;
+
+          // async loop target_beneficiaries
+          async.each( project_update.target_locations, function ( target_location, tl_next ) {
+
+            // prepare report for cloning
+            var l = JSON.parse( JSON.stringify( target_location ) );
+            l.target_location_reference_id = l.id.valueOf();
+            delete l.id;
+
+            // push to locations
+            locations.push( _under.extend( {}, r, l ) );
+
+            // tl next
+            tl_next();
+
+          }, function ( err ) {
+            if ( err ) return err;
+            next();
           });
+
         }, function ( err ) {
           if ( err ) return err;
-          returnProject();
+
+            // ASYNC REQUEST 3.1
+            // async loop project_update locations
+            async.each( locations, function ( d, next ) {
+              // Location.updateOrCreate( findProject, { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
+              Location.findOne( { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
+                if( !location ) { location = { id: null } }
+                Location.updateOrCreate( _under.extend( {}, findProject, { report_id: d.report_id } ), { id: location.id }, d ).exec(function( err, result ){
+                  // no need to return locations
+                  next();
+                });
+              });
+            }, function ( err ) {
+              if ( err ) return err;
+              returnProject();
+            });
+          
         });
+
+
+
+
+
+
       });
       
 
