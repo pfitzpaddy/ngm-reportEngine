@@ -30,7 +30,7 @@ var ProjectController = {
   },
 
   // return reports for a project
-  getProjectReports: function( project ) {
+  getProjectReports: function( project, cb ) {
 
     // dates
     var project_start = moment( project.project_start_date ).startOf( 'M' ),
@@ -46,19 +46,13 @@ var ProjectController = {
     // number of reports
     var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
 
+    // reports_duration array
+    var reports_array = Array( parseInt( reports_duration ) ).fill( 1 );
 
-    // TODO
-    // // async loop target_beneficiaries
-    // async.each( reports, function ( report, next ) {
-    //   next();
-    // }, function ( err ) {
-    //   if ( err ) return err;
-    // });
-
-
-    // for each report month
-    for ( m = 0; m < reports_duration; m++ ) {
-
+    // async loop target_beneficiaries
+    var m = 0
+    async.each( reports_array, function ( reports_item, next ) {
+      
       // report_status pending if dates before project start date
       var report_status = moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format() >= project_start.format() ? 'todo' : 'pending';
       
@@ -80,15 +74,22 @@ var ProjectController = {
       // add report with p to reports
       reports.push( _under.extend( {}, p, report ) );
 
-    }
+      // increase month counter
+      m++;
 
-    // return the reports for the project period
-    return reports;
+      // next
+      next();
 
-  },
+    }, function ( err ) {
+      if ( err ) return cb( err, false );
+      // return the reports for the project period
+      return cb( false, reports );
+    });
+
+  },  
 
   // return locations for reports
-  getProjectReportLocationsAsync: function( reports, target_locations ){
+  getProjectReportLocations: function( reports, target_locations, cb ){
 
     // report locations
     var locations = [];
@@ -118,60 +119,14 @@ var ProjectController = {
         tl_next();
 
       }, function ( err ) {
-        if ( err ) return err;
+        if ( err ) return cb( err, false );
         next();
       });
 
     }, function ( err ) {
-      if ( err ) return err;
-      return locations;
+      if ( err ) return cb( err, false );
+      return cb( false, locations );
     });
-
-  },
-
-  // return locations for reports
-  getProjectReportLocations: function( reports, target_locations ){
-
-    // report locations
-    var locations = [];
-
-    
-    // TODO
-    // // async loop target_beneficiaries
-    // async.each( reports, function ( report, next ) {
-    //   next();
-    // }, function ( err ) {
-    //   if ( err ) return err;
-    // });
-
-
-    // forEach report
-    reports.forEach(function( report, i ){
-
-      // clone report
-      var r = JSON.parse( JSON.stringify( report ) );
-
-      // prepare report for cloning
-      r.report_id = r.id.valueOf();
-      delete r.id;
-
-      // forEach target location
-      target_locations.forEach(function( target_location, i ){
-        
-        // prepare report for cloning
-        var l = JSON.parse( JSON.stringify( target_location ) );
-        l.target_location_reference_id = l.id.valueOf();
-        delete l.id;
-
-        // push to locations
-        locations.push( _under.extend( {}, r, l ) );
-
-      });
-
-    });
-
-    // return locations
-    return locations;
 
   },
 
@@ -509,107 +464,70 @@ var ProjectController = {
     })
     .then( function( update_result ) {
 
-      // results
+      // update_project
       var project_update = ProjectController.set_result( update_result[ 0 ] );
-      // set project_update
       findProject = { project_id: project_update.id }
       project_update.target_beneficiaries = [];
       project_update.target_locations = [];
 
       // reports holder
       var reports = [];
-      
-      // generate reports for duration of project_update
-      var project_reports = ProjectController.getProjectReports( project_update );
 
       // async
       var async_counter = 0;
       var async_requests = 3;
       
+      // generate reports for duration of project_update
+      ProjectController.getProjectReports( project_update, function( err, project_reports ){
 
-      // ASYNC REQUEST 1
-      // async loop target_beneficiaries
-      async.each( target_beneficiaries, function ( d, next ) {
-        TargetBeneficiaries.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
-          project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
-          next();
-        });
-      }, function ( err ) {
-        if ( err ) return err;
-        // ++
-        async_counter++;
-        // return
-        if ( async_counter === async_requests ) {
-          returnProject();
-        }
-      });
-
-
-      // ASYNC REQUEST 2
-      // async loop target_locations
-      async.each( target_locations, function ( d, next ) {
-        TargetLocation.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
-          project_update.target_locations.push( ProjectController.set_result( result ) );
-          next();
-        });
-      }, function ( err ) {
-        if ( err ) return err;
-        returnProject();
-      });
-
-
-      // ASYNC REQUEST 3
-      // async loop project_reports
-      async.each( project_reports, function ( d, next ) {
-        // Report.updateOrCreate( findProject, { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
-        Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
-          if( !report ) { report = { id: null } }
-          Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
-            reports.push( ProjectController.set_result( result ) );
-            next();
-          });
-        });
-      }, function ( err ) {
+        console.log( project_reports );
+        
+        // err
         if ( err ) return err;
 
-
-        // generate locations for each report ( requires report_id )
-        // var locations = ProjectController.getProjectReportLocations( reports, project_update.target_locations );
-
-
-        var locations = [];
-
+        // ASYNC REQUEST 1
         // async loop target_beneficiaries
-        async.each( reports, function ( report, next ) {
-
-          // clone report
-          var r = JSON.parse( JSON.stringify( report ) );
-
-          // prepare report for cloning
-          r.report_id = r.id.valueOf();
-          delete r.id;
-
-          // async loop target_beneficiaries
-          async.each( project_update.target_locations, function ( target_location, tl_next ) {
-
-            // prepare report for cloning
-            var l = JSON.parse( JSON.stringify( target_location ) );
-            l.target_location_reference_id = l.id.valueOf();
-            delete l.id;
-
-            // push to locations
-            locations.push( _under.extend( {}, r, l ) );
-
-            // tl next
-            tl_next();
-
-          }, function ( err ) {
-            if ( err ) return err;
+        async.each( target_beneficiaries, function ( d, next ) {
+          TargetBeneficiaries.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
+            project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
             next();
           });
-
         }, function ( err ) {
           if ( err ) return err;
+          returnProject();
+        });
+
+        // ASYNC REQUEST 2
+        // async loop target_locations
+        async.each( target_locations, function ( d, next ) {
+          TargetLocation.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
+            project_update.target_locations.push( ProjectController.set_result( result ) );
+            next();
+          });
+        }, function ( err ) {
+          if ( err ) return err;
+          returnProject();
+        });
+
+        // ASYNC REQUEST 3
+        // async loop project_reports
+        async.each( project_reports, function ( d, next ) {
+          // Report.updateOrCreate( findProject, { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
+          Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
+            if( !report ) { report = { id: null } }
+            Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
+              reports.push( ProjectController.set_result( result ) );
+              next();
+            });
+          });
+        }, function ( err ) {
+          if ( err ) return err;
+
+          // generate locations for each report ( requires report_id )
+          ProjectController.getProjectReportLocations( reports, project_update.target_locations, function( err, locations ){
+            
+            // err
+            if ( err ) return err;
 
             // ASYNC REQUEST 3.1
             // async loop project_update locations
@@ -626,16 +544,12 @@ var ProjectController = {
               if ( err ) return err;
               returnProject();
             });
-          
+
+          });
+
         });
-
-
-
-
-
-
-      });
       
+      });
 
       // return the project_update
       var returnProject = function() {
