@@ -476,11 +476,19 @@ var ProjectController = {
       // async
       var async_counter = 0;
       var async_requests = 3;
+
+      // return the project_update
+      var returnProject = function() {
+        // ++
+        async_counter++;
+        // return
+        if ( async_counter === async_requests ) {
+          return res.json( 200, project_update );
+        }
+      }
       
       // generate reports for duration of project_update
       ProjectController.getProjectReports( project_update, function( err, project_reports ){
-
-        console.log( project_reports );
         
         // err
         if ( err ) return err;
@@ -550,16 +558,6 @@ var ProjectController = {
         });
       
       });
-
-      // return the project_update
-      var returnProject = function() {
-        // ++
-        async_counter++;
-        // return
-        if ( async_counter === async_requests ) {
-          return res.json( 200, project_update );
-        }
-      }
 
     });
 
