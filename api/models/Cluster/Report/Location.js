@@ -113,7 +113,8 @@ module.exports = {
 
 		// target_location_reference
 		target_location_reference_id: {
-			type: 'string'
+			type: 'string',
+			required: true
 		},
 
 		// location group

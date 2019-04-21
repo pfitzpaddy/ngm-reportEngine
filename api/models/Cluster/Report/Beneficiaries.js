@@ -410,7 +410,13 @@ module.exports = {
 
 		// location
 		location_id: {
-			type: 'string'
+			type: 'string',
+			required: true
+		},
+		// target_location_reference
+		target_location_reference_id: {
+			type: 'string',
+			required: true
 		},
 		admin1pcode: {
 			type: 'string',

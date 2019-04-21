@@ -166,7 +166,7 @@ module.exports.routes = {
   'POST /cluster/report/getReportCsv': 'Cluster/Reports/ReportController.getReportCsv',
   'POST /cluster/report/getReportsList': 'Cluster/Reports/ReportController.getReportsList',
   'POST /cluster/report/getReportDetailsById': 'Cluster/Reports/ReportController.getReportDetailsById',
-  'POST /cluster/report/getReport': 'Cluster/Reports/ReportController.getReportById',
+  'POST /cluster/report/getReport': 'Cluster/Reports/ReportController.getReport',
   'POST /cluster/report/setReport': 'Cluster/Reports/ReportController.setReportById',
   'POST /cluster/report/updateReportStatus': 'Cluster/Reports/ReportController.updateReportStatus',
   'POST /cluster/report/removeBeneficiary': 'Cluster/Reports/ReportController.removeBeneficiary',
