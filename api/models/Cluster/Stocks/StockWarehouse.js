@@ -31,11 +31,9 @@ module.exports = {
 		},
 		cluster_id: {
 			type: 'string',
-			required: true
 		},
 		cluster: {
 			type: 'string',
-			required: true
 		},
 		username: {
 			type: 'string',
