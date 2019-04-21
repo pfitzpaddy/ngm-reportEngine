@@ -478,7 +478,7 @@ var ProjectController = {
       var async_requests = 3;
 
       // return the project_update
-      var returnProject = function() {
+      var returnProject = function( project_update ) {
         // ++
         async_counter++;
         // return
@@ -502,7 +502,7 @@ var ProjectController = {
           });
         }, function ( err ) {
           if ( err ) return err;
-          returnProject();
+          returnProject( project_update );
         });
 
         // ASYNC REQUEST 2
@@ -514,7 +514,7 @@ var ProjectController = {
           });
         }, function ( err ) {
           if ( err ) return err;
-          returnProject();
+          returnProject( project_update );
         });
 
         // ASYNC REQUEST 3
@@ -540,17 +540,17 @@ var ProjectController = {
             // ASYNC REQUEST 3.1
             // async loop project_update locations
             async.each( locations, function ( d, next ) {
-              // Location.updateOrCreate( findProject, { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
               Location.findOne( { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
                 if( !location ) { location = { id: null } }
-                Location.updateOrCreate( _under.extend( {}, findProject, { report_id: d.report_id } ), { id: location.id }, d ).exec(function( err, result ){
+                // relations set in getProjectReportLocations
+                Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, result ){
                   // no need to return locations
                   next();
                 });
               });
             }, function ( err ) {
               if ( err ) return err;
-              returnProject();
+              returnProject( project_update );
             });
 
           });

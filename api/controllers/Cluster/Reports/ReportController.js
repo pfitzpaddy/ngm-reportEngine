@@ -358,26 +358,45 @@ var ReportController = {
 	},	
 
 	// get all Reports by project id
-	getReportById: function( req, res ) {
+	getReport: function( req, res ) {
 
 		// request input
-		if ( !req.param( 'id' ) ) {
-			return res.json(401, { err: 'id required!' });
+		if ( !req.param( 'report_id' ) && ( !req.param( 'project_id' ) || !req.param( 'report_month' ) || !req.param( 'report_year' ) ) ) {
+			return res.json( 401, { err: 'report_id or project_id, report_month, report_year required!' });
 		}
 
-		// if location_group
-		var location_filter = { report_id: req.param( 'id' ) }
+		var find;
+		var findReport;
+		var findLocation;
+
+		// getReportById
+		if ( req.param( 'report_id' ) ) {
+			// set
+			find = { id: req.param( 'report_id' ) }
+			findReport = { report_id: req.param( 'report_id' ) }
+			findLocation = { report_id: req.param( 'report_id' ) }
+		}
+
+		// getReportByParams
+		if ( req.param( 'project_id' ) ) {
+			// set
+			find = { project_id: req.param( 'project_id' ), report_month: req.param( 'report_month' ), report_year: req.param( 'report_year' ) }
+			findReport = find;
+			findLocation = find;
+		}
+
+		// if location_group_id
 		if ( req.param( 'location_group_id') ) {
-			location_filter = { report_id: req.param( 'id' ), location_group_id: req.param( 'location_group_id') }
+			findLocation = _under.extend( {}, findLocation, { location_group_id: req.param( 'location_group_id') } );
 		}
 
 		// promise
     Promise.all([
-      Report.findOne( { id: req.param( 'id' ) } ),
-      Location.find( location_filter ),
-      Beneficiaries.find( { report_id: req.param( 'id' ) } ).populateAll(),
-      Trainings.find( { report_id: req.param( 'id' ) } ),
-      TrainingParticipants.find( { report_id: req.param( 'id' ) } )
+      Report.findOne( find ),
+      Location.find( findLocation ),
+      Beneficiaries.find( findReport ).populateAll(),
+      Trainings.find( findReport ),
+      TrainingParticipants.find( findReport )
     ])
     .catch( function( err ) {
       return res.negotiate( err );
@@ -504,6 +523,7 @@ var ReportController = {
       report_id: report.id
     }
     var findLocation;
+    var findTargetLocation;
     var findTraining;
 
 		// get report by organization_id
@@ -547,13 +567,14 @@ var ReportController = {
 	        	// set result, update / create beneficiaries, trainings
 	        	location = ReportController.set_result( result );
 	        	findLocation = { location_id: location.id }
+	        	findTargetLocation = { target_location_reference_id: location.target_location_reference_id }
 		    		location.beneficiaries = [];
 		    		location.trainings = [];
 
 			      // async loop report beneficiaries
 			      async.each( beneficiaries, function ( beneficiary, b_next ) {
 							// update or create
-			        Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation ), { id: beneficiary.id }, beneficiary ).exec(function( err, result ){
+			        Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: beneficiary.id }, beneficiary ).exec(function( err, result ){
 			        	location.beneficiaries.push( ReportController.set_result( result ) );
 			        	b_next();
 			        });
@@ -571,7 +592,7 @@ var ReportController = {
 							var training_participants = training.training_participants;
 
 							// update or create
-			        Trainings.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation ), { id: training.id }, training ).exec(function( err, result ){
+			        Trainings.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: training.id }, training ).exec(function( err, result ){
 			        	
 			        	// set result, update / create beneficiaries, trainings
 			        	training = ReportController.set_result( result );
@@ -583,7 +604,7 @@ var ReportController = {
 				      		// async loop report beneficiaries
 				      		async.each( training_participants, function ( training_participant, tp_next ) {
 										// update or create
-						        TrainingParticipants.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTraining ), { id: training_participant.id }, training_participant ).exec(function( err, result ){
+						        TrainingParticipants.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation, findTraining ), { id: training_participant.id }, training_participant ).exec(function( err, result ){
 						        	training.training_participants.push( ReportController.set_result( result ) );
 						        });
 				        		tp_next();
