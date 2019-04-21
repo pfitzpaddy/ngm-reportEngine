@@ -520,7 +520,10 @@ var ReportController = {
 
 	      // async loop report locations
 	      async.each( locations, function ( location, next ) {
-
+			// change location report_status if changed			
+			if ( report.report_status !== location.report_status ){
+				location.report_status = report.report_status
+			}
 	      	// set counter
 		    	var locations_counter = 0;
 		    	var locations_features = 2;

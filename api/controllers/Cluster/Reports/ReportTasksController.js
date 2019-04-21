@@ -578,44 +578,27 @@ module.exports = {
     // only run if date is 1 week before monthly reporting period required
     // if ( moment().date() <= 10 ) {
     Report
-    .find()
-    .where( { project_id: { '!' : null } } )
-    .where( { report_year: moment().subtract( 1, 'M' ).year() })
-    .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
-    .where( { report_active: true } )
-    .where( { report_status: 'todo' } )
-    .sort( 'report_month DESC' )
-    .exec( function( err, reports ){
+      .find()
+      .where( { project_id: { '!' : null } } )
+      .where( { report_year: moment().subtract( 1, 'M' ).year() })
+      .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
+      .where( { report_active: true } )
+      .where( { report_status: 'todo' } )
+      .sort( 'report_month DESC' )
+      .exec( function( err, reports ){
 
-      if ( err ) return res.negotiate( err );
-
-      // find active reports for the next reporting period
-      Location
-        .find()
-        .where( { report_id: { '!' : null } } )
-        .where( { report_year: moment().subtract( 1, 'M' ).year() })
-        .where( { report_month: { '<=': moment().subtract( 1, 'M' ).month() } } )
-        .where( { report_active: true } )
-        .where( { report_status: 'todo' } )
-        .sort( 'report_month DESC' )
-        .exec( function( err, locations ){
-
-          // return error
           if ( err ) return res.negotiate( err );
-
           // no reports return
-          if ( !locations.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
-
-
+          if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
+        
           // for each report, group by username
-          locations.forEach( function( location, i ) {
+          reports.forEach( function( location, i ) {
 
+            location.report_id = location.id;
             // if username dosnt exist
             if ( !nStore[ location.email ] ) {
-
               var due_message = 'due SOON';
               // set due message TODAY
-              console.log( moment().date() )
               if ( moment().date() === due_date ) {
                 due_message = 'due TODAY';
               }
@@ -637,7 +620,6 @@ module.exports = {
 
             // group reports by report!
             if ( !nStore[ location.email ].projectsStore[ location.project_id ] ){
-
               // add report urls
               nStore[ location.email ].projectsStore[ location.project_id ] = {
                 country: location.admin0name,
@@ -661,63 +643,6 @@ module.exports = {
             }
 
           });
-
-          // catching up with project focal points who are not in locations
-          // for each report, group by username
-          if ( moment().date() > due_date ) {
-
-            reports.forEach( function( location, i ) {
-
-              location.report_id = location.id;
-              // if username dosnt exist
-              if ( !nStore[ location.email ] ) {
-                var due_message = 'due SOON';
-                // set due message TODAY
-                if ( moment().date() === due_date ) {
-                  due_message = 'due TODAY';
-                }
-                // set due message PENDING
-                if ( moment().date() > due_date ) {
-                  due_message = 'OVERDUE';
-                }
-
-                // add for notification email template
-                nStore[ location.email ] = {
-                  email: location.email,
-                  username: location.username,
-                  report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
-                  reporting_due_date: moment( location.reporting_due_date ).format( 'DD MMMM, YYYY' ),
-                  reporting_due_message: due_message,
-                  projectsStore: []
-                };
-              }
-
-              // group reports by report!
-              if ( !nStore[ location.email ].projectsStore[ location.project_id ] ){
-                // add report urls
-                nStore[ location.email ].projectsStore[ location.project_id ] = {
-                  country: location.admin0name,
-                  cluster: location.cluster,
-                  project_title: location.project_title,
-                  reports: []
-                }
-
-              }
-
-              // one report per month
-              if ( !nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] ) {
-                // project reports
-                nStore[ location.email ].projectsStore[ location.project_id ].reports.push({
-                  report_value: location.report_month,
-                  report_month: moment( location.reporting_period ).format( 'MMMM' ),
-                  report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
-                });
-                // avoids report row per location
-                nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] = [{ report: true }];
-              }
-
-            });
-          }
 
           // each user, send only one email!
           for ( var user in nStore ) {
@@ -797,7 +722,6 @@ module.exports = {
           });
 
         });
-      });
       // } else { return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } ); }
 
   }
