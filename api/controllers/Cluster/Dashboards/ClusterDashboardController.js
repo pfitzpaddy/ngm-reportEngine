@@ -1811,60 +1811,107 @@ var ClusterDashboardController = {
 
 								switch (req.param('chart_for')) {
 									case 'children':
+										if ($beneficiaries.boys < 1 && $beneficiaries.girls < 1) {
 
-										// calc
+											// // assign data left
+											result.label.left.label.label = 0;
+											result.label.left.subLabel.label = 0;
+											// // assign data center
+											result.label.center.label.label = 0;
+											result.label.center.subLabel.label = 0;
+											// // assign data right
+											result.label.right.label.label = 0;
+											result.label.right.subLabel.label = 0;
 
-										var boysPerCent = ($beneficiaries.boys / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-										var girlsPerCent = ($beneficiaries.girls / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-										var totalPerCent = ($beneficiaries.childTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
+											// // highcharts elderly_women
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											// // highcharts elderly_men
+											result.data[1].y = 0;
+											result.data[1].label = 0;
+											
+											return res.json(200, result);
 
-										// assign data left
-										result.label.left.label.label = boysPerCent;
-										result.label.left.subLabel.label = $beneficiaries.boys;
-										// assign data center
-										result.label.center.label.label = totalPerCent;
-										result.label.center.subLabel.label = $beneficiaries.childTotal;
-										// assign data right
-										result.label.right.label.label = girlsPerCent;
-										result.label.right.subLabel.label = $beneficiaries.girls;
+										} else {
+											// calc
 
-										// highcharts girls
-										result.data[0].y = girlsPerCent;
-										result.data[0].label = $beneficiaries.childTotal;
-										// highcharts boys
-										result.data[1].y = boysPerCent;
-										result.data[1].label = $beneficiaries.childTotal;
-										
-										return res.json(200, result);
+											var boysPerCent = ($beneficiaries.boys / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
+											var girlsPerCent = ($beneficiaries.girls / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
+											var totalPerCent = ($beneficiaries.childTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
+
+											// assign data left
+											result.label.left.label.label = boysPerCent;
+											result.label.left.subLabel.label = $beneficiaries.boys;
+											// assign data center
+											result.label.center.label.label = totalPerCent;
+											result.label.center.subLabel.label = $beneficiaries.childTotal;
+											// assign data right
+											result.label.right.label.label = girlsPerCent;
+											result.label.right.subLabel.label = $beneficiaries.girls;
+
+											// highcharts girls
+											result.data[0].y = girlsPerCent;
+											result.data[0].label = $beneficiaries.childTotal;
+											// highcharts boys
+											result.data[1].y = boysPerCent;
+											result.data[1].label = $beneficiaries.childTotal;
+											
+											return res.json(200, result);
+										}
 
 										break;
 
 									case 'adult':
+										if ($beneficiaries.men < 1 && $beneficiaries.women < 1) {
 
-										// calc
+											// // assign data left
+											result.label.left.label.label = 0;
+											result.label.left.subLabel.label = 0;
+											// // assign data center
+											result.label.center.label.label = 0;
+											result.label.center.subLabel.label = 0;
+											// // assign data right
+											result.label.right.label.label = 0;
+											result.label.right.subLabel.label = 0;
 
-										var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
-										var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
-										var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-									
-										// // assign data left
-										result.label.left.label.label = mensPerCent;
-										result.label.left.subLabel.label = $beneficiaries.men;
-										// // assign data center
-										result.label.center.label.label = totalPerCent;
-										result.label.center.subLabel.label = $beneficiaries.adultTotal;
-										// // assign data right
-										result.label.right.label.label = womensPerCent;
-										result.label.right.subLabel.label = $beneficiaries.women;
+											// // highcharts elderly_women
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											// // highcharts elderly_men
+											result.data[1].y = 0;
+											result.data[1].label = 0;
+											
+											return res.json(200, result);
 
-										// // highcharts women
-										result.data[0].y = womensPerCent;
-										result.data[0].label = $beneficiaries.adultTotal;
-										// // highcharts men
-										result.data[1].y = mensPerCent;
-										result.data[1].label = $beneficiaries.adultTotal;
+										} else {
+											// calc
+
+											var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
+											var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
+											var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
 										
-										return res.json(200, result);
+											// // assign data left
+											result.label.left.label.label = mensPerCent;
+											result.label.left.subLabel.label = $beneficiaries.men;
+											// // assign data center
+											result.label.center.label.label = totalPerCent;
+											result.label.center.subLabel.label = $beneficiaries.adultTotal;
+											// // assign data right
+											result.label.right.label.label = womensPerCent;
+											result.label.right.subLabel.label = $beneficiaries.women;
+
+											// // highcharts women
+											result.data[0].y = womensPerCent;
+											result.data[0].label = $beneficiaries.adultTotal;
+											// // highcharts men
+											result.data[1].y = mensPerCent;
+											result.data[1].label = $beneficiaries.adultTotal;
+											
+											return res.json(200, result);
+
+										}
 
 										break;
 
