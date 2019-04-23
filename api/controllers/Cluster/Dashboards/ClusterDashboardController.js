@@ -92,6 +92,19 @@ var ClusterDashboardController = {
 									: { $or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { $regex : params.cluster_id } }, { activity_description_id: { $regex: 'cash' } }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] },
 			organization_tag_Native: params.organization_tag === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: params.organization_tag },
 			date_Native: { reporting_period: { $gte: new Date( params.start_date ), $lte: new Date( params.end_date )} },
+			delivery_type_id: function() {
+				var filter = {}
+				if ( params.indicator === 'households_population' ) {
+					filter = { delivery_type_id: 'population' }
+				}
+				if ( params.indicator === 'beneficiaries_population' ) {
+					filter = { delivery_type_id: 'population' }
+				}
+				if ( params.indicator === 'beneficiaries_service' ) {
+					filter = { delivery_type_id: 'service' }
+				}
+				return filter
+			}
 
 		}
 	},
@@ -113,7 +126,8 @@ var ClusterDashboardController = {
 										filters.acbar_partners,
 										filters.organization_tag_Native,
 										filters.beneficiaries,
-										filters.date_Native )
+										filters.date_Native,
+										filters.delivery_type_id() )
 
 		// switch on indicator
 		switch( params.indicator ) {
@@ -616,6 +630,68 @@ var ClusterDashboardController = {
 					});
 
 				break;
+
+			case 'households_population':
+				
+				// total sum
+				Beneficiaries.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate(
+						[
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group:
+								{
+									_id: null,
+									total:  { $sum: { $add: [ "$households" ] } } ,
+								}
+							}
+						]
+					).toArray(function (err, beneficiaries) {
+						if (err) return res.serverError(err);
+
+						var total = beneficiaries[0]?beneficiaries[0].total:0;
+
+						return res.json( 200, { 'value': total } );
+					});
+				});
+				
+				break;
+
+			
+			case 'beneficiaries_population':
+
+				// total sum
+				Beneficiaries.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate(
+						[
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group:
+								{
+									_id: null,
+									total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+								}
+							}
+						]
+					).toArray(function (err, beneficiaries) {
+						if (err) return res.serverError(err);
+
+						var total = beneficiaries[0]?beneficiaries[0].total:0;
+
+						return res.json( 200, { 'value': total } );
+					});
+				});
+				
+				break;
+				
 
 
 			// raw data export
@@ -1967,6 +2043,7 @@ var ClusterDashboardController = {
 										break;
 
 										default:
+											return res.json( 200, { value:0 });
 											break;
 									}
 
@@ -1977,6 +2054,10 @@ var ClusterDashboardController = {
 										
 				break;
 				
+				default: 
+					return res.json( 200, { value:0 });
+					break;
+
 
 		}
 
