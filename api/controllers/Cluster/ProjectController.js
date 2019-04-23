@@ -388,7 +388,12 @@ var ProjectController = {
     }
 
     // project for UI
-    var project = {};
+    var project = {
+      target_beneficiaries: [],
+      target_locations: []
+    };
+    var target_beneficiaries;
+    var target_locations;
 
     // promise
     Promise.all([
@@ -402,9 +407,11 @@ var ProjectController = {
     .then( function( result ) {
 
       // gather results
-      var project = result[ 0 ][ 0 ];
-      var target_beneficiaries = result[ 1 ];
-      var target_locations = result[ 2 ];
+      if ( result[ 0 ][ 0 ] ) {
+        project = result[ 0 ][ 0 ];
+        target_beneficiaries = result[ 1 ];
+        target_locations = result[ 2 ];
+      }
 
       // create project
       project.target_beneficiaries = target_beneficiaries;
