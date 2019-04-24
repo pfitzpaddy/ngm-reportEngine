@@ -779,6 +779,8 @@ var ClusterDashboardController = {
 								d.report_month_number = d.report_month+1;
 								d.report_month = moment( d.reporting_period ).format( 'MMMM' );
 								d.reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
+								d.updatedAt = moment( d.updatedAt ).format( 'YYYY-MM-DD HH:mm:ss' );
+								d.createdAt = moment( d.createdAt ).format( 'YYYY-MM-DD HH:mm:ss' );
 								// grand total
 								total += sum;
 							});
@@ -880,7 +882,9 @@ var ClusterDashboardController = {
 										'admin5lng',
 										'admin5lat',
 										'site_lng',
-										'site_lat'
+										'site_lat',
+										'updatedAt',
+										'createdAt',
 									],
 
 							fieldNames = [
@@ -980,7 +984,9 @@ var ClusterDashboardController = {
 									'admin5lng',
 									'admin5lat',
 									'site_lng',
-									'site_lat'
+									'site_lat',
+									'updatedAt',
+									'createdAt'
 								];
 
 							// return csv
