@@ -361,7 +361,7 @@ var ReportController = {
 	getReport: function( req, res ) {
 
 		// request input
-		if ( !req.param( 'report_id' ) && ( !req.param( 'project_id' ) || !req.param( 'report_month' ) || !req.param( 'report_year' ) ) ) {
+		if ( !req.param( 'report_id' ) && ( !req.param( 'project_id' ) || ( !req.param( 'report_month' ) && !( req.param( 'report_month' ) === 0 ) ) || !req.param( 'report_year' ) ) ) {
 			return res.json( 401, { err: 'report_id or project_id, report_month, report_year required!' });
 		}
 
