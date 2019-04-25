@@ -389,15 +389,18 @@ var ProjectController = {
 
     // project for UI
     var project = {
+      project_budget_progress: [],
       target_beneficiaries: [],
       target_locations: []
     };
+    var project_budget_progress;
     var target_beneficiaries;
     var target_locations;
 
     // promise
     Promise.all([
       Project.find( { id: req.param('id') } ),
+      BudgetProgress.find( { project_id: req.param('id') } ),
       TargetBeneficiaries.find( { project_id: req.param('id') } ),
       TargetLocation.find( { project_id: req.param('id') } )
     ])
@@ -409,11 +412,13 @@ var ProjectController = {
       // gather results
       if ( result[ 0 ][ 0 ] ) {
         project = result[ 0 ][ 0 ];
-        target_beneficiaries = result[ 1 ];
-        target_locations = result[ 2 ];
+        project_budget_progress = result[ 1 ];
+        target_beneficiaries = result[ 2 ];
+        target_locations = result[ 3 ];
       }
 
       // create project
+      project.project_budget_progress = project_budget_progress;
       project.target_beneficiaries = target_beneficiaries;
       project.target_locations = target_locations;
 
@@ -434,7 +439,7 @@ var ProjectController = {
 
     // get project
     var project = req.param('project');
-    // var budget_progress = req.param('project').budget_progress;
+    var project_budget_progress = req.param('project').project_budget_progress;
     var target_beneficiaries = req.param('project').target_beneficiaries;
     var target_locations = req.param('project').target_locations;
 
@@ -460,8 +465,7 @@ var ProjectController = {
     // promise
     Promise.all([
       Project.updateOrCreate( { id: project.id }, project ),
-      BudgetProgress.update( findProject, updateUser ),
-      // target_beneficiaries, target_locations, report, location ( below )
+      // budget_progress, target_beneficiaries, target_locations, report, location ( below )
       Beneficiaries.update( findProject, updateUser ),
       Trainings.update( findProject, updateUser ),
       TrainingParticipants.update( findProject, updateUser )
@@ -473,7 +477,10 @@ var ProjectController = {
 
       // update_project
       var project_update = ProjectController.set_result( update_result[ 0 ] );
+
+      // project update
       findProject = { project_id: project_update.id }
+      project_update.project_budget_progress = [];
       project_update.target_beneficiaries = [];
       project_update.target_locations = [];
 
@@ -482,7 +489,7 @@ var ProjectController = {
 
       // async
       var async_counter = 0;
-      var async_requests = 3;
+      var async_requests = 4;
 
       // return the project_update
       var returnProject = function( project_update ) {
@@ -493,6 +500,18 @@ var ProjectController = {
           return res.json( 200, project_update );
         }
       }
+
+      // ASYNC REQUEST 1
+      // async loop target_beneficiaries
+      async.each( project_budget_progress, function ( d, next ) {
+        BudgetProgress.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
+          project_update.project_budget_progress.push( ProjectController.set_result( result ) );
+          next();
+        });
+      }, function ( err ) {
+        if ( err ) return err;
+        returnProject( project_update );
+      });
       
       // generate reports for duration of project_update
       ProjectController.getProjectReports( project_update, function( err, project_reports ){
@@ -500,7 +519,7 @@ var ProjectController = {
         // err
         if ( err ) return err;
 
-        // ASYNC REQUEST 1
+        // ASYNC REQUEST 2
         // async loop target_beneficiaries
         async.each( target_beneficiaries, function ( d, next ) {
           TargetBeneficiaries.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
@@ -512,7 +531,7 @@ var ProjectController = {
           returnProject( project_update );
         });
 
-        // ASYNC REQUEST 2
+        // ASYNC REQUEST 3
         // async loop target_locations
         async.each( target_locations, function ( d, next ) {
           TargetLocation.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
@@ -524,12 +543,13 @@ var ProjectController = {
           returnProject( project_update );
         });
 
-        // ASYNC REQUEST 3
+        // ASYNC REQUEST 4
         // async loop project_reports
         async.each( project_reports, function ( d, next ) {
           // Report.updateOrCreate( findProject, { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
           Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
             if( !report ) { report = { id: null } }
+            if ( report ) { d.report_status = report.report_status; d.report_active = report.report_active }
             Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
               reports.push( ProjectController.set_result( result ) );
               next();
