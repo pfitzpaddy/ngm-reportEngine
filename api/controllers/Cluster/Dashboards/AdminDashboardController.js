@@ -664,29 +664,94 @@ var AdminDashboardController = {
 
       case 'reports_saved':
         
-        // get organizations by project
-        Beneficiaries
-          .find()
-          .where( params.cluster_filter )
-          .where( params.acbar_partners_filter )
-          .where( params.adminRpcode_filter )
-          .where( params.admin0pcode_filter )
-          .where( params.activity_type_id )
-          .where( { project_start_date: { '<=': new Date( params.end_date ) } } )
-          .where( { project_end_date: { '>=': new Date( params.start_date ) } } )
-          .where( params.organization_filter )
-          .exec( function( err, results ){
+        // match clause for native mongo query
+        var filterObject = _.extend({}, params.cluster_filter,
+                                      params.acbar_partners_filter,
+                                      params.adminRpcode_filter,
+                                      params.admin0pcode_filter,  
+                                      { report_active: true },
+                                      params.activity_type_id,
+                                      { report_status: 'todo' },
+                                      { reporting_period: 
+                                        { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')), 
+                                          '$lte': new Date(params.moment( params.end_date   ).format('YYYY-MM-DD'))
+                                        } 
+                                      },
+                                      params.organization_filter_Native 
+                                  );  
+        // reports due
+        Report.native(function(err, collection) {
+          if (err) return res.serverError(err);
+        
+          collection.find(
+            filterObject
+            ).sort({updatedAt:-1 }).toArray(function (err, reports) {
+                 
+              // return error
+              if (err) return res.negotiate( err );
 
-            // return error
-            if (err) return res.negotiate( err );
+                // counter
+                var counter = 0,
+                    length  = reports.length,
+                    reports_saved = 0;
 
-            // filter by project_id
-            var reports = _.countBy( results, 'report_id' );
+                // if no reports
+                if ( length === 0 ) {
 
-            // return indicator
-            return res.json( 200, { 'value': Object.keys( reports ).length });
+                  // return empty
+                  return res.json( 200, [] );
 
-          });
+                } else {
+
+                  // reports ids
+                  var reports_array = _.map(reports,function(report){return report._id.toString()});
+                  
+                  // find saved
+                  Beneficiaries.native(function(err, collection) {
+                    if (err) return res.serverError(err);
+                  
+                    collection.aggregate([
+                        { 
+                          $match : {report_id:{"$in":reports_array}} 
+                        },
+                        {
+                          $group: {
+                            _id: '$report_id'
+                          }
+                        }
+                      ]).toArray(function (err, results) {
+                          
+                          // err
+                          if (err) return res.negotiate(err);
+
+                          // for reports not submitted with entries
+                          var non_empty_reports=_.map(results,'_id')  
+
+                          // status
+                          reports.forEach( function( d, i ){
+                                
+                            // if benficiaries
+                            if ( non_empty_reports.indexOf(d._id.toString())>-1) {
+                              // add status
+                              reports_saved++;
+                            }
+
+                            // return
+                            counter++;
+                            if ( counter === length ) {
+                              // return indicator
+                              return res.json( 200, { 'value': reports_saved });
+                            }
+
+                          });
+
+                      });
+                  
+                  });
+                }
+
+            });
+        });
 
         break;
 
@@ -832,6 +897,7 @@ var AdminDashboardController = {
         break;
 
       case 'reports_due':
+
         // match clause for native mongo query
         var filterObject = _.extend({},	params.cluster_filter,
                                       params.acbar_partners_filter,
