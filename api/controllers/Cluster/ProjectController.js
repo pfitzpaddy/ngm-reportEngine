@@ -422,6 +422,43 @@ var ProjectController = {
       project.target_beneficiaries = target_beneficiaries;
       project.target_locations = target_locations;
 
+
+      
+      if(typeof(project.implementing_partners) === 'string'){
+        // implementing_partners string to array
+
+
+        var newarray = project.implementing_partners.split(",");
+           project.implementing_partners = [];
+
+              //console.log(newarray,"nuevo array");
+
+              newarray.forEach( function(imppartner,element2){
+
+                var imppartnermayus = imppartner.toUpperCase();
+
+                var imppartnerpush =
+                {
+                  organization_name : imppartner,
+                  organization : imppartnermayus,
+                }
+                
+                project.implementing_partners.push(imppartnerpush);
+                
+                }
+              );
+            
+
+         }else if(!project.implementing_partners){
+
+              //create implementing_partners array
+
+               project.implementing_partners = [];
+
+    
+            }
+
+
       // return Project
       return res.json( 200, project );
 
