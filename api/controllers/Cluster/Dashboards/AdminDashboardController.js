@@ -662,78 +662,10 @@ var AdminDashboardController = {
 
         break;
 
-      case 'reports_total':
-
-        // reports total
-        Report
-          .find()
-          .where( params.cluster_filter )
-          .where( params.acbar_partners_filter )
-          .where( params.adminRpcode_filter )
-          .where( params.admin0pcode_filter )
-          .where( { report_active: true } )
-          .where( params.activity_type_id )
-          .where( { report_status: [ 'todo', 'complete' ] } )
-          .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
-          .where( params.organization_filter )
-          .sort('updatedAt DESC')
-          .exec( function( err, reports ){
-
-            // return error
-            if (err) return res.negotiate( err );
-
-            // return
-            if ( params.list ) {
-
-              // counter
-              var counter=0,
-                  length=reports.length;
-
-              // reports
-              reports.forEach( function( d, i ){
-
-                // check if form has been edited
-                Beneficiaries
-                  .count( { report_id: d.id } )
-                  .exec(function( err, b ){
-
-                    // return error
-                    if (err) return res.negotiate( err );
-
-                    // add status / icon
-                    reports[i].status = '#e57373';
-                    reports[i].icon = 'fiber_manual_record';
-
-                    // if benficiaries
-                    if ( b ) {
-                      // add status
-                      reports[i].status = reports[i].report_status === 'complete' ? '#4db6ac' : '#fff176'
-                    }
-
-                    // reutrn
-                    counter++;
-                    if ( counter === length ) {
-                      // table
-                      return res.json( 200, reports );
-                    }
-
-                  });
-
-              });
-
-            } else {
-
-              // return indicator
-              return res.json( 200, { 'value': reports.length });
-            }
-
-          });
-
-        break;
-
-      case 'reports_due':
+      case 'reports_saved':
+        
         // match clause for native mongo query
-      var filterObject = _.extend({},	params.cluster_filter,
+        var filterObject = _.extend({}, params.cluster_filter,
                                       params.acbar_partners_filter,
                                       params.adminRpcode_filter,
                                       params.admin0pcode_filter,  
@@ -758,12 +690,10 @@ var AdminDashboardController = {
               // return error
               if (err) return res.negotiate( err );
 
-              // return
-              if ( params.list ) {
-
                 // counter
                 var counter = 0,
-                    length  = reports.length;
+                    length  = reports.length,
+                    reports_saved = 0;
 
                 // if no reports
                 if ( length === 0 ) {
@@ -776,6 +706,7 @@ var AdminDashboardController = {
                   // reports ids
                   var reports_array = _.map(reports,function(report){return report._id.toString()});
                   
+                  // find saved
                   Beneficiaries.native(function(err, collection) {
                     if (err) return res.serverError(err);
                   
@@ -789,77 +720,45 @@ var AdminDashboardController = {
                           }
                         }
                       ]).toArray(function (err, results) {
+                          
+                          // err
                           if (err) return res.negotiate(err);
 
                           // for reports not submitted with entries
-                          var non_empty_reports=_.map(results,'_id')	
+                          var non_empty_reports=_.map(results,'_id')  
 
                           // status
                           reports.forEach( function( d, i ){
+                                
+                            // if benficiaries
+                            if ( non_empty_reports.indexOf(d._id.toString())>-1) {
+                              // add status
+                              reports_saved++;
+                            }
 
-                                // add status
-                                reports[i].id     = reports[i]._id.toString();
-                                reports[i].status = '#e57373'
-                                reports[i].status_title = 'Due';
-                                reports[i].icon = 'watch_later';
-                                reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
-                                reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
-                                // if benficiaries
-                                if ( non_empty_reports.indexOf(d._id.toString())>-1) {
-                                  // add status
-                                  reports[i].status = '#fff176';
-                                  reports[i].status_title = 'Pending';
-                                }
+                            // return
+                            counter++;
+                            if ( counter === length ) {
+                              // return indicator
+                              return res.json( 200, { 'value': reports_saved });
+                            }
 
-                                // return
-                                counter++;
-                                if ( counter === length ) {
+                          });
 
-                                  // !csv
-                                  if ( !params.csv ) {
-                                    // table
-                                    return res.json( 200, reports );
-                                  }
-
-                                  // csv
-                                  if ( params.csv ) {
-
-                                    // return csv
-                                    json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
-
-                                      // error
-                                      if ( err ) return res.negotiate( err );
-
-                                      // success
-                                      return res.json( 200, { data: csv } );
-
-                                    });
-                                  }
-
-                                }
-
-                            });
-
-                         });
-                });
+                      });
+                  
+                  });
                 }
-
-              } else {
-
-                // return indicator
-                return res.json( 200, { 'value': reports.length });
-              }
-
 
             });
         });
 
         break;
 
-      case 'reports_complete':
+      case 'reports_submitted':
 
         // reports complete
-        var filterObject = _.extend({},	params.cluster_filter,
+        var filterObject = _.extend({}, params.cluster_filter,
                                         params.acbar_partners_filter,
                                         params.adminRpcode_filter,
                                         params.admin0pcode_filter,  
@@ -917,7 +816,7 @@ var AdminDashboardController = {
                                     if (err) return res.serverError(err);
 
                                     // for reports not submitted with entries
-                                    var non_empty_reports=_.map(results,'_id')		
+                                    var non_empty_reports=_.map(results,'_id')    
                                     
                                     TrainingParticipants.native(function(err, collection) {
                                       if (err) return res.serverError(err);
@@ -997,6 +896,203 @@ var AdminDashboardController = {
 
         break;
 
+      case 'reports_due':
+
+        // match clause for native mongo query
+        var filterObject = _.extend({},	params.cluster_filter,
+                                      params.acbar_partners_filter,
+                                      params.adminRpcode_filter,
+                                      params.admin0pcode_filter,  
+                                      { report_active: true },
+                                      params.activity_type_id,
+                                      { report_status: 'todo' },
+                                      { reporting_period: 
+                                        { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')), 
+                                          '$lte': new Date(params.moment( params.end_date   ).format('YYYY-MM-DD'))
+                                        } 
+                                      },
+                                      params.organization_filter_Native 
+                                  );  
+        // reports due
+        Report.native(function(err, collection) {
+          if (err) return res.serverError(err);
+        
+          collection.find(
+            filterObject
+            ).sort({updatedAt:-1 }).toArray(function (err, reports) {
+                 
+              // return error
+              if (err) return res.negotiate( err );
+
+              // return
+              if ( params.list ) {
+
+                // counter
+                var counter = 0,
+                    length  = reports.length;
+
+                // if no reports
+                if ( length === 0 ) {
+
+                  // return empty
+                  return res.json( 200, [] );
+
+                } else {
+
+                  // reports ids
+                  var reports_array = _.map(reports,function(report){return report._id.toString()});
+                  
+                  Beneficiaries.native(function(err, collection) {
+                    if (err) return res.serverError(err);
+                  
+                    collection.aggregate([
+                        { 
+                          $match : {report_id:{"$in":reports_array}} 
+                        },
+                        {
+                          $group: {
+                            _id: '$report_id'
+                          }
+                        }
+                      ]).toArray(function (err, results) {
+                          if (err) return res.negotiate(err);
+
+                          // for reports not submitted with entries
+                          var non_empty_reports=_.map(results,'_id')	
+
+                          // status
+                          reports.forEach( function( d, i ){
+
+                                // add status
+                                reports[i].id     = reports[i]._id.toString();
+                                reports[i].status = '#e57373'
+                                reports[i].status_title = 'Due';
+                                reports[i].icon = 'error';
+                                reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
+                                reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
+                                // if benficiaries
+                                if ( non_empty_reports.indexOf(d._id.toString())>-1) {
+                                  // add status
+                                  reports[i].icon = 'watch_later';
+                                  reports[i].status = '#fff176';
+                                  reports[i].status_title = 'Pending';
+                                }
+
+                                // return
+                                counter++;
+                                if ( counter === length ) {
+
+                                  // !csv
+                                  if ( !params.csv ) {
+                                    // table
+                                    return res.json( 200, reports );
+                                  }
+
+                                  // csv
+                                  if ( params.csv ) {
+
+                                    // return csv
+                                    json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
+
+                                      // error
+                                      if ( err ) return res.negotiate( err );
+
+                                      // success
+                                      return res.json( 200, { data: csv } );
+
+                                    });
+                                  }
+
+                                }
+
+                            });
+
+                         });
+                });
+                }
+
+              } else {
+
+                // return indicator
+                return res.json( 200, { 'value': reports.length });
+              }
+
+
+            });
+        });
+
+        break;
+
+      case 'reports_total':
+
+        // reports total
+        Report
+          .find()
+          .where( params.cluster_filter )
+          .where( params.acbar_partners_filter )
+          .where( params.adminRpcode_filter )
+          .where( params.admin0pcode_filter )
+          .where( { report_active: true } )
+          .where( params.activity_type_id )
+          .where( { report_status: [ 'todo', 'complete' ] } )
+          .where( { reporting_period: { '>=': params.moment( params.start_date ).format('YYYY-MM-DD'), '<=': params.moment( params.end_date ).format('YYYY-MM-DD') } } )
+          .where( params.organization_filter )
+          .sort('updatedAt DESC')
+          .exec( function( err, reports ){
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // return
+            if ( params.list ) {
+
+              // counter
+              var counter=0,
+                  length=reports.length;
+
+              // reports
+              reports.forEach( function( d, i ){
+
+                // check if form has been edited
+                Beneficiaries
+                  .count( { report_id: d.id } )
+                  .exec(function( err, b ){
+
+                    // return error
+                    if (err) return res.negotiate( err );
+
+                    // add status / icon
+                    reports[i].status = '#e57373';
+                    reports[i].icon = 'fiber_manual_record';
+
+                    // if benficiaries
+                    if ( b ) {
+                      // add status
+                      reports[i].status = reports[i].report_status === 'complete' ? '#4db6ac' : '#fff176'
+                    }
+
+                    // reutrn
+                    counter++;
+                    if ( counter === length ) {
+                      // table
+                      return res.json( 200, reports );
+                    }
+
+                  });
+
+              });
+
+            } else {
+
+              // return indicator
+              return res.json( 200, { 'value': reports.length });
+            }
+
+          });
+
+        break;
+
+     
       case 'reports_complete_total':
 
         // reports total

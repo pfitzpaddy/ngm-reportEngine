@@ -266,7 +266,7 @@ var ReportController = {
     	// gather results
     	var reports = result[ 0 ];
     	var beneficiaries = result[ 1 ];
-
+    	
 	    // async loop reports
 	    async.each( reports, function ( report, next ) {
 
@@ -279,8 +279,8 @@ var ReportController = {
 				if ( report.report_status === 'todo' && moment().isSameOrBefore( moment( report.reporting_due_date ) ) ) {
 
 					// add status todo but ok
-					report.status = '#4db6ac';
 					report.icon = 'watch_later';
+					report.status = '#4db6ac';
 					report.status_title = 'ToDo';
 
 				}
@@ -289,7 +289,7 @@ var ReportController = {
 				if ( report.report_status === 'todo' && moment().isAfter( moment( report.reporting_due_date ) ) ) {
 
 					// set to red (overdue!)
-					report.icon = 'watch_later';
+					report.icon = 'error';
 					report.status = '#e57373'
 					report.status_title = 'Due';
 
@@ -304,7 +304,7 @@ var ReportController = {
 						// if no benficiaries and submitted
 						if ( report.report_status === 'complete' ) {
 							// add status
-							report.icon = 'watch_later';
+							report.icon = 'check_circle';
 							report.status = '#4db6ac';
 							report.status_title = 'Complete';
 						}
