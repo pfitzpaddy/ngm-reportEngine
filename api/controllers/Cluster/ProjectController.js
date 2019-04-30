@@ -420,7 +420,41 @@ var ProjectController = {
       // create project
       project.project_budget_progress = project_budget_progress;
       project.target_beneficiaries = target_beneficiaries;
+            
+
+      //var newtarget_locations;
+      
+
+
       project.target_locations = target_locations;
+
+      project.target_locations.forEach( function(location,element2){
+
+      if(typeof(location.implementing_partners) === 'string'){
+       
+        var newarray = location.implementing_partners.split(",");
+               location.implementing_partners= [];
+
+               newarray.forEach( function(imppartner,element2){
+
+
+                var imppartnermayus = imppartner.toUpperCase();
+                
+                var imppartnerpush =
+                {
+                  organization_name : imppartner,
+                  organization : imppartnermayus,
+                }
+                
+                location.implementing_partners.push(imppartnerpush);
+                
+                }
+              );
+
+        
+      }
+     });
+
 
 
       
