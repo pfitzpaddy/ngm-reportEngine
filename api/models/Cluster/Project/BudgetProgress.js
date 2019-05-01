@@ -196,6 +196,12 @@ module.exports = {
 		activity_type_name: {
 			type: 'string'
 		},
+		activity_description_id:{
+			type: 'string'
+		},
+		activity_description_name:{
+			type: 'string'
+		},
 		project_budget_currency: {
 			type: 'string',
 			required: true
