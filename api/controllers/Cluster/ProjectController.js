@@ -421,11 +421,6 @@ var ProjectController = {
       project.project_budget_progress = project_budget_progress;
       project.target_beneficiaries = target_beneficiaries;
             
-
-      //var newtarget_locations;
-      
-
-
       project.target_locations = target_locations;
 
       project.target_locations.forEach( function(location,element2){
@@ -436,7 +431,6 @@ var ProjectController = {
                location.implementing_partners= [];
 
                newarray.forEach( function(imppartner,element2){
-
 
                 var imppartnermayus = imppartner.toUpperCase();
                 
@@ -450,22 +444,17 @@ var ProjectController = {
                 
                 }
               );
-
         
       }
      });
-
-
 
       
       if(typeof(project.implementing_partners) === 'string'){
         // implementing_partners string to array
 
-
         var newarray = project.implementing_partners.split(",");
            project.implementing_partners = [];
 
-              //console.log(newarray,"nuevo array");
 
               newarray.forEach( function(imppartner,element2){
 
@@ -481,17 +470,12 @@ var ProjectController = {
                 
                 }
               );
-            
 
          }else if(!project.implementing_partners){
 
-              //create implementing_partners array
-
                project.implementing_partners = [];
-
     
             }
-
 
       // return Project
       return res.json( 200, project );
