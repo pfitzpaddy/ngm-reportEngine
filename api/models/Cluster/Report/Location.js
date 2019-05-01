@@ -79,7 +79,7 @@ module.exports = {
 			required: true
 		},
 		implementing_partners: {
-			type: 'string'
+			type: 'array'
 		},
 		cluster_id: {
 			type: 'string',
