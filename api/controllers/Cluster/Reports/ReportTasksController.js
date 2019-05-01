@@ -281,13 +281,18 @@ var ReportTasksController = {
             
             // set
             if( !report ) { report = { id: null } }
-            if ( report ) { new_report.report_status = report.report_status; new_report.report_active = report.report_active }
+            if ( report ) { new_report.report_status = report.report_status; new_report.report_active = report.report_active, new_report.updatedAt = report.updatedAt }
             
             // create reports
             Report.updateOrCreate( findProject, { id: report.id }, new_report ).exec(function( err, report_result ){
 
               // err
               if ( err ) return err;
+
+              // make array ( sails returns object on create, array on update )
+              if ( !report.id ) {
+                report_result = [ report_result ];
+              }
 
               // get target_locations
               TargetLocation
@@ -345,88 +350,110 @@ var ReportTasksController = {
 
   setReportsToDoPreviousMonth: function( req, res ) {
 
-    // only run if date is above monthly reporting period
-    // if ( moment().date() === 1 ) {
+    // find active projects
+    Project
+      .find()
+      .where( { project_start_date: { $lte: moment().subtract(1, 'month' ).endOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
+      .where( { project_end_date: { $gte: moment().subtract(1, 'month' ).startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
+      .exec( function( err, projects ){
 
-      // find active projects
-      Project
-        .find()
-        .where( { project_start_date: { $lte: moment().subtract(1, 'month' ).endOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
-        .where( { project_end_date: { $gte: moment().subtract(1, 'month' ).startOf( 'M' ).format( 'YYYY-MM-DD' ) } } )
-        .exec( function( err, projects ){
+        // return error
+        if ( err ) return res.negotiate( err );
+      
 
-          // return error
-          if ( err ) return res.negotiate( err );
+        // ASYNC REQUEST 1
+        // async loop target_beneficiaries
+        async.each( projects, function ( project, next ) {
 
-          // counter
-          var counter = 0;
-              length = projects.length;
+          var findProject = { project_id: project.id }
+          
+          // create report
+          var r = {
+            project_id: project.id,
+            report_status: 'todo',
+            report_active: true,
+            report_month: moment().month(),
+            report_year: moment().year(),
+            reporting_period: moment().set( 'date', 1 ).format(),
+            reporting_due_date: moment().add( 1, 'M' ).set( 'date', 10 ).format()
+          };
 
-          // for each project
-          projects.forEach( function( project, i ){
+          // clone project
+          var p = JSON.parse( JSON.stringify( project ) );
+                  delete p.id;
 
-            // create report
-            var r = {
-              project_id: projects[i].id,
-              report_status: 'todo',
-              report_active: true,
-              report_month: moment().subtract(1, 'month' ).month(),
-              report_year: moment().subtract(1, 'month' ).year(),
-              reporting_period: moment().subtract(1, 'month' ).set( 'date', 1 ).format(),
-              reporting_due_date: moment().subtract(1, 'month' ).add( 1, 'M' ).set( 'date', 10 ).format()
-            };
+          // create report
+          var new_report = _under.extend( {}, p, r );
 
-            // clone project
-            var p = _under.clone( projects[i] );
-                    delete p.id;
-
-            // create report
-            var newReport = _under.extend( {}, r, p );
-
+          // find reports
+          Report.findOne( { project_id: new_report.project_id, report_month: new_report.report_month, report_year: new_report.report_year } ).then( function ( report ){
+            
+            // set
+            if( !report ) { report = { id: null } }
+            if ( report ) { new_report.report_status = report.report_status; new_report.report_active = report.report_active, new_report.updatedAt = report.updatedAt }
+            
             // create reports
-            Report
-              .findOrCreate( {
-                  project_id: newReport.project_id,
-                  report_month: newReport.report_month,
-                  report_year: newReport.report_year
-                }, newReport )
-              .exec( function( err, report ) {
+            Report.updateOrCreate( findProject, { id: report.id }, new_report ).exec(function( err, report_result ){
 
-                // return error
-                if ( err ) return res.negotiate( err );
+              // err
+              if ( err ) return err;
 
-                // get target_locations
-                TargetLocation
-                  .find()
-                  .where( { project_id: r.project_id } )
-                  .exec( function( err, target_locations ){
+              // make array ( sails returns object on create, array on update )
+              if ( !report.id ) {
+                report_result = [ report_result ];
+              }
 
-                    // return error
-                    if ( err ) return res.negotiate( err );
+              // get target_locations
+              TargetLocation
+                .find()
+                .where( findProject )
+                .exec( function( err, target_locations ){
 
-                    // create report locations
-                    Location
-                      .createNewReportLocations( report, target_locations, function( err, locations ){
+                  // err
+                  if ( err ) return err;
+              
+                  // generate locations for each report ( requires report_id )
+                  ReportTasksController.getProjectReportLocations( report_result, target_locations, function( err, locations ){
 
-                        // return error
-                        if ( err ) return res.negotiate( err );
+                    // err
+                    if ( err ) return err;
 
-                        // counter
-                        counter++;
-                        if ( counter === length ) {
-                          return res.json( 200, { msg: 'success' } );
-                        }
+                    // ASYNC REQUEST 1.1
+                    // async loop project_update locations
+                    async.each( locations, function ( d, next ) {
 
+                      // find
+                      Location.findOne( { project_id: project.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
+                        if( !location ) { location = { id: null } }
+                        // relations set in getProjectReportLocations
+                        Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, location_result ){
+                          
+                          // err
+                          if ( err ) return err;
+                          
+                          // no need to return locations
+                          next();
+
+                        });
+                      });
+                    }, function ( err ) {
+                      if ( err ) return err;
+                      next();
                     });
 
-                });
-            });
+                  });
 
+                });
+
+            });
           });
 
-      });
+        }, function ( err ) {
+          if ( err ) return err;
+          return res.json( 200, { msg: 'success' } );
+        });
 
-    // } else { return res.json( 200, { msg: 'Reporting not open for ' + moment().format('MMM') + '!' } ); }
+    });
 
   },
 

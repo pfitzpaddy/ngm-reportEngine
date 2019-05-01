@@ -549,7 +549,7 @@ var ProjectController = {
           // Report.updateOrCreate( findProject, { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
           Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
             if( !report ) { report = { id: null } }
-            if ( report ) { d.report_status = report.report_status; d.report_active = report.report_active }
+            if ( report ) { d.report_status = report.report_status; d.report_active = report.report_active, d.updatedAt = report.updatedAt }
             Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
               reports.push( ProjectController.set_result( result ) );
               next();
