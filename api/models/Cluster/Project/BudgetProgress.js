@@ -196,6 +196,7 @@ module.exports = {
 		activity_type_name: {
 			type: 'string'
 		},
+
 		activity_description_id:{
 			type: 'string'
 		},
