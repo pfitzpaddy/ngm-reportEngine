@@ -548,6 +548,8 @@ var ProjectController = {
 
       // update_project
       var project_update = ProjectController.set_result( update_result[ 0 ] );
+      var project_update_copy = JSON.parse( JSON.stringify( project_update ) );
+      delete project_update_copy.id;
 
       // project update
       findProject = { project_id: project_update.id }
@@ -575,8 +577,35 @@ var ProjectController = {
       // ASYNC REQUEST 1
       // async loop target_beneficiaries
       async.each( project_budget_progress, function ( d, next ) {
-        BudgetProgress.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
+        var budget = _under.extend( {}, project_update_copy, d );
+        BudgetProgress.updateOrCreate( findProject, { id: budget.id }, budget ).exec(function( err, result ){
           project_update.project_budget_progress.push( ProjectController.set_result( result ) );
+          next();
+        });
+      }, function ( err ) {
+        if ( err ) return err;
+        returnProject( project_update );
+      });
+
+      // ASYNC REQUEST 2
+      // async loop target_beneficiaries
+      async.each( target_beneficiaries, function ( d, next ) {
+        var t_beneficiary = _under.extend( {}, project_update_copy, d );
+        TargetBeneficiaries.updateOrCreate( findProject, { id: t_beneficiary.id }, t_beneficiary ).exec(function( err, result ){
+          project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
+          next();
+        });
+      }, function ( err ) {
+        if ( err ) return err;
+        returnProject( project_update );
+      });
+
+      // ASYNC REQUEST 3
+      // async loop target_locations
+      async.each( target_locations, function ( d, next ) {
+        var t_location = _under.extend( {}, project_update_copy, d );
+        TargetLocation.updateOrCreate( findProject, { id: t_location.id }, t_location ).exec(function( err, result ){
+          project_update.target_locations.push( ProjectController.set_result( result ) );
           next();
         });
       }, function ( err ) {
@@ -590,37 +619,13 @@ var ProjectController = {
         // err
         if ( err ) return err;
 
-        // ASYNC REQUEST 2
-        // async loop target_beneficiaries
-        async.each( target_beneficiaries, function ( d, next ) {
-          TargetBeneficiaries.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
-            project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
-            next();
-          });
-        }, function ( err ) {
-          if ( err ) return err;
-          returnProject( project_update );
-        });
-
-        // ASYNC REQUEST 3
-        // async loop target_locations
-        async.each( target_locations, function ( d, next ) {
-          TargetLocation.updateOrCreate( findProject, { id: d.id }, d ).exec(function( err, result ){
-            project_update.target_locations.push( ProjectController.set_result( result ) );
-            next();
-          });
-        }, function ( err ) {
-          if ( err ) return err;
-          returnProject( project_update );
-        });
-
         // ASYNC REQUEST 4
         // async loop project_reports
         async.each( project_reports, function ( d, next ) {
           // Report.updateOrCreate( findProject, { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year }, d ).exec(function( err, result ){
           Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
             if( !report ) { report = { id: null } }
-            if ( report ) { d.report_status = report.report_status; d.report_active = report.report_active }
+            if ( report ) { d.report_status = report.report_status; d.report_active = report.report_active, d.updatedAt = report.updatedAt }
             Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
               reports.push( ProjectController.set_result( result ) );
               next();
