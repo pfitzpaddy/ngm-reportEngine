@@ -275,7 +275,7 @@ var ReportController = {
 				report.status = '#80cbc4';
 				report.status_title = 'Empty Submission';
 
-				// if report is 'todo' and past due date!
+				// if report is 'todo' and before due date!
 				if ( report.report_status === 'todo' && moment().isSameOrBefore( moment( report.reporting_due_date ) ) ) {
 
 					// add status todo but ok
@@ -303,14 +303,19 @@ var ReportController = {
 
 						// if no benficiaries and submitted
 						if ( report.report_status === 'complete' ) {
+
 							// add status
 							report.icon = 'check_circle';
 							report.status = '#4db6ac';
 							report.status_title = 'Complete';
+							// if beneficiaries ( report has been updated )
+							if ( beneficiary ) {
+								report.icon = 'check_circle';
+							}
 						}
 						
-						// if report is 'todo' and past due date!
-						if ( report.report_status === 'todo' &&  moment().isAfter( moment( report.reporting_due_date ) ) ) {
+						// if report is 'todo' and has records ( is saved )
+						if ( report.report_status === 'todo' ) {
 							// if beneficiaries ( report has been updated )
 							if ( beneficiary ) {
 								report.icon = 'watch_later';
@@ -520,7 +525,8 @@ var ReportController = {
       project_id: report.project_id
     }
     var findReport = {
-      report_id: report.id
+      report_id: report.id,
+      report_status: report.report_status
     }
     var findLocation;
     var findTargetLocation;
