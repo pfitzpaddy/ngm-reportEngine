@@ -303,15 +303,10 @@ var ReportController = {
 
 						// if no benficiaries and submitted
 						if ( report.report_status === 'complete' ) {
-
 							// add status
 							report.icon = 'check_circle';
 							report.status = '#4db6ac';
 							report.status_title = 'Complete';
-							// if beneficiaries ( report has been updated )
-							if ( beneficiary ) {
-								report.icon = 'check_circle';
-							}
 						}
 						
 						// if report is 'todo' and has records ( is saved )
