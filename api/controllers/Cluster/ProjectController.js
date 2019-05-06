@@ -545,14 +545,21 @@ var ProjectController = {
       var reports = [];
 
       // async
+      var target_locations_counter = 0;
+      var target_reports_counter = 0;
       var async_counter = 0;
-      var async_requests = 4;
+      var async_requests = 5;
 
       // return the project_update
-      var returnProject = function( project_update ) {
+      var returnProject = function() {
+        // make locations
+        if ( target_locations_counter && target_reports_counter ) {
+          target_locations_counter = 0;
+          target_reports_counter = 0;
+          setLocations();
+        }
         // ++
         async_counter++;
-        // return
         if ( async_counter === async_requests ) {
           return res.json( 200, project_update );
         }
@@ -568,7 +575,7 @@ var ProjectController = {
         });
       }, function ( err ) {
         if ( err ) return err;
-        returnProject( project_update );
+        returnProject();
       });
 
       // ASYNC REQUEST 2
@@ -581,7 +588,7 @@ var ProjectController = {
         });
       }, function ( err ) {
         if ( err ) return err;
-        returnProject( project_update );
+        returnProject();
       });
 
       // ASYNC REQUEST 3
@@ -594,9 +601,10 @@ var ProjectController = {
         });
       }, function ( err ) {
         if ( err ) return err;
-        returnProject( project_update );
+        target_locations_counter++;
+        returnProject();
       });
-      
+
       // generate reports for duration of project_update
       ProjectController.getProjectReports( project_update, function( err, project_reports ){
         
@@ -617,34 +625,39 @@ var ProjectController = {
           });
         }, function ( err ) {
           if ( err ) return err;
+          target_reports_counter++;
+          returnProject();
+        });
 
-          // generate locations for each report ( requires report_id )
-          ProjectController.getProjectReportLocations( reports, project_update.target_locations, function( err, locations ){
-            
-            // err
-            if ( err ) return err;
+      });
 
-            // ASYNC REQUEST 3.1
-            // async loop project_update locations
-            async.each( locations, function ( d, next ) {
-              Location.findOne( { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
-                if( !location ) { location = { id: null } }
-                // relations set in getProjectReportLocations
-                Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, result ){
-                  // no need to return locations
-                  next();
-                });
+      // locations
+      var setLocations = function() {
+        
+        // generate locations for each report ( requires report_id )
+        ProjectController.getProjectReportLocations( reports, project_update.target_locations, function( err, locations ){
+          
+          // err
+          if ( err ) return err;
+
+          // ASYNC REQUEST 5
+          // async loop project_update locations
+          async.each( locations, function ( d, next ) {
+            Location.findOne( { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
+              if( !location ) { location = { id: null } }
+              // relations set in getProjectReportLocations
+              Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, result ){
+                // no need to return locations
+                next();
               });
-            }, function ( err ) {
-              if ( err ) return err;
-              returnProject( project_update );
             });
-
+          }, function ( err ) {
+            if ( err ) return err;
+            returnProject();
           });
 
         });
-      
-      });
+      }
 
     });
 
