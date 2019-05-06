@@ -924,99 +924,95 @@ var AdminDashboardController = {
               // return error
               if (err) return res.negotiate( err );
 
-              // return
-              if ( params.list ) {
+              // counter
+              var counter = 0,
+                  length  = reports.length;
 
-                // counter
-                var counter = 0,
-                    length  = reports.length;
+              // if no reports
+              if ( length === 0 ) {
 
-                // if no reports
-                if ( length === 0 ) {
-
-                  // return empty
-                  return res.json( 200, [] );
-
-                } else {
-
-                  // reports ids
-                  var reports_array = _.map(reports,function(report){return report._id.toString()});
-                  
-                  Beneficiaries.native(function(err, collection) {
-                    if (err) return res.serverError(err);
-                  
-                    collection.aggregate([
-                        { 
-                          $match : {report_id:{"$in":reports_array}} 
-                        },
-                        {
-                          $group: {
-                            _id: '$report_id'
-                          }
-                        }
-                      ]).toArray(function (err, results) {
-                          if (err) return res.negotiate(err);
-
-                          // for reports not submitted with entries
-                          var non_empty_reports=_.map(results,'_id')	
-
-                          // status
-                          reports.forEach( function( d, i ){
-
-                                // add status
-                                reports[i].id     = reports[i]._id.toString();
-                                reports[i].status = '#e57373'
-                                reports[i].status_title = 'Due';
-                                reports[i].icon = 'error';
-                                reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
-                                reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
-                                // if benficiaries
-                                if ( non_empty_reports.indexOf(d._id.toString())>-1) {
-                                  // add status
-                                  reports[i].icon = 'watch_later';
-                                  reports[i].status = '#fff176';
-                                  reports[i].status_title = 'Pending';
-                                }
-
-                                // return
-                                counter++;
-                                if ( counter === length ) {
-
-                                  // !csv
-                                  if ( !params.csv ) {
-                                    // table
-                                    return res.json( 200, reports );
-                                  }
-
-                                  // csv
-                                  if ( params.csv ) {
-
-                                    // return csv
-                                    json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
-
-                                      // error
-                                      if ( err ) return res.negotiate( err );
-
-                                      // success
-                                      return res.json( 200, { data: csv } );
-
-                                    });
-                                  }
-
-                                }
-
-                            });
-
-                         });
-                });
-                }
+                // return empty
+                return res.json( 200, [] );
 
               } else {
 
-                // return indicator
-                return res.json( 200, { 'value': reports.length });
-              }
+                // reports ids
+                var reports_array = _.map(reports,function(report){return report._id.toString()});
+                
+                Beneficiaries.native(function(err, collection) {
+                  if (err) return res.serverError(err);
+                
+                  collection.aggregate([
+                      { 
+                        $match : {report_id:{"$in":reports_array}} 
+                      },
+                      {
+                        $group: {
+                          _id: '$report_id'
+                        }
+                      }
+                    ]).toArray(function (err, results) {
+                        if (err) return res.negotiate(err);
 
+                        // for reports not submitted with entries
+                        var non_empty_reports=_.map(results,'_id')	
+
+                        // status
+                        reports.forEach( function( d, i ){
+
+                              // add status
+                              reports[i].id     = reports[i]._id.toString();
+                              reports[i].status = '#e57373'
+                              reports[i].status_title = 'Due';
+                              reports[i].icon = 'error';
+                              reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
+                              reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
+                              // if benficiaries
+                              if ( non_empty_reports.indexOf(d._id.toString())>-1) {
+                                // add status
+                                reports[i].icon = 'watch_later';
+                                reports[i].status = '#fff176';
+                                reports[i].status_title = 'Pending';
+                              }
+
+                              // return
+                              counter++;
+                              if ( counter === length ) {
+
+                                // value
+                                if ( !params.list ) {
+                                  // return indicator
+                                  return res.json( 200, { 'value': reports.length - non_empty_reports.length });
+                                }
+
+                                // !csv
+                                if ( !params.csv ) {
+                                  // table
+                                  return res.json( 200, reports );
+                                }
+
+                                // csv
+                                if ( params.csv ) {
+
+                                  // return csv
+                                  json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
+
+                                    // error
+                                    if ( err ) return res.negotiate( err );
+
+                                    // success
+                                    return res.json( 200, { data: csv } );
+
+                                  });
+                                }
+
+                              }
+
+                          });
+
+                       });
+                });
+              }
 
             });
         });
