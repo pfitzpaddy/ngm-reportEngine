@@ -188,7 +188,7 @@ var AdminDashboardController = {
           .where( { report_active: true } )
           .exec( function( err, reports ) {
             if (err) return res.negotiate(err);
-            reports = reports.map( report = report.id);
+            reports = reports.map( report => report.id);
             StockLocation
                 .find({ report_id: reports }, { fields: { stock_warehouse_id: 1 } })
                 .exec(function(err, locations) {
