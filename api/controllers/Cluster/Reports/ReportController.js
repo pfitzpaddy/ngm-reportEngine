@@ -520,8 +520,7 @@ var ReportController = {
       project_id: report.project_id
     }
     var findReport = {
-      report_id: report.id,
-      report_status: report.report_status
+      report_id: report.id
     }
     var findLocation;
     var findTargetLocation;
