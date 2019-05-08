@@ -977,6 +977,17 @@ var ClusterDashboardController = {
 									da.sort();
 									d.donor = da.join(', ');
 								}
+
+								//implementing_partner
+								if (d.implementing_partners) {
+									var im = [];
+									d.implementing_partners.forEach(function (impl, i) {
+										if (impl) im.push(impl.organization_name);
+									});
+									im.sort();
+									d.implementing_partners = im.join(', ');
+								}
+
 								// sum
 								var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
 								// beneficiaries
