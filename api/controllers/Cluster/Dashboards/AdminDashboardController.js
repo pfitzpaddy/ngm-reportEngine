@@ -842,7 +842,19 @@ var AdminDashboardController = {
                                                         reports[i].id           = reports[i]._id.toString();
                                                         reports[i].status       = '#4db6ac'
                                                         reports[i].status_title = 'Complete';
-                                                        reports[i].icon         = 'check_circle';
+																												reports[i].icon         = 'check_circle';
+																												if (reports[i].report_validation && reports[i].report_validation === 'valid') {
+																													reports[i].icon = 'done_all';
+																													reports[i].status = '#4db6ac';
+																												}
+																												if (reports[i].report_validation && reports[i].report_validation === 'invalid') {
+																													reports[i].icon = 'not_interested';
+																													reports[i].status = '#f44336';
+																												}
+																												if (reports[i].report_validation && reports[i].report_validation === 'checked') {
+																													reports[i].icon = 'watch_later';
+																													reports[i].status = '#4db6ac';
+																												}
                                                         reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
                                                         reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
 
