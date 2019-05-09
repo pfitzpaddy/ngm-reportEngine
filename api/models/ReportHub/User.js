@@ -279,7 +279,7 @@ module.exports = {
     // get user by email
     User
     	.find()
-    	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id })
+    	.where({ admin0pcode: user.admin0pcode, organization_id: user.organization_id, status: "active" })
     	.sort('createdAt ASC')
     	.exec( function( err, admin ){
 
