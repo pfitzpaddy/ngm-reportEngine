@@ -979,7 +979,7 @@ var ClusterDashboardController = {
 								}
 
 								//implementing_partner
-								if (d.implementing_partners) {
+								if (Array.isArray(d.implementing_partners)) {
 									var im = [];
 									d.implementing_partners.forEach(function (impl, i) {
 										if (impl) im.push(impl.organization_name);
