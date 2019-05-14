@@ -116,6 +116,9 @@ module.exports = {
 		funding_2017: {
 			type: 'float',
 		},
+		funding_year: {
+			type: 'integer',
+		},
 		reported_on_fts_id: {
 			type: 'string'
 		},
