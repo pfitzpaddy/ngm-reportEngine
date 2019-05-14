@@ -178,7 +178,9 @@ module.exports = {
 			type: 'date',
 			required: true
 		},
-
+		report_validation:{
+			type: 'string',
+		},
     // add reference to Locations
     // locations: {
     //   collection: 'location',

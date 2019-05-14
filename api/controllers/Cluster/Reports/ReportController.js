@@ -321,6 +321,18 @@ var ReportController = {
 							report.icon = 'check_circle';
 							report.status = '#4db6ac';
 							report.status_title = 'Complete';
+							if (report.report_validation && report.report_validation ==='valid' ) {
+								report.icon = 'done_all';
+								report.status = '#4db6ac';
+							}
+							if (report.report_validation && report.report_validation === 'invalid') {
+								report.icon = 'not_interested';
+								report.status = '#f44336';
+							}
+							if (report.report_validation && report.report_validation === 'checked') {
+								report.icon = 'watch_later';
+								report.status = '#4db6ac';
+							}
 						}
 						
 						// if report is 'todo' and has records ( is saved )
@@ -688,6 +700,24 @@ var ReportController = {
 
 			});
 	
+	},
+
+	// report validation
+	updateReportValidation:function(req,res){
+
+		if (!req.param('report_id') && !req.param('update')){
+			return res.json(401, { err: 'report, validation required!' });
+		}
+
+		Report
+			.update({ id: req.param('report_id') },req.param('update'))
+			.exec(function (err,report) {
+				// return error
+				if (err) return res.json({ err: true, error: err });
+				// return success
+				return res.json(200, report);
+			})
+
 	},
 
 	// remove
