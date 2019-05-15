@@ -1012,6 +1012,8 @@ var ClusterDashboardController = {
 									// success
 									if (params.ocha) {
 										res.set('Content-Type', 'text/csv');
+										filename = req.param('reportname') ? req.param('reportname') : 'beneficiaries'
+										res.setHeader('Content-disposition', 'attachment; filename=' + filename + '.csv');
 										res.send(200, csv);
 										MetricsController.setApiMetrics({
 											dashboard: 'cluster_dashboard',
