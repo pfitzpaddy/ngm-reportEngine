@@ -48,6 +48,7 @@ var ClusterDashboardController = {
 			list: req.param('list') ? req.param('list') : false,
 			indicator: req.param('indicator'),
 			cluster_id: req.param('cluster_id'),
+			cluster_ids: req.param('cluster_ids') ? req.param('cluster_ids') : [req.param('cluster_id')],
 			activity_type_id: req.param( 'activity_type_id' ) ? req.param( 'activity_type_id' ) : 'all',
 			adminRpcode: req.param('adminRpcode'),
 			admin0pcode: req.param('admin0pcode'),
@@ -91,6 +92,12 @@ var ClusterDashboardController = {
 								: ( params.cluster_id !== 'cvwg' )
 									? { $or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { $regex : params.cluster_id } } ] } 
 									: { $or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { $regex : params.cluster_id } }, { activity_description_id: { $regex: 'cash' } }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] },
+			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') ) 
+								? {} 
+								: ( params.cluster_ids.includes('cvwg') )
+									? { $or: [{ cluster_id: { $in: params.cluster_ids } }, { "mpc_purpose.cluster_id" : { $in : params.cluster_ids }}, { activity_description_id: { $regex: 'cash' } }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] }
+									: { $or: [{ cluster_id: { $in: params.cluster_ids } }, { "mpc_purpose.cluster_id" : { $in : params.cluster_ids }} ] },
+			is_cluster_ids_array: params.cluster_ids ? true : false,
 			organization_tag_Native: params.organization_tag === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: params.organization_tag },
 			date_Native: { reporting_period: { $gte: new Date( params.start_date ), $lte: new Date( params.end_date )} },
 			delivery_type_id: function() {
@@ -122,7 +129,7 @@ var ClusterDashboardController = {
 										filters.admin0pcode_Native,
 										filters.admin1pcode_Native,
 										filters.admin2pcode_Native,
-										filters.cluster_id_Native,
+										filters.is_cluster_ids_array ? filters.cluster_ids_Native : filters.cluster_id_Native,
 										filters.activity_type_id,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
