@@ -1019,7 +1019,14 @@ var ClusterDashboardController = {
 									// success
 									if (params.ocha) {
 										res.set('Content-Type', 'text/csv');
-										return res.send(200, csv);
+										filename = req.param('reportname') ? req.param('reportname') : 'beneficiaries'
+										res.setHeader('Content-disposition', 'attachment; filename=' + filename + '.csv');
+										res.send(200, csv);
+										MetricsController.setApiMetrics({
+											dashboard: 'cluster_dashboard',
+											theme: params.indicator,
+											url: req.url,
+										}, function (err) { return })									
 									} else {
 										return res.json(200, { data: csv });
 									}
