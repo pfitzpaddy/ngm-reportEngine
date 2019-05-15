@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-module.exports = {
+module.exports = MetricsController = {
 
   // get users
   getUsers: function (req, res) {
@@ -87,6 +87,27 @@ module.exports = {
       }
     });
     
+  },
+  
+  // set metrics for api calls
+  setApiMetrics: function (config, cb) {
+    // default metrics
+    config = _.extend({
+      organization: 'public',
+      email: 'public@immap.org',
+      dashboard: 'api',
+      theme: 'api',
+      username: 'welcome',
+      url: '/cluster/indicator',
+      format: 'api/text/csv'
+    }, config);
+
+    Metrics.create(config).exec(function (err) {
+      if (err) {
+        cb(err);
+      }
+      cb();
+    });
   }
 
 };
