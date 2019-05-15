@@ -52,6 +52,19 @@ module.exports = {
 		implementing_partners: {
 			type: 'array'
 		},
+		undaf_desarrollo_paz:{
+			type: 'array'
+		},
+		acuerdos_de_paz:{
+			type: 'array'
+		},
+
+		dac_oecd_development_assistance_committee:{
+			type:'array'
+		},
+		ods_objetivos_de_desarrollo_sostenible:{
+			type:'array'
+		},
 		cluster_id: {
 			type: 'string',
 			required: true
