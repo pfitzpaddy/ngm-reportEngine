@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 ##################################################
 # ReportHub Backup
 # Steps
@@ -25,6 +25,6 @@ sudo zip -r $STAMP.zip $STAMP
 # # copy to s3
 # aws s3 cp $DIR/ngmReportHub.zip s3://s3-af-geonode/ngmReportHub/$STAMP
 # aws s3 cp $DIR/ngmHealthCluster.zip s3://s3-af-geonode/ngmHealthCluster/$STAMP
-aws s3 cp $DIR.zip s3://s3-af-geonode/ngmReportHub/$STAMP
+/usr/local/bin/aws s3 cp $DIR.zip s3://s3-af-geonode/ngmReportHub/$STAMP
 # delete local
 # sudo rm -r -f $DIR
