@@ -43,8 +43,8 @@ var AdminDashboardController = {
           organization_tag: req.param( 'organization_tag' ),
           cluster_filter: req.param( 'cluster_id' ) === 'all' || req.param( 'cluster_id' ) === 'acbar' ? {} : { cluster_id: req.param( 'cluster_id' ) },
           acbar_partners_filter: req.param( 'cluster_id' ) === 'acbar' ? { project_acbar_partner: true } : {},
-          organization_filter: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: req.param( 'organization_tag' ) },
-          organization_filter_Native: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '$nin': $nin_organizations } } : { organization_tag: req.param( 'organization_tag' ) },
+          organization_filter: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '!': $nin_organizations } } : { $or: [{ organization_tag: req.param( 'organization_tag' ) }, { "implementing_partners.organization_tag": req.param('organization_tag') }] },
+          organization_filter_Native: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '$nin': $nin_organizations } } : { $or: [{ organization_tag: req.param( 'organization_tag' ) }, { "implementing_partners.organization_tag": req.param('organization_tag') }] },
           adminRpcode_filter: req.param( 'adminRpcode' ) === 'all' ? {} : { adminRpcode: req.param( 'adminRpcode' ).toUpperCase() },
           admin0pcode_filter: req.param( 'admin0pcode' ) === 'all' ? {} : { admin0pcode: req.param( 'admin0pcode' ).toUpperCase() },
           start_date: req.param( 'start_date' ),
@@ -866,7 +866,14 @@ var AdminDashboardController = {
                                                                   reports[i].status_title = 'Empty Submission';
                                                                 }
 
-
+                                                                // set implementing partners icon
+                                                                if (req.param('organization_tag') !== 'all' && d.implementing_partners && d.implementing_partners.length) {
+                                                                  if (d.implementing_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
+                                                                    reports[i].icon = 'group';
+                                                                    reports[i].status = '#2196F3';
+                                                                    reports[i].status_title = 'Complete';
+                                                                  }
+                                                                }
                                                                 // return
                                                                 counter++;
                                                                 if ( counter === length ) {
@@ -987,6 +994,14 @@ var AdminDashboardController = {
                                 reports[i].status_title = 'Pending';
                               }
 
+                              // set implementing partners icon
+                              if (req.param('organization_tag') !== 'all' && d.implementing_partners && d.implementing_partners.length) {
+                                if (d.implementing_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
+                                  reports[i].icon = 'group';
+                                  reports[i].status = '#2196F3';
+                                  reports[i].status_title = 'Pending';
+                                }
+                              }
                               // return
                               counter++;
                               if ( counter === length ) {
