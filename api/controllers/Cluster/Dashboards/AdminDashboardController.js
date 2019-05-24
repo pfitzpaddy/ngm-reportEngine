@@ -1229,8 +1229,10 @@ var AdminDashboardController = {
 						// 	: (req.param('cluster_id') !== 'cvwg')
 						// 		? { $or: [{ cluster_id: req.param('cluster_id') }, { mpc_purpose_cluster_id: { $regex: req.param('cluster_id') } }] }
 						// 		: { $or: [{ cluster_id: req.param('cluster_id') }, { mpc_purpose_cluster_id: { $regex: req.param('cluster_id') } }, { activity_description_id: { $regex: 'cash' } }] },
-						cluster_id_Native: (req.param('cluster_id') === 'all' ) ? {} : { cluster_id: req.param('cluster_id') },
-						organization_tag_Native: req.param('organization_tag') === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: req.param('organization_tag') },
+						// cluster_id_Native: (req.param('cluster_id') === 'all' ) ? {} : { cluster_id: req.param('cluster_id') },
+						cluster_id_Native: (req.param('cluster_id') === 'all' ) ? {} : { $or: [{ cluster_id: req.param('cluster_id') }, { "activity_type.cluster_id": req.param('cluster_id') }] },
+						// organization_tag_Native: req.param('organization_tag') === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: req.param('organization_tag') },
+						organization_tag_Native: req.param('organization_tag') === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { $or: [{ organization_tag: req.param('organization_tag') }, { "implementing_partners.organization_tag": req.param('organization_tag') }] },
 						project_startDateNative: { project_start_date: { $lte: new Date(req.param('end_date')) }},
 						project_endDateNative: { project_end_date: { $gte: new Date(req.param('start_date')) }},
 						default_native: { project_id: { $ne: null }},
@@ -1261,7 +1263,8 @@ var AdminDashboardController = {
 								cluster: { $first: '$cluster' },
 								organization_tag: { $first:'$organization_tag'},
 								organization_id: { $first: '$organization_id' },
-								organization: { $first: '$organization' },								
+								organization: { $first: '$organization' },
+								implementing_partners: { $first: '$implementing_partners'},								
 								target_total:{ $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }								
 							}
 						}
