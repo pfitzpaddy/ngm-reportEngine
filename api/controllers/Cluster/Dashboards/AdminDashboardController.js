@@ -1318,7 +1318,9 @@ var AdminDashboardController = {
 										}
 										el.report_total_format = nFormatter(el.report_total);
 									}
-																	
+                  if (el.implementing_partners && Array.isArray(el.implementing_partners)) {
+                    el.implementing_partners = el.implementing_partners.map(x => x.organization ? x.organization : x.organization_tag).join(", ");
+                  }						
 								});													
 								return res.json(200, target_beneficiaries);
 							})
