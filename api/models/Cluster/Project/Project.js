@@ -118,7 +118,6 @@ module.exports = {
 		location_groups: {
 			type: 'array'
 		},
-		
 
 		// project
 		project_acbar_partner: {
