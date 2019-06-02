@@ -66,6 +66,10 @@ module.exports.routes = {
   'GET /metrics/getLocations': 'ReportHub/MetricsController.getLocations',
   'GET /metrics/getReports': 'ReportHub/MetricsController.getReports',
 
+  // User login stats
+  'GET /getUserLoginHistoryIndicator': 'ReportHub/OrganizationController.getUserLoginHistoryIndicator',
+  'POST /getUserLoginHistoryIndicator': 'ReportHub/OrganizationController.getUserLoginHistoryIndicator',
+
   // Upload
   'POST /upload-file': 'ReportHub/FileController.upload',
   'POST /process': 'ReportHub/FileController.process',
