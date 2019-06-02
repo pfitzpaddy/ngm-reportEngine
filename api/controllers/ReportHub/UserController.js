@@ -150,9 +150,18 @@ var UserController = {
 
             // err
             if( err ) return res.negotiate( err );
-
+          
             // Send back user with token
-            return res.json( 200, user );
+            res.json( 200, user );
+
+            var userHistory = _.clone( user );
+                userHistory.user_id = user.id;
+                delete userHistory.id;
+
+            UserLoginHistory
+              .create(userHistory).exec(function (err) { });
+
+            return;
 
           });
 

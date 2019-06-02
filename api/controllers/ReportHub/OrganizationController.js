@@ -344,6 +344,67 @@ module.exports = {
 
   },
 
+  // get user login history stats
+  getUserLoginHistoryIndicator: function( req, res ){
+
+    // set filters
+    var adminRpcode_filter = !req.param( 'adminRpcode' ) || req.param( 'adminRpcode' ) === 'all' ? {} : { adminRpcode: req.param( 'adminRpcode' ) },
+        admin0pcode_filter = !req.param( 'admin0pcode' ) || req.param( 'admin0pcode' ) === 'all' ? {} : { admin0pcode: req.param( 'admin0pcode' ) },
+        organization_filter = !req.param( 'organization_tag' ) || req.param( 'organization_tag' ) === 'all' ? {} : { organization_tag: req.param( 'organization_tag' ) },
+        project_filter = !req.param( 'project' ) || req.param( 'project' ) === 'all' ? {} : { programme_id: req.param( 'project' ) },
+        cluster_id_filter = !req.param( 'cluster_id' ) || req.param( 'cluster_id' ) === 'all' ? {} : { cluster_id: req.param( 'cluster_id' ) },
+        status_filter = !req.param( 'status' ) || req.param( 'status' ) === 'all' ? {} : { status: req.param( 'status' ) };
+
+    // users
+    UserLoginHistory
+      .find()
+      .where( adminRpcode_filter )
+      .where( admin0pcode_filter )
+      .where( organization_filter )
+      .where( project_filter )
+      .where( cluster_id_filter )
+      .where( status_filter )
+      .exec( function( err, users ){
+
+        // return error
+        if ( err ) return res.negotiate( err );
+
+        // indicator
+        switch( req.param( 'indicator' ) ) {
+
+          // distinct organizations
+          case 'organizations':
+            var organizations = _.uniq( users, function( user ) { return user.organization; });
+            return res.json( 200, { value: organizations.length } );
+            break;
+
+          // distinct countries
+          case 'countries':
+            var countries = _.uniq( users, function( user ) { return user.admin0pcode; });
+            return res.json( 200, { value: countries.length } );
+            break;
+
+          // distinct sectors
+          case 'sectors':
+            var sectors = _.uniq( users, function( user ) { return user.cluster_id; });
+            return res.json( 200, { value: sectors.length } );
+            break;
+
+          // distinct users
+          case 'users':
+            var users = _.uniq( users, function( user ) { return user.user_id; });
+            return res.json( 200, { value: users.length } );
+            break;
+
+          // user list
+          default:
+            return res.json( 200, users );
+        }
+
+      });
+
+  },
+
   // get organization by id
   getOrganizationUsers: function( req, res ){
 
