@@ -119,13 +119,6 @@ module.exports = {
 			type: 'array'
 		},
 
-
-		// flag to manage date changes
-		update_dates: {
-			type: 'boolean',
-			defaultsTo: false
-		},
-
 		// project
 		project_acbar_partner: {
 			type: 'boolean'
