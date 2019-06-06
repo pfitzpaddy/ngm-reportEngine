@@ -4,9 +4,6 @@
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
-// var 				  _ = require('lodash');
-var 		   ObjectId = require('mongodb').ObjectID;
-const BulkHasOperations = function (b) { return b && b.s && b.s.currentBatch && b.s.currentBatch.operations && b.s.currentBatch.operations.length > 0; }
 
 module.exports = {
 
@@ -364,7 +361,31 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		boys_0_5:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		boys_6_11:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		boys_12_17:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 		boys:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls_0_5:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls_6_11:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls_12_17:{
 			type: 'integer',
 			defaultsTo: 0
 		},

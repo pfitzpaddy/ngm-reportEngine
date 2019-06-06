@@ -314,7 +314,31 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		boys_0_5:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		boys_6_11:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		boys_12_17:{
+			type: 'integer',
+			defaultsTo: 0
+		},
 		boys:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls_0_5:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls_6_11:{
+			type: 'integer',
+			defaultsTo: 0
+		},
+		girls_12_17:{
 			type: 'integer',
 			defaultsTo: 0
 		},
