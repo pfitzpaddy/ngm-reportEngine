@@ -409,6 +409,14 @@ module.exports = {
 			type: 'integer',
 			defaultsTo: 0
 		},
+		total_male:{
+			type: 'integer',
+			defaultsTo: 0
+    },
+		total_female:{
+			type: 'integer',
+			defaultsTo: 0
+    },
 		total_beneficiaries:{
 			type: 'integer',
 			defaultsTo: 0
