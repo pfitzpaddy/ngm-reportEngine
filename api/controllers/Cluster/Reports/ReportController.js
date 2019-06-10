@@ -567,6 +567,8 @@ var ReportController = {
 				// prepare for cloning
 	      var report_copy = JSON.parse( JSON.stringify( report ) );
 	      delete report_copy.id;
+	      delete report_copy.createdAt;
+	      delete report_copy.updatedAt;
 
 	      // async loop report locations
 	      async.each( locations, function ( location, next ) {
