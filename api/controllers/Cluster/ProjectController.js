@@ -541,6 +541,8 @@ var ProjectController = {
       var project_update = ProjectController.set_result( update_result[ 0 ] );
       var project_update_copy = JSON.parse( JSON.stringify( project_update ) );
       delete project_update_copy.id;
+      delete project_update_copy.createdAt;
+      delete project_update_copy.updatedAt;
 
       // project update
       findProject = { project_id: project_update.id }
@@ -595,6 +597,8 @@ var ProjectController = {
         });
       }, function ( err ) {
         if ( err ) return err;
+        _under.sortBy( project_update.target_beneficiaries, function( d ) { console.log(d.createdAt); return d.createdAt; });
+        console.log(project_update.target_beneficiaries)
         returnProject();
       });
 
