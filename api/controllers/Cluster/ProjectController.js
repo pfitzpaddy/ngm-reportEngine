@@ -597,8 +597,6 @@ var ProjectController = {
         });
       }, function ( err ) {
         if ( err ) return err;
-        _under.sortBy( project_update.target_beneficiaries, function( d ) { console.log(d.createdAt); return d.createdAt; });
-        console.log(project_update.target_beneficiaries)
         returnProject();
       });
 
