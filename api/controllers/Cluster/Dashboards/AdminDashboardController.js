@@ -372,7 +372,7 @@ var AdminDashboardController = {
 
         break;
 
-      case 'reports_complete':
+      case 'reports_submitted':
 
         // reports complete
         StockReport
@@ -470,6 +470,64 @@ var AdminDashboardController = {
               return res.json( 200, { 'value': reports.length });
             }
 
+          });
+
+        break;
+
+        // TODO: with native queries
+        case 'reports_saved':
+
+        // reports due
+        StockReport
+          .find()
+          .where(params.cluster_filter)
+          .where(params.acbar_partners_filter)
+          .where(params.adminRpcode_filter)
+          .where(params.admin0pcode_filter)
+          .where({ report_active: true })
+          .where({ report_status: 'todo' })
+          .where({ reporting_period: { '>=': new Date(params.start_date), '<=': new Date(params.end_date) } })
+          .where(params.organization_filter)
+          .sort('updatedAt DESC')
+          .exec(function (err, reports) {
+
+            // return error
+            if (err) return res.negotiate(err);
+
+            // counter
+            var counter = 0,
+              length = reports.length;
+              reports_saved = 0
+
+            // if no reports
+            if (length === 0) {
+
+              // return empty
+              return res.json(200, { 'value': reports_saved });
+
+            } else {
+
+              // reports
+              reports.forEach(function (d, i) {
+
+                // if stocks records  
+                Stock
+                  .count({ report_id: d.id })
+                  .exec(function (err, b) {
+
+                    if (b) {
+                      reports_saved += 1;
+                    }
+
+                    counter++;
+                    if (counter === length) {
+                      
+                      return res.json(200, { 'value': reports_saved });
+
+                    }
+                  });
+              });
+            }
           });
 
         break;
