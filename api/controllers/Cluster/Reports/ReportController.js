@@ -608,6 +608,9 @@ var ReportController = {
 			      async.each( beneficiaries, function ( beneficiary, b_next ) {
 			      	// clone
 			      	var b = _under.extend( {}, report_copy, location_copy, beneficiary );
+					// handled by sails
+					delete b.createdAt;
+					delete b.updatedAt;
 							// update or create
 			        Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: b.id }, b ).exec(function( err, result ){
 			        	location.beneficiaries.push( ReportController.set_result( result ) );
