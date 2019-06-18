@@ -696,6 +696,10 @@ module.exports = {
 		},
 		training_female:{
 			type: 'integer'
+		},
+		// technical order in location form
+		_order: {
+			type: 'integer'
 		}
 
 	},

@@ -605,12 +605,21 @@ var ReportController = {
 			      delete location_copy.id;
 
 			      // async loop report beneficiaries
-			      async.each( beneficiaries, function ( beneficiary, b_next ) {
+			      async.eachOf( beneficiaries, function ( beneficiary, i, b_next ) {
 			      	// clone
-			      	var b = _under.extend( {}, report_copy, location_copy, beneficiary );
-							// update or create
+					var b = _under.extend( {}, report_copy, location_copy, beneficiary );
+
+					// handled by sails
+					delete b.createdAt;
+					delete b.updatedAt;
+
+					// update or create
 			        Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: b.id }, b ).exec(function( err, result ){
-			        	location.beneficiaries.push( ReportController.set_result( result ) );
+						// location.beneficiaries.push( ReportController.set_result( result ) );
+
+						// set beneficiaries in the origin order
+						location.beneficiaries[i] = ReportController.set_result( result );
+
 			        	b_next();
 			        });
 			      }, function ( err ) {

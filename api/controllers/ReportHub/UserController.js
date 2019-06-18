@@ -43,6 +43,10 @@ var UserController = {
           // save
           user.save( function(err){
 
+            if (err) return res.negotiate( err );
+            // return user
+            res.json( 200, user );
+
             // create userHistory
             var userHistory = _.clone( user );
                 userHistory.user_id = user.id
@@ -50,16 +54,12 @@ var UserController = {
 
             // create user history for tracking!
             UserHistory
-              .create( userHistory )
-              .exec( function( err, newUserHistory ) {
-                
-                // err
-                if (err) return res.negotiate( err );
-                
-                // return user
-                res.json( 200, user );
+              .create(userHistory).exec(function (err) { });
 
-              });
+            UserLoginHistory
+              .create(userHistory).exec(function (err) { });
+
+            return;
           });
 
         });
