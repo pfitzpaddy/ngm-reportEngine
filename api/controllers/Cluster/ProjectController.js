@@ -35,31 +35,29 @@ var ProjectController = {
     // dates
     var project_start = moment( project.project_start_date ).startOf( 'M' ),
         project_end = moment( project.project_end_date ).endOf( 'M' ),
-        reports_start = moment(project.project_start_date).startOf('Y')>=moment('2017-01-01')?moment(project.project_start_date).startOf('Y'):moment('2017-01-01'),
         reports_end = moment().endOf( 'M' );
 
     // variables
     var reports = [],
-        s_date = project_start, // reports_start, // project_start.format('YYYY-MM-DD') > reports_start.format('YYYY-MM-DD') ? project_start : reports_start,
-        e_date = reports_end; // project_end.format('YYYY-MM-DD') < reports_end.format( 'YYYY-MM-DD' ) ? project_end : reports_end;
+        s_date = project_start < reports_end ? project_start : reports_end,
+        e_date = project_end < reports_end ? project_end : reports_end;
 
     // number of reports
     var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
 
     // reports_duration array
-    var reports_array = Array( parseInt( reports_duration ) ).fill( 1 );
+    var reports_array = Array(parseInt( reports_duration )).fill().map((item, index) => 0 + index);
+    
+    // clone project
+    var p = JSON.parse( JSON.stringify( project ) );
+    delete p.id;
 
-    // async loop target_beneficiaries
-    var m = 0
-    async.each( reports_array, function ( reports_item, next ) {
-      
-      // report_status pending if dates before project start date
-      var report_status = moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format() >= project_start.format() ? 'todo' : 'pending';
-      
+    async.each( reports_array, function ( m, next ) {
+
       // create report
       var report = {
         project_id: project.id,
-        report_status: report_status,
+        report_status: 'todo',
         report_active: true,
         report_month: moment( s_date ).add( m, 'M' ).month(),
         report_year: moment( s_date ).add( m, 'M' ).year(),
@@ -67,15 +65,8 @@ var ProjectController = {
         reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 10 ).format()
       };
 
-      // clone project
-      var p = JSON.parse( JSON.stringify( project ) );
-      delete p.id;
-
       // add report with p to reports
       reports.push( _under.extend( {}, p, report ) );
-
-      // increase month counter
-      m++;
 
       // next
       next();
