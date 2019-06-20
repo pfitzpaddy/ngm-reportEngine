@@ -210,6 +210,32 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		admin1name:{
+			type:'string'
+		},
+		admin1pcode:{
+			type:'string'
+		},
+		admin1lat:{
+			type: 'float'
+		},
+		admin1lng:{
+			type: 'float'
+		},
+
+		admin2name:{
+			type:'string'
+		},
+		admin2pcode:{
+			type:'string'
+		},
+		admin2lat:{
+			type: 'float'
+		},
+		admin2lng:{
+			type: 'float'
+		},
+
 		project_budget_amount_recieved: {
 			type: 'float',
 			required: true
