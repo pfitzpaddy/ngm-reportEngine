@@ -274,13 +274,18 @@ var UserController = {
               // generic error
               if (err) return res.negotiate( err );
 
-              // user object to update tables
-              var updatedRelationsUser = {
-                username: result[0].username,
-                name: result[0].name,
-                position: result[0].position,
-                phone: result[0].phone,
-                email: result[0].email
+              // if change in organization or country do not update collections
+              if (originalUser.admin0pcode !== updatedUser.admin0pcode || originalUser.organization_tag !== updatedUser.organization_tag) {
+                  var updatedRelationsUser = {}
+              } else {
+                // user object to update tables
+                var updatedRelationsUser = {
+                  username: result[0].username,
+                  name: result[0].name,
+                  position: result[0].position,
+                  phone: result[0].phone,
+                  email: result[0].email
+                }
               }
 
               var findOriginalUser = {
@@ -318,6 +323,7 @@ var UserController = {
                         originalUser.contract_start_date && originalUser.contract_start_date.toString() !== result[0].contract_start_date && result[0].contract_start_date.toString() ||
                         originalUser.contract_end_date && originalUser.contract_end_date.toString() !== result[0].contract_end_date && result[0].contract_end_date.toString() ||
                         originalUser.admin0pcode !== result[0].admin0pcode ||
+                        originalUser.organization_tag !== result[0].organization_tag ||
                         originalUser.site_name !== result[0].site_name ){
                     // profile details
                     UserController.updateProfileDetails( req, res, originalUser, result[0] );
@@ -340,12 +346,12 @@ var UserController = {
   updateProfileDetails: function( req, res, originalUser, updatedUser ){
 
     // if country changes, make updates and add new history
-    if ( originalUser.admin0pcode !== updatedUser.admin0pcode ) {
+    if ( originalUser.admin0pcode !== updatedUser.admin0pcode || originalUser.organization_tag !== updatedUser.organization_tag ) {
 
       // fetch
       Organization
         .find()
-        .where( { admin0pcode: updatedUser.admin0pcode } )
+        .where( { admin0pcode: updatedUser.admin0pcode, organization_tag: updatedUser.organization_tag } )
         .exec( function( err, organization ){
           
           // generic error
@@ -363,6 +369,9 @@ var UserController = {
                 
                 // generic error
                 if (err) return res.negotiate( err );
+
+                // uncomment 1 line and add in user update roles: updatedUser.roles if handing user ORG role by default
+                // updatedUser.roles.push('ORG');
 
                 // update user country
                 User
@@ -393,6 +402,8 @@ var UserController = {
               });
 
           } else {
+            // uncomment 1 line and add in user update roles: updatedUser.roles if handing user ORG role by default
+            // updatedUser.roles = updatedUser.roles.filter(role => role === 'ORG');
 
             // update user country
             User
