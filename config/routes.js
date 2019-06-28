@@ -191,8 +191,11 @@ module.exports.routes = {
   // CLUSTER DASHBOARD
   // 'GET /cluster/latestUpdate': 'Cluster/Dashboards/ClusterDashboardController.getlatestUpdate',
   'GET /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator',
-  'POST /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator',
+  'POST /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator', 
 
+  //4wprojectplanDASHBOARD
+  'GET /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator',
+  'POST /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator', 
 
   // -------- HEALTH --------
   // 4W Dashboard
