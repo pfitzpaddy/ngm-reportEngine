@@ -48,6 +48,12 @@ var ProjectController = {
     // reports_duration array
     var reports_array = Array(parseInt( reports_duration )).fill().map((item, index) => 0 + index);
 
+    // prepare project for cloning
+    var p = JSON.parse( JSON.stringify( project ) );
+    delete p.id;
+    delete p.createdAt;
+    delete p.updatedAt;
+
     async.each( reports_array, function ( m, next ) {
 
       // create report
@@ -62,7 +68,7 @@ var ProjectController = {
       };
 
       // add report with p to reports
-      reports.push( _under.extend( {}, report, project ) );
+      reports.push( _under.extend( {}, report, p ) );
 
       // next
       next();
@@ -76,7 +82,7 @@ var ProjectController = {
   },  
 
   // return locations for reports
-  getProjectReportLocations: function( project, reports, target_locations, cb ){
+  getProjectReportLocations: function( reports, target_locations, cb ){
 
     // report locations
     var locations = [];
@@ -104,7 +110,7 @@ var ProjectController = {
         delete l.updatedAt;
 
         // push to locations
-        locations.push( _under.extend( {}, r, l, project ) );
+        locations.push( _under.extend( {}, r, l ) );
 
         // tl next
         tl_next();
@@ -599,7 +605,7 @@ var ProjectController = {
       });
 
       // generate reports for duration of project_update
-      ProjectController.getProjectReports( project_copy, function( err, project_reports ){
+      ProjectController.getProjectReports( project_update, function( err, project_reports ){
         
         // err
         if ( err ) return err;
@@ -629,7 +635,7 @@ var ProjectController = {
       var setLocations = function() {
         
         // generate locations for each report ( requires report_id )
-        ProjectController.getProjectReportLocations( project_copy, reports, project_update.target_locations, function( err, locations ){
+        ProjectController.getProjectReportLocations( reports, project_update.target_locations, function( err, locations ){
           
           // err
           if ( err ) return err;
