@@ -760,6 +760,7 @@ var ClusterDashboardController = {
 							if (err) return res.serverError(err);
 							
 							var fields = [
+								'_id',
 								'project_id',
 								'report_id',
 								'cluster_id',
@@ -859,9 +860,13 @@ var ClusterDashboardController = {
 								'site_lat',
 								'updatedAt',
 								'createdAt',
+								'name',
+								'phone',
+								'email',
 							],
 
 						fieldNames = [
+								'beneficiary_id',
 								'project_id',
 								'report_id',
 								'cluster_id',
@@ -960,7 +965,10 @@ var ClusterDashboardController = {
 								'site_lng',
 								'site_lat',
 								'updatedAt',
-								'createdAt'
+								'createdAt',
+								'focal_point_name',
+								'focal_point_phone',
+								'focal_point_email',
 							];
 
 							var total = 0;
