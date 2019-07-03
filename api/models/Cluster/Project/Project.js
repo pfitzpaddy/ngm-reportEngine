@@ -130,6 +130,18 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
+		//plan hrp/rmrp/undaf COL
+		hrp_plan: {
+			type: 'boolean'
+		},
+		rmrp_plan: {
+			type: 'boolean'
+		},
+		interagencial_plan: {
+			type: 'boolean'
+		},
+
 		project_status: {
 			type: 'string',
 			defaultsTo: 'active'
