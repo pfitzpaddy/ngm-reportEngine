@@ -517,7 +517,7 @@ var ProjectController = {
 
     // promise
     Promise.all([
-      Project.updateOrCreate( { id: project.id }, project_copy ),
+      Project.updateOrCreate( { id: project.id }, project ),
       // budget_progress, target_beneficiaries, target_locations, report, location ( below )
       Beneficiaries.update( findProject, project_copy ),
       Trainings.update( findProject, project_copy ),
