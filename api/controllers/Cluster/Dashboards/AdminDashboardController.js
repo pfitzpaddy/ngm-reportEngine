@@ -976,8 +976,8 @@ var AdminDashboardController = {
                                           '$lte': new Date(params.moment( params.end_date   ).format('YYYY-MM-DD'))
                                         } 
                                       },
-                                  );  
-                                  console.log(filterObject)
+                                  );
+        
         // reports due
         Report.native(function(err, collection) {
           if (err) return res.serverError(err);

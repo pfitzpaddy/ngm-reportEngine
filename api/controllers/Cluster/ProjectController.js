@@ -508,9 +508,7 @@ var ProjectController = {
     }
 
     // find project
-    var findProject = {
-      project_id: project.id
-    }
+    var findProject = { project_id: project.id }
 
     // copy project
     var project_copy = JSON.parse( JSON.stringify( project ) );
@@ -536,6 +534,8 @@ var ProjectController = {
 
       // project update
       var project_update = ProjectController.set_result( update_result[ 0 ] );
+      // update project_id (for newly created projects)
+      findProject = { project_id: project_update.id }
       project_update.project_budget_progress = [];
       project_update.target_beneficiaries = [];
       project_update.target_locations = [];
