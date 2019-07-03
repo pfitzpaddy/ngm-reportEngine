@@ -8,7 +8,7 @@
 // require
 var moment = require( 'moment' );
 var json2csv = require( 'json2csv' );
-//var $nin_organizations = [ 'immap', 'arcs' ];
+var $nin_organizations = [ 'immap', 'arcs' ];
 var async = require('async');
 
 var Cluster4wprojectplanDashboardController = {
@@ -2113,7 +2113,7 @@ var Cluster4wprojectplanDashboardController = {
 
 				Project.native(function(err, collection) {
 
-					console.log(filterObject, "FILTROS");
+					
 					if (err) return res.serverError(err);
 				
 					collection.aggregate([
@@ -2138,6 +2138,69 @@ var Cluster4wprojectplanDashboardController = {
 						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
 				});	
+				
+				break;
+
+				case 'organizations_4wdashboard_projectplan':
+
+				if ( params.list ) {
+
+				Project.native(function(err, collection) {
+
+					
+					if (err) return res.serverError(err);
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						},
+						{
+							$group: {
+								_id: {organization_tag:'$organization_tag', organization:'$organization'}
+							}
+						}
+						]).toArray(function (err, results) {
+						if (err) return res.serverError(err);
+
+						organizations=_.pluck(results,'_id')		
+							organizations.sort(function(a, b) {
+								return a.organization.localeCompare(b.organization);
+							});
+							organizations.unshift({
+											organization_tag: 'all',
+											organization: 'ALL',
+										});
+							return res.json( 200, organizations );
+						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+					});
+				});	
+			}else {	// count of organizations
+					Project.native(function(err, collection) {
+						if (err) return res.serverError(err);
+					
+						collection.aggregate([
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group: {
+									_id: '$organization_tag'
+								}
+							},
+							{
+								$group: {
+									_id: 1,
+									total: {
+									$sum: 1
+									}
+								}
+							}
+						]).toArray(function (err, results) {
+							if (err) return res.serverError(err);
+							return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+						});
+					});	
+				}
 				
 				break;
 				
