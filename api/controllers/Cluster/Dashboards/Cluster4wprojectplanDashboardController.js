@@ -2234,20 +2234,20 @@ var Cluster4wprojectplanDashboardController = {
 						var donantes = [];
 
 						results.forEach( function( d, i ) {
-							console.log(results[i].project_donor, "DONANTES PROJECT_DONOR");
+							//console.log(results[i].project_donor, "DONANTES PROJECT_DONOR");
 							results[i].project_donor.forEach(function (d, j){
 
-								console.log(results[i].project_donor[j], "DONANTE DENTRO DEL FOREACH DE PROJECT_DONOR");
+								//console.log(results[i].project_donor[j], "DONANTE DENTRO DEL FOREACH DE PROJECT_DONOR");
 
 							//const resultado = donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
                              const resultado = donantes.find( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
-                             console.log(resultado, "RESULTADO");
+                            // console.log(resultado, "RESULTADO");
 
                              if(!resultado){
-                             	console.log("lo metio");
+                                 //	console.log("lo metio");
                              	donantes.push(results[i].project_donor[j]);
                              }else{
-                             	console.log("no lo metio")
+                             //	console.log("no lo metio")
                              }
                             /* if(donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id )=== -1){
                             console.log("LO METIO");
@@ -2267,25 +2267,122 @@ var Cluster4wprojectplanDashboardController = {
 
 
 							});
-							//results[i].project_donor = results[i].project_donor.join(', ');
-							//console.log(results[i].project_donor, "SEPARADOS");
-						//	report[i].organization = report[i].organization.join(', ');
-						//	report[i].implementing_partners = report[i].implementing_partners.join(', ');
 						});
 
-						console.log("TOTAL DONANTES", donantes.length);
-
-
+						
 						return res.json( 200, { 'value': donantes.length } );
 					});
 				});	
 				
 				break;
+
+
+				case 'total_implementing_partners_4wdashboard_projectplan':
+
+				Project.native(function(err, collection) {
+
+					
+					if (err) return res.serverError(err);
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						}/*,
+						{
+							$group: {
+								_id: '$_id'
+							}
+						},
+						{
+							$group: {
+								_id: 1,
+								total: {
+								$sum: 1
+								}
+							}
+						}*/
+					]).toArray(function (err, results) {
+						if (err) return res.serverError(err);
+
+						var implementers = [];
+
+						results.forEach( function( d, i ) {
+							//console.log(results[i].implementing_partners, "IMPLEMENTADORES PROJECT_DONOR");
+							results[i].implementing_partners.forEach(function (d, j){
+
+								//console.log(results[i].implementing_partners[j], "IMPLEMENTADOR DENTRO DEL FOREACH DE PROJECT_DONOR");
+
+                             //cambiar implementer.id por implementer.organization_id
+                             const resultado = implementers.find( implementer => implementer.id === results[i].implementing_partners[j].id );
+                             //console.log(resultado, "RESULTADO");
+
+                             if(!resultado){
+                             //	console.log("lo metio");
+                             	implementers.push(results[i].implementing_partners[j]);
+                             }else{
+                             //	console.log("no lo metio")
+                             }
+                            
+
+							});
+						});
+
+						//console.log("TOTAL IMPLEMENTADORES", implementers.length);
+
+						return res.json( 200, { 'value': implementers.length } );
+					});
+				});	
+
+				break;
+
+				// count
+			case 'target_locations_4wdashboard_projectplan':
+				TargetLocation.native(function(err, collection) {
+					if (err) return res.serverError(err);
+
+					//console.log(filterObject, "FILTROS TARGET LOCATIONS");
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						},
+						{
+							$group: {
+								_id: {
+									project_id: '$project_id',
+									site_lat: '$site_lat',
+									site_lng: '$site_lng',
+									site_name: '$site_name'
+								}
+							}
+						},
+						{
+							$group: {
+								_id: 1,
+								total: {
+								$sum: 1
+								}
+							}
+						}
+					]).toArray(function (err, results) {
+						if (err) return res.serverError(err);
+
+						
+					 //console.log(results, "RESULTADOS");
+
+						/*results.forEach(function (d,i){
+							console.log( "IMPRIMO ID: ",d.id);
+						});*/
+						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+					});
+				});	
+				
+				break;	
+
 				
 				default: 
 					return res.json( 200, { value:0 });
 					break;
-
 
 		}
 
