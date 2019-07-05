@@ -2203,6 +2203,84 @@ var Cluster4wprojectplanDashboardController = {
 				}
 				
 				break;
+
+				case 'total_donors_4wdashboard_projectplan':
+
+				Project.native(function(err, collection) {
+
+					
+					if (err) return res.serverError(err);
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						}/*,
+						{
+							$group: {
+								_id: '$_id'
+							}
+						},
+						{
+							$group: {
+								_id: 1,
+								total: {
+								$sum: 1
+								}
+							}
+						}*/
+					]).toArray(function (err, results) {
+						if (err) return res.serverError(err);
+
+						var donantes = [];
+
+						results.forEach( function( d, i ) {
+							console.log(results[i].project_donor, "DONANTES PROJECT_DONOR");
+							results[i].project_donor.forEach(function (d, j){
+
+								console.log(results[i].project_donor[j], "DONANTE DENTRO DEL FOREACH DE PROJECT_DONOR");
+
+							//const resultado = donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
+                             const resultado = donantes.find( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
+                             console.log(resultado, "RESULTADO");
+
+                             if(!resultado){
+                             	console.log("lo metio");
+                             	donantes.push(results[i].project_donor[j]);
+                             }else{
+                             	console.log("no lo metio")
+                             }
+                            /* if(donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id )=== -1){
+                            console.log("LO METIO");
+                             } else{
+                             	console.log("YA EXISTE",resultado);
+                             };*/
+
+                            /* if(resultado === -1) {
+                             	donantes.push(results[i].project_donor[j]);
+                             	console.log("LO METIO");
+                             }else{
+                             	console.log("YA EXISTE",resultado);
+                             }*/
+
+
+								//donantes.findIndex( donante => donante.projec_donor_id == results[i].project_donor[j].project_donor_id);
+
+
+							});
+							//results[i].project_donor = results[i].project_donor.join(', ');
+							//console.log(results[i].project_donor, "SEPARADOS");
+						//	report[i].organization = report[i].organization.join(', ');
+						//	report[i].implementing_partners = report[i].implementing_partners.join(', ');
+						});
+
+						console.log("TOTAL DONANTES", donantes.length);
+
+
+						return res.json( 200, { 'value': donantes.length } );
+					});
+				});	
+				
+				break;
 				
 				default: 
 					return res.json( 200, { value:0 });
