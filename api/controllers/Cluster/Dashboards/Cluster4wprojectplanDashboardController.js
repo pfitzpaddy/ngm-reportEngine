@@ -2111,7 +2111,7 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'projects_4wdashboard_projectplan':
 
-				Project.native(function(err, collection) {
+				/*Project.native(function(err, collection) {
 
 					
 					if (err) return res.serverError(err);
@@ -2137,7 +2137,42 @@ var Cluster4wprojectplanDashboardController = {
 						if (err) return res.serverError(err);
 						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
+				});*/
+					
+
+				TargetLocation.native(function(err, collection) {
+					if (err) return res.serverError(err);
+
+					//console.log(filterObject, "FILTROS TARGET LOCATIONS");
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						},
+						{
+							$group: {
+								_id: {
+									project_id: '$project_id',
+									//site_lat: '$site_lat',
+									//site_lng: '$site_lng',
+									//site_name: '$site_name'
+								}
+							}
+						},
+						{
+							$group: {
+								_id: 1,
+								total: {
+								$sum: 1
+								}
+							}
+						}
+					]).toArray(function (err, results) {
+						if (err) return res.serverError(err);
+						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+					});
 				});	
+
 				
 				break;
 
@@ -2145,7 +2180,7 @@ var Cluster4wprojectplanDashboardController = {
 
 				if ( params.list ) {
 
-				Project.native(function(err, collection) {
+				TargetLocation.native(function(err, collection) {
 
 					
 					if (err) return res.serverError(err);
@@ -2175,7 +2210,7 @@ var Cluster4wprojectplanDashboardController = {
 					});
 				});	
 			}else {	// count of organizations
-					Project.native(function(err, collection) {
+					TargetLocation.native(function(err, collection) {
 						if (err) return res.serverError(err);
 					
 						collection.aggregate([
@@ -2206,7 +2241,7 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'total_donors_4wdashboard_projectplan':
 
-				Project.native(function(err, collection) {
+				TargetLocation.native(function(err, collection) {
 
 					
 					if (err) return res.serverError(err);
@@ -2279,7 +2314,7 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'total_implementing_partners_4wdashboard_projectplan':
 
-				Project.native(function(err, collection) {
+				TargetLocation.native(function(err, collection) {
 
 					
 					if (err) return res.serverError(err);
