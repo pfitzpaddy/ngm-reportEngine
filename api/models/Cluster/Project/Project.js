@@ -205,6 +205,9 @@ module.exports = {
 		project_donor: {
 			type: 'array'
 		},
+		project_gender_marker:{
+			type:'string'
+		},
 		activity_type: {
 			type: 'array',
 			required: true
