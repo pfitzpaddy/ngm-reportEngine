@@ -14,18 +14,18 @@ var _under = require('underscore');
 
 var ReportController = {
 
-  // TASKS
+	// TASKS
 
-  // parse results from sails
-  set_result: function( result ) {
-    if( util.isArray( result ) ) {
-      // update ( array )
-      return result[0];
-    } else { 
-      // create ( object )
-      return result;
-    }
-  },
+	// parse results from sails
+	set_result: function( result ) {
+		if( util.isArray( result ) ) {
+			// update ( array )
+			return result[0];
+		} else { 
+			// create ( object )
+			return result;
+		}
+	},
 
 	// request as csv
 	getReportCsv: function( req, res ) {
@@ -268,21 +268,21 @@ var ReportController = {
 		}
 
 		// promise
-    Promise.all([
-      Report.find( req.param( 'filter' ) ).sort( 'report_month ASC' ),
-      Beneficiaries.find( req.param( 'filter' ) )
-    ])
-    .catch( function( err ) {
-      return res.negotiate( err );
-    })
-    .then( function( result ) {
+		Promise.all([
+			Report.find( req.param( 'filter' ) ).sort( 'report_month ASC' ),
+			Beneficiaries.find( req.param( 'filter' ) )
+		])
+		.catch( function( err ) {
+			return res.negotiate( err );
+		})
+		.then( function( result ) {
 
-    	// gather results
-    	var reports = result[ 0 ];
-    	var beneficiaries = result[ 1 ];
-    	
-	    // async loop reports
-	    async.each( reports, function ( report, next ) {
+			// gather results
+			var reports = result[ 0 ];
+			var beneficiaries = result[ 1 ];
+			
+			// async loop reports
+			async.each( reports, function ( report, next ) {
 
 				// add status empty
 				report.icon = 'adjust'
@@ -309,11 +309,11 @@ var ReportController = {
 
 				}	
 
-	    	// async loop beneficiaries
-	    	async.each( beneficiaries, function ( beneficiary, b_next ) {
-    			
-    			// beneficiaries exist for this report
-    			if ( report.id === beneficiary.report_id ) {
+				// async loop beneficiaries
+				async.each( beneficiaries, function ( beneficiary, b_next ) {
+					
+					// beneficiaries exist for this report
+					if ( report.id === beneficiary.report_id ) {
 
 						// if no benficiaries and submitted
 						if ( report.report_status === 'complete' ) {
@@ -345,19 +345,19 @@ var ReportController = {
 							}
 						}
 
-    			}
-    			b_next();
-	    	}, function ( err ) {
-		      if ( err ) return err;
+					}
+					b_next();
+				}, function ( err ) {
+					if ( err ) return err;
 					next();
-		    });
-	    }, function ( err ) {
-	      if ( err ) return err;
+				});
+			}, function ( err ) {
+				if ( err ) return err;
 				// return
 				return res.json( 200, reports );
-	    });
+			});
 
-    });
+		});
 
 	},
 
@@ -417,115 +417,115 @@ var ReportController = {
 		}
 
 		// promise
-    Promise.all([
-      Report.findOne( find ),
-      Location.find( findLocation ),
-      Beneficiaries.find( findReport ).populateAll(),
-      Trainings.find( findReport ),
-      TrainingParticipants.find( findReport )
-    ])
-    .catch( function( err ) {
-      return res.negotiate( err );
-    })
-    .then( function( result ) {
+		Promise.all([
+			Report.findOne( find ),
+			Location.find( findLocation ),
+			Beneficiaries.find( findReport ).populateAll(),
+			Trainings.find( findReport ),
+			TrainingParticipants.find( findReport )
+		])
+		.catch( function( err ) {
+			return res.negotiate( err );
+		})
+		.then( function( result ) {
 
-    	// gather results
-    	var report = result[ 0 ];
-    	var locations = result[ 1 ];
-    	var beneficiaries = result[ 2 ];
-    	var trainings = result[ 3 ];
-    	var training_participants = result[ 4 ];
+			// gather results
+			var report = result[ 0 ];
+			var locations = result[ 1 ];
+			var beneficiaries = result[ 2 ];
+			var trainings = result[ 3 ];
+			var training_participants = result[ 4 ];
 
-    	// placeholder
-    	report.locations = [];
+			// placeholder
+			report.locations = [];
 
-	    // async loop target_beneficiaries
-	    async.each( locations, function ( location, next ) {
+			// async loop target_beneficiaries
+			async.each( locations, function ( location, next ) {
 
-	    	// counter
-	    	var locations_counter = 0;
-	    	var locations_features = 2;
+				// counter
+				var locations_counter = 0;
+				var locations_features = 2;
 
-    		// set holders
-    		location.beneficiaries = [];
-    		location.trainings = [];
+				// set holders
+				location.beneficiaries = [];
+				location.trainings = [];
 
-	    	// set next in locations array
-	    	var set_next = function ( location ){
-	    		locations_counter++;
+				// set next in locations array
+				var set_next = function ( location ){
+					locations_counter++;
 					if( locations_counter === locations_features ){
 						report.locations.push( location );
 						next();
 					}
-	    	}
+				}
 
-    		// beneficiaries
-    		if ( beneficiaries.length ){
-    			async.each( beneficiaries, function ( beneficiary, b_next ) {
-	    			if ( location.id === beneficiary.location_id ) {
-	    				// push
-	    				location.beneficiaries.push( beneficiary );
-	    			}
-    				// next
-    				b_next();
-	    		}, function ( err ) {
-			    	// error
-			      if ( err ) return err;
-			      // increment counter
-			      set_next( location );
-			    });
-	    	} else {
-		      // increment counter
-		      set_next( location );
-    		}
-
-    		// trainings
-    		if ( trainings.length ){
-	    		async.each( trainings, function ( training, t_next ) {
-	    			if ( location.id === training.location_id ) {
-	    				// set holders
-	    				training.training_participants = [];
-	    				// participants
-	    				if ( training_participants.length ){
-								async.each( training_participants, function ( training_participant, tp_next ) { 						
-	    						if ( training.id === training_participant.training_id ){
-	    							training.training_participants.push( training_participant );
-	    						}
-	    						// next
-	    						tp_next();
-	    					}, function ( err ) {
-						    	// error
-						      if ( err ) return err;
-			    				// push
-			    				location.trainings.push( training );
-									// next
-    							t_next();
-								});
-	    				} else {
-								// next
-  							t_next();
-	    				}
-	    			} else {
-	    				// next
-	    				t_next();
-	    			}
-	    		}, function ( err ) {
-			    	// error
-			      if ( err ) return err;
-			      // increment counter
-			      set_next( location );
+				// beneficiaries
+				if ( beneficiaries.length ){
+					async.each( beneficiaries, function ( beneficiary, b_next ) {
+						if ( location.id === beneficiary.location_id ) {
+							// push
+							location.beneficiaries.push( beneficiary );
+						}
+						// next
+						b_next();
+					}, function ( err ) {
+						// error
+						if ( err ) return err;
+						// increment counter
+						set_next( location );
 					});
-    		} else {
-		      // increment counter
-		      set_next( location );
-    		}
+				} else {
+					// increment counter
+					set_next( location );
+				}
 
-	    }, function ( err ) {
-      	if ( err ) return err;
+				// trainings
+				if ( trainings.length ){
+					async.each( trainings, function ( training, t_next ) {
+						if ( location.id === training.location_id ) {
+							// set holders
+							training.training_participants = [];
+							// participants
+							if ( training_participants.length ){
+								async.each( training_participants, function ( training_participant, tp_next ) { 						
+									if ( training.id === training_participant.training_id ){
+										training.training_participants.push( training_participant );
+									}
+									// next
+									tp_next();
+								}, function ( err ) {
+									// error
+									if ( err ) return err;
+									// push
+									location.trainings.push( training );
+									// next
+									t_next();
+								});
+							} else {
+								// next
+								t_next();
+							}
+						} else {
+							// next
+							t_next();
+						}
+					}, function ( err ) {
+						// error
+						if ( err ) return err;
+						// increment counter
+						set_next( location );
+					});
+				} else {
+					// increment counter
+					set_next( location );
+				}
+
+			}, function ( err ) {
+				if ( err ) return err;
 				return res.json( 200, report );
-	    });
+			});
 
-    });
+		});
 
 	},
 
@@ -541,16 +541,16 @@ var ReportController = {
 		var report = req.param( 'report' );
 		var locations = req.param( 'report' ).locations;
 
-    // find
-    var findProject = {
-      project_id: report.project_id
-    }
-    var findReport = {
-      report_id: report.id
-    }
-    var findLocation;
-    var findTargetLocation;
-    var findTraining;
+		// find
+		var findProject = {
+			project_id: report.project_id
+		}
+		var findReport = {
+			report_id: report.id
+		}
+		var findLocation;
+		var findTargetLocation;
+		var findTraining;
 
 		// get report by organization_id
 		Report
@@ -565,129 +565,126 @@ var ReportController = {
 				report.locations = [];
 
 				// prepare for cloning
-	      var report_copy = JSON.parse( JSON.stringify( report ) );
-	      delete report_copy.id;
-	      delete report_copy.createdAt;
-	      delete report_copy.updatedAt;
+				var report_copy = JSON.parse( JSON.stringify( report ) );
+				delete report_copy.id;
+				delete report_copy.createdAt;
+				delete report_copy.updatedAt;
 
-	      // async loop report locations
-	      async.each( locations, function ( location, next ) {
+				// async loop report locations
+				async.each( locations, function ( location, next ) {
 
-	      	// set counter
-		    	var locations_counter = 0;
-		    	var locations_features = 2;
+					// set counter
+					var locations_counter = 0;
+					var locations_features = 2;
 
-	    		// set beneficiaries / trainings
+					// set beneficiaries / trainings
 					var beneficiaries = location.beneficiaries;
 					var trainings = location.trainings;
 
-		    	// set next in locations array
-		    	var set_next = function ( location ){
-		    		locations_counter++;
+					// set next in locations array
+					var set_next = function ( location ){
+						locations_counter++;
 						if( locations_counter === locations_features ){
 							report.locations.push( location );
 							next();
 						}
-		    	}
+					}
 
 					// update or create
-	        Location.updateOrCreate( _under.extend( {}, findProject, findReport ), { id: location.id }, location ).exec(function( err, result ){
-	        	
-	        	// set result, update / create beneficiaries, trainings
-	        	location = ReportController.set_result( result );
-	        	findLocation = { location_id: location.id }
-	        	findTargetLocation = { target_location_reference_id: location.target_location_reference_id }
-		    		location.beneficiaries = [];
-		    		location.trainings = [];
+					Location.updateOrCreate( _under.extend( {}, findProject, findReport ), { id: location.id }, location ).exec(function( err, result ){
+						
+						// set result, update / create beneficiaries, trainings
+						location = ReportController.set_result( result );
+						findLocation = { location_id: location.id }
+						findTargetLocation = { target_location_reference_id: location.target_location_reference_id }
+						location.beneficiaries = [];
+						location.trainings = [];
 
 						// prepare for cloning
-			      var location_copy = JSON.parse( JSON.stringify( location ) );
-			      delete location_copy.id;
+						var location_copy = JSON.parse( JSON.stringify( location ) );
+						delete location_copy.id;
+						delete location_copy.createdAt;
+						delete location_copy.updatedAt;
 
-			      // async loop report beneficiaries
-			      async.eachOf( beneficiaries, function ( beneficiary, i, b_next ) {
-			      	// clone
-					var b = _under.extend( {}, report_copy, location_copy, beneficiary );
+						// async loop report beneficiaries
+						async.eachOf( beneficiaries, function ( beneficiary, i, b_next ) {
+						
+						// clone
+						var b = _under.extend( {}, report_copy, location_copy, beneficiary );
 
-					// handled by sails
-					delete b.createdAt;
-					delete b.updatedAt;
-
-					// update or create
-			        Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: b.id }, b ).exec(function( err, result ){
+						// update or create
+						Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: b.id }, b ).exec(function( err, result ){
 						// location.beneficiaries.push( ReportController.set_result( result ) );
-
 						// set beneficiaries in the origin order
 						location.beneficiaries[i] = ReportController.set_result( result );
+								b_next();
+							});
+						}, function ( err ) {
+							if ( err ) return err;
+							// increment counter
+							set_next( location );
+						});
 
-			        	b_next();
-			        });
-			      }, function ( err ) {
-			        if ( err ) return err;
-				      // increment counter
-				      set_next( location );
-			      });
+					 
+						// async loop report beneficiaries
+						async.each( trainings, function ( training, t_next ) {
 
-			     
-			      // async loop report beneficiaries
-			      async.each( trainings, function ( training, t_next ) {
+							// clone
+							var t = _under.extend( {}, report_copy, location_copy, training );
 
-			      	// clone
-			      	var t = _under.extend( {}, report_copy, location_copy, training );
-
-			      	// set beneficiaries / trainings
+							// set beneficiaries / trainings
 							var training_participants = t.training_participants;
 
 							// update or create
-			        Trainings.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: t.id }, t ).exec(function( err, result ){
-			        	
-			        	// set result, update / create beneficiaries, trainings
-			        	t = ReportController.set_result( result );
-			        	findTraining = { training_id: t.id }
-			        	t.training_participants = [];
+							Trainings.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: t.id }, t ).exec(function( err, result ){
+								
+								// set result, update / create beneficiaries, trainings
+								t = ReportController.set_result( result );
+								findTraining = { training_id: t.id }
+								t.training_participants = [];
 
 								// prepare for cloning
-					      var triaining_copy = JSON.parse( JSON.stringify( t ) );
-					      delete triaining_copy.id;
-			        	
-			        	// if training_participants
-			        	if ( training_participants && training_participants.length ) {
-				      		// async loop report beneficiaries
-				      		async.each( training_participants, function ( training_participant, tp_next ) {
-						      	// clone
-						      	var t_participant = _under.extend( {}, report_copy, location_copy, triaining_copy, training_participant );
+								var triaining_copy = JSON.parse( JSON.stringify( t ) );
+								delete triaining_copy.id;
+								
+								// if training_participants
+								if ( training_participants && training_participants.length ) {
+									// async loop report beneficiaries
+									async.each( training_participants, function ( training_participant, tp_next ) {
+										// clone
+										var t_participant = _under.extend( {}, report_copy, location_copy, triaining_copy, training_participant );
 										// update or create
-						        TrainingParticipants.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation, findTraining ), { id: t_participant.id }, t_participant ).exec(function( err, result ){
-						        	t.training_participants.push( ReportController.set_result( result ) );
-						        	tp_next();
-						        });
-					        }, function ( err ) {
-						        if ( err ) return err;
-						        // push
-						        location.trainings.push( t );
-							      // increment counter
-							      t_next();
-						      });
-					      } else {
-						      // increment counter
-						      t_next();
-					      }
+										TrainingParticipants.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation, findTraining ), { id: t_participant.id }, t_participant ).exec(function( err, result ){
+											t.training_participants.push( ReportController.set_result( result ) );
+											tp_next();
+										});
+									}, function ( err ) {
+										if ( err ) return err;
+										// push
+										location.trainings.push( t );
+										// increment counter
+										t_next();
+									});
+								} else {
+									// increment counter
+									t_next();
+								}
 
-					    });
-			      }, function ( err ) {
-			        if ( err ) return err;
-				      // increment counter
-				      set_next( location );
-			      });
+							});
+						}, function ( err ) {
+							if ( err ) return err;
+							// increment counter
+							set_next( location );
+						});
 
 
-	        });
-	      }, function ( err ) {
-	      	if ( err ) return err;
+					});
+				}, function ( err ) {
+					if ( err ) return err;
 					return res.json( 200, report );
-	      });     
+				});     
 
-    });
+		});
 
 	},
 
@@ -771,16 +768,16 @@ var ReportController = {
 		var $id = req.param( 'id' );
 
 		// promise
-    Promise.all([
-      Trainings.destroy({ id: $id }),
-      TrainingParticipants.destroy({ training_id: $id })
-    ])
-    .catch( function( err ) {
-      return res.negotiate( err );
-    })
-    .then( function( result ) {
-    	return res.json( 200, { msg: 'success' } );
-    });
+		Promise.all([
+			Trainings.destroy({ id: $id }),
+			TrainingParticipants.destroy({ training_id: $id })
+		])
+		.catch( function( err ) {
+			return res.negotiate( err );
+		})
+		.then( function( result ) {
+			return res.json( 200, { msg: 'success' } );
+		});
 
 	},
 

@@ -685,7 +685,8 @@ var ClusterDashboardController = {
 								$group:
 								{
 									_id: null,
-									total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									total:  { $sum: { $add: [ "$total_beneficiaries" ] } }
 								}
 							}
 						]
@@ -718,7 +719,8 @@ var ClusterDashboardController = {
 									$group:
 									{
 										_id: null,
-										total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } } ,
+									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									total:  { $sum: { $add: [ "$total_beneficiaries" ] } }
 									}
 								}
 							]
@@ -954,7 +956,7 @@ var ClusterDashboardController = {
 								'women',
 								'elderly_men',
 								'elderly_women',
-								'total',
+								'total_beneficiaries',
 								'admin1lng',
 								'admin1lat',
 								'admin2lng',
@@ -1004,16 +1006,17 @@ var ClusterDashboardController = {
 								}
 
 								// sum
-								var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
+								// var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
 								// beneficiaries
-								d.total = sum;
+								// d.total = sum;
 								d.report_month_number = d.report_month + 1;
 								d.report_month = moment(d.reporting_period).format('MMMM');
 								d.reporting_period = moment(d.reporting_period).format('YYYY-MM-DD');
 								d.updatedAt = moment(d.updatedAt).format('YYYY-MM-DD HH:mm:ss');
 								d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
 								// grand total
-								total += sum;
+								// total += sum;
+								total += d.total_beneficiaries;
 								next();
 
 							}, function (err) {
