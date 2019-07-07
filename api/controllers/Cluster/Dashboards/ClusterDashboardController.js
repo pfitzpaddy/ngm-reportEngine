@@ -695,8 +695,6 @@ var ClusterDashboardController = {
 
 						var total = beneficiaries[0]?beneficiaries[0].total:0;
 
-						console.log( total );
-
 						return res.json( 200, { 'value': total } );
 					});
 				});
@@ -749,8 +747,6 @@ var ClusterDashboardController = {
 									if (err) return res.serverError(err);
 									
 									var total = beneficiaries[0]?beneficiaries[0].total:0 + training_participants[0]?training_participants[0].total:0  
-
-									console.log( total );
 				
 									return res.json( 200, { 'value': total } );
 								});
@@ -960,7 +956,7 @@ var ClusterDashboardController = {
 								'women',
 								'elderly_men',
 								'elderly_women',
-								'total',
+								'total_beneficiaries',
 								'admin1lng',
 								'admin1lat',
 								'admin2lng',
@@ -1013,7 +1009,6 @@ var ClusterDashboardController = {
 								// var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
 								// beneficiaries
 								// d.total = sum;
-								d.total = d.total_beneficiaries;
 								d.report_month_number = d.report_month + 1;
 								d.report_month = moment(d.reporting_period).format('MMMM');
 								d.reporting_period = moment(d.reporting_period).format('YYYY-MM-DD');
@@ -1021,7 +1016,7 @@ var ClusterDashboardController = {
 								d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
 								// grand total
 								// total += sum;
-								total += d.total;
+								total += d.total_beneficiaries;
 								next();
 
 							}, function (err) {
