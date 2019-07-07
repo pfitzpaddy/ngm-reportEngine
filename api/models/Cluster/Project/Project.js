@@ -130,6 +130,36 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
+		//Response components COL
+
+		humanitarian_component:{
+			type:'boolean'
+		},
+
+		construccion_de_paz_component:{
+			type:'boolean'
+		},
+
+		desarrollo_sostenible_component:{
+			type:'boolean'
+		},
+
+		flujos_migratorios_component:{
+			type:'boolean'
+		},
+
+		//plan hrp/rmrp/undaf COL
+		hrp_plan: {
+			type: 'boolean'
+		},
+		rmrp_plan: {
+			type: 'boolean'
+		},
+		interagencial_plan: {
+			type: 'boolean'
+		},
+
 		project_status: {
 			type: 'string',
 			defaultsTo: 'active'
@@ -174,6 +204,9 @@ module.exports = {
 		},
 		project_donor: {
 			type: 'array'
+		},
+		project_gender_marker:{
+			type:'string'
 		},
 		activity_type: {
 			type: 'array',
