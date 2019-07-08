@@ -47,10 +47,12 @@ var ProjectController = {
 
     // reports_duration array
     var reports_array = Array(parseInt( reports_duration )).fill().map((item, index) => 0 + index);
-    
-    // clone project
+
+    // prepare project for cloning
     var p = JSON.parse( JSON.stringify( project ) );
     delete p.id;
+    delete p.createdAt;
+    delete p.updatedAt;
 
     async.each( reports_array, function ( m, next ) {
 
@@ -66,7 +68,7 @@ var ProjectController = {
       };
 
       // add report with p to reports
-      reports.push( _under.extend( {}, p, report ) );
+      reports.push( _under.extend( {}, report, p ) );
 
       // next
       next();
@@ -94,6 +96,8 @@ var ProjectController = {
       // prepare report for cloning
       r.report_id = r.id.valueOf();
       delete r.id;
+      delete r.createdAt;
+      delete r.updatedAt;
 
       // async loop target_beneficiaries
       async.each( target_locations, function ( target_location, tl_next ) {
@@ -102,6 +106,8 @@ var ProjectController = {
         var l = JSON.parse( JSON.stringify( target_location ) );
         l.target_location_reference_id = l.id.valueOf();
         delete l.id;
+        delete l.createdAt;
+        delete l.updatedAt;
 
         // push to locations
         locations.push( _under.extend( {}, r, l ) );
@@ -502,40 +508,33 @@ var ProjectController = {
     }
 
     // find project
-    var findProject = {
-      project_id: project.id
-    }
+    var findProject = { project_id: project.id }
 
-    // user object to update tables
-    var updateUser = {
-      username: project.username,
-      name: project.name,
-      position: project.position,
-      phone: project.phone,
-      email: project.email
-    }
+    // copy project
+    var project_copy = JSON.parse( JSON.stringify( project ) );
+    delete project_copy.id;
+    delete project_copy.project_budget_progress;
+    delete project_copy.target_beneficiaries;
+    delete project_copy.target_locations;
+    delete project_copy.createdAt;
+    delete project_copy.updatedAt;
 
     // promise
     Promise.all([
       Project.updateOrCreate( { id: project.id }, project ),
       // budget_progress, target_beneficiaries, target_locations, report, location ( below )
-      Beneficiaries.update( findProject, updateUser ),
-      Trainings.update( findProject, updateUser ),
-      TrainingParticipants.update( findProject, updateUser )
+      Beneficiaries.update( findProject, project_copy ),
+      Trainings.update( findProject, project_copy ),
+      TrainingParticipants.update( findProject, project_copy )
     ])
     .catch( function( err ) {
       return res.negotiate( err );
     })
     .then( function( update_result ) {
 
-      // update_project
-      var project_update = ProjectController.set_result( update_result[ 0 ] );
-      var project_update_copy = JSON.parse( JSON.stringify( project_update ) );
-      delete project_update_copy.id;
-      delete project_update_copy.createdAt;
-      delete project_update_copy.updatedAt;
-
       // project update
+      var project_update = ProjectController.set_result( update_result[ 0 ] );
+      // update project_id (for newly created projects)
       findProject = { project_id: project_update.id }
       project_update.project_budget_progress = [];
       project_update.target_beneficiaries = [];
@@ -568,7 +567,7 @@ var ProjectController = {
       // ASYNC REQUEST 1
       // async loop target_beneficiaries
       async.each( project_budget_progress, function ( d, next ) {
-        var budget = _under.extend( {}, project_update_copy, d );
+        var budget = _under.extend( {}, d, project_copy );
         BudgetProgress.updateOrCreate( findProject, { id: budget.id }, budget ).exec(function( err, result ){
           project_update.project_budget_progress.push( ProjectController.set_result( result ) );
           next();
@@ -581,7 +580,7 @@ var ProjectController = {
       // ASYNC REQUEST 2
       // async loop target_beneficiaries
       async.each( target_beneficiaries, function ( d, next ) {
-        var t_beneficiary = _under.extend( {}, project_update_copy, d );
+        var t_beneficiary = _under.extend( {}, d, project_copy );
         TargetBeneficiaries.updateOrCreate( findProject, { id: t_beneficiary.id }, t_beneficiary ).exec(function( err, result ){
           project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
           next();
@@ -594,7 +593,7 @@ var ProjectController = {
       // ASYNC REQUEST 3
       // async loop target_locations
       async.each( target_locations, function ( d, next ) {
-        var t_location = _under.extend( {}, project_update_copy, d );
+        var t_location = _under.extend( {}, d, project_copy );
         TargetLocation.updateOrCreate( findProject, { id: t_location.id }, t_location ).exec(function( err, result ){
           project_update.target_locations.push( ProjectController.set_result( result ) );
           next();
@@ -618,6 +617,7 @@ var ProjectController = {
           Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
             if( !report ) { report = { id: null } }
             if ( report ) { d.report_status = report.report_status; d.report_active = report.report_active, d.updatedAt = report.updatedAt }
+            // Report update or create
             Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
               reports.push( ProjectController.set_result( result ) );
               next();
