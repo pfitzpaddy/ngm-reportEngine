@@ -229,6 +229,7 @@ module.exports = {
 			
 		},
 		
+		// ET (to be moved to activities)
 		distribution_start_date: {
 			type: 'date'
 		},
@@ -238,6 +239,18 @@ module.exports = {
 		distribution_status: {
 			type: 'string'
 		},
+
+		// Will become the standard date measurement (replacing above)
+		activity_start_date: {
+			type: 'date'
+		},
+		activity_end_date: {
+			type: 'date'
+		},
+		activity_status: {
+			type: 'string'
+		},
+
 
 		// activity_type
 		activity_type_id: {
@@ -425,16 +438,19 @@ module.exports = {
 			type: 'boolean'
 		},
 
+		// to replace partial_kits + kit_details (potentially units, unit_type_id, unit_type_name)
+		details: {
+			type: 'array'
+		},
+
 		// store partial kits
 		partial_kits: {
 			type: 'array'
-
 		},
 
 		// store kit details
 		kit_details: {
 			type: 'array'
-
 		},
 
 		// location

@@ -378,16 +378,19 @@ module.exports = {
       type: 'boolean'
     },
 
+		// to replace partial_kits + kit_details (potentially units, unit_type_id, unit_type_name)
+		details: {
+			type: 'array'
+		},
+
 		// store partial kits
 		partial_kits: {
 			type: 'array'
-
 		},
 
 		// store kit details
 		kit_details: {
 			type: 'array'
-
 		},
 
     remarks:{
