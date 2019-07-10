@@ -519,11 +519,15 @@ var ProjectController = {
     delete project_copy.createdAt;
     delete project_copy.updatedAt;
 
+    var project_copy_no_cluster = JSON.parse( JSON.stringify( project_copy ) );
+    delete project_copy_no_cluster.cluster;
+    delete project_copy_no_cluster.cluster_id;
+
     // promise
     Promise.all([
       Project.updateOrCreate( { id: project.id }, project ),
       // budget_progress, target_beneficiaries, target_locations, report, location ( below )
-      Beneficiaries.update( findProject, project_copy ),
+      Beneficiaries.update( findProject, project_copy_no_cluster ),
     ])
     .catch( function( err ) {
       return res.negotiate( err );
@@ -565,7 +569,7 @@ var ProjectController = {
       // ASYNC REQUEST 1
       // async loop target_beneficiaries
       async.each( project_budget_progress, function ( d, next ) {
-        var budget = _under.extend( {}, d, project_copy );
+        var budget = _under.extend( {}, d, project_copy_no_cluster );
         BudgetProgress.updateOrCreate( findProject, { id: budget.id }, budget ).exec(function( err, result ){
           project_update.project_budget_progress.push( ProjectController.set_result( result ) );
           next();
@@ -578,7 +582,7 @@ var ProjectController = {
       // ASYNC REQUEST 2
       // async loop target_beneficiaries
       async.each( target_beneficiaries, function ( d, next ) {
-        var t_beneficiary = _under.extend( {}, d, project_copy, { cluster_id: d.cluster_id, cluster: d.cluster } );
+        var t_beneficiary = _under.extend( {}, d, project_copy_no_cluster );
         TargetBeneficiaries.updateOrCreate( findProject, { id: t_beneficiary.id }, t_beneficiary ).exec(function( err, result ){
           project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
           next();
