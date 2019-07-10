@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- Default home page -->
+<html>
+	<head>
+		<style>
+		</style>
+	</head>
+	<body>
+		<p>Hi <%= name %>,</p>
+		<p>
+			There are not submitted reports!
+		</p>
+		<p>
+			Follow the links below to complete and submit your pending <%= type %> reports.
+		</p>
+			<ul>
+			<% for(var i=0; i < projects.length; i++) { %>
+				<li><%= projects[i].country %></li>
+				<li><%= projects[i].cluster %></li>
+				<li><%= projects[i].project_title %></li>
+			<% for(var j=0; j < projects[i].reports.length; j++) { %>
+				<ul>
+					<li>
+						<a title="<%= projects[i].reports[j].report_month %> <%= type %> Report" href="<%= projects[i].reports[j].report_url %>"><%= projects[i].reports[j].report_month %> <%= type %> Report</a>
+					</li>
+				</ul>
+			<% } %>
+				<br/>
+			<% } %>
+			</ul>
+		</p>
+
+		<p><br/><%= sendername %></p>
+
+	</body>
+</html>
