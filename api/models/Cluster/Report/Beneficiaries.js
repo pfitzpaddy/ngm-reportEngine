@@ -443,16 +443,6 @@ module.exports = {
 			type: 'array'
 		},
 
-		// store partial kits
-		partial_kits: {
-			type: 'array'
-		},
-
-		// store kit details
-		kit_details: {
-			type: 'array'
-		},
-
 		// location
 		location_id: {
 			type: 'string',

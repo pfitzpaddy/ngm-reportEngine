@@ -421,8 +421,6 @@ var ReportController = {
 			Report.findOne( find ),
 			Location.find( findLocation ),
 			Beneficiaries.find( findReport ).populateAll(),
-			Trainings.find( findReport ),
-			TrainingParticipants.find( findReport )
 		])
 		.catch( function( err ) {
 			return res.negotiate( err );
@@ -433,8 +431,6 @@ var ReportController = {
 			var report = result[ 0 ];
 			var locations = result[ 1 ];
 			var beneficiaries = result[ 2 ];
-			var trainings = result[ 3 ];
-			var training_participants = result[ 4 ];
 
 			// placeholder
 			report.locations = [];
@@ -444,11 +440,10 @@ var ReportController = {
 
 				// counter
 				var locations_counter = 0;
-				var locations_features = 2;
+				var locations_features = 1;
 
 				// set holders
 				location.beneficiaries = [];
-				location.trainings = [];
 
 				// set next in locations array
 				var set_next = function ( location ){
@@ -468,47 +463,6 @@ var ReportController = {
 						}
 						// next
 						b_next();
-					}, function ( err ) {
-						// error
-						if ( err ) return err;
-						// increment counter
-						set_next( location );
-					});
-				} else {
-					// increment counter
-					set_next( location );
-				}
-
-				// trainings
-				if ( trainings.length ){
-					async.each( trainings, function ( training, t_next ) {
-						if ( location.id === training.location_id ) {
-							// set holders
-							training.training_participants = [];
-							// participants
-							if ( training_participants.length ){
-								async.each( training_participants, function ( training_participant, tp_next ) { 						
-									if ( training.id === training_participant.training_id ){
-										training.training_participants.push( training_participant );
-									}
-									// next
-									tp_next();
-								}, function ( err ) {
-									// error
-									if ( err ) return err;
-									// push
-									location.trainings.push( training );
-									// next
-									t_next();
-								});
-							} else {
-								// next
-								t_next();
-							}
-						} else {
-							// next
-							t_next();
-						}
 					}, function ( err ) {
 						// error
 						if ( err ) return err;
@@ -550,7 +504,6 @@ var ReportController = {
 		}
 		var findLocation;
 		var findTargetLocation;
-		var findTraining;
 
 		// get report by organization_id
 		Report
@@ -575,11 +528,10 @@ var ReportController = {
 
 					// set counter
 					var locations_counter = 0;
-					var locations_features = 2;
+					var locations_features = 1;
 
-					// set beneficiaries / trainings
+					// set beneficiaries
 					var beneficiaries = location.beneficiaries;
-					var trainings = location.trainings;
 
 					// set next in locations array
 					var set_next = function ( location ){
@@ -593,12 +545,11 @@ var ReportController = {
 					// update or create
 					Location.updateOrCreate( _under.extend( {}, findProject, findReport ), { id: location.id }, location ).exec(function( err, result ){
 						
-						// set result, update / create beneficiaries, trainings
+						// set result, update / create beneficiaries
 						location = ReportController.set_result( result );
 						findLocation = { location_id: location.id }
 						findTargetLocation = { target_location_reference_id: location.target_location_reference_id }
 						location.beneficiaries = [];
-						location.trainings = [];
 
 						// prepare for cloning
 						var location_copy = JSON.parse( JSON.stringify( location ) );
@@ -618,58 +569,6 @@ var ReportController = {
 						// set beneficiaries in the origin order
 						location.beneficiaries[i] = ReportController.set_result( result );
 								b_next();
-							});
-						}, function ( err ) {
-							if ( err ) return err;
-							// increment counter
-							set_next( location );
-						});
-
-					 
-						// async loop report beneficiaries
-						async.each( trainings, function ( training, t_next ) {
-
-							// clone
-							var t = _under.extend( {}, report_copy, location_copy, training );
-
-							// set beneficiaries / trainings
-							var training_participants = t.training_participants;
-
-							// update or create
-							Trainings.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: t.id }, t ).exec(function( err, result ){
-								
-								// set result, update / create beneficiaries, trainings
-								t = ReportController.set_result( result );
-								findTraining = { training_id: t.id }
-								t.training_participants = [];
-
-								// prepare for cloning
-								var triaining_copy = JSON.parse( JSON.stringify( t ) );
-								delete triaining_copy.id;
-								
-								// if training_participants
-								if ( training_participants && training_participants.length ) {
-									// async loop report beneficiaries
-									async.each( training_participants, function ( training_participant, tp_next ) {
-										// clone
-										var t_participant = _under.extend( {}, report_copy, location_copy, triaining_copy, training_participant );
-										// update or create
-										TrainingParticipants.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation, findTraining ), { id: t_participant.id }, t_participant ).exec(function( err, result ){
-											t.training_participants.push( ReportController.set_result( result ) );
-											tp_next();
-										});
-									}, function ( err ) {
-										if ( err ) return err;
-										// push
-										location.trainings.push( t );
-										// increment counter
-										t_next();
-									});
-								} else {
-									// increment counter
-									t_next();
-								}
-
 							});
 						}, function ( err ) {
 							if ( err ) return err;
@@ -754,58 +653,7 @@ var ReportController = {
 
 			});
 
-	},
-
-	// remove
-	removeTrainingById: function( req, res ){
-
-		// request input
-		if ( !req.param( 'id' ) ) {
-			return res.json(401, { err: 'id required!' });
-		}
-
-		// get report
-		var $id = req.param( 'id' );
-
-		// promise
-		Promise.all([
-			Trainings.destroy({ id: $id }),
-			TrainingParticipants.destroy({ training_id: $id })
-		])
-		.catch( function( err ) {
-			return res.negotiate( err );
-		})
-		.then( function( result ) {
-			return res.json( 200, { msg: 'success' } );
-		});
-
-	},
-
-	// remove
-	removeTraineeById: function( req, res ){
-
-		// request input
-		if ( !req.param( 'id' ) ) {
-			return res.json(401, { err: 'id required!' });
-		}
-
-		// get report
-		var $id = req.param( 'id' );
-
-		// destroy
-		TrainingParticipants
-			.destroy({ id: $id })
-			.exec(function( err, b ){
-
-				// return error
-				if ( err ) return res.json({ err: true, error: err });
-
-				// return reports
-				return res.json( 200, { msg: 'success' } );
-
-			});
-
-	},
+	}
 
 };
 

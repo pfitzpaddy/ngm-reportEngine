@@ -524,8 +524,6 @@ var ProjectController = {
       Project.updateOrCreate( { id: project.id }, project ),
       // budget_progress, target_beneficiaries, target_locations, report, location ( below )
       Beneficiaries.update( findProject, project_copy ),
-      Trainings.update( findProject, project_copy ),
-      TrainingParticipants.update( findProject, project_copy )
     ])
     .catch( function( err ) {
       return res.negotiate( err );
@@ -754,9 +752,7 @@ var ProjectController = {
       BudgetProgress.destroy( { project_id: project_id } ),
       Report.destroy( { project_id: project_id } ),
       Location.destroy( { project_id: project_id } ),
-      Beneficiaries.destroy( { project_id: project_id } ),
-      Trainings.destroy( { project_id: project_id } ),
-      TrainingParticipants.destroy( { project_id: project_id } )
+      Beneficiaries.destroy( { project_id: project_id } )
     ])
     .catch( function( err ) {
       return res.negotiate( err );
