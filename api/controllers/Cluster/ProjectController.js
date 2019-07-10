@@ -578,7 +578,7 @@ var ProjectController = {
       // ASYNC REQUEST 2
       // async loop target_beneficiaries
       async.each( target_beneficiaries, function ( d, next ) {
-        var t_beneficiary = _under.extend( {}, d, project_copy );
+        var t_beneficiary = _under.extend( {}, d, project_copy, { cluster_id: d.cluster_id, cluster: d.cluster } );
         TargetBeneficiaries.updateOrCreate( findProject, { id: t_beneficiary.id }, t_beneficiary ).exec(function( err, result ){
           project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
           next();
