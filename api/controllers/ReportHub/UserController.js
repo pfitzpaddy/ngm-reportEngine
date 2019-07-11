@@ -304,8 +304,6 @@ var UserController = {
                 Report.update( findOriginalUser, updatedRelationsUser ),
                 Location.update( findOriginalUser, updatedRelationsUser ),
                 Beneficiaries.update( findOriginalUser, updatedRelationsUser ),
-                Trainings.update( findOriginalUser, updatedRelationsUser ),
-                TrainingParticipants.update( findOriginalUser, updatedRelationsUser ),
                 Stock.update( findOriginalUser, updatedRelationsUser ),
                 StockLocation.update( findOriginalUser, updatedRelationsUser ),
                 StockReport.update( findOriginalUser, updatedRelationsUser ),
