@@ -518,6 +518,9 @@ var ProjectController = {
     delete project_copy.target_locations;
     delete project_copy.createdAt;
     delete project_copy.updatedAt;
+    delete project_copy.admin1pcode;
+    delete project_copy.admin2pcode;
+    delete project_copy.admin3pcode;
 
     var project_copy_no_cluster = JSON.parse( JSON.stringify( project_copy ) );
     delete project_copy_no_cluster.cluster;
