@@ -252,6 +252,22 @@ module.exports = {
 		},
 
 
+		// FORM
+
+		// capture filter / display levels from activities.csv and store to avoid 
+			// filtering and retrieving the wrong form details (i.e. has indicator_id which is not unique
+			// and retrieves wrong form configuration as it should in fact know to filter on activity_details_id )
+		display_activity_detail: {
+			type: 'boolean',
+			required: true
+		},
+
+		display_indicator: {
+			type: 'boolean',
+			required: true
+		},
+		
+
 		// activity_type
 		activity_type_id: {
 			type: 'string',
