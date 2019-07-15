@@ -21,7 +21,7 @@ var ReportController = {
 		if( util.isArray( result ) ) {
 			// update ( array )
 			return result[0];
-		} else { 
+		} else {
 			// create ( object )
 			return result;
 		}
@@ -41,7 +41,7 @@ var ReportController = {
 		// activity
 		if ( req.param( 'report_type' ) === 'activity' ) {
 
-			var fields = [ 
+			var fields = [
 						'project_id',
 						'report_id',
 						'cluster',
@@ -280,7 +280,7 @@ var ReportController = {
 			// gather results
 			var reports = result[ 0 ];
 			var beneficiaries = result[ 1 ];
-			
+
 			// async loop reports
 			async.each( reports, function ( report, next ) {
 
@@ -298,7 +298,7 @@ var ReportController = {
 					report.status_title = 'ToDo';
 
 				}
-				
+
 				// if report is 'todo' and past due date!
 				if ( report.report_status === 'todo' && moment().isAfter( moment( report.reporting_due_date ) ) ) {
 
@@ -307,11 +307,11 @@ var ReportController = {
 					report.status = '#e57373'
 					report.status_title = 'Due';
 
-				}	
+				}
 
 				// async loop beneficiaries
 				async.each( beneficiaries, function ( beneficiary, b_next ) {
-					
+
 					// beneficiaries exist for this report
 					if ( report.id === beneficiary.report_id ) {
 
@@ -334,7 +334,7 @@ var ReportController = {
 								report.status = '#4db6ac';
 							}
 						}
-						
+
 						// if report is 'todo' and has records ( is saved )
 						if ( report.report_status === 'todo' ) {
 							// if beneficiaries ( report has been updated )
@@ -363,7 +363,7 @@ var ReportController = {
 
 	// update to complete
 	getReportDetailsById: function( req, res ) {
-		
+
 		// request input guards
 		if ( !req.param( 'id' ) ) {
 			return res.json(401, { err: 'id required!' });
@@ -380,8 +380,8 @@ var ReportController = {
 				return res.json( 200, report );
 
 			});
-	
-	},	
+
+	},
 
 	// get all Reports by project id
 	getReport: function( req, res ) {
@@ -544,7 +544,7 @@ var ReportController = {
 
 					// update or create
 					Location.updateOrCreate( _under.extend( {}, findProject, findReport ), { id: location.id }, location ).exec(function( err, result ){
-						
+
 						// set result, update / create beneficiaries
 						location = ReportController.set_result( result );
 						findLocation = { location_id: location.id }
@@ -559,7 +559,7 @@ var ReportController = {
 
 						// async loop report beneficiaries
 						async.eachOf( beneficiaries, function ( beneficiary, i, b_next ) {
-						
+
 						// clone
 						var b = _under.extend( {}, report_copy, location_copy, beneficiary );
 
@@ -581,7 +581,7 @@ var ReportController = {
 				}, function ( err ) {
 					if ( err ) return err;
 					return res.json( 200, report );
-				});     
+				});
 
 		});
 
@@ -589,7 +589,7 @@ var ReportController = {
 
 	// update to complete
 	updateReportStatus: function( req, res ) {
-		
+
 		// request input guards
 		if ( !req.param( 'report_id' ) && !req.param( 'report_status' ) ) {
 			return res.json(401, { err: 'report_id, report_status required!' });
@@ -606,7 +606,7 @@ var ReportController = {
 				return res.json( 200, report );
 
 			});
-	
+
 	},
 
 	// report validation
@@ -653,7 +653,30 @@ var ReportController = {
 
 			});
 
-	}
+  },
+
+  deleteReportById: async function (req, res) {
+    // request input
+    if (!req.param('id')) {
+      return res.json(401, { err: 'repor_id required!' });
+    }
+
+    var report_id = req.param('id');
+
+    try {
+
+      await Promise.all([
+        Report.destroy({ id: report_id }),
+        Location.destroy({ report_id: report_id }),
+        Beneficiaries.destroy({ report_id: report_id })
+      ]);
+
+      return res.json(200, { msg: 'Report ' + report_id + ' has been deleted!' });
+
+    } catch (err) {
+      return res.negotiate(err);
+    }
+  }
 
 };
 
