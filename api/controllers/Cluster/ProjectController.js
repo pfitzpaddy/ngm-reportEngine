@@ -590,10 +590,10 @@ var ProjectController = {
 
       // ASYNC REQUEST 2
       // async loop target_beneficiaries
-      async.each( target_beneficiaries, function ( d, next ) {
+      async.eachOf( target_beneficiaries, function ( d, ib, next ) {
         var t_beneficiary = _under.extend( {}, d, project_copy_no_cluster );
         TargetBeneficiaries.updateOrCreate( findProject, { id: t_beneficiary.id }, t_beneficiary ).exec(function( err, result ){
-          project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
+          project_update.target_beneficiaries[ib] = ProjectController.set_result( result );
           next();
         });
       }, function ( err ) {
@@ -603,10 +603,10 @@ var ProjectController = {
 
       // ASYNC REQUEST 3
       // async loop target_locations
-      async.each( target_locations, function ( d, next ) {
+      async.eachOf( target_locations, function ( d, il, next ) {
         var t_location = _under.extend( {}, d, project_copy );
         TargetLocation.updateOrCreate( findProject, { id: t_location.id }, t_location ).exec(function( err, result ){
-          project_update.target_locations.push( ProjectController.set_result( result ) );
+          project_update.target_locations[il] = ProjectController.set_result( result );
           next();
         });
       }, function ( err ) {
