@@ -12,7 +12,7 @@ var json2csv = require('json2csv');
 var moment = require('moment');
 var async = require('async');
 var _under = require('underscore');
-  
+
 // project controller
 var ProjectController = {
 
@@ -23,7 +23,7 @@ var ProjectController = {
     if( util.isArray( result ) ) {
       // update ( array )
       return result[0];
-    } else { 
+    } else {
       // create ( object )
       return result;
     }
@@ -79,7 +79,7 @@ var ProjectController = {
       return cb( false, reports );
     });
 
-  },  
+  },
 
   // return locations for reports
   getProjectReportLocations: function( reports, target_locations, cb ){
@@ -154,9 +154,9 @@ var ProjectController = {
 
   },
 
-  // get distinct sectors 
+  // get distinct sectors
   getProjectSectors: function( req, res ) {
-    
+
     // organization_id required
     if ( !req.param('organization_id') ) {
       return res.json(401, { err: 'organization_id required!' });
@@ -424,35 +424,35 @@ var ProjectController = {
       // create project
       project.project_budget_progress = project_budget_progress;
       project.target_beneficiaries = target_beneficiaries;
-            
+
       project.target_locations = target_locations;
 
       project.target_locations.forEach( function(location,element2){
 
       if(typeof(location.implementing_partners) === 'string'){
-       
+
         var newarray = location.implementing_partners.split(",");
                location.implementing_partners= [];
 
                newarray.forEach( function(imppartner,element2){
 
                 var imppartnermayus = imppartner.toUpperCase();
-                
+
                 var imppartnerpush =
                 {
                   organization_name : imppartner,
                   organization : imppartnermayus,
                 }
-                
+
                 location.implementing_partners.push(imppartnerpush);
-                
+
                 }
               );
-        
+
       }
      });
 
-      
+
       if(typeof(project.implementing_partners) === 'string'){
         // implementing_partners string to array
 
@@ -469,16 +469,16 @@ var ProjectController = {
                   organization_name : imppartner,
                   organization : imppartnermayus,
                 }
-                
+
                 project.implementing_partners.push(imppartnerpush);
-                
+
                 }
               );
 
          }else if(!project.implementing_partners){
 
                project.implementing_partners = [];
-    
+
             }
 
       // return Project
@@ -551,16 +551,22 @@ var ProjectController = {
       // async
       var target_locations_counter = 0;
       var target_reports_counter = 0;
+      var delete_reports_counter = 0;
       var async_counter = 0;
-      var async_requests = 5;
+      var async_requests = 6;
 
       // return the project_update
-      var returnProject = function() {
+      var returnProject = function(err) {
+        if (err) return res.negotiate(err);
         // make locations
         if ( target_locations_counter && target_reports_counter ) {
           target_locations_counter = 0;
           target_reports_counter = 0;
           setLocations();
+        }
+        if ( delete_reports_counter ) {
+          delete_reports_counter = 0
+          removeReports();
         }
         // ++
         async_counter++;
@@ -611,7 +617,7 @@ var ProjectController = {
 
       // generate reports for duration of project_update
       ProjectController.getProjectReports( project_update, function( err, project_reports ){
-        
+
         // err
         if ( err ) return err;
 
@@ -636,12 +642,53 @@ var ProjectController = {
 
       });
 
+      // ASYNC REQUEST 6
+      var removeReports = async function () {
+        // construct find query
+        const lt_project_start_date = new Date(moment(project_update.project_start_date).subtract(1, 'month').endOf('month'))
+        const gt_project_end_date = new Date(moment(project_update.project_end_date).add(1, 'month').startOf('month'))
+
+        const find = {
+          project_id: project_update.id,
+          $or: [
+            {
+              reporting_period: { $lte: new Date(lt_project_start_date) }
+            },
+            {
+              reporting_period: { $gte: new Date(gt_project_end_date) }
+            }
+          ]
+        };
+
+        try {
+          // find reports outside of project dates
+          const reports = await Report.find(find, { select: ['id'] });
+          const uniq_reports = [...new Set(reports.map(b => b.id))];
+
+          const beneficiaries = await Beneficiaries.find({ report_id: { $in: uniq_reports } }, { select: ['report_id'] })
+          const uniq_reports_with_beneficiaries = [...new Set(beneficiaries.map(b => b.report_id))];
+
+          const reports_to_delete = _.difference(uniq_reports, uniq_reports_with_beneficiaries);
+
+          await Promise.all([
+            Report.destroy({ id: { $in: reports_to_delete } }),
+            Location.destroy({ report_id: { $in: reports_to_delete } }),
+          ]);
+
+          returnProject(null);
+
+        } catch (err) {
+          returnProject(err);
+        }
+
+      };
+
       // locations
       var setLocations = function() {
-        
+
         // generate locations for each report ( requires report_id )
         ProjectController.getProjectReportLocations( reports, project_update.target_locations, function( err, locations ){
-          
+
           // err
           if ( err ) return err;
 
@@ -658,6 +705,7 @@ var ProjectController = {
             });
           }, function ( err ) {
             if ( err ) return err;
+            delete_reports_counter++;
             returnProject();
           });
 
