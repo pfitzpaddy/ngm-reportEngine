@@ -763,28 +763,31 @@ var ProjectController = {
   },
 
   // remove target location
-  removeLocationById: function( req, res ) {
-    
+  removeLocationById: async function( req, res ) {
+
     // request input
-    if ( !req.param( 'id' ) ) {
+    if (!req.param('id')) {
       return res.json({ err: true, error: 'id required!' });
     }
 
     // get id
-    var id = req.param( 'id' );
+    var id = req.param('id');
 
-    // promise
-    Promise.all([
-      TargetLocation.destroy( { id: id } ),
-      Location.destroy( { target_location_reference_id: id } )
-    ])
-    .catch( function( err ) {
-      return res.negotiate( err );
-    })
-    .then( function( result ) {
-      // return Project
-      return res.json( 200, { msg: 'Success!' } );
-    });
+    try {
+      // find locations containing beneficiaries first
+      const beneficiaries = await Beneficiaries.find({ target_location_reference_id: id }, { select: ['location_id'] })
+      const uniq_locations = [...new Set(beneficiaries.map(b => b.location_id))];
+
+      await Promise.all([
+        TargetLocation.destroy({ id: id }),
+        Location.destroy({ target_location_reference_id: id, id: { $nin: uniq_locations } })
+      ])
+
+      return res.json(200, { msg: 'Success!' });
+
+    } catch (err) {
+      return res.negotiate(err);
+    }
 
   },
 
