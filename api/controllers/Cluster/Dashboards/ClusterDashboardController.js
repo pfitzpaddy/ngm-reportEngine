@@ -953,8 +953,14 @@ var ClusterDashboardController = {
 								'createdAt'
 							];
 
+              if (params.admin0pcode.toUpperCase() === 'AF') {
+                ix = fields.indexOf('activity_description_name') + 1;
+                ix && fields.splice(ix, 0, 'injury_treatment_same_province');
+                ix && fieldNames.splice(ix, 0, 'injury_treatment_same_province');
+              }
+
 							var total = 0;
-							
+
 							// format beneficiaries
 							async.eachLimit(beneficiaries, 200, function (d, next) {
 								// hrp code
