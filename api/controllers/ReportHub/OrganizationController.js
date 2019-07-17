@@ -35,6 +35,47 @@ module.exports = {
 
   },
 
+	getOrganizationsByFilter:function(req,res){
+		// check params
+		if (!req.param('filter')) {
+			return res.json(401, { msg: 'filter required' });
+		}
+
+		// id params
+		// var admin0pcode = req.param('admin0pcode');
+
+		// based on project
+		var organizations = [];
+		Project
+			.find(req.param('filter'))
+			.exec(function (err, org) {
+				if(org.length){
+					org.forEach(function (d, i) {
+						// if not existing											
+							organizations.push({ organization_tag: d.organization_tag, organization: d.organization});			
+					});
+					distinct = _.uniq(organizations, function (x) {
+															return x.organization_tag
+														});
+					organizations = _.sortBy(distinct, 'organization_tag');
+				}
+				return res.json(200, organizations);
+			})
+		// Pure Organization
+		// find
+		// Organization
+		// 	.find(req.param('filter'))
+		// 	// .where({ admin0pcode: admin0pcode })
+		// 	.exec(function (err, organization) {
+
+		// 		// return error
+		// 		if (err) return res.negotiate(err);
+		// 		organization = _.sortBy(organization, 'organization_tag');
+		// 		// return updated user
+		// 		return res.json(200, organization);
+
+		// 	})
+	},
   // get org menu
   getOrganizationMenu: function( req, res ){
     

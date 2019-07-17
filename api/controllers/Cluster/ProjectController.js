@@ -158,13 +158,16 @@ var ProjectController = {
   getProjectSectors: function( req, res ) {
     
     // organization_id required
-    if ( !req.param('organization_id') ) {
-      return res.json(401, { err: 'organization_id required!' });
-    }
+    // if ( !req.param('organization_tag') ) {
+    //   return res.json(401, { err: 'organization_id required!' });
+		// }
 
+		if (!req.param('filter')) {
+			return res.json(401, { msg: 'filter required' });
+		}
     // get project by organization_id & status
     Project
-      .find( { organization_id: req.param( 'organization_id' ) } )
+			.find( req.param('filter') )
       .exec( function( err, projects ){
 
         // return error
