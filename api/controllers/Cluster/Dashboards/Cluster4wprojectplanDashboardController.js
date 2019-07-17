@@ -2117,36 +2117,7 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'projects_4wdashboard_projectplan':
 
-				/*Project.native(function(err, collection) {
-
-					
-					if (err) return res.serverError(err);
-				
-					collection.aggregate([
-						{ 
-							$match : filterObject 
-						},
-						{
-							$group: {
-								_id: '$_id'
-							}
-						},
-						{
-							$group: {
-								_id: 1,
-								total: {
-								$sum: 1
-								}
-							}
-						}
-					]).toArray(function (err, results) {
-						if (err) return res.serverError(err);
-						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
-					});
-				});*/
-					
-
-				TargetLocation.native(function(err, collection) {
+				/*TargetLocation.native(function(err, collection) {
 					if (err) return res.serverError(err);
 
 					console.log(filterObject, "FILTROS TARGET LOCATIONS");
@@ -2159,7 +2130,7 @@ var Cluster4wprojectplanDashboardController = {
 							$group: {
 								_id: {
 									project_id: '$project_id',
-									//activity_type: {$elemMatch: {'cluster_id':filters.cluster_id.cluster_id}},
+									activity_type: {activity_type: {'cluster_id':filters.cluster_id.cluster_id}},
 									//site_lat: '$site_lat',
 									//site_lng: '$site_lng',
 									//site_name: '$site_name'
@@ -2176,15 +2147,88 @@ var Cluster4wprojectplanDashboardController = {
 						}
 					]).toArray(function (err, results) {
 						if (err) return res.serverError(err);
-						console.log(results,"RESULTADOS PROJECTOS TOTAL");
+						console.log(results,"RESULTADOS PROJECTOS");
 						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
-				});	
+				});	*/
+				resultFiltersPrj = [];
+
+
+			TargetLocation
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.admin1pcode )
+					.where( filters.admin2pcode )
+					.where( filters.organization_tag )
+					.where( filters.beneficiaries )
+					.where( filters.project_startDateNative )
+					.where(filters.project_endDateNative)
+					.exec( function( err, result ){
+
+						// return error
+						if (err) return res.negotiate( err );
+
+						//console.log(filters.cluster_id.cluster_id, "CLUSTER ID CLUSTER ID");
+
+						//console.log(result.length, ": RESULTADO ANTES DE CLUSTER_ID");
+
+						if(filters.cluster_id.cluster_id){
+							//console.log("FILTRO cluster_id EXISTE");
+
+							//console.log(result.length, ": RESULTADO DESPUES DE CLUSTER_ID");
+
+								result.forEach(function(d,i){
+
+								
+
+									const resultado = d.activity_type.find(cluster => cluster.cluster_id === filters.cluster_id.cluster_id);
+									if(resultado){
+										//console.log(resultado, "RESULTADO");
+									//	console.log(d, "EL TARGET LOCATION QUE TIENE EN ACTIVITY_TYPE el CLUSTER_ID");
+							      //console.log(d.project_id, "MIRO SI ID_PROYECTO YA EXISTE");
+
+										const exist = resultFiltersPrj.find(proj => proj.project_id === d.project_id);
+										
+									//	console.log(exist, ": EXIST");
+										if(!exist){
+										//	console.log("NO EXISTE, PUSH");
+
+											resultFiltersPrj.push(d);
+
+										}else{
+										//	console.log("si existe");
+										}
+
+									}
+
+
+								});
+				       }else{
+				     //  	console.log("FILTER CLUSTER_ID NO EXISTE");
+				       	resultFiltersPrj = result;
+
+				       }
+				      // console.log(resultFilters.length, "TARGETLOC que cumple con cluster_id");
+
+					//	console.log(resultFiltersTargLoc.length, "RESULTADO FINAL");
+
+						return res.json( 200, { 'value': resultFiltersPrj.length } );
+
+
+					});
+
 
 				
 				break;
 
 				case 'organizations_4wdashboard_projectplan':
+				console.log(filterObject, "FILTROOOS");
+				//console.log(filters, "FILTROS 2");
+				console.log(params.list, "LISTA PARAMETROS");
+
+				resultsFiltersOrganizations = [];
 
 				if ( params.list ) {
 
@@ -2203,16 +2247,26 @@ var Cluster4wprojectplanDashboardController = {
 							}
 						}
 						]).toArray(function (err, results) {
+						
 						if (err) return res.serverError(err);
 
-						organizations=_.pluck(results,'_id')		
-							organizations.sort(function(a, b) {
-								return a.organization.localeCompare(b.organization);
-							});
-							organizations.unshift({
-											organization_tag: 'all',
-											organization: 'ALL',
-										});
+						console.log(results, ": RESULTS ORGANIZACIONES");
+
+								/*organizations=_.pluck(results,'_id')		
+									organizations.sort(function(a, b) {
+										return a.organization.localeCompare(b.organization);
+									});
+									organizations.unshift({
+													organization_tag: 'all',
+													organization: 'ALL',
+												});*/
+
+
+
+
+
+
+
 							return res.json( 200, organizations );
 						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
@@ -2224,7 +2278,7 @@ var Cluster4wprojectplanDashboardController = {
 						collection.aggregate([
 							{ 
 								$match : filterObject 
-							},
+							}/*,
 							{
 								$group: {
 									_id: '$organization_tag'
@@ -2237,10 +2291,73 @@ var Cluster4wprojectplanDashboardController = {
 									$sum: 1
 									}
 								}
-							}
+							}*/
 						]).toArray(function (err, results) {
-							if (err) return res.serverError(err);
-							return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+
+						console.log(results, "ORGANZIACIONES 2");
+						console.log(results.length, "TAMAÑO ORGA");
+
+						organizations = [];
+
+
+						if(filters.cluster_id.cluster_id){
+
+						    	results.forEach(function(d,i){
+
+						    		const resultado = d.activity_type.find(cluster => cluster.cluster_id === filters.cluster_id.cluster_id);
+										if(resultado){
+											//console.log(resultado, "RESULTADO");
+											//console.log(d, "EL TARGET LOCATION QUE TIENE EN ACTIVITY_TYPE el CLUSTER_ID");
+											resultsFiltersOrganizations.push(d);
+
+										}
+
+								    	});
+
+								    resultsFiltersOrganizations.forEach( function( d, i ) {
+									//console.log(results[i].project_donor, "DONANTES PROJECT_DONOR");
+									resultsFiltersOrganizations[i].project_donor.forEach(function (d, j){
+
+										//console.log(results[i].project_donor[j], "DONANTE DENTRO DEL FOREACH DE PROJECT_DONOR");
+
+									//const resultado = donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
+		                             const resultado = organizations.find( organization => organization.project_donor_id === resultsFiltersOrganizations[i].project_donor[j].project_donor_id );
+		                            // console.log(resultado, "RESULTADO");
+
+		                             if(!resultado){
+		                                 //	console.log("lo metio");
+		                             	organizations.push(resultsFiltersOrganizations[i].project_donor[j]);
+		                             }
+
+									});
+								});
+								//    console.log(donantes.length,"RESULTADO CON CLUSTER_ID DE DONANTES");
+
+
+
+						   }else{
+
+							   	results.forEach( function( d, i ) {
+
+							   		const resultado = organizations.find(organization => organization.organization_tag === d.organization_tag);
+
+							   		if(!resultado){
+							   			organizations.push(d);
+							   		}
+								
+						    	});
+
+						    //	console.log(donantes.length, "RESULTADO SIN CLUSTER_ID DE DONANTES");
+
+
+
+						   }
+
+						   console.log(organizations.length, ": total final");
+
+							//if (err) return res.serverError(err);
+							//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+							return res.json(200,{'value':organizations.length});
 						});
 					});	
 				}
@@ -2248,6 +2365,8 @@ var Cluster4wprojectplanDashboardController = {
 				break;
 
 				case 'total_donors_4wdashboard_projectplan':
+
+				resultFiltersDonors = [];
 
 				TargetLocation.native(function(err, collection) {
 
@@ -2276,41 +2395,69 @@ var Cluster4wprojectplanDashboardController = {
 
 						var donantes = [];
 
-						results.forEach( function( d, i ) {
-							//console.log(results[i].project_donor, "DONANTES PROJECT_DONOR");
-							results[i].project_donor.forEach(function (d, j){
 
-								//console.log(results[i].project_donor[j], "DONANTE DENTRO DEL FOREACH DE PROJECT_DONOR");
+						 if(filters.cluster_id.cluster_id){
 
-							//const resultado = donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
-                             const resultado = donantes.find( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
-                            // console.log(resultado, "RESULTADO");
+						    	results.forEach(function(d,i){
 
-                             if(!resultado){
-                                 //	console.log("lo metio");
-                             	donantes.push(results[i].project_donor[j]);
-                             }else{
-                             //	console.log("no lo metio")
-                             }
-                            /* if(donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id )=== -1){
-                            console.log("LO METIO");
-                             } else{
-                             	console.log("YA EXISTE",resultado);
-                             };*/
+						    		const resultado = d.activity_type.find(cluster => cluster.cluster_id === filters.cluster_id.cluster_id);
+										if(resultado){
+											//console.log(resultado, "RESULTADO");
+											//console.log(d, "EL TARGET LOCATION QUE TIENE EN ACTIVITY_TYPE el CLUSTER_ID");
+											resultFiltersDonors.push(d);
 
-                            /* if(resultado === -1) {
-                             	donantes.push(results[i].project_donor[j]);
-                             	console.log("LO METIO");
-                             }else{
-                             	console.log("YA EXISTE",resultado);
-                             }*/
+										}
+
+								    	});
+
+								    resultFiltersDonors.forEach( function( d, i ) {
+									//console.log(results[i].project_donor, "DONANTES PROJECT_DONOR");
+									resultFiltersDonors[i].project_donor.forEach(function (d, j){
+
+										//console.log(results[i].project_donor[j], "DONANTE DENTRO DEL FOREACH DE PROJECT_DONOR");
+
+									//const resultado = donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
+		                             const resultado = donantes.find( donante => donante.project_donor_id === resultFiltersDonors[i].project_donor[j].project_donor_id );
+		                            // console.log(resultado, "RESULTADO");
+
+		                             if(!resultado){
+		                                 //	console.log("lo metio");
+		                             	donantes.push(resultFiltersDonors[i].project_donor[j]);
+		                             }
+
+									});
+								});
+								//    console.log(donantes.length,"RESULTADO CON CLUSTER_ID DE DONANTES");
 
 
-								//donantes.findIndex( donante => donante.projec_donor_id == results[i].project_donor[j].project_donor_id);
+
+						   }else{
+
+							   	results.forEach( function( d, i ) {
+								//console.log(results[i].project_donor, "DONANTES PROJECT_DONOR");
+									results[i].project_donor.forEach(function (d, j){
+
+											//console.log(results[i].project_donor[j], "DONANTE DENTRO DEL FOREACH DE PROJECT_DONOR");
+
+										//const resultado = donantes.indexOf( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
+			                             const resultado = donantes.find( donante => donante.project_donor_id === results[i].project_donor[j].project_donor_id );
+			                            // console.log(resultado, "RESULTADO");
+
+			                             if(!resultado){
+			                                 //	console.log("lo metio");
+			                             	donantes.push(results[i].project_donor[j]);
+			                             }
+		                            
+									});
+						    	});
+
+						    //	console.log(donantes.length, "RESULTADO SIN CLUSTER_ID DE DONANTES");
 
 
-							});
-						});
+
+						   }
+
+					
 
 						
 						return res.json( 200, { 'value': donantes.length } );
@@ -2321,6 +2468,9 @@ var Cluster4wprojectplanDashboardController = {
 
 
 				case 'total_implementing_partners_4wdashboard_projectplan':
+
+							resultFiltersImpPart = [];
+
 
 				TargetLocation.native(function(err, collection) {
 
@@ -2351,7 +2501,46 @@ var Cluster4wprojectplanDashboardController = {
 
 						var implementers = [];
 
-						results.forEach( function( d, i ) {
+					    if(filters.cluster_id.cluster_id){
+
+						    	results.forEach(function(d,i){
+
+						    		const resultado = d.activity_type.find(cluster => cluster.cluster_id === filters.cluster_id.cluster_id);
+										if(resultado){
+											//console.log(resultado, "RESULTADO");
+											//console.log(d, "EL TARGET LOCATION QUE TIENE EN ACTIVITY_TYPE el CLUSTER_ID");
+											resultFiltersImpPart.push(d);
+
+										}
+
+						    	});
+
+						    	resultFiltersImpPart.forEach(function(d,i){
+
+						    		resultFiltersImpPart[i].implementing_partners.forEach(function(d,j){
+						    			     const resultado = implementers.find( implementer => implementer.id === resultFiltersImpPart[i].implementing_partners[j].id );
+                                           if(!resultado){
+                                           	implementers.push(resultFiltersImpPart[i].implementing_partners[j]);
+                                           }
+
+						    		});
+
+						    	});
+
+						    //	console.log(implementers.length,"RESULTADO CON CLUSTER_ID DE IMPLEMENTING PARTNERS");
+
+
+
+
+
+						 }else{
+
+						  results.forEach( function( d, i ) {
+
+						
+
+
+
 							//console.log(results[i].implementing_partners, "IMPLEMENTADORES PROJECT_DONOR");
 							results[i].implementing_partners.forEach(function (d, j){
 
@@ -2372,6 +2561,9 @@ var Cluster4wprojectplanDashboardController = {
 							});
 						});
 
+						//console.log(implementers.length, "RESULTADO SIN CLUSTER_ID DE IMPLEMENTING PARTNERS");
+					}
+
 						//console.log("TOTAL IMPLEMENTADORES", implementers.length);
 
 						return res.json( 200, { 'value': implementers.length } );
@@ -2385,11 +2577,10 @@ var Cluster4wprojectplanDashboardController = {
 
 			//console.log(filters , "FILTROS");
 
-			resultFilter = [];
-			//console.log(filters.cluster_id, "CLUSTER ID ANTES");
+			resultFiltersTargLoc = [];
 			//filters.cluster_id = JSON.parse(filters.cluster_id);
 			//filters.cluster_id = JSON.stringify(filters.cluster_id);
-			//console.log(filters.cluster_id, "CLUSTER ID DESPUES DE PARSE");
+		
 
 			TargetLocation
 					.find()
@@ -2398,148 +2589,47 @@ var Cluster4wprojectplanDashboardController = {
 					.where( filters.admin0pcode )
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
-					//.where( filters.cluster_id )
-					//.where({activity_type: {$elemMatch: {'cluster_id':filters.cluster_id.cluster_id}}})
 					.where( filters.organization_tag )
 					.where( filters.beneficiaries )
 					.where( filters.project_startDateNative )
 					.where(filters.project_endDateNative)
-					//.populate( params.indicator )
 					.exec( function( err, result ){
-
-
 
 						// return error
 						if (err) return res.negotiate( err );
 
-						//console.log(result.length, "TOTAL RESULTADOS ANTES DE CLUSTER_ID");
-						console.log(filters.cluster_id,"CLUSTER ID");
-						console.log(filters.cluster_id.cluster_id, "CLUSTER ID CLUSTER ID");
+						//console.log(filters.cluster_id.cluster_id, "CLUSTER ID CLUSTER ID");
 
-						console.log(result.length, "RESULTADO");
+						//console.log(result.length, ": RESULTADO ANTES DE CLUSTER_ID");
 
 						if(filters.cluster_id.cluster_id){
-							console.log("FILTRO cluster_id EXISTE");
+							//console.log("FILTRO cluster_id EXISTE");
 
 								result.forEach(function(d,i){
 
-										/*d.activity_type.forEach(function(act,i){
-
-											console.log(act, "ELEMENTO DE ACTIVITY_TYPE");
-
-
-										const resultado = act.find(cluster => cluster.cluster_id === filters.cluster_id.cluster_id);
-											console.log("EL RESULTADO: ",resultado);
-
-										if(resultado){
-											resultFilter.push(resultado);
-
-
-										}else{
-											console.log("EL RESULTADO NO EXISTE ");
-
-										}
-									});*/
+								
 
 									const resultado = d.activity_type.find(cluster => cluster.cluster_id === filters.cluster_id.cluster_id);
 									if(resultado){
-										console.log(resultado, "RESULTADO");
+										//console.log(resultado, "RESULTADO");
+									//	console.log(d, "EL TARGET LOCATION QUE TIENE EN ACTIVITY_TYPE el CLUSTER_ID");
+										resultFiltersTargLoc.push(d);
 
 									}
 
 
 								});
 				       }else{
-				       	console.log("FILTER CLUSTER_ID NO EXISTE");
+				     //  	console.log("FILTER CLUSTER_ID NO EXISTE");
+				       	resultFiltersTargLoc = result;
 
 				       }
+				      // console.log(resultFilters.length, "TARGETLOC que cumple con cluster_id");
 
-						/*if(Object.entries(filters.cluster_id).length !== 0){
-							//console.log("EXISTE FILTRO CLUSTER_ID");
+					//	console.log(resultFiltersTargLoc.length, "RESULTADO FINAL");
 
-							
-							
-
-							result.forEach(function(d,i){
-
-								//console.log(d.activity_type, "ARRAY ACTIVIDADES TARGETLOC");
-								
-							//	d.activity_type.forEach(function (activity,id){
-
-
-
-								//});
-
-								d.activity_type.forEach(function (activity,d){
-									//console.log(activity, "ACTIVIDAD TARGETLOC");
-
-
-									//const resultado = filters.cluster_id.find(cluster => cluster.cluster_id === activity.cluster_id);
-								   //console.log(resultado, "resultado busqueda filtro");
-
-								});
-
-								//const resultado = d.activity_type.find( activity => activity.cluster_id === filters.cluster_id );
-								//console.log(resultado, "resultado busqueda filtro");
-
-
-							});
-							return res.json(200,{'value':resultFilter.length});
-
-						}else{
-							//console.log("NO EXISTE FILTRO CLUSTER_ID");
-							return res.json( 200, { 'value': result.length } );
-						}*/
-
-						return res.json( 200, { 'value': result.length } );
+						return res.json( 200, { 'value': resultFiltersTargLoc.length } );
 					});
-
-
-
-
-
-
-				/*TargetLocation.native(function(err, collection) {
-					if (err) return res.serverError(err);
-
-					console.log(filterObject, "FILTROS TARGET LOCATIONS");
-				
-					collection.aggregate([
-						{ 
-							$match : filterObject 
-						},
-						{
-							$group: {
-								_id: {
-									project_id: '$project_id',
-									site_lat: '$site_lat',
-									site_lng: '$site_lng',
-									site_name: '$site_name'
-								}
-							}
-						},
-						{
-							$group: {
-								_id: 1,
-								total: {
-								$sum: 1
-								}
-							}
-						}
-					]).toArray(function (err, results) {
-						if (err) return res.serverError(err);
-
-						
-					 //console.log(results, "RESULTADOS");
-
-						//results.forEach(function (d,i){
-							//console.log( "IMPRIMO ID: ",d.id);
-						//});
-						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
-					});
-
-				});	*/
-				
 				
 				break;	
 
