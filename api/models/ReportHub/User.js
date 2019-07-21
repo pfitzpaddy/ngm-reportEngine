@@ -141,7 +141,7 @@ module.exports = {
         liClass: 'teal z-depth-2',
         aClass: 'white-text',
         iClass: 'medium material-icons',
-        href: '/cluster/projects/',
+        href: '/cluster/projects/list',
         title: 'MY PROJECTS'
        }]
 		},
