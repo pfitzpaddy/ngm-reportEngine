@@ -102,6 +102,12 @@ module.exports.policies = {
     '*': true
   },
 
+   // public
+  'Cluster/Dashboards/Cluster4wprojectplanDashboardController': { 
+    '*': true
+  },
+
+
   // public
   'Cluster/Lists/ListController': {
     '*': true
