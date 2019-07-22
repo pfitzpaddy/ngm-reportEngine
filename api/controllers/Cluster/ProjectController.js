@@ -12,7 +12,7 @@ var json2csv = require('json2csv');
 var moment = require('moment');
 var async = require('async');
 var _under = require('underscore');
-  
+
 // project controller
 var ProjectController = {
 
@@ -23,7 +23,7 @@ var ProjectController = {
     if( util.isArray( result ) ) {
       // update ( array )
       return result[0];
-    } else { 
+    } else {
       // create ( object )
       return result;
     }
@@ -79,7 +79,7 @@ var ProjectController = {
       return cb( false, reports );
     });
 
-  },  
+  },
 
   // return locations for reports
   getProjectReportLocations: function( reports, target_locations, cb ){
@@ -154,17 +154,20 @@ var ProjectController = {
 
   },
 
-  // get distinct sectors 
+  // get distinct sectors
   getProjectSectors: function( req, res ) {
-    
-    // organization_id required
-    if ( !req.param('organization_id') ) {
-      return res.json(401, { err: 'organization_id required!' });
-    }
 
+    // organization_id required
+    // if ( !req.param('organization_tag') ) {
+    //   return res.json(401, { err: 'organization_id required!' });
+		// }
+
+		if (!req.param('filter')) {
+			return res.json(401, { msg: 'filter required' });
+		}
     // get project by organization_id & status
     Project
-      .find( { organization_id: req.param( 'organization_id' ) } )
+			.find( req.param('filter') )
       .exec( function( err, projects ){
 
         // return error
@@ -424,35 +427,35 @@ var ProjectController = {
       // create project
       project.project_budget_progress = project_budget_progress;
       project.target_beneficiaries = target_beneficiaries;
-            
+
       project.target_locations = target_locations;
 
       project.target_locations.forEach( function(location,element2){
 
       if(typeof(location.implementing_partners) === 'string'){
-       
+
         var newarray = location.implementing_partners.split(",");
                location.implementing_partners= [];
 
                newarray.forEach( function(imppartner,element2){
 
                 var imppartnermayus = imppartner.toUpperCase();
-                
+
                 var imppartnerpush =
                 {
                   organization_name : imppartner,
                   organization : imppartnermayus,
                 }
-                
+
                 location.implementing_partners.push(imppartnerpush);
-                
+
                 }
               );
-        
+
       }
      });
 
-      
+
       if(typeof(project.implementing_partners) === 'string'){
         // implementing_partners string to array
 
@@ -469,16 +472,16 @@ var ProjectController = {
                   organization_name : imppartner,
                   organization : imppartnermayus,
                 }
-                
+
                 project.implementing_partners.push(imppartnerpush);
-                
+
                 }
               );
 
          }else if(!project.implementing_partners){
 
                project.implementing_partners = [];
-    
+
             }
 
       // return Project
@@ -518,14 +521,19 @@ var ProjectController = {
     delete project_copy.target_locations;
     delete project_copy.createdAt;
     delete project_copy.updatedAt;
+    delete project_copy.admin1pcode;
+    delete project_copy.admin2pcode;
+    delete project_copy.admin3pcode;
+
+    var project_copy_no_cluster = JSON.parse( JSON.stringify( project_copy ) );
+    delete project_copy_no_cluster.cluster;
+    delete project_copy_no_cluster.cluster_id;
 
     // promise
     Promise.all([
       Project.updateOrCreate( { id: project.id }, project ),
       // budget_progress, target_beneficiaries, target_locations, report, location ( below )
-      Beneficiaries.update( findProject, project_copy ),
-      Trainings.update( findProject, project_copy ),
-      TrainingParticipants.update( findProject, project_copy )
+      Beneficiaries.update( findProject, project_copy_no_cluster ),
     ])
     .catch( function( err ) {
       return res.negotiate( err );
@@ -546,16 +554,22 @@ var ProjectController = {
       // async
       var target_locations_counter = 0;
       var target_reports_counter = 0;
+      var delete_reports_counter = 0;
       var async_counter = 0;
-      var async_requests = 5;
+      var async_requests = 6;
 
       // return the project_update
-      var returnProject = function() {
+      var returnProject = function(err) {
+        if (err) return res.negotiate(err);
         // make locations
         if ( target_locations_counter && target_reports_counter ) {
           target_locations_counter = 0;
           target_reports_counter = 0;
           setLocations();
+        }
+        if ( delete_reports_counter ) {
+          delete_reports_counter = 0
+          removeReports();
         }
         // ++
         async_counter++;
@@ -567,7 +581,7 @@ var ProjectController = {
       // ASYNC REQUEST 1
       // async loop target_beneficiaries
       async.each( project_budget_progress, function ( d, next ) {
-        var budget = _under.extend( {}, d, project_copy );
+        var budget = _under.extend( {}, d, project_copy_no_cluster );
         BudgetProgress.updateOrCreate( findProject, { id: budget.id }, budget ).exec(function( err, result ){
           project_update.project_budget_progress.push( ProjectController.set_result( result ) );
           next();
@@ -579,10 +593,10 @@ var ProjectController = {
 
       // ASYNC REQUEST 2
       // async loop target_beneficiaries
-      async.each( target_beneficiaries, function ( d, next ) {
-        var t_beneficiary = _under.extend( {}, d, project_copy );
+      async.eachOf( target_beneficiaries, function ( d, ib, next ) {
+        var t_beneficiary = _under.extend( {}, d, project_copy_no_cluster );
         TargetBeneficiaries.updateOrCreate( findProject, { id: t_beneficiary.id }, t_beneficiary ).exec(function( err, result ){
-          project_update.target_beneficiaries.push( ProjectController.set_result( result ) );
+          project_update.target_beneficiaries[ib] = ProjectController.set_result( result );
           next();
         });
       }, function ( err ) {
@@ -592,10 +606,10 @@ var ProjectController = {
 
       // ASYNC REQUEST 3
       // async loop target_locations
-      async.each( target_locations, function ( d, next ) {
+      async.eachOf( target_locations, function ( d, il, next ) {
         var t_location = _under.extend( {}, d, project_copy );
         TargetLocation.updateOrCreate( findProject, { id: t_location.id }, t_location ).exec(function( err, result ){
-          project_update.target_locations.push( ProjectController.set_result( result ) );
+          project_update.target_locations[il] = ProjectController.set_result( result );
           next();
         });
       }, function ( err ) {
@@ -606,7 +620,7 @@ var ProjectController = {
 
       // generate reports for duration of project_update
       ProjectController.getProjectReports( project_update, function( err, project_reports ){
-        
+
         // err
         if ( err ) return err;
 
@@ -631,12 +645,53 @@ var ProjectController = {
 
       });
 
+      // ASYNC REQUEST 6
+      var removeReports = async function () {
+        // construct find query
+        const lt_project_start_date = new Date(moment(project_update.project_start_date).subtract(1, 'month').endOf('month'))
+        const gt_project_end_date = new Date(moment(project_update.project_end_date).add(1, 'month').startOf('month'))
+
+        const find = {
+          project_id: project_update.id,
+          $or: [
+            {
+              reporting_period: { $lte: new Date(lt_project_start_date) }
+            },
+            {
+              reporting_period: { $gte: new Date(gt_project_end_date) }
+            }
+          ]
+        };
+
+        try {
+          // find reports outside of project dates
+          const reports = await Report.find(find, { select: ['id'] });
+          const uniq_reports = [...new Set(reports.map(b => b.id))];
+
+          const beneficiaries = await Beneficiaries.find({ report_id: { $in: uniq_reports } }, { select: ['report_id'] })
+          const uniq_reports_with_beneficiaries = [...new Set(beneficiaries.map(b => b.report_id))];
+
+          const reports_to_delete = _.difference(uniq_reports, uniq_reports_with_beneficiaries);
+
+          await Promise.all([
+            Report.destroy({ id: { $in: reports_to_delete } }),
+            Location.destroy({ report_id: { $in: reports_to_delete } }),
+          ]);
+
+          returnProject(null);
+
+        } catch (err) {
+          returnProject(err);
+        }
+
+      };
+
       // locations
       var setLocations = function() {
-        
+
         // generate locations for each report ( requires report_id )
         ProjectController.getProjectReportLocations( reports, project_update.target_locations, function( err, locations ){
-          
+
           // err
           if ( err ) return err;
 
@@ -653,6 +708,7 @@ var ProjectController = {
             });
           }, function ( err ) {
             if ( err ) return err;
+            delete_reports_counter++;
             returnProject();
           });
 
@@ -710,28 +766,31 @@ var ProjectController = {
   },
 
   // remove target location
-  removeLocationById: function( req, res ) {
-    
+  removeLocationById: async function( req, res ) {
+
     // request input
-    if ( !req.param( 'id' ) ) {
+    if (!req.param('id')) {
       return res.json({ err: true, error: 'id required!' });
     }
 
     // get id
-    var id = req.param( 'id' );
+    var id = req.param('id');
 
-    // promise
-    Promise.all([
-      TargetLocation.destroy( { id: id } ),
-      Location.destroy( { target_location_reference_id: id } )
-    ])
-    .catch( function( err ) {
-      return res.negotiate( err );
-    })
-    .then( function( result ) {
-      // return Project
-      return res.json( 200, { msg: 'Success!' } );
-    });
+    try {
+      // find locations containing beneficiaries first
+      const beneficiaries = await Beneficiaries.find({ target_location_reference_id: id }, { select: ['location_id'] })
+      const uniq_locations = [...new Set(beneficiaries.map(b => b.location_id))];
+
+      await Promise.all([
+        TargetLocation.destroy({ id: id }),
+        Location.destroy({ target_location_reference_id: id, id: { $nin: uniq_locations } })
+      ])
+
+      return res.json(200, { msg: 'Success!' });
+
+    } catch (err) {
+      return res.negotiate(err);
+    }
 
   },
 
@@ -754,9 +813,7 @@ var ProjectController = {
       BudgetProgress.destroy( { project_id: project_id } ),
       Report.destroy( { project_id: project_id } ),
       Location.destroy( { project_id: project_id } ),
-      Beneficiaries.destroy( { project_id: project_id } ),
-      Trainings.destroy( { project_id: project_id } ),
-      TrainingParticipants.destroy( { project_id: project_id } )
+      Beneficiaries.destroy( { project_id: project_id } )
     ])
     .catch( function( err ) {
       return res.negotiate( err );

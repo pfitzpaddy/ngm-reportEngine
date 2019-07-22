@@ -726,31 +726,11 @@ var ClusterDashboardController = {
 							]
 						).toArray(function (err, beneficiaries) {
 							if (err) return res.serverError(err);
-							
-							TrainingParticipants.native(function(err, collection) {
-								if (err) return res.serverError(err);
-							
-								collection.aggregate(
-									[
-										{ 
-											$match : filterObject 
-										},
-										{
-											$group:
-											{
-												_id: null,
-												total:  { $sum: { $add: [ "$trainee_men", "$trainee_women" ] } } ,
-											}
-										}
-									]
-								).toArray(function (err, training_participants) {
-									if (err) return res.serverError(err);
 									
-									var total = beneficiaries[0]?beneficiaries[0].total:0 + training_participants[0]?training_participants[0].total:0  
-				
-									return res.json( 200, { 'value': total } );
-								});
-							});
+							var total = beneficiaries[0]?beneficiaries[0].total:0;  
+		
+							return res.json( 200, { 'value': total } );
+
 						});
 					});
 				}	else	{
@@ -850,7 +830,7 @@ var ClusterDashboardController = {
 								'women',
 								'elderly_men',
 								'elderly_women',
-								'total',
+								'total_beneficiaries',
 								'admin1lng',
 								'admin1lat',
 								'admin2lng',
@@ -956,7 +936,7 @@ var ClusterDashboardController = {
 								'women',
 								'elderly_men',
 								'elderly_women',
-								'total_beneficiaries',
+								'total',
 								'admin1lng',
 								'admin1lat',
 								'admin2lng',
@@ -973,8 +953,14 @@ var ClusterDashboardController = {
 								'createdAt'
 							];
 
+              if (params.admin0pcode.toUpperCase() === 'AF') {
+                ix = fields.indexOf('activity_description_name') + 1;
+                ix && fields.splice(ix, 0, 'injury_treatment_same_province');
+                ix && fieldNames.splice(ix, 0, 'injury_treatment_same_province');
+              }
+
 							var total = 0;
-							
+
 							// format beneficiaries
 							async.eachLimit(beneficiaries, 200, function (d, next) {
 								// hrp code
@@ -1171,171 +1157,6 @@ var ClusterDashboardController = {
 					});
 
 				break;
-
-
-			// raw data export
-			case 'training_participants':
-
-				// trainings
-				TrainingParticipants
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.date )
-					.exec( function( err, training_participants ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						var fields = [
-							'project_id',
-							'project_title',
-							'project_description',
-							'project_start_date',
-							'project_end_date',
-							'project_hrp_code',
-							'project_code',
-							'report_id',
-							'report_month',
-							'report_year',
-							'reporting_period',
-							'report_submitted',
-							'admin0pcode',
-							'admin0name',
-							'cluster_id',
-							'cluster',
-							'organization',
-							'organization_tag',
-							'training_id',
-							'training_title',
-							'training_topics',
-							'training_start_date',
-							'training_end_date',
-							'training_days_number',
-							'training_conducted_by',
-							'training_supported_by',
-							'trainee_affiliation_id',
-							'trainee_affiliation_name',
-							'trainee_health_worker_id',
-							'trainee_health_worker_name',
-							'trainee_men',
-							'trainee_women',
-							'site_id',
-							'site_class',
-							'site_status',
-							'site_name',
-							'site_implementation_id',
-							'site_implementation_name',
-							'site_type_id',
-							'site_type_name',
-							'conflict',
-							'admin1lng',
-							'admin1lat',
-							'admin2lng',
-							'admin2lat',
-							'admin3lat',
-							'admin3lng',
-							'admin4lat',
-							'admin4lng',
-							'admin5lat',
-							'admin5lng',
-							'site_lng',
-							'site_lat',
-							'createdAt',
-							'updatedAt'
-						],
-
-					fieldNames = [
-							'project_id',
-							'project_title',
-							'project_description',
-							'project_start_date',
-							'project_end_date',
-							'project_hrp_code',
-							'project_code',
-							'report_id',
-							'report_month',
-							'report_year',
-							'reporting_period',
-							'report_submitted',
-							'admin0pcode',
-							'admin0name',
-							'cluster_id',
-							'cluster',
-							'organization',
-							'organization_tag',
-							'training_id',
-							'training_title',
-							'training_topics',
-							'training_start_date',
-							'training_end_date',
-							'training_days_number',
-							'training_conducted_by',
-							'training_supported_by',
-							'trainee_affiliation_id',
-							'trainee_affiliation_name',
-							'trainee_health_worker_id',
-							'trainee_health_worker_name',
-							'trainee_men',
-							'trainee_women',
-							'site_id',
-							'site_class',
-							'site_status',
-							'site_name',
-							'site_implementation_id',
-							'site_implementation_name',
-							'site_type_id',
-							'site_type_name',
-							'conflict',
-							'admin1lng',
-							'admin1lat',
-							'admin2lng',
-							'admin2lat',
-							'admin3lat',
-							'admin3lng',
-							'admin4lat',
-							'admin4lng',
-							'admin5lat',
-							'admin5lng',
-							'site_lng',
-							'site_lat',
-							'createdAt',
-							'updatedAt'
-						];
-						// return csv
-
-						training_participants.forEach(function( d, i ){
-							training_participants[ i ].report_month_number = d.report_month+1;
-							training_participants[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							training_participants[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-						});
-
-						json2csv({ data: training_participants, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
 			
 			// NG WASH
 			// accountability
@@ -1343,7 +1164,7 @@ var ClusterDashboardController = {
 
 				var data = [];
 
-				// trainings
+				// accountability
 				Beneficiaries
 					.find()
 					.where( filters.default )
@@ -1411,7 +1232,7 @@ var ClusterDashboardController = {
 
 				var data = [];
 
-				// trainings
+				// boreholes
 				Beneficiaries
 					.find()
 					.where( filters.default )
@@ -1478,7 +1299,7 @@ var ClusterDashboardController = {
 
 				var data = [];
 
-				// trainings
+				// cash
 				Beneficiaries
 					.find()
 					.where( filters.default )
@@ -1546,7 +1367,7 @@ var ClusterDashboardController = {
 
 				var data = [];
 
-				// trainings
+				// hygiene
 				Beneficiaries
 					.find()
 					.where( filters.default )
@@ -1614,7 +1435,7 @@ var ClusterDashboardController = {
 
 				var data = [];
 
-				// trainings
+				// sanitation
 				Beneficiaries
 					.find()
 					.where( filters.default )
@@ -1682,7 +1503,7 @@ var ClusterDashboardController = {
 
 				var data = [];
 
-				// trainings
+				// water
 				Beneficiaries
 					.find()
 					.where( filters.default )

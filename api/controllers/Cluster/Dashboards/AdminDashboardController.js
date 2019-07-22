@@ -859,95 +859,77 @@ var AdminDashboardController = {
                           }
                         }
                       ]).toArray(function (err, results) {
-                                    if (err) return res.serverError(err);
+                        if (err) return res.serverError(err);
 
-                                    // for reports not submitted with entries
-                                    var non_empty_reports=_.map(results,'_id')    
-                                    
-                                    TrainingParticipants.native(function(err, collection) {
-                                      if (err) return res.serverError(err);
-                                    
-                                      collection.aggregate([
-                                          { 
-                                            $match : {report_id:{"$in":reports_array}} 
-                                          },
-                                          {
-                                            $group: {
-                                              _id: '$report_id'
-                                            }
-                                          }
-                                        ]).toArray(function (err, results) {
+                        // for reports not submitted with entries
+                        var non_empty_reports=_.map(results,'_id')    
 
-                                                  if (err) return res.serverError(err);
-                                                  var non_empty_train_reports=_.map(results,'_id')
+                        // reports
+                        reports.forEach( function( d, i ){
 
-                                                  // reports
-                                                  reports.forEach( function( d, i ){
+                              // add status
+                              reports[i].id           = reports[i]._id.toString();
+                              reports[i].status       = '#4db6ac'
+                              reports[i].status_title = 'Complete';
+  														reports[i].icon         = 'check_circle';
+  														if (reports[i].report_validation && reports[i].report_validation === 'valid') {
+  															reports[i].icon = 'done_all';
+  															reports[i].status = '#4db6ac';
+  														}
+  														if (reports[i].report_validation && reports[i].report_validation === 'invalid') {
+  															reports[i].icon = 'not_interested';
+  															reports[i].status = '#f44336';
+  														}
+  														if (reports[i].report_validation && reports[i].report_validation === 'checked') {
+  															reports[i].icon = 'watch_later';
+  															reports[i].status = '#4db6ac';
+  														}
+                              reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
+                              reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
 
-                                                        // add status
-                                                        reports[i].id           = reports[i]._id.toString();
-                                                        reports[i].status       = '#4db6ac'
-                                                        reports[i].status_title = 'Complete';
-																												reports[i].icon         = 'check_circle';
-																												if (reports[i].report_validation && reports[i].report_validation === 'valid') {
-																													reports[i].icon = 'done_all';
-																													reports[i].status = '#4db6ac';
-																												}
-																												if (reports[i].report_validation && reports[i].report_validation === 'invalid') {
-																													reports[i].icon = 'not_interested';
-																													reports[i].status = '#f44336';
-																												}
-																												if (reports[i].report_validation && reports[i].report_validation === 'checked') {
-																													reports[i].icon = 'watch_later';
-																													reports[i].status = '#4db6ac';
-																												}
-                                                        reports[i].report_month_format = moment( reports[i].report_month+1, 'MM' ).format('MMMM');
-                                                        reports[i].report_link = params.url + '#/cluster/projects/report/' + reports[i].project_id + '/' + reports[i]._id.toString();
+                              // if benficiaries
+                              if ( non_empty_reports.indexOf(d._id.toString())<0 ) {
+                                        // add status                   
+                                        reports[i].status       = '#80cbc4';
+                                        reports[i].icon         = 'adjust';
+                                        reports[i].status_title = 'Empty Submission';
+                                      }
 
-                                                        // if benficiaries
-                                                        if ( non_empty_reports.indexOf(d._id.toString())<0&&non_empty_train_reports.indexOf(d._id.toString())<0  ) {
-                                                                  // add status                   
-                                                                  reports[i].status       = '#80cbc4';
-                                                                  reports[i].icon         = 'adjust';
-                                                                  reports[i].status_title = 'Empty Submission';
-                                                                }
+                                      // set implementing partners icon
+                                      if (req.param('organization_tag') !== 'all' && d.implementing_partners && d.implementing_partners.length) {
+                                        if (d.implementing_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
+                                          reports[i].icon = 'group';
+                                          reports[i].status = '#2196F3';
+                                          reports[i].status_title = 'Complete';
+                                        }
+                                      }
+                                      // return
+                                      counter++;
+                                      if ( counter === length ) {
 
-                                                                // set implementing partners icon
-                                                                if (req.param('organization_tag') !== 'all' && d.implementing_partners && d.implementing_partners.length) {
-                                                                  if (d.implementing_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
-                                                                    reports[i].icon = 'group';
-                                                                    reports[i].status = '#2196F3';
-                                                                    reports[i].status_title = 'Complete';
-                                                                  }
-                                                                }
-                                                                // return
-                                                                counter++;
-                                                                if ( counter === length ) {
+                                        // !csv
+                                        if ( !params.csv ) {
+                                          // table
+                                          return res.json( 200, reports );
+                                        }
 
-                                                                  // !csv
-                                                                  if ( !params.csv ) {
-                                                                    // table
-                                                                    return res.json( 200, reports );
-                                                                  }
+                                        // csv
+                                        if ( params.csv ) {
 
-                                                                  // csv
-                                                                  if ( params.csv ) {
+                                          // return csv
+                                          json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
 
-                                                                    // return csv
-                                                                    json2csv({ data: reports, fields: fields, fieldNames: fieldNames  }, function( err, csv ) {
+                                            // error
+                                            if ( err ) return res.negotiate( err );
 
-                                                                      // error
-                                                                      if ( err ) return res.negotiate( err );
+                                            // success
+                                            return res.json( 200, { data: csv } );
 
-                                                                      // success
-                                                                      return res.json( 200, { data: csv } );
-
-                                                                    });
-                                                                  }
-                                                                }
-                                                    });
-                                              });
-                                    });
+                                          });
+                                        }
+                                      }
+                        });
+                        
                       });
                   });
                 }

@@ -198,8 +198,20 @@ module.exports = {
 
 		beneficiary_category_name: {
 			type: 'string'
+		},
 
-			
+
+		// FORM
+
+		// capture filter / display levels from activities.csv and store to avoid 
+			// filtering and retrieving the wrong form details (i.e. has indicator_id which is not unique
+			// and retrieves wrong form configuration as it should in fact know to filter on activity_details_id )
+		display_activity_detail: {
+			type: 'boolean'
+		},
+
+		display_indicator: {
+			type: 'boolean'
 		},
 
 		// activity_type
@@ -378,16 +390,9 @@ module.exports = {
       type: 'boolean'
     },
 
-		// store partial kits
-		partial_kits: {
+		// to replace partial_kits + kit_details (potentially units, unit_type_id, unit_type_name)
+		details: {
 			type: 'array'
-
-		},
-
-		// store kit details
-		kit_details: {
-			type: 'array'
-
 		},
 
     remarks:{
