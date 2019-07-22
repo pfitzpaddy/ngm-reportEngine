@@ -79,8 +79,8 @@ var Cluster4wprojectplanDashboardController = {
 									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
 									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
 			                          // ?{cluster_id:params.cluster_id}
-			                      ?{$or:[{cluster_id:params.cluster_id},{activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
-			                     : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
+			                      ?{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
+			                     : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			                   
 			//activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
@@ -109,8 +109,8 @@ var Cluster4wprojectplanDashboardController = {
 									//: { $or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { $regex : params.cluster_id } }, { activity_description_id: { $regex: 'cash' } }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] },
 			                       // ? {or:[{cluster_id:params.cluster_id},{activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
 			                    // ?{cluster_id:params.cluster_id}
-			                      ?{$or:[{cluster_id:params.cluster_id},{activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
-			                    : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
+			                      ?{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
+			                    : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			                     
 			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') ) 
 								? {} 
@@ -120,8 +120,8 @@ var Cluster4wprojectplanDashboardController = {
 			                   // ? {cluster_id:{$in: params.cluster_ids}}
 			                   //   : {cluster_id:{$in: params.cluster_ids}},
 			                    // ?{cluster_id:params.cluster_id}
-			                     ?{$or:[{cluster_id:params.cluster_id},{activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
-			                    :{activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
+			                     ?{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
+			                    :{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			                 
 			is_cluster_ids_array: params.cluster_ids ? true : false,
 			organization_tag_Native: params.organization_tag === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: params.organization_tag },
