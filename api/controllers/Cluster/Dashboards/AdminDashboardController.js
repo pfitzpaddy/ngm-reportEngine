@@ -1009,6 +1009,7 @@ var AdminDashboardController = {
 
                               // add status
                               reports[i].id     = reports[i]._id.toString();
+                              reports[i].location_groups = reports[i].location_groups ? reports[i].location_groups.length : 0;
                               reports[i].status = '#e57373'
                               reports[i].status_title = 'Due';
                               reports[i].icon = 'error';
