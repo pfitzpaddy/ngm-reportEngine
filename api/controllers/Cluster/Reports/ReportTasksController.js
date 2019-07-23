@@ -10,6 +10,8 @@ var _under = require('underscore');
 var moment = require('moment');
 var async = require('async');
 
+var REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG = sails.config.REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG;
+
 // ReportTasksController
 var ReportTasksController = {
 
@@ -257,7 +259,12 @@ var ReportTasksController = {
         async.each( projects, function ( project, next ) {
 
           var findProject = { project_id: project.id }
-          
+
+          const admin0pcode = project.admin0pcode;
+
+          let config = REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG.find(obj => obj.admin0pcode === admin0pcode);
+          if (!config) config = REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG.find(obj => obj.admin0pcode === "ALL");
+
           // create report
           var r = {
             project_id: project.id,
@@ -266,7 +273,7 @@ var ReportTasksController = {
             report_month: moment().month(),
             report_year: moment().year(),
             reporting_period: moment().set( 'date', 1 ).format(),
-            reporting_due_date: moment().add( 1, 'M' ).set( 'date', 10 ).format()
+            reporting_due_date: moment().add( 1, 'M' ).set( 'date', config.reporting_due_date ).format()
           };
 
           // clone project
@@ -278,11 +285,11 @@ var ReportTasksController = {
 
           // find reports
           Report.findOne( { project_id: new_report.project_id, report_month: new_report.report_month, report_year: new_report.report_year } ).then( function ( report ){
-            
+
             // set
             if( !report ) { report = { id: null } }
             if ( report ) { new_report.report_status = report.report_status; new_report.report_active = report.report_active, new_report.updatedAt = report.updatedAt }
-            
+
             // create reports
             Report.updateOrCreate( findProject, { id: report.id }, new_report ).exec(function( err, report_result ){
 
@@ -302,7 +309,7 @@ var ReportTasksController = {
 
                   // err
                   if ( err ) return err;
-              
+
                   // generate locations for each report ( requires report_id )
                   ReportTasksController.getProjectReportLocations( report_result, target_locations, function( err, locations ){
 
@@ -318,10 +325,10 @@ var ReportTasksController = {
                         if( !location ) { location = { id: null } }
                         // relations set in getProjectReportLocations
                         Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, location_result ){
-                          
+
                           // err
                           if ( err ) return err;
-                          
+
                           // no need to return locations
                           next();
 
@@ -345,7 +352,7 @@ var ReportTasksController = {
         });
 
       });
-  
+
   },
 
   setReportsToDoPreviousMonth: function( req, res ) {
@@ -359,14 +366,14 @@ var ReportTasksController = {
 
         // return error
         if ( err ) return res.negotiate( err );
-      
+
 
         // ASYNC REQUEST 1
         // async loop target_beneficiaries
         async.each( projects, function ( project, next ) {
 
           var findProject = { project_id: project.id }
-          
+
           // create report
           var r = {
             project_id: project.id,
@@ -387,11 +394,11 @@ var ReportTasksController = {
 
           // find reports
           Report.findOne( { project_id: new_report.project_id, report_month: new_report.report_month, report_year: new_report.report_year } ).then( function ( report ){
-            
+
             // set
             if( !report ) { report = { id: null } }
             if ( report ) { new_report.report_status = report.report_status; new_report.report_active = report.report_active, new_report.updatedAt = report.updatedAt }
-            
+
             // create reports
             Report.updateOrCreate( findProject, { id: report.id }, new_report ).exec(function( err, report_result ){
 
@@ -411,7 +418,7 @@ var ReportTasksController = {
 
                   // err
                   if ( err ) return err;
-              
+
                   // generate locations for each report ( requires report_id )
                   ReportTasksController.getProjectReportLocations( report_result, target_locations, function( err, locations ){
 
@@ -427,10 +434,10 @@ var ReportTasksController = {
                         if( !location ) { location = { id: null } }
                         // relations set in getProjectReportLocations
                         Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, location_result ){
-                          
+
                           // err
                           if ( err ) return err;
-                          
+
                           // no need to return locations
                           next();
 
@@ -812,64 +819,72 @@ var ReportTasksController = {
       .where( { report_month: moment().subtract( 1, 'M' ).month() } )
       .where( { report_active: true } )
       .where( { report_status: 'todo' } )
+      .where( { project_status : "active" } )
       .sort( 'report_month DESC' )
       .exec( function( err, reports ){
 
           if ( err ) return res.negotiate( err );
           // no reports return
           if ( !reports.length ) return res.json( 200, { msg: 'No reports pending for ' + moment().subtract( 1, 'M' ).format( 'MMMM' ) + '!' } );
-        
+
           // for each report, group by username
           reports.forEach( function( location, i ) {
 
-            location.report_id = location.id;
-            // if username dosnt exist
-            if ( !nStore[ location.email ] ) {
-              var due_message = 'due SOON';
-              // set due message TODAY
-              if ( moment().date() === due_date ) {
-                due_message = 'due TODAY';
-              }
-              // set due message PENDING
-              if ( moment().date() > due_date ) {
-                due_message = 'PENDING';
-              }
+            const admin0pcode = location.admin0pcode;
 
-              // add for notification email template
-              nStore[ location.email ] = {
-                email: location.email,
-                username: location.username,
-                report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
-                reporting_due_date: moment( location.reporting_due_date ).format( 'DD MMMM, YYYY' ),
-                reporting_due_message: due_message,
-                projectsStore: []
-              };
-            }
+            let config = REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG.find(obj => obj.admin0pcode === admin0pcode);
+            if (!config) config = REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG.find(obj => obj.admin0pcode === "ALL");
 
-            // group reports by report!
-            if ( !nStore[ location.email ].projectsStore[ location.project_id ] ){
-              // add report urls
-              nStore[ location.email ].projectsStore[ location.project_id ] = {
-                country: location.admin0name,
-                cluster: location.cluster,
-                project_title: location.project_title,
-                reports: []
+            if (config.soon.includes(moment().date()) || config.pending.includes(moment().date()) || config.today.includes(moment().date())) {
+
+              location.report_id = location.id;
+              // if username dosnt exist
+              if ( !nStore[ location.email ] ) {
+                var due_message = 'due SOON';
+                // set due message TODAY
+                if ( config.today.includes(moment().date()) ) {
+                  due_message = 'due TODAY';
+                }
+                // set due message PENDING
+                if ( config.pending.includes(moment().date()) ) {
+                  due_message = 'PENDING';
+                }
+
+                // add for notification email template
+                nStore[ location.email ] = {
+                  email: location.email,
+                  username: location.username,
+                  report_month: moment().subtract( 1, 'M' ).format( 'MMMM' ),
+                  reporting_due_date: moment( location.reporting_due_date ).format( 'DD MMMM, YYYY' ),
+                  reporting_due_message: due_message,
+                  projectsStore: []
+                };
               }
 
-            }
+              // group reports by report!
+              if ( !nStore[ location.email ].projectsStore[ location.project_id ] ){
+                // add report urls
+                nStore[ location.email ].projectsStore[ location.project_id ] = {
+                  country: location.admin0name,
+                  cluster: location.cluster,
+                  project_title: location.project_title,
+                  reports: []
+                }
 
-            // one report per month
-            if ( !nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] ) {
-              // project reports
-              nStore[ location.email ].projectsStore[ location.project_id ].reports.push({
-                report_value: location.report_month,
-                report_month: moment( location.reporting_period ).format( 'MMMM' ),
-                report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
-              });
-              // avoids report row per location
-              nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] = [{ report: true }];
-            }
+              }
 
+              // one report per month
+              if ( !nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] ) {
+                // project reports
+                nStore[ location.email ].projectsStore[ location.project_id ].reports.push({
+                  report_value: location.report_month,
+                  report_month: moment( location.reporting_period ).format( 'MMMM' ),
+                  report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + location.project_id + '/' + location.report_id
+                });
+                // avoids report row per location
+                nStore[ location.email ].projectsStore[ location.project_id ].reports[ location.report_id ] = [{ report: true }];
+              }
+            }
           });
 
           // each user, send only one email!

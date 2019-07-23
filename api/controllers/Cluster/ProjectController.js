@@ -13,6 +13,8 @@ var moment = require('moment');
 var async = require('async');
 var _under = require('underscore');
 
+var REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG = sails.config.REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG;
+
 // project controller
 var ProjectController = {
 
@@ -31,6 +33,12 @@ var ProjectController = {
 
   // return reports for a project
   getProjectReports: function( project, cb ) {
+
+    const admin0pcode = project.admin0pcode ? project.admin0pcode : "ALL";
+    let config = REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG.find(obj => obj.admin0pcode === admin0pcode);
+    if (!config) config = REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG.find(obj => obj.admin0pcode === 'ALL');
+
+    const REPORTING_DUE_DATE = config.reporting_due_date;
 
     // dates
     var project_start = moment( project.project_start_date ).startOf( 'M' ),
@@ -64,7 +72,7 @@ var ProjectController = {
         report_month: moment( s_date ).add( m, 'M' ).month(),
         report_year: moment( s_date ).add( m, 'M' ).year(),
         reporting_period: moment( s_date ).add( m, 'M' ).set( 'date', 1 ).format(),
-        reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', 10 ).format()
+        reporting_due_date: moment( s_date ).add( m+1, 'M' ).set( 'date', REPORTING_DUE_DATE ).format()
       };
 
       // add report with p to reports
