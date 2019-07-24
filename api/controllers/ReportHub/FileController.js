@@ -11,6 +11,7 @@ var path = require('path');
 
 const { google } = require('googleapis');
 
+// const puppeteer = require('puppeteer')
 
 module.exports = {
 
@@ -642,8 +643,145 @@ module.exports = {
 
 	},
 
-	//
-	print: function  (req, res) {
+  print: async function (req, res) {
+
+    try {
+      var report = req.param('report'),
+        printUrl = req.param('printUrl'),
+        user = req.param('user'),
+        viewportWidth = req.param('viewportWidth') ? req.param('viewportWidth') : 1920,
+        viewportHeight = req.param('viewportHeight') ? req.param('viewportHeight') : 1570;
+
+      const puppeteer = require('puppeteer');
+
+      const browser = await puppeteer.launch({
+        headless: true, args: [
+          '--proxy-server="direct://"',
+          '--proxy-bypass-list=*'
+        ]
+      });
+
+      const page = await browser.newPage();
+
+      await page.goto(req.protocol + '://' + req.host + '/desk/#/cluster/login');
+
+      await page.evaluate((user) => {
+        localStorage.setObject('auth_token', user);
+      }, user);
+
+      await page.close();
+
+      const pageDashboard = await browser.newPage();
+      pageDashboard.setDefaultNavigationTimeout(300000);
+
+      pageDashboard.setViewport({
+        width: viewportWidth,
+        height: viewportHeight
+      });
+
+      await pageDashboard.goto(printUrl, { waitUntil: ['load', 'domcontentloaded', 'networkidle0'] });
+
+      await pageDashboard.evaluate(() => {
+
+        // hide side nav
+        $(".ngm-menu").css({ 'width': '0px' });
+        // left/right padding
+        $("#ngm-report").css({ 'padding-left': '90px' });
+        $("#ngm-report").css({ 'padding-right': '90px' });
+        // hide btns
+        $('.btn').css({ 'display': 'none' });
+        $("#ngm-report-download").css({ 'display': 'none' });
+        $(".ngm-profile-btn").css({ 'display': 'none' });
+        $("#dashboard-btn").parent().parent().css({ "display": "none" });
+        // navigation breadcrumb
+        $("#ngm-breadcrumb").css({ 'display': 'none' });
+        // tabs breadcrumb
+        $("#ngm-tabs").css({ 'display': 'none' });
+        // menu footer
+        $(".ngm-menu-footer").css({ 'display': 'none' });
+        $(".upload-view-switch").css({ 'display': 'none' });
+        // title size adjustment
+        $("#ngm-report-title").css({ 'font-size': '3.1rem' });
+        // count size
+        $('.count').css({ 'font-size': '2rem' });
+        $('.count').css({ 'line-height': '2rem' });
+        // position date range
+        $("#ngm-report-datepicker").css({ 'padding-left': '20px;' });
+
+        // fix layout issue - for each row
+        $('.row').each(function (i, row) {
+          // for each widget
+          $(row).children().each(function (j, w) {
+            if ($(w).attr('class')) {
+              // if col is not full length
+              if ($(w).attr('class').search('l12') === -1) {
+                // get width
+                var width = ((parseInt($(w).attr('class').slice(-1)) / 12) * 100).toFixed(2);
+                console.log(width)
+                // update widget width
+                $(w).css({ 'width': width + '%' });
+              }
+            }
+          });
+        });
+
+        // if textarea
+        if ($('textarea')[0]) {
+
+          // update text color
+          $('input').css({ 'color': '#000000' });
+          $('select').css({ 'color': '#000000' });
+
+          // expand
+          $('textarea').css({ 'color': '#000000' });
+          $('textarea').height($('textarea')[0].scrollHeight);
+        }
+
+        $('.remove').remove();
+
+        // update all promo charts
+        $(".highchart-promo").css({ 'top': '40px', 'left': '10px' });
+        // hide map controls
+        $(".leaflet-control-container").css({ 'display': 'none' });
+        // hide contact card
+        $("#ngm-contact").css({ 'display': 'none' });
+        // display download date
+        $("#ngm-report-extracted").css({ 'display': 'block' });
+        // adjust to left donuts
+        $(".highcharts-series-group").css({ 'transform': 'translateX(-25px)' });
+
+      });
+
+      // await pageDashboard.screenshot({
+      //   path: `/home/ubuntu/nginx/www/ngm-reportPrint/pdf/${report}.jpg`,
+      //   type: 'jpg',
+      //   quality: 100
+      // });
+
+      await pageDashboard.emulateMedia('print');
+
+      const pdf = await pageDashboard.pdf({ path: `/home/ubuntu/nginx/www/ngm-reportPrint/pdf/${report}.pdf`, width: viewportWidth - 280, height: viewportHeight });
+
+      await browser.close();
+
+      res.json({
+        status: 200,
+        report: report + '.pdf'
+      });
+    } catch (err) {
+      res.json(400, {
+        error: err
+      });
+    }
+
+  },
+
+	/**
+   * @deprecated
+   *
+   * Update to phantom 2.5 is required which supports es6
+   */
+	print_with_phantomjs: function  (req, res) {
 
 		var report = req.param('report'),
 			printUrl = req.param('printUrl'),
