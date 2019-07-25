@@ -667,7 +667,7 @@ module.exports = {
       await page.goto(req.protocol + '://' + req.host + '/desk/#/cluster/login');
 
       await page.evaluate((user) => {
-        localStorage.setObject('auth_token', user);
+        localStorage.setItem('auth_token', JSON.stringify(user));
       }, user);
 
       await page.close();
