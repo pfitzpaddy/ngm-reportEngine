@@ -657,7 +657,8 @@ module.exports = {
       const browser = await puppeteer.launch({
         headless: true, args: [
           '--proxy-server="direct://"',
-          '--proxy-bypass-list=*'
+          '--proxy-bypass-list=*',
+          '--no-sandbox'
         ]
       });
 
