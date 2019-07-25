@@ -869,6 +869,7 @@ var AdminDashboardController = {
 
                               // add status
                               reports[i].id           = reports[i]._id.toString();
+                              reports[i].location_groups = reports[i].location_groups ? reports[i].location_groups.length : 0;
                               reports[i].status       = '#4db6ac'
                               reports[i].status_title = 'Complete';
   														reports[i].icon         = 'check_circle';
