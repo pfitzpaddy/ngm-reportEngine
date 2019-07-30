@@ -40,6 +40,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		admin1type_name: {
+			type: 'string'
+		},
 		admin2pcode: {
 			type: 'string',
 			required: true
@@ -48,10 +51,16 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		admin2type_name: {
+			type: 'string'
+		},
 		admin3pcode: {
 			type: 'string'
 		},
 		admin3name: {
+			type: 'string'
+		},
+		admin3type_name: {
 			type: 'string'
 		},
 		admin4pcode: {
@@ -60,10 +69,16 @@ module.exports = {
 		admin4name: {
 			type: 'string'
 		},
+		admin4type_name: {
+			type: 'string'
+		},
 		admin5pcode: {
 			type: 'string'
 		},
 		admin5name: {
+			type: 'string'
+		},
+		admin5type_name: {
 			type: 'string'
 		},
 		organization_id: {
