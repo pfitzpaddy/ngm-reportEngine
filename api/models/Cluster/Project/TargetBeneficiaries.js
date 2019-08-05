@@ -94,6 +94,9 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		hrp_plan:{
+			type: 'boolean'
+		},
 		project_code: {
 			type: 'string'
 		},
