@@ -107,6 +107,11 @@ module.exports.policies = {
     '*': true
   },
 
+  //public
+  'Cluster/Dashboards/Cluster4wplusDashboardController':{
+    '*': true
+  },
+
 
   // public
   'Cluster/Lists/ListController': {
