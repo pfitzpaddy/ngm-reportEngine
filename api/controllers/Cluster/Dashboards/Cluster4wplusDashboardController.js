@@ -1925,6 +1925,7 @@ var Cluster4wplusDashboardController = {
 
 
 				//console.log("FILTROS: ",filters);
+				total_projects = [];
 
 			Beneficiaries
 					.find()
@@ -1944,28 +1945,67 @@ var Cluster4wplusDashboardController = {
 
 
 						if (err) return res.negotiate( err );
-						resultFiltersPrj = [];
+
+						console.log("TOTAL PROYECTOS BENEFICIARIOS: ",result.length);
+
+						//resultFiltersPrj = [];
 
 						result.forEach(function(d,i){
 
-								const exist = resultFiltersPrj.find(proj => proj.project_id === d.project_id);
+							//	const exist = resultFiltersPrj.find(proj => proj.project_id === d.project_id);
+							const exist = total_projects.find(proj => proj.project_id === d.project_id);
+
 										
 										if(!exist){
 
-											resultFiltersPrj.push(d);
+											total_projects.push(d);
 
 										}else{
 										}
 
 
 								});
-
 						
-					return res.json(200,{'value':resultFiltersPrj.length});
+					//return res.json(200,{'value':resultFiltersPrj.length});
 
 
 					});
 
+			    BudgetProgress.find()
+			              .where( filters.default)
+			              .where( filters.adminRpcode)
+			              .where( filters.admin0pcode)
+			              .where( filters.admin1pcode)
+			              .where( filters.admin2pcode)
+			              .where( filters.organization_tag)
+			              .where( filters.hrp_plan)
+			              .where( filters.beneficiaries)
+			              .where( filters.cluster_id)
+			              .where( filters.activity_type)
+			              .where( filters.project_startDateNative)
+			              .where( filters.project_endDateNative)
+			              .exec( function(err, result){
+
+			              	if(err) return res.negotiate(err);
+
+			              	console.log("TOTAL BUDGET PRORG: ",result.length);
+
+			              	result.forEach(function(d,i){
+
+			              		const exist = total_projects.find(proj => proj.project_id === d.project_id);
+
+			              		if(!exist){
+			              			total_projects.push(d);
+			              		}
+			              	});
+
+			              	return res.json(200,{'value':total_projects.length});
+
+			              });
+
+			       
+
+			           
 
 				
 				break;
@@ -2094,6 +2134,69 @@ var Cluster4wplusDashboardController = {
 
 					});
 				
+				
+				break;
+
+		       case 'beneficiaries_4wplusdashboard':
+
+				// total sum
+				Beneficiaries.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate(
+						[
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group:
+								{
+									_id: null,
+									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									total:  { $sum: { $add: [ "$total_beneficiaries" ] } }
+								}
+							}
+						]
+					).toArray(function (err, beneficiaries) {
+						if (err) return res.serverError(err);
+
+						var total = beneficiaries[0]?beneficiaries[0].total:0;
+
+						return res.json( 200, { 'value': total } );
+					});
+				});
+				
+				break;
+
+				case 'budgetprogress_4wplusdashboard':
+
+				// total sum
+				BudgetProgress.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate(
+						[
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group:
+								{
+									_id: null,
+									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									total:  { $sum: { $add: [ "$project_budget_amount_recieved" ] } }
+								}
+							}
+						]
+					).toArray(function (err, budgetprogress) {
+						if (err) return res.serverError(err);
+
+
+						var total = budgetprogress[0]?budgetprogress[0].total:0;
+
+						return res.json( 200, { 'value': total } );
+					});
+				});
 				
 				break;
 
