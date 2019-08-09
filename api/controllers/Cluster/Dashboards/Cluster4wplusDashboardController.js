@@ -1924,10 +1924,9 @@ var Cluster4wplusDashboardController = {
 
 
 
-				//console.log("FILTROS: ",filters);
-				total_projects = [];
+					total_projects = [];
 
-			Beneficiaries
+		         	Beneficiaries
 					.find()
 					.where( filters.default )
 					.where( filters.adminRpcode )
@@ -1946,13 +1945,10 @@ var Cluster4wplusDashboardController = {
 
 						if (err) return res.negotiate( err );
 
-						console.log("TOTAL PROYECTOS BENEFICIARIOS: ",result.length);
 
-						//resultFiltersPrj = [];
 
 						result.forEach(function(d,i){
 
-							//	const exist = resultFiltersPrj.find(proj => proj.project_id === d.project_id);
 							const exist = total_projects.find(proj => proj.project_id === d.project_id);
 
 										
@@ -1966,12 +1962,11 @@ var Cluster4wplusDashboardController = {
 
 								});
 						
-					//return res.json(200,{'value':resultFiltersPrj.length});
 
 
 					});
 
-			    BudgetProgress.find()
+			          BudgetProgress.find()
 			              .where( filters.default)
 			              .where( filters.adminRpcode)
 			              .where( filters.admin0pcode)
@@ -1988,7 +1983,6 @@ var Cluster4wplusDashboardController = {
 
 			              	if(err) return res.negotiate(err);
 
-			              	console.log("TOTAL BUDGET PRORG: ",result.length);
 
 			              	result.forEach(function(d,i){
 
@@ -2002,20 +1996,25 @@ var Cluster4wplusDashboardController = {
 			              	return res.json(200,{'value':total_projects.length});
 
 			              });
-
-			       
-
-			           
-
+			              
 				
 				break;
 
 				case 'organizations_4wplusdashboard':
 				
-				//console.log("FILTEROBJECT: ", filterObject);
-				resultsFiltersOrganizations = [];
 
 				if ( params.list ) {
+
+					//console.log("IMPRIME AQUI EN 1");
+
+
+					organizationList = [];
+
+					organizationList.unshift({
+											organization_tag: 'all',
+											organization: 'ALL',
+										});
+
 
 				Beneficiaries.native(function(err, collection) {
 
@@ -2035,26 +2034,115 @@ var Cluster4wplusDashboardController = {
 						
 						if (err) return res.serverError(err);
 
-					
-							if (err) return res.serverError(err);
 
 							organizations=_.pluck(results,'_id')		
 							organizations.sort(function(a, b) {
-								//console.log(a.organization.localeCompare(b.organization), "LO QUE RETORNA");
 								return a.organization.localeCompare(b.organization);
 							});
-							organizations.unshift({
+							/*organizations.unshift({
 											organization_tag: 'all',
 											organization: 'ALL',
-										});
-							return res.json( 200, organizations );
+										});*/
+
+					     //	console.log("ORGANIZATIONS BENEFICIARIOS: ", organizations);
+
+                            
+                           
+						   organizations.forEach( function( d, i ) {
+
+							 		if(d.organization_tag){
+
+							 			const resultado = organizationList.find( org => org.organization_tag === d.organization_tag );
+
+							 			if(!resultado){
+
+							 				organizationList.push(d);
+
+							 			}
+								 			
+			                            
+										}
+									
+						    	});
+
+							//console.log("RESULTADO EN BENEFICIARIOS: ",organizationList);
 
 
 
-						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+
+
+							//NUEVO
+
+							BudgetProgress.native(function(err, collection) {
+						if (err) return res.serverError(err);
+					
+						collection.aggregate([
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group: {
+								_id: {organization_tag:'$organization_tag', organization:'$organization'}
+
+								}
+							}/*,
+							{
+								$group: {
+									_id: 1,
+									total: {
+									$sum: 1
+									}
+								}
+							}*/
+						]).toArray(function (err, results) {
+
+								if (err) return res.serverError(err);
+
+
+
+						   organizationsBudget=_.pluck(results,'_id')		
+							organizationsBudget.sort(function(a, b) {
+								return a.organization.localeCompare(b.organization);
+							});
+
+
+								   organizationsBudget.forEach( function( d, i ) {
+
+							 		if(d.organization_tag){
+
+							 			const resultado = organizationList.find( org => org.organization_tag === d.organization_tag );
+
+							 			if(!resultado){
+
+							 				organizationList.push(d);
+
+							 			}
+								 			
+			                            
+										}
+									
+						    	});
+                              
+                              
+
+
+							return res.json(200, organizationList);
+
+
+
+						});
+					});
+
 					});
 				});	
+
+
+
 			}else {	// count of organizations
+
+					//console.log("IMPRIME AQUI EN 2");
+
+					resultsFiltersOrganizations = [];
 
 					Beneficiaries.native(function(err, collection) {
 						if (err) return res.serverError(err);
@@ -2067,7 +2155,7 @@ var Cluster4wplusDashboardController = {
 								$group: {
 									_id: '$organization_tag'
 								}
-							},
+							}/*,
 							{
 								$group: {
 									_id: 1,
@@ -2075,18 +2163,68 @@ var Cluster4wplusDashboardController = {
 									$sum: 1
 									}
 								}
-							}
+							}*/
 						]).toArray(function (err, results) {
 
 
-							return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+							resultsFiltersOrganizations = results;
+						//	console.log("RESULTS EN 2: ",results);
+							//console.log("TOTAL ORGANIZATIONS en Beneficiarios: ",resultsFiltersOrganizations[0].total);
+
+
+							//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+						});
+					});	
+
+
+						BudgetProgress.native(function(err, collection) {
+						if (err) return res.serverError(err);
+					
+						collection.aggregate([
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group: {
+									_id: '$organization_tag'
+								}
+							}/*,
+							{
+								$group: {
+									_id: 1,
+									total: {
+									$sum: 1
+									}
+								}
+							}*/
+						]).toArray(function (err, results) {
+
+
+						   results.forEach( function( d, i ) {
+
+							 		if(d._id){
+
+							 			const resultado = resultsFiltersOrganizations.find( org => org._id === d._id );
+
+							 			if(!resultado){
+
+							 				resultsFiltersOrganizations.push(d);
+
+							 			}
+								 			
+			                            
+										}
+									
+						    	});
+			
+							return res.json(200, {'value': resultsFiltersOrganizations.length});
 						});
 					});	
 				}
 				
 				break;
 
-				case 'total_donors_4wplusdashboard':
+				/*case 'total_donors_4wplusdashboard':
 
 
 					Beneficiaries
@@ -2135,7 +2273,7 @@ var Cluster4wplusDashboardController = {
 					});
 				
 				
-				break;
+				break;*/
 
 		       case 'beneficiaries_4wplusdashboard':
 
@@ -2262,8 +2400,10 @@ var Cluster4wplusDashboardController = {
 				// count
 			case 'locations_4wplusDashboard':
 
+			 locationsTotal = [];
+
 			
-					Beneficiaries.native(function(err, collection) {
+			 Beneficiaries.native(function(err, collection) {
 					if (err) return res.serverError(err);
 				
 					collection.aggregate([
@@ -2279,7 +2419,7 @@ var Cluster4wplusDashboardController = {
 									site_name: '$site_name'
 								}
 							}
-						},
+						}/*,
 						{
 							$group: {
 								_id: 1,
@@ -2287,15 +2427,92 @@ var Cluster4wplusDashboardController = {
 								$sum: 1
 								}
 							}
-						}
+						}*/
 					]).toArray(function (err, results) {
 						if (err) return res.serverError(err);
 						//console.log(results, "RESULTADOS"); 
-					
 
-						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+
+
+
+						results.forEach(function(d,i){
+
+							const exist = locationsTotal.find(locat => (locat.site_lat === d.site_lat && locat.site_lng === d.site_lng));
+
+							if(!exist){
+
+								locationsTotal.push(d._id);
+							}
+
+						});
+
+						//console.log("UBICACIONES EN BENEFICIARIES", locationsTotal);
+
+
+				BudgetProgress.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						},
+						{
+							$group: {
+								_id: {
+									project_id: '$project_id',
+									admin2lat: '$admin2lat',
+									admin2lng: '$admin2lng',
+									admin1name: '$admin1name',
+									admin2name: '$admin2name'
+								}
+							}
+						}/*,
+						{
+							$group: {
+								_id: 1,
+								total: {
+								$sum: 1
+								}
+							}
+						}*/
+					]).toArray(function (err, resultsLocations) {
+
+					//	console.log("RESULTADOS BUDGETPRO: ",resultsLocations);
+
+						
+
+						resultsLocations.forEach(function(d,i){
+
+							const exist = locationsTotal.find(locati => (locati.site_lat === d._id.admin2lat && locati.site_lng === d._id.admin2lng));
+
+							if(!exist){
+
+								objlocat = {
+									
+									project_id: d._id.project_id,
+									site_lat: d._id.admin2lat,
+									site_lng: d._id.admin2lng,
+								    site_name: d._id.admin2name + ', '+d._id.admin1name
+
+
+								};
+
+
+								locationsTotal.push(objlocat);
+							}
+
+						});
+
+				//	console.log("UBICACIONES EN FINANCIERO", locationsTotal);
+
+				    return res.json(200, {'value': locationsTotal.length});
+
+						//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
-				});
+				  });
+			    });
+		     
+		     });
 
 				
 				break;	
