@@ -1945,6 +1945,9 @@ var Cluster4wplusDashboardController = {
 
 						if (err) return res.negotiate( err );
 
+						//console.log("RESULTADOS EN BENEFICIARIES: ",result);
+
+
 
 
 						result.forEach(function(d,i){
@@ -1961,12 +1964,47 @@ var Cluster4wplusDashboardController = {
 
 
 								});
+
+
+						BudgetProgress.find()
+			              .where( filters.default)
+			              .where( filters.adminRpcode)
+			              .where( filters.admin0pcode)
+			              .where( filters.admin1pcode)
+			              .where( filters.admin2pcode)
+			              .where( filters.organization_tag)
+			              .where( filters.hrp_plan)
+			              .where( filters.beneficiaries)
+			              .where( filters.cluster_id)
+			              .where( filters.activity_type)
+			              .where( filters.project_startDateNative)
+			              .where( filters.project_endDateNative)
+			              .exec( function(err, resultbud){
+
+			              	//console.log("RESULTADOS EN BUDGET: ",result);
+
+			              	if(err) return res.negotiate(err);
+
+
+			              	resultbud.forEach(function(d,i){
+
+			              		const exist = total_projects.find(proj => proj.project_id === d.project_id);
+
+			              		if(!exist){
+			              			total_projects.push(d);
+			              		}
+			              	});
+
+
+			              	return res.json(200,{'value':total_projects.length});
+
+			              });
 						
 
 
 					});
 
-			          BudgetProgress.find()
+			        /*  BudgetProgress.find()
 			              .where( filters.default)
 			              .where( filters.adminRpcode)
 			              .where( filters.admin0pcode)
@@ -1981,6 +2019,8 @@ var Cluster4wplusDashboardController = {
 			              .where( filters.project_endDateNative)
 			              .exec( function(err, result){
 
+			              	//console.log("RESULTADOS EN BUDGET: ",result);
+
 			              	if(err) return res.negotiate(err);
 
 
@@ -1989,14 +2029,16 @@ var Cluster4wplusDashboardController = {
 			              		const exist = total_projects.find(proj => proj.project_id === d.project_id);
 
 			              		if(!exist){
-			              			total_projects.push(d);
+			              			total_projects.push(d.project_id);
 			              		}
 			              	});
+
+			              	console.log("TOTAL PROYECTOS: ", total_projects);
 
 			              	return res.json(200,{'value':total_projects.length});
 
 			              });
-			              
+			              */
 				
 				break;
 
@@ -2153,7 +2195,7 @@ var Cluster4wplusDashboardController = {
 							},
 							{
 								$group: {
-									_id: '$organization_tag'
+									_id: {organization_tag:'$organization_tag', organization:'$organization'}
 								}
 							}/*,
 							{
@@ -2166,17 +2208,31 @@ var Cluster4wplusDashboardController = {
 							}*/
 						]).toArray(function (err, results) {
 
+							  organizations=_.pluck(results,'_id')		
+							organizations.sort(function(a, b) {
+								return a.organization.localeCompare(b.organization);
+							});
 
-							resultsFiltersOrganizations = results;
+							organizations.forEach(function(d,i){
+
+								const exist = resultsFiltersOrganizations.find(orgbenef => orgbenef.organization === d.organization)
+
+								if(!exist){
+
+									resultsFiltersOrganizations.push(d);
+
+
+								}
+
+							});
+
 						//	console.log("RESULTS EN 2: ",results);
 							//console.log("TOTAL ORGANIZATIONS en Beneficiarios: ",resultsFiltersOrganizations[0].total);
 
 
 							//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
-						});
-					});	
 
-
+							
 						BudgetProgress.native(function(err, collection) {
 						if (err) return res.serverError(err);
 					
@@ -2186,7 +2242,7 @@ var Cluster4wplusDashboardController = {
 							},
 							{
 								$group: {
-									_id: '$organization_tag'
+									_id: {organization_tag:'$organization_tag', organization:'$organization'}
 								}
 							}/*,
 							{
@@ -2199,12 +2255,17 @@ var Cluster4wplusDashboardController = {
 							}*/
 						]).toArray(function (err, results) {
 
+							organizationsBudget=_.pluck(results,'_id')		
+							organizationsBudget.sort(function(a, b) {
+								return a.organization.localeCompare(b.organization);
+							});
 
-						   results.forEach( function( d, i ) {
 
-							 		if(d._id){
+						   organizationsBudget.forEach( function( d, i ) {
 
-							 			const resultado = resultsFiltersOrganizations.find( org => org._id === d._id );
+							 		
+
+							 			const resultado = resultsFiltersOrganizations.find( org => org.organization === d.organization );
 
 							 			if(!resultado){
 
@@ -2213,13 +2274,17 @@ var Cluster4wplusDashboardController = {
 							 			}
 								 			
 			                            
-										}
+								
 									
 						    	});
 			
 							return res.json(200, {'value': resultsFiltersOrganizations.length});
 						});
 					});	
+						});
+					});	
+
+
 				}
 				
 				break;
@@ -2522,7 +2587,7 @@ var Cluster4wplusDashboardController = {
 			case 'markers4wplusDasbhboard':
 					
 				// params
-				var locations = [],
+				var locationsMarkTotal = [],
 					markers = {},
 					counter = 0,
 					length = 0;
@@ -2561,16 +2626,117 @@ var Cluster4wplusDashboardController = {
 									}
 								  }
 								}
-							]).toArray(function (err, locations) {
+							]).toArray(function (err, results) {
 							  	if (err) return res.serverError(err);
-							
-								// return no locations
-								if ( !locations.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:4.5973254, lng:-74.0759398, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
+
+
+							  	results.forEach(function(d,i){
+
+							const exist = locationsMarkTotal.find(locat => (locat._id.site_lat === d.site_lat && locat._id.site_lng === d.site_lng));
+
+							if(!exist){
+
+								locationsMarkTotal.push(d);
+							}
+
+						});
+
+
+
+					BudgetProgress.native(function(err, collection) {
+
+							if (err) return res.serverError(err);
+						
+							collection.aggregate([
+								{ 
+									$match : filterObject 
+								},
+								{
+									$group: {
+										_id: {
+											project_id: '$project_id',
+											admin2lat: '$admin2lat',
+											admin2lng: '$admin2lng',
+											admin1name: '$admin1name',
+											admin2name: '$admin2name',
+											cluster:'$cluster',
+												organization:'$organization',
+												hrp_plan: '$hrp_plan',
+												project_title:'$project_title',
+												admin0name:'$admin0name',
+												admin3name:'$admin3name',
+												admin4name:'$admin4name',
+												admin5name:'$admin5name',
+												cluster_id:'$cluster_id',
+												site_type_name:'$site_type_name',
+												name:'$name',
+												position:'$position',
+												phone:'$phone', 
+												email:'$email'
+										}
+									}
+								}/*,
+								{
+									$group: {
+										_id: 1,
+										total: {
+										$sum: 1
+										}
+									}
+								}*/
+							]).toArray( function (err, resultsLocations) {
+
+							   //	console.log("RESULTADOS BUDGETPRO: ",resultsLocations);
+
+						
+
+						    	resultsLocations.forEach(function(d,i){
+	 
+								const exist = locationsMarkTotal.find(locati => (locati._id.site_lat === d._id.admin2lat && locati._id.site_lng === d._id.admin2lng));
+
+								if(!exist){
+
+
+
+									d._id = {
+										
+										project_id: d._id.project_id,
+										site_lat: d._id.admin2lat,
+										site_lng: d._id.admin2lng,
+									    site_name: d._id.admin2name + ', '+d._id.admin1name,
+										admin1name: d._id.admin1name,
+										admin2name: d._id.admin2name,
+										cluster: d._id.cluster,
+											organization: d._id.organization,
+											hrp_plan: d._id.hrp_plan,
+											project_title: d._id.project_title,
+											admin0name: d._id.admin0name,
+											admin3name: d._id.admin3name,
+											admin4name: d._id.admin4name,
+											admin5name: d._id.admin5name,
+											cluster_id: d._id.cluster_id,
+											site_type_name: "Múltiples Sitios",
+											name: d._id.name,
+											position:d._id.position,
+											phone:d._id.phone, 
+											email: d._id.email
+
+									};
+
+									locationsMarkTotal.push(d);
+								}
+
+						    	});
+
+
+					    	 // return no locations
+								if ( !locationsMarkTotal.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:4.5973254, lng:-74.0759398, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
 
 								// length
-								length = locations.length;
+								length = locationsMarkTotal.length;
+
 								// foreach location
-								locations.forEach( function( d, i ){
+								locationsMarkTotal.forEach( function( d, i ){
 
 									// popup message
 									var message = '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">' + d._id.cluster + '</h5>'
@@ -2617,15 +2783,17 @@ var Cluster4wplusDashboardController = {
 									}
 
 								});
+							});
+                      }); // close BudgetProgress
+                    }); 
+                 }); //close beneficiaries
 
-								});
-				});
-
-				break;
-
-
+				        
+				      
+                break;
 				
 				default: 
+
 					return res.json( 200, { value:0 });
 					break;
 
