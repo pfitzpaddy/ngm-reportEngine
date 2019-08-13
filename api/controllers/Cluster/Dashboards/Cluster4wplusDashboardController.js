@@ -50,11 +50,11 @@ var Cluster4wplusDashboardController = {
 		return {
 			csv: req.param('csv') ? req.param('csv') : false,
 			ocha: req.param('ocha') ? req.param('ocha') : false,
-			list: req.param('list') ? req.param('list') : false,
+			list: req.param('list') ? req.param('list') : false, 
 			indicator: req.param('indicator'),
 			cluster_id: req.param('cluster_id'),
 			cluster_ids: req.param('cluster_ids') ? req.param('cluster_ids') : [req.param('cluster_id')],
-			//activity_type_id: req.param( 'activity_type_id' ) ? req.param( 'activity_type_id' ) : 'all',
+			activity_type_id: req.param( 'activity_type_id' ) ? req.param( 'activity_type_id' ) : 'all',
 			adminRpcode: req.param('adminRpcode'),
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
@@ -96,7 +96,7 @@ var Cluster4wplusDashboardController = {
 			                      ?{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
 			                     : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			                   
-			//activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
+			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
 			//beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
@@ -174,9 +174,7 @@ var Cluster4wplusDashboardController = {
 										filters.admin1pcode_Native,
 										filters.admin2pcode_Native,
 										//filters.is_cluster_ids_array ? filters.cluster_ids_Native : filters.cluster_id_Native,
-										//filters.activity_type_id,
-										//filters.activity_type, //para filtrar por activity_type
-										//filters.activity_typeNative,
+										filters.activity_type_id,
 										filters.is_cluster_ids_array ? filters.cluster_id : filters.cluster_id_Native,
 										//filters.cluster_id,
 										filters.acbar_partners,
@@ -202,7 +200,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
-					//.where( filters.activity_type_id )
+					.where( filters.activity_type_id )
 					//.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
@@ -1918,13 +1916,98 @@ var Cluster4wplusDashboardController = {
 										
 				break;*/
 
-				//4wDASHBOARDprojectplan
+				//4wDASHBOARDplus
+
+
+				//activities activity_type
+
+				case 'activities_activity_type':
+
+
+				activities = [];
+
+				if(filters.cluster_id === 'all'){
+
+					Activities
+					.find()
+					.where( filters.default )
+					.where( filters.admin0pcode )
+			
+					.exec( function( err, result ){
+
+
+						if (err) return res.negotiate( err );
+
+						//console.log("RESULTADOS EN BENEFICIARIES: ",result);
+
+						result.forEach(function(d,i){
+
+							exist = activities.find(act => act.activity_type_id === d.activity_type_id);
+
+							if(!exist){
+								activities.push(d);
+							}
+
+
+
+						});
+
+
+						//console.log("TOTAL ACTIVIDADES SIN CLUSTER",activities.length);
+
+					return res.json(200, { 'data': activities } );
+					});
+
+
+				}else{
+
+
+
+		         	Activities
+					.find()
+					.where( filters.default )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id)
+					//.where( filters.activity_type)
+			
+					.exec( function( err, result ){
+
+
+						if (err) return res.negotiate( err );
+
+						//console.log("RESULTADOS EN BENEFICIARIES: ",result);
+
+
+                        result.forEach(function(d,i){
+
+							exist = activities.find(act => act.activity_type_id === d.activity_type_id);
+
+							if(!exist){
+								activities.push(d);
+							}
+
+
+
+						});
+
+						//console.log("TOTAL ACTIVIDADES",activities.length);
+
+											return res.json(200, { 'data': activities } );
+
+					});
+				};
+
+				
+				break;
+
+
 
 				case 'projects_4wplusdashboard':
 
 
 
 					total_projects = [];
+
 
 		         	Beneficiaries
 					.find()
@@ -1937,7 +2020,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.hrp_plan)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
-					.where( filters.activity_type)
+					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
 					.exec( function( err, result ){
@@ -1976,7 +2059,7 @@ var Cluster4wplusDashboardController = {
 			              .where( filters.hrp_plan)
 			              .where( filters.beneficiaries)
 			              .where( filters.cluster_id)
-			              .where( filters.activity_type)
+			              .where( filters.activity_type_id)
 			              .where( filters.project_startDateNative)
 			              .where( filters.project_endDateNative)
 			              .exec( function(err, resultbud){
@@ -1994,6 +2077,7 @@ var Cluster4wplusDashboardController = {
 			              			total_projects.push(d);
 			              		}
 			              	});
+
 
 
 			              	return res.json(200,{'value':total_projects.length});
@@ -2419,6 +2503,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.hrp_plan)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
+					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
 					.exec( function( err, results ) {
