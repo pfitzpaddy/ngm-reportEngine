@@ -3425,6 +3425,7 @@ var Cluster4wplusDashboardController = {
 											var TotalAge_18_59 = $beneficiaries.age_18_59;
 											var TotalAge_60_more = $beneficiaries.age_60_more;
 
+
 											var TotalAges = TotalAge_6_11 + TotalAge_0_5 +TotalAge_12_17 +  TotalAge_18_59 + TotalAge_60_more;
 
 											var age_0_5PerCent = ($beneficiaries.age_0_5 / (TotalAges))*100;
@@ -3469,7 +3470,7 @@ var Cluster4wplusDashboardController = {
 											result.data[2].label = $beneficiaries.age_12_17+ ' - '+ age_12_17PerCent ;
 											result.data[2].color = 'red';
 
-											result.data[3].y = Totalge_18_59;
+											result.data[3].y = TotalAge_18_59;
 											//result.data[3].y = 12034;
 
 											result.data[3].label = $beneficiaries.age_18_59+ ' - '+ age_18_59PerCent ;
@@ -3669,20 +3670,28 @@ var Cluster4wplusDashboardController = {
 							results.aggregate([
 								{
 									$match : filterObject
-								},
+								}/*, 
+						{
+							$group: {
+								_id: '$project_id'
+							}
+						},
 								{
 									$group: {
 									
-										health: {'cluster_id':'health'},count: { $sum: 1 },
-										protection: {'cluster_id':'protection'},count: { $sum: 1 }
+										//health: {'cluster_id':'health'},count: { $sum: 1 },
+										//protection: {'cluster_id':'protection'},count: { $sum: 1 }
+										_id: {cluster_id:"$cluster_id"}
 
 										//health: {cluster_id: 'health'},
 										//protection: {cluster_id:'protection'}
 										//_id: {organization_tag:'$organization_tag', organization:'$organization'}
-									}
 
 
-								}/*,
+
+								}
+							}*//*,
+							
 							{
 								$group: {
 									_id: 1,
@@ -3694,7 +3703,28 @@ var Cluster4wplusDashboardController = {
 							]).toArray(function (err, beneficiaries) {
 								if (err) return res.serverError(err);	
 
-									console.log("_ID CLUSTER: ",beneficiaries)	;						
+									//console.log("CLUSTERS: ",beneficiaries)	;
+
+									var health=[];
+									var healthTotalBene=0;
+									var wash = [];
+
+								beneficiaries.forEach(function(d,i){
+
+									if(d.cluster_id === 'protection'){
+
+										//education.push(d);
+
+									}
+									else if(d.cluster_id === 'health'){
+										wash.push(d);
+										healthTotalBene += d.total_beneficiaries;
+										}	
+								});
+
+								//console.log("Educación: ", education.length);		
+								console.log("Wash: ", wash.length);
+								console.log("total HEALTH: ", healthTotalBene);	
 
 
 
