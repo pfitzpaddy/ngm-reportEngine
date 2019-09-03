@@ -131,7 +131,7 @@ module.exports = {
 		comments: {
 			type: 'string'
 		},
-
+ 
 		// project
 		project_acbar_partner: {
 			type: 'boolean'
@@ -140,9 +140,35 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		hrp_plan:{
+			//Response components COL
+
+		humanitarian_component:{
+			type:'boolean'
+		},
+
+		construccion_de_paz_component:{
+			type:'boolean'
+		},
+
+		desarrollo_sostenible_component:{
+			type:'boolean'
+		},
+
+		flujos_migratorios_component:{
+			type:'boolean'
+		},
+
+		//plan hrp/rmrp/undaf COL
+		hrp_plan: {
 			type: 'boolean'
 		},
+		rmrp_plan: {
+			type: 'boolean'
+		},
+		interagencial_plan: {
+			type: 'boolean'
+		},
+
 		project_code: {
 			type: 'string'
 		},
@@ -185,6 +211,9 @@ module.exports = {
 			type: 'string'
 		},
 		inter_cluster_activities: {
+			type: 'array'
+		},
+		implementing_partners: {
 			type: 'array'
 		},
 

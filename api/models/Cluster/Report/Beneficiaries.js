@@ -82,16 +82,43 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		project_acbar_partner: {
+		project_acbar_partner: { 
 			type: 'boolean'
 		},
 		project_hrp_code: {
 			type: 'string',
 			required: true
 		},
-		hrp_plan:{
-            type: 'boolean',
+
+		//Response components COL
+
+		humanitarian_component:{ 
+			type:'boolean'
 		},
+
+		construccion_de_paz_component:{
+			type:'boolean'
+		},
+
+		desarrollo_sostenible_component:{
+			type:'boolean'
+		},
+
+		flujos_migratorios_component:{
+			type:'boolean'
+		},
+
+		//plan hrp/rmrp/undaf COL
+		hrp_plan: {
+			type: 'boolean'
+		},
+		rmrp_plan: {
+			type: 'boolean'
+		},
+		interagencial_plan: {
+			type: 'boolean'
+		},
+
 
 		project_code: {
 			type: 'string'
