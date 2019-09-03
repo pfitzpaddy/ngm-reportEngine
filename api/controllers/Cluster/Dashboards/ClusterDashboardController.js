@@ -1644,7 +1644,8 @@ var ClusterDashboardController = {
 															+ '<div style="text-align:center">' + d._id.name + '</div>'
 															+ '<div style="text-align:center">' + d._id.position + '</div>'
 															+ '<div style="text-align:center">' + d._id.phone + '</div>'
-															+ '<div style="text-align:center">' + d._id.email + '</div>';
+															+ '<div style="text-align:center">' + d._id.email + '</div>'
+															+ '<div align="center" style="margin-top:10px;"><a style="color:#fff;height: 30px;line-height: 30px;" class="btn" href="#/cluster/projects/summary/' + d._id.project_id +'" target="_blank">'+'Go to Project</a></div>';
 
 									// create markers
 									markers[ 'marker' + counter ] = {

@@ -615,7 +615,13 @@ var ProjectController = {
       // ASYNC REQUEST 3
       // async loop target_locations
       async.eachOf( target_locations, function ( d, il, next ) {
-        var t_location = _under.extend( {}, d, project_copy );
+        var t_location = _under.extend( {}, d, project_copy, {
+          name: d.name,
+          position: d.position,
+          phone: d.phone,
+          email: d.email,
+          username: d.username
+        } );
         TargetLocation.updateOrCreate( findProject, { id: t_location.id }, t_location ).exec(function( err, result ){
           project_update.target_locations[il] = ProjectController.set_result( result );
           next();
