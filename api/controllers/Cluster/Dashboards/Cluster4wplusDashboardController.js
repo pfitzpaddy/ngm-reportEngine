@@ -38,12 +38,13 @@ var Cluster4wplusDashboardController = {
 					!req.param('admin0pcode') ||
 					!req.param('organization_tag') ||
 					!req.param('hrpplan')||
+					!req.param('implementer')||
 					!req.param('admin1pcode') ||
 					!req.param('admin2pcode') ||
 					//!req.param('beneficiaries') ||
 					!req.param('start_date') ||
 					!req.param('end_date') ) {
-			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, hrpplan, admin1pcode, admin2pcode, start_date, end_date required!'});
+			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, hrpplan, implementer, admin1pcode, admin2pcode, start_date, end_date required!'});
 		}
 
 		// return params
@@ -59,6 +60,7 @@ var Cluster4wplusDashboardController = {
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
 			hrpplan: req.param('hrpplan'),
+			implementer: req.param('implementer'),
 			admin1pcode: req.param('admin1pcode'),
 			admin2pcode: req.param('admin2pcode'),
 			//beneficiaries: req.param('beneficiaries'),
@@ -86,6 +88,12 @@ var Cluster4wplusDashboardController = {
 			                  : (params.hrpplan === 'true')
 			                   ? { hrp_plan: true}
 			                   : { hrp_plan: false},
+
+	        implementer_tag: (params.implementer === 'all')
+	                            ? {}
+	                           : {implementing_partners : [{'organization_tag':params.implementer}]},
+	                           //: {implementing_partners: {$elemMatch:{'organization_tag':params.implementer} } },
+	         
 
 			cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
@@ -121,6 +129,11 @@ var Cluster4wplusDashboardController = {
 			                  : (params.hrpplan === 'true')
 			                   ? { hrp_plan: true}
 			                   : { hrp_plan: false},
+
+			implementer_tagNative: (params.implementer === 'all')
+	                            ? {}
+	                           : {implementing_partners : [{'organization_tag':params.implementer}]},
+	                           //: {implementing_partners: {$elemMatch:{'organization_tag':params.implementer} } },
 
 
 			cluster_id_Native: ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
@@ -180,6 +193,7 @@ var Cluster4wplusDashboardController = {
 										filters.acbar_partners,
 										filters.organization_tag_Native,
 										filters.hrp_plan_Native,
+										filters.implementer_tagNative,
 										//filters.beneficiaries,
 										//filters.date_Native,
 										filters.project_startDateNative,
@@ -1921,7 +1935,74 @@ var Cluster4wplusDashboardController = {
 
 				//activities activity_type
 
+				case 'implementing_partners':
+          
+                 //  console.log("FILTROS IMPLEMENTING PARERS:" ,filters);
+                 //  console.log("FILTEROBJECT", filterObject );
+
+				
+					Beneficiaries
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.admin1pcode )
+					.where( filters.admin2pcode )
+					.where( filters.organization_tag )
+					.where( filters.hrp_plan)
+					.where( filters.beneficiaries )
+					.where( filters.cluster_id)
+					.where( filters.activity_type_id)
+					.where( filters.project_startDateNative )
+					.where( filters.project_endDateNative)
+					.exec( function( err, results ) {
+						if (err) return res.serverError(err);
+
+						var imppartners = [];
+
+					  
+
+					if(results.length){
+
+						console.log("RESULTADOS: ",results);
+
+						results.forEach( function( d, i ) {
+
+							if(results[i].implementing_partners){
+
+								 results[i].implementing_partners.forEach(function (d, j){
+
+
+	                             const resultado = imppartners.find( implementer => implementer.organization_tag === results[i].implementing_partners[j].organization_tag );
+
+	                             if(!resultado){
+	                             	imppartners.push(results[i].implementing_partners[j]);
+	                             }
+	                            
+
+								});
+
+							}
+
+						
+                         
+
+
+						});
+					}
+
+
+						return res.json( 200, { 'data': imppartners } );
+					});
+				
+
+
+				break;
+
+
 				case 'activities_activity_type':
+
+
 
 
 				activities = [];
