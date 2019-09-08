@@ -52,7 +52,7 @@ module.exports = {
 				if(org.length){
 					org.forEach(function (d, i) {
 						// if not existing											
-							organizations.push({ organization_tag: d.organization_tag, organization: d.organization});			
+							organizations.push({ organization_tag: d.organization_tag, organization_name: d.organization_name, organization: d.organization });
 					});
 					distinct = _.uniq(organizations, function (x) {
 															return x.organization_tag
