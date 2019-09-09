@@ -44,6 +44,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+		organization_name: {
+			type: 'string',
+			required: true
+		},
 		// implementing partners
 		implementing_partners_checked: {
 			type: 'boolean',
