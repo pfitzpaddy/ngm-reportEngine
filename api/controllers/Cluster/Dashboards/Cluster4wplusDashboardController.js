@@ -99,7 +99,7 @@ var Cluster4wplusDashboardController = {
 
 	        donor_tag: (params.donor === 'all')
 	                            ? {}
-	                             : { $or : [ { project_donor_id: params.project_donor_id}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
+	                             : { $or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
 	                          // : { project_donor_id : { $elemMatch : { 'project_donor_id' : params.donor} } },
 
 
@@ -139,7 +139,7 @@ var Cluster4wplusDashboardController = {
 
 	        donor_tagNative: ( params.donor === 'all')
 	                            ? {}
-	                            : { $or : [ { project_donor_id: params.project_donor_id}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
+	                            : { $or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
 
 	                          // : { project_donor_id : { $elemMatch : { 'project_donor_id' : params.donor} } },
 
@@ -202,7 +202,9 @@ var Cluster4wplusDashboardController = {
 										//filters.cluster_id,
 
 
- )
+           );
+		console.log("FILTROS: ",filters);
+		console.log("FILTEROBJECT: ", filterObject);
 
 		// switch on indicator
 		switch( params.indicator ) {
@@ -223,7 +225,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
 					.where( filters.implementer_tag)
-					.where( filters.donort_tag)
+					.where( filters.donor_tag)
 					//.where( filters.beneficiaries )
 					.where( filters.date )
 					.sort( 'updatedAt DESC' )
@@ -1943,7 +1945,7 @@ var Cluster4wplusDashboardController = {
 
 				case 'implementing_partners':
           
-                   console.log("FILTROS IMPLEMENTING PARERS:" ,filters);
+                   //console.log("FILTROS IMPLEMENTING PARERS:" ,filters);
                    //console.log("FILTEROBJECT", filterObject );
                  var imppartners = [];
                  imppartners.unshift({
@@ -1965,7 +1967,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
 					.where( filters.implementer_tag)
-					.where( filters.donors_tag)
+					.where( filters.donor_tag)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
@@ -2001,6 +2003,9 @@ var Cluster4wplusDashboardController = {
 							}
                         
 						});
+
+						var partben = imppartners;
+						//console.log("PARTNERS EN BENEF: ", partben);
 					}
 
 					BudgetProgress
@@ -2013,6 +2018,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
 					.where( filters.implementer_tag)
+					.where( filters.donor_tag)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
@@ -2071,7 +2077,7 @@ var Cluster4wplusDashboardController = {
                  var donorslist = [];
                  donorslist.unshift({
 								project_donor_id : 'all',
-						   		porject_donor_name: 'All',
+						   		porject_donor_name: 'ALL',
 						   		
 								});
 				
@@ -2123,6 +2129,8 @@ var Cluster4wplusDashboardController = {
 						});
 					}
 
+					console.log("FILTROS: ", filters);
+
 					BudgetProgress
 					.find()
 					.where( filters.default )
@@ -2133,9 +2141,10 @@ var Cluster4wplusDashboardController = {
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
 					.where( filters.implementer_tag)
-					.where( filters.donor_tag)
+					
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
+					.where( filters.donor_tag)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
@@ -2151,28 +2160,34 @@ var Cluster4wplusDashboardController = {
 
 						result.forEach( function( d, i ) {
 
-							if(result[i].project_donor){
+							//if(result[i].project_donor){
 
-								 result[i].project_donor.forEach(function (d, j){
+								/// result[i].project_donor.forEach(function (d, j){
 
 								 //	console.log("imple: ",results[i].implementing_partners[j]);
 
 								 //	if(results[i].implementing_partners[j]){
 
-								 		const resultado = donorslist.find( donor => donor.project_donor === result[i].project_donor[j].project_donor_id );
+								 		const resultado = donorslist.find( donor => donor.project_donor_id === d.project_donor_id );
 
 			                             if(!resultado){
+
+			                             	var donortoadd = {
+			                             		'project_donor_id':d.project_donor_id,
+			                             		'project_donor_name':d.project_donor_name
+			                             	}
 			                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
-			                             	donorslist.push(result[i].project_donor[j]);
+			                             	donorslist.push(donortoadd);
 			                             }
 
 								 //	}
 
-								});
+							//	});
 
-							}
+							//}
                         
 						});
+
 					  }
 					  return res.json( 200, { 'data': donorslist } );
 
@@ -2286,7 +2301,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
 					.where( filters.implementer_tag)
-					.where( filters.donort_tag)
+					.where( filters.donor_tag)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
@@ -2811,6 +2826,8 @@ var Cluster4wplusDashboardController = {
 
 
 						});
+					   var partners =	imppartners;
+					  // console.log("TOTAL PARTNERS EN BENEF: ", partners.length);
 					}
 
 
