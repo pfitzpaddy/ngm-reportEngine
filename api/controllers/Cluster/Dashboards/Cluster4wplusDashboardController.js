@@ -37,6 +37,7 @@ var Cluster4wplusDashboardController = {
 					!req.param('adminRpcode') ||
 					!req.param('admin0pcode') ||
 					!req.param('organization_tag') ||
+					!req.param('project_type_component') ||
 					!req.param('hrpplan')||
 					!req.param('implementer')||
 					!req.param('donor')||
@@ -60,6 +61,7 @@ var Cluster4wplusDashboardController = {
 			adminRpcode: req.param('adminRpcode'),
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
+			project_type_component: req.param('project_type_component'),
 			hrpplan: req.param('hrpplan'),
 			implementer: req.param('implementer'),
 			donor: req.param('donor'),
@@ -90,27 +92,32 @@ var Cluster4wplusDashboardController = {
 			                  : (params.hrpplan === 'true')
 			                   ? { hrp_plan: true}
 			                   : { hrp_plan: false},
+			clusterid:  ( params.cluster_id === 'all' ) 
+								? {} 
+								//: ( params.cluster_id !== 'cvwg' )
+									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
+									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
+			                    :{cluster_id:params.cluster_id},
+			                    //: { or :[{cluster_id:params.cluster_id},{ 'inter_cluster_activities.cluster_id':params.cluster_id } ] } ,
 
-	        implementer_tag: (params.implementer === 'all')
+			                    // ?{ cluster_id:params.cluster_id}
+			                    // : { inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
+
+			 implementer_tag: (params.implementer === 'all')
 	                            ? {}
 	                           //: {implementing_partners : [{'organization_tag':params.implementer}]},
 	                          // : {implementing_partners : {'organization_tag': {$all:[params.implementer]}}},
 	                           : {implementing_partners: { $elemMatch:{'organization_tag':params.implementer} } },
 
 	        donor_tag: (params.donor === 'all')
-	                            ? {}
-	                             : { $or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
-	                          // : { project_donor_id : { $elemMatch : { 'project_donor_id' : params.donor} } },
+	                        ? {}
+	                        : { or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
+	                      /*  : { project_donor_id: params.donor}
 
-
-			cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
-								? {} 
-								: ( params.cluster_id !== 'cvwg' )
-									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
-									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
-			                          // ?{cluster_id:params.cluster_id}
-			                      ?{ $or :[{cluster_id:params.cluster_id},{ inter_cluster_activities: { $elemMatch:{'cluster_id':params.cluster_id}}}]}
-			                     : { inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
+	                        ? { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},*/
+	        project_type: (params.project_type_component === 'all')
+	                       ? {}
+	                       : { or: [{ hrp_plan: params.project_type_component },{ interagencial_plan:params.project_type_component },{rmrp_plan: params.project_type_component}]}, 
 			                   
 			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
@@ -132,24 +139,39 @@ var Cluster4wplusDashboardController = {
 			                   ? { hrp_plan: true}
 			                   : { hrp_plan: false},
 
+			
+
+			clusterid_Native: ( params.cluster_id === 'all' ) 
+								
+								? {} 
+							   // : ( params.cluster_id !== 'cvwg' )
+									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
+									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
+			                     :{cluster_id:params.cluster_id},
+			                    // : { $or :[{ cluster_id:params.cluster_id},{ inter_cluster_activities : { $elemMatch:{cluster_id:params.cluster_id}}}]} ,
+			                    // : { $or :[{ cluster_id:params.cluster_id},{ 'inter_cluster_activities.cluster_id':params.cluster_id}]} ,
+
+
+			                     //?{ cluster_id:params.cluster_id}
+			                    // : { inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
+
 			implementer_tagNative: ( params.implementer === 'all')
 	                            ? {}
 	                     
 	                           : { implementing_partners: { $elemMatch: { 'organization_tag' : params.implementer} }},
 
 	        donor_tagNative: ( params.donor === 'all')
-	                            ? {}
-	                            : { $or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
+	                         ? {}
+	                        : { $or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
+	                        /*:  { project_donor_id: params.donor}
 
-	                          // : { project_donor_id : { $elemMatch : { 'project_donor_id' : params.donor} } },
+	                        ?{ project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},*/
+			
+			   project_typeNative : (params.project_type_component === 'all')
+	                       ? {}
+	                       : { $or: [{ 'hrp_plan': params.project_type_component },{ 'interagencial_plan':params.project_type_component },{'rmrp_plan': params.project_type_component}]}, 
+			                   
 
-			cluster_id_Native: ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
-								
-								? {} 
-							    : ( params.cluster_id !== 'cvwg' )
-								? { $or : [{ cluster_id:params.cluster_id } , { inter_cluster_activities : { $elemMatch : { 'cluster_id' : params.cluster_id}}}]}
-			                  : { inter_cluster_activities : { $elemMatch : { 'cluster_id':params.cluster_id }}},
-			                     
 			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') ) 
 								? {} 
 								: ( params.cluster_ids.includes('cvwg') )
@@ -185,11 +207,12 @@ var Cluster4wplusDashboardController = {
 										filters.admin1pcode_Native,
 										filters.admin2pcode_Native,
 										filters.activity_type_id,
-										filters.is_cluster_ids_array ? filters.cluster_id : filters.cluster_id_Native,
-										//filters.cluster_id,
+										filters.clusterid_Native,
+										//filters.is_cluster_ids_array ? filters.cluster_id : filters.cluster_id_Native,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
 										filters.hrp_plan_Native,
+										filters.project_typeNative,
 										filters.implementer_tagNative,
 										filters.donor_tagNative,
 										//filters.beneficiaries,
@@ -203,8 +226,8 @@ var Cluster4wplusDashboardController = {
 
 
            );
-		console.log("FILTROS: ",filters);
-		console.log("FILTEROBJECT: ", filterObject);
+		//console.log("FILTROS: ",filters);
+		//console.log("FILTEROBJECT: ", filterObject);
 
 		// switch on indicator
 		switch( params.indicator ) {
@@ -220,10 +243,11 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin0pcode )
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
+					.where( filters.clusterid )
 					.where( filters.activity_type_id )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
+					.where( filters.project_type)
 					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
 					//.where( filters.beneficiaries )
@@ -1948,14 +1972,14 @@ var Cluster4wplusDashboardController = {
                    //console.log("FILTROS IMPLEMENTING PARERS:" ,filters);
                    //console.log("FILTEROBJECT", filterObject );
                  var imppartners = [];
-                 imppartners.unshift({
+                /* imppartners.unshift({
 												id : 'all',
 						   		organization_tag: 'all',
 						   		organization: 'ALL',
 						   		organization_type:'all',
 						   		admin0pcode:'COL',
 						   		organization_name : "ALL"
-										});
+										});*/
 				
 					Beneficiaries
 					.find()
@@ -1966,10 +1990,11 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
+					.where( filters.project_type)
+					.where( filters.beneficiaries )
+					.where( filters.clusterid)
 					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
@@ -1986,15 +2011,18 @@ var Cluster4wplusDashboardController = {
 
 						results.forEach( function( d, i ) {
 
-							if(results[i].implementing_partners){
+							if(d.implementing_partners){
 
-								 results[i].implementing_partners.forEach(function (d, j){
+								 d.implementing_partners.forEach(function (partner, j){
+								 	//console.log("RESULTS EN BENEF: ", partner);
 
 
-	                             const resultado = imppartners.find( implementer => implementer.organization_tag === results[i].implementing_partners[j].organization_tag );
+	                             const resultado = imppartners.find( implementer => implementer.organization_tag === partner.organization_tag );
 
 	                             if(!resultado){
-	                             	imppartners.push(results[i].implementing_partners[j]);
+	                             	imppartners.push(partner);
+	                             	//console.log("RESULTS EN BENEF: ", partner);
+	                             	console.log("PROYECTO en BENEF: ", d.project_id);
 	                             }
 	                            
 
@@ -2017,10 +2045,11 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
+					.where( filters.project_type)
+					.where( filters.beneficiaries )
+					.where( filters.clusterid)
 					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
@@ -2036,9 +2065,11 @@ var Cluster4wplusDashboardController = {
 
 						result.forEach( function( d, i ) {
 
-							if(result[i].implementing_partners){
+							/*if(result[i].implementing_partners){
 
 								 result[i].implementing_partners.forEach(function (d, j){
+
+
 
 								 //	console.log("imple: ",results[i].implementing_partners[j]);
 
@@ -2048,13 +2079,30 @@ var Cluster4wplusDashboardController = {
 
 			                             if(!resultado){
 			                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
+			                             	console.log("RESULTS EN BUDGETPROGREs: ", result[i].implementing_partners[j]);
+
 			                             	imppartners.push(result[i].implementing_partners[j]);
+
 			                             }
 
 								 //	}
 
 								});
 
+							}*/
+							if(d.implementing_partners){
+
+								d.implementing_partners.forEach(function(partner,j){
+									if(partner){
+										const resultado = imppartners.find( implementer => implementer.organization_tag === partner.organization_tag);
+
+										if (!resultado){
+											//console.log("RESULTS en BUDGETPROGRESS: ", partner);
+											imppartners.push(partner);
+											console.log("PROJECT EN BUDGET: ", d.project_id);
+										}
+									}
+								})
 							}
                         
 						});
@@ -2075,11 +2123,11 @@ var Cluster4wplusDashboardController = {
 				case 'project_donors':
 
                  var donorslist = [];
-                 donorslist.unshift({
+                /* donorslist.unshift({
 								project_donor_id : 'all',
 						   		porject_donor_name: 'ALL',
 						   		
-								});
+								});*/
 				
 					Beneficiaries
 					.find()
@@ -2090,10 +2138,11 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
+					.where( filters.project_type)
+					.where( filters.beneficiaries )
+					.where( filters.clusterid)
 					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
@@ -2129,7 +2178,7 @@ var Cluster4wplusDashboardController = {
 						});
 					}
 
-					console.log("FILTROS: ", filters);
+					//console.log("FILTROS: ", filters);
 
 					BudgetProgress
 					.find()
@@ -2140,10 +2189,10 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
-					.where( filters.implementer_tag)
-					
+					.where( filters.project_type)
 					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
+					.where( filters.clusterid)
+					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
@@ -2208,7 +2257,7 @@ var Cluster4wplusDashboardController = {
 
 				activities = [];
 
-				if(filters.cluster_id === 'all'){
+				if(filters.clusterid === 'all'){
 
 					Activities
 					.find()
@@ -2249,7 +2298,7 @@ var Cluster4wplusDashboardController = {
 					.find()
 					.where( filters.default )
 					.where( filters.admin0pcode )
-					.where( filters.cluster_id)
+					.where( filters.clusterid)
 					//.where( filters.activity_type)
 			
 					.exec( function( err, result ){
@@ -2300,10 +2349,11 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
+					.where( filters.project_type)
+					.where( filters.beneficiaries )
+					.where( filters.clusterid)
 					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
@@ -2341,10 +2391,11 @@ var Cluster4wplusDashboardController = {
 			              .where( filters.admin2pcode)
 			              .where( filters.organization_tag)
 			              .where( filters.hrp_plan)
+			              .where( filters.project_type)
+			              .where( filters.beneficiaries)
+			              .where( filters.clusterid)
 			              .where( filters.implementer_tag)
 			              .where( filters.donor_tag)
-			              .where( filters.beneficiaries)
-			              .where( filters.cluster_id)
 			              .where( filters.activity_type_id)
 			              .where( filters.project_startDateNative)
 			              .where( filters.project_endDateNative)
@@ -2651,8 +2702,8 @@ var Cluster4wplusDashboardController = {
 							return res.json(200, {'value': resultsFiltersOrganizations.length});
 						});
 					});	
-						});
-					});	
+				  });
+				});	
 
 
 				}
@@ -2715,6 +2766,9 @@ var Cluster4wplusDashboardController = {
 				// total sum
 				Beneficiaries.native(function(err, collection) {
 					if (err) return res.serverError(err);
+
+					console.log("FILTER: ",filterObject);
+					console.log("FILTROS: ", filters);
 				
 					collection.aggregate(
 						[
@@ -2789,10 +2843,11 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
+					.where( filters.project_type)
+					.where( filters.beneficiaries )
+					.where( filters.clusterid)
 					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
@@ -2841,10 +2896,11 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
 					.where( filters.hrp_plan)
+					.where( filters.project_type)
+					.where( filters.beneficiaries )
+					.where( filters.clusterid)
 					.where( filters.implementer_tag)
 					.where( filters.donor_tag)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
 					.where( filters.activity_type_id)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
