@@ -46,7 +46,7 @@ var Cluster4wplusDashboardController = {
 					//!req.param('beneficiaries') ||
 					!req.param('start_date') ||
 					!req.param('end_date') ) {
-			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, hrpplan, implementer, donor, admin1pcode, admin2pcode, start_date, end_date required!'});
+			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, project_type_component, hrpplan, implementer, donor, admin1pcode, admin2pcode, start_date, end_date required!'});
 		}
 
 		// return params
@@ -117,8 +117,15 @@ var Cluster4wplusDashboardController = {
 	                        ? { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},*/
 	        project_type: (params.project_type_component === 'all')
 	                       ? {}
-	                       : { or: [{ hrp_plan: params.project_type_component },{ interagencial_plan:params.project_type_component },{rmrp_plan: params.project_type_component}]}, 
-			                   
+	                       //: { or: [{ hrp_plan: params.project_type_component },{ interagencial_plan:params.project_type_component },{rmrp_plan: params.project_type_component}]}, 
+			                 : ( params.project_type_component === 'hrp_plan')
+			                 ? { hrp_plan :  true}
+			                 : ( params.project_type_component === 'interagencial_plan')
+			                 ? { interagencial_plan: true}
+			                 : ( params.project_type_component === 'rmrp_plan')
+			                 ? { rmrp_plan : true}
+			                 : {} ,
+
 			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
@@ -167,10 +174,20 @@ var Cluster4wplusDashboardController = {
 
 	                        ?{ project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},*/
 			
-			   project_typeNative : (params.project_type_component === 'all')
+			   /*project_typeNative : (params.project_type_component === 'all')
 	                       ? {}
 	                       : { $or: [{ 'hrp_plan': params.project_type_component },{ 'interagencial_plan':params.project_type_component },{'rmrp_plan': params.project_type_component}]}, 
-			                   
+			          */
+			    project_typeNative: (params.project_type_component === 'all')
+	                       ? {}
+	                       //: { or: [{ hrp_plan: params.project_type_component },{ interagencial_plan:params.project_type_component },{rmrp_plan: params.project_type_component}]}, 
+			                 : ( params.project_type_component === 'hrp_plan')
+			                 ? { hrp_plan :  true}
+			                 : ( params.project_type_component === 'interagencial_plan')
+			                 ? { interagencial_plan: true}
+			                 : ( params.project_type_component === 'rmrp_plan')
+			                 ? { rmrp_plan : true}
+			                 : {} ,         
 
 			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') ) 
 								? {} 
