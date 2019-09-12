@@ -87,11 +87,11 @@ var Cluster4wplusDashboardController = {
 			admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
 			admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
 			//hrp_plan: params.hrpplan === 'all' ? {} : { hrp_plan: params.hrpplan}, 
-			hrp_plan: (params.hrpplan === 'all')
+			hrp_plan: (params.hrpplan === 'all' )
 			                  ? {} 
 			                  : (params.hrpplan === 'true')
-			                   ? { hrp_plan: true}
-			                   : { hrp_plan: false},
+			                  ? { hrp_plan: true}
+			                  : { hrp_plan: {'!': true}},
 			clusterid:  ( params.cluster_id === 'all' ) 
 								? {} 
 								//: ( params.cluster_id !== 'cvwg' )
@@ -140,13 +140,12 @@ var Cluster4wplusDashboardController = {
 			admin0pcode_Native: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode.toUpperCase() },
 			admin1pcode_Native: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode.toUpperCase() },
 			admin2pcode_Native: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode.toUpperCase() },
-			hrp_plan_Native: ( params.hrpplan === 'all' )
-			                  ? {} 
-			                  : ( params.hrpplan === 'true')
-			                   ? { hrp_plan: true}
-			                   : { hrp_plan: false},
-
 			
+			hrp_plan_Native: ( params.hrpplan === 'all')
+			                   ? {} 
+			                  : ( params.hrpplan === 'true')
+			                  ? { hrp_plan: true}
+			                  : { hrp_plan: { $ne: true}},
 
 			clusterid_Native: ( params.cluster_id === 'all' ) 
 								
