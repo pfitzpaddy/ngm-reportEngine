@@ -2038,7 +2038,7 @@ var Cluster4wplusDashboardController = {
 	                             if(!resultado){
 	                             	imppartners.push(partner);
 	                             	//console.log("RESULTS EN BENEF: ", partner);
-	                             	console.log("PROYECTO en BENEF: ", d.project_id);
+	                             	//console.log("PROYECTO en BENEF: ", d.project_id);
 	                             }
 	                            
 
@@ -2115,7 +2115,7 @@ var Cluster4wplusDashboardController = {
 										if (!resultado){
 											//console.log("RESULTS en BUDGETPROGRESS: ", partner);
 											imppartners.push(partner);
-											console.log("PROJECT EN BUDGET: ", d.project_id);
+										//	console.log("PROJECT EN BUDGET: ", d.project_id);
 										}
 									}
 								})
@@ -2783,8 +2783,8 @@ var Cluster4wplusDashboardController = {
 				Beneficiaries.native(function(err, collection) {
 					if (err) return res.serverError(err);
 
-					console.log("FILTER: ",filterObject);
-					console.log("FILTROS: ", filters);
+					//console.log("FILTER: ",filterObject);
+					//console.log("FILTROS: ", filters);
 				
 					collection.aggregate(
 						[
@@ -3651,6 +3651,7 @@ var Cluster4wplusDashboardController = {
 									'color': '#f48fb1',
 									'name': 'Age 0-5',
 									'label': 0,
+									'drilldown': "Age 0-5"
 								},{
 									'y': 0,
 									'color': '#90caf9',
@@ -3660,19 +3661,19 @@ var Cluster4wplusDashboardController = {
 								{
 									'y': 0,
 									'color': 'red',
-									'name': 'Age 12-17',
+									'name': '12-17',
 									'label': 0,
 								},
 								{
 									'y': 0,
 									'color': 'blue',
-									'name': 'Age 18-59',
+									'name': '18-59',
 									'label': 0,
 
 								},{
 									'y': 0,
 									'color': 'orange',
-									'name': 'Age 60 more',
+									'name': '60 more',
 									'label': 0,
 
 								}]
@@ -3804,28 +3805,38 @@ var Cluster4wplusDashboardController = {
 										if ($beneficiaries.maleTotal < 1 && $beneficiaries.femaleTotal < 1) {
 
 											// // assign data left
-											result.label.left.label.label = 0;
+											/*result.label.left.label.label = 0;
 											result.label.left.subLabel.label = 0;
 											// // assign data center
 											result.label.center.label.label = 0;
 											result.label.center.subLabel.label = 0;
 											// // assign data right
 											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
+											result.label.right.subLabel.label = 0;*/
 
 											// // highcharts elderly_women
-											result.data[0].y = 100;
+											result.data[0].y = 0;
 											result.data[0].label = 0;
 											result.data[0].color = '#c7c7c7';
 											// // highcharts elderly_men
 											result.data[1].y = 0;
 											result.data[1].label = 0;
-											result.data[0].color = '#c7c7c7';
+											result.data[1].color = '#c7c7c7';
 
 
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											result.data[2].y = 0;
+											result.data[2].label = 0;
+											result.data[2].color = '#c7c7c7';
+
+											result.data[3].y = 0;
+											result.data[3].label = 0;
+											result.data[3].color = '#c7c7c7';
+
+											result.data[4].y = 0;
+											result.data[4].label = 0;
+											result.data[4].color = '#c7c7c7';
+
+
 											
 											return res.json(200, result);
 
@@ -3871,32 +3882,27 @@ var Cluster4wplusDashboardController = {
 											result.label.right.subLabel.label = TotalAge_6_11;*/
 
 											// // highcharts women
+											var string0_5label = 'Age 0-5: ' + $beneficiaries.age_0_5 + ' - ' + age_0_5PerCent.toFixed(1)+'%';
 											result.data[0].y = $beneficiaries.age_0_5;
-											//result.data[0].y = 1000;
-
-											result.data[0].label = $beneficiaries.age_0_5+ ' - ' + age_0_5PerCent;
 											result.data[0].color = '#c7c7c7';
+											result.data[0].label = age_0_5PerCent;
 											// // highcharts men
 											result.data[1].y = TotalAge_6_11 ;
 											//result.data[1].y = 579 ;
-											result.data[1].label = $beneficiaries.age_6_11+ '-'+ age_6_11PerCent ;
+											result.data[1].label = age_6_11PerCent ;
 											//console.log("LABEL: ",result.data[1]);
 											result.data[1].color = '#90caf9';
 
 											result.data[2].y = TotalAge_12_17;
-											//result.data[2].y = 250;
-
-											result.data[2].label = $beneficiaries.age_12_17+ ' - '+ age_12_17PerCent ;
+											result.data[2].label = age_12_17PerCent ;
 											result.data[2].color = 'red';
 
 											result.data[3].y = TotalAge_18_59;
-											//result.data[3].y = 12034;
-
-											result.data[3].label = $beneficiaries.age_18_59+ ' - '+ age_18_59PerCent ;
+											result.data[3].label = age_18_59PerCent ;
 											result.data[3].color = 'blue';
 
 											result.data[4].y = TotalAge_60_more;
-											result.data[4].label = $beneficiaries.age_60_more+ ' - '+ age_60_morePerCent ;
+											result.data[4].label = age_60_morePerCent ;
 											result.data[4].color = 'orange';
 
 											/*result.data[2].x = womensPerCent;
