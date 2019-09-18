@@ -324,8 +324,18 @@ var ProjectController = {
     // do response
     _doResponse : function($project){
       if (csv) {
+        console.log("IMPRIMO queryProject: ",queryProject);
+        console.log("IMPRIMO VALOR DE ADMIN0PCODE: ",queryProject.admin0pcode);
         var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
-        fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target locations','Created' ];
+        
+        if(queryProject.admin0pcode === 'col'){
+              fieldNames = [ 'Cluster', 'Organización', 'País', 'Project ID', 'Estado del Proyecto', 'Punto Focal', 'Email', 'Teléfono', 'Título del Proyecto', 'Descripción del Proyecto', 'HRP Project Code', 'Fecha Inicio del Proyecto', 'Fecha Finalización del Proyecto', 'Presupuesto del Proyecto', 'Moneda de Presupuesto dle Proyecto', 'Donantes del Proyecto'  ,  'Socios Implementadores', 'Strategic Objectives', 'Beneficiary types','Tipos de Actividades','Beneficiarios Objetivo', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Ubicaciones Objetivo','Fecha Creación' ];
+
+        }else{
+
+                  fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target locations','Created' ];
+
+        }
         $project = this._projectJson2Csv($project);
 
         json2csv({ data: $project, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
