@@ -131,8 +131,8 @@ var Cluster4wplusDashboardController = {
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
 			
 			
-			project_startDate: { project_start_date : {'>=': new Date( params.start_date)}},
-			project_endDate: { project_end_date : {'<=': new Date( params.end_date)}},
+			project_startDate: { project_start_date : {'<=': new Date( params.end_date)}},
+			project_endDate: { project_end_date : {'>=': new Date( params.start_date)}},
 			
 
 
@@ -202,8 +202,8 @@ var Cluster4wplusDashboardController = {
 			//date_Native: { reporting_period: { $gte: new Date( params.start_date ), $lte: new Date( params.end_date )} },
 		    //activity_typeNative: (params.cluster_id) === 'all' ? {} : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			//new date_Native
-			project_startDateNative: { project_start_date : { $gte : new Date( params.start_date) }},
-			project_endDateNative: { project_end_date: { $lte: new Date( params.end_date) }},
+			project_startDateNative: { project_start_date : { $lte : new Date( params.end_date) }},
+			project_endDateNative: { project_end_date: { $gte: new Date( params.start_date) }},
 
 
 
@@ -2378,7 +2378,9 @@ var Cluster4wplusDashboardController = {
 
 						if (err) return res.negotiate( err );
 
-						//console.log("RESULTADOS EN BENEFICIARIES: ",result);
+						//console.log("TOTAL PROYECTOS EN BENEFICIARIES: ",result.length);
+
+						//var añadidos = 0;
 
 
 
@@ -2391,12 +2393,15 @@ var Cluster4wplusDashboardController = {
 										if(!exist){
 
 											total_projects.push(d);
+											//añadidos = añadidos+1;
 
 										}else{
 										}
 
 
 								});
+
+						//console.log("total projects: ",añadidos);
 
 
 						BudgetProgress.find()
@@ -2417,10 +2422,11 @@ var Cluster4wplusDashboardController = {
 			              .where( filters.project_endDateNative)
 			              .exec( function(err, resultbud){
 
-			              	//console.log("RESULTADOS EN BUDGET: ",result);
+			              //	console.log("TOTAL PROYCTOS EN BUDGET: ",resultbud.length);
 
 			              	if(err) return res.negotiate(err);
 
+                   //        var añadidos2 = 0
 
 			              	resultbud.forEach(function(d,i){
 
@@ -2428,8 +2434,14 @@ var Cluster4wplusDashboardController = {
 
 			              		if(!exist){
 			              			total_projects.push(d);
+			              			//añadidos2= añadidos2+1;
+			              		}else{
+			              			//console.log("EXISTE: ",d.project_id);
 			              		}
 			              	});
+
+			              							//console.log("total projects 2: ",añadidos2);
+
 
 
 
