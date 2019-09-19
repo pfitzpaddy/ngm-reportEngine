@@ -1790,6 +1790,16 @@ var ClusterDashboardController = {
 											// assign data center
 											result.label.center.label.label = totalPerCent;
 											result.label.center.subLabel.label = $beneficiaries.childTotal;
+											if (result.label.center.subLabel.label >= 1000000 && result.label.center.subLabel.label < 1000000000) {
+												result.label.center.subLabel.label = result.label.center.subLabel.label / 1000000;
+												result.label.center.subLabel.postfix = 'M';
+												result.label.center.subLabel.fractionSize = 2;
+											}
+											if (result.label.center.subLabel.label >= 1000000000) {
+												result.label.center.subLabel.label = result.label.center.subLabel.label / 1000000000;
+												result.label.center.subLabel.postfix = 'B';
+												result.label.center.subLabel.fractionSize = 2;
+											}
 											// assign data right
 											result.label.right.label.label = girlsPerCent;
 											result.label.right.subLabel.label = $beneficiaries.girls;
@@ -1842,6 +1852,16 @@ var ClusterDashboardController = {
 											// // assign data center
 											result.label.center.label.label = totalPerCent;
 											result.label.center.subLabel.label = $beneficiaries.adultTotal;
+											if (result.label.center.subLabel.label >= 1000000 && result.label.center.subLabel.label < 1000000000) {
+												result.label.center.subLabel.label = result.label.center.subLabel.label / 1000000;
+												result.label.center.subLabel.postfix = 'M';
+												result.label.center.subLabel.fractionSize = 2;
+											}
+											if (result.label.center.subLabel.label >= 1000000000) {
+												result.label.center.subLabel.label = result.label.center.subLabel.label / 1000000000;
+												result.label.center.subLabel.postfix = 'B';
+												result.label.center.subLabel.fractionSize = 2;
+											} 
 											// // assign data right
 											result.label.right.label.label = womensPerCent;
 											result.label.right.subLabel.label = $beneficiaries.women;
@@ -1894,6 +1914,16 @@ var ClusterDashboardController = {
 											// // assign data center
 											result.label.center.label.label = totalPerCent;
 											result.label.center.subLabel.label = $beneficiaries.elderTotal;
+											if (result.label.center.subLabel.label >= 1000000 && result.label.center.subLabel.label < 1000000000) {
+												result.label.center.subLabel.label = result.label.center.subLabel.label / 1000000;
+												result.label.center.subLabel.postfix = 'M';
+												result.label.center.subLabel.fractionSize =2;
+											}
+											if (result.label.center.subLabel.label >= 1000000000) {
+												result.label.center.subLabel.label = result.label.center.subLabel.label / 1000000000;
+												result.label.center.subLabel.postfix = 'B';
+												result.label.center.subLabel.fractionSize =2;
+											}
 											// // assign data right
 											result.label.right.label.label = elwomensPerCent;
 											result.label.right.subLabel.label = $beneficiaries.elderly_women;
