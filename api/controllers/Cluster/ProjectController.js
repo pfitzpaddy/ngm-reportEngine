@@ -324,11 +324,36 @@ var ProjectController = {
     // do response
     _doResponse : function($project){
       if (csv) {
-        var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
-        fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target locations','Created' ];
+
+        //columns to COL or columns to others countries
+        if(queryProject.admin0pcode === 'col'){
+       
+       // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','humanitarian_component','hrp_plan','construccion_de_paz_component','desarrollo_sostenible_component','interagencial_plan','flujos_migratorios_component','rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+       
+       var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','componente_humanitario','plan_hrp_plan','componente_construccion_de_paz','componente_desarrollo_sostenible','plan_interagencial','componente_flujos_migratorios','plan_rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+
+        fieldNames = [ 'Cluster', 'Organización',  'País', 'Project ID', 'Estado del Proyecto', 'Punto Focal', 'Email', 'Teléfono', 'Código del Proyecto','Título del Proyecto',  'Descripción del Proyecto', 'Fecha Inicio del Proyecto', 'Fecha Finalización del Proyecto', 'Presupuesto del Proyecto', 'Moneda de Presupuesto del Proyecto','Marcador de Género - GAM', 'Donantes del Proyecto'  ,  'Socios Implementadores', 'Componente Humanitario', 'Plan HRP','Componente Construcción de Paz','Componente Desarrollo Sostenible','Plan Interagencial','Componente Flujos Migratorios','Plan RMRP','Strategic Objectives', 'Beneficiary types','Tipos de Actividades','Beneficiarios Objetivo', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Ubicaciones Objetivo','Fecha Creación'];
+        
+        // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','project_components_list','project_plans_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+       // fieldNames = [ 'Cluster', 'Organización', 'País', 'Project ID', 'Estado del Proyecto', 'Punto Focal', 'Email', 'Teléfono', 'Código del Proyecto', 'Título del Proyecto', 'Descripción del Proyecto', 'Fecha Inicio del Proyecto', 'Fecha Finalización del Proyecto', 'Presupuesto del Proyecto', 'Moneda de Presupuesto del Proyecto','Marcador de Género - GAM', 'Donantes del Proyecto'  ,  'Socios Implementadores', 'Componentes al que pertenece','Planes al que pertenece','Strategic Objectives', 'Beneficiary types','Tipos de Actividades','Beneficiarios Objetivo', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Ubicaciones Objetivo','Fecha Creación'];
+        
+        //var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list', 'target_locations_list','createdAt']
+         //fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Target locations','Created' ];
+
+
+        }else{
+         /// var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+          var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list', 'target_locations_list','createdAt']
+
+        //fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target locations','Created' ];
+         fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Target locations','Created' ];
+
+
+        }
+
         $project = this._projectJson2Csv($project);
 
-        json2csv({ data: $project, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+        json2csv({ data: $project, fields: fields, fieldNames: fieldNames,excelBOM: true }, function( err, csv ) {
           if ( err ) return res.negotiate( err );
           return res.json( 200, { data: csv } );
         });
@@ -366,24 +391,73 @@ var ProjectController = {
               p[keyto] = pa.join('; ');
             }
           };
+
+          //to COL: change true, false values in components and plan columns
+
+          var changevalues = function(val){
+            var object;
+
+            if(val == undefined){
+              object = "";
+            }else if(val == false){
+              object = "NO";
+            }else if(val == true){
+              object = "SI";
+            }
+            return object;
+          };
+
         // takes subdocuments key and produces flattened list of its values ->key_list
         var updateJson = function(project){
             setKey( project, 'implementing_partners','implementing_partners_list',['organization_name']);
             setKey( project, 'strategic_objectives', 'strategic_objectives_list', ['objective_type_name', 'objective_type_description'] );
             setKey( project, 'beneficiary_type', 'beneficiary_type_list', ['beneficiary_type_name'] );
-            setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
+            //setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
             setKey( project, 'inter_cluster_activities', 'inter_cluster_activities_list', ['cluster']  );
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
+
+            
+
+            //values in columns to COL or values to others countries
+
+            if(queryProject.admin0pcode == 'col'){
+
+              project.componente_humanitario = changevalues(project.humanitarian_component);
+              project.componente_construccion_de_paz = changevalues(project.construccion_de_paz_component);
+              project.componente_desarrollo_sostenible = changevalues(project.desarrollo_sostenible_component);
+              project.componente_flujos_migratorios = changevalues(project.flujos_migratorios_component);
+              project.plan_hrp_plan= changevalues(project.hrp_plan);
+              project.plan_interagencial= changevalues(project.interagencial_plan);
+              project.plan_rmrp_plan = changevalues(project.rmrp_plan);
+
+
+            setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name', 'key:project_donor_budget'] );
             setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
+             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys_0_5','key:boys_6_11', 'key:boys_12_17', 'key:girls_0_5', 'key:girls_6_11','key:girls_12_17', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:total_male', 'key:total_female','key:unit_type_id' ]  );
+            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat','key:name', 'email']  );
+            
+            setKey(project, 'undaf_desarrollo_paz','undaf_desarrollo_paz_list', ['code','name_tag','description'] );
+            setKey(project, 'acuerdos_de_paz','acuerdos_de_paz_list',['code','name_tag','description']);
+            setKey(project, 'dac_oecd_development_assistance_committee','dac_oecd_development_assistance_committee_list',['code','name_tag','description']);
+            setKey(project, 'ods_objetivos_de_desarrollo_sostenible','ods_objetivos_de_desarrollo_sostenible_list',['code','name_tag','description']);
+
+            }else{
+                setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
+                setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
-            setKey(project, 'undaf_desarrollo_paz','undaf_desarrollo_paz_list', ['code','name_tag','description'] ),
-            setKey(project, 'acuerdos_de_paz','acuerdos_de_paz_list',['code','name_tag','description']),
-            setKey(project, 'dac_oecd_development_assistance_committee','dac_oecd_development_assistance_committee_list',['code','name_tag','description']),
-            setKey(project, 'ods_objetivos_de_desarrollo_sostenible','ods_objetivos_de_desarrollo_sostenible_list',['code','name_tag','description']),
+                 setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+
+            }
+           // setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
+            //'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
+          // setKey(project, 'undaf_desarrollo_paz','undaf_desarrollo_paz_list', ['code','name_tag','description'] ),
+           // setKey(project, 'acuerdos_de_paz','acuerdos_de_paz_list',['code','name_tag','description']),
+           // setKey(project, 'dac_oecd_development_assistance_committee','dac_oecd_development_assistance_committee_list',['code','name_tag','description']),
+          //  setKey(project, 'ods_objetivos_de_desarrollo_sostenible','ods_objetivos_de_desarrollo_sostenible_list',['code','name_tag','description']),
 
 
-            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+            //setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
 
         };
 
@@ -406,11 +480,13 @@ var ProjectController = {
     var project = {
       project_budget_progress: [],
       target_beneficiaries: [],
-      target_locations: []
+      target_locations: [],
+     project_components_plan: []
     };
     var project_budget_progress;
     var target_beneficiaries;
     var target_locations;
+    var project_components_plan;
 
     // promise
     Promise.all([
@@ -430,6 +506,7 @@ var ProjectController = {
         project_budget_progress = result[ 1 ];
         target_beneficiaries = result[ 2 ];
         target_locations = result[ 3 ];
+        project_components_plan = result[4];
       }
 
       // create project
@@ -437,6 +514,8 @@ var ProjectController = {
       project.target_beneficiaries = target_beneficiaries;
 
       project.target_locations = target_locations;
+
+      project.project_components_plan = project_components_plan;
 
       project.target_locations.forEach( function(location,element2){
 
