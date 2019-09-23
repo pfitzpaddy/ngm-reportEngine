@@ -90,8 +90,8 @@ var Cluster4wprojectplanDashboardController = {
 			//activity_type: params.cluster_id === 'all' ? {} : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			//new date filter
 			
-			project_startDate: { project_start_date: {'>=': new Date(params.start_date)}},
-			project_endDate: { project_end_date: {'<=': new Date(params.end_date)}},
+			project_startDate: { project_start_date: {'<=': new Date(params.end_date)}},
+			project_endDate: { project_end_date: {'>=': new Date(params.start_date)}},
 			//default_Native: { report_year: { $gte: 2017 }, location_id: { $ne: null } },
 			
 			//new default_native
@@ -131,8 +131,8 @@ var Cluster4wprojectplanDashboardController = {
 
 
 			//new date_Native
-			project_startDateNative: { project_start_date: { $gte: new Date(params.start_date) }},
-			project_endDateNative: { project_end_date: { $lte: new Date(params.end_date) }},
+			project_startDateNative: { project_start_date: { $lte: new Date(params.end_date) }},
+			project_endDateNative: { project_end_date: { $gte: new Date(params.start_date) }},
 
 
 
@@ -184,7 +184,9 @@ var Cluster4wprojectplanDashboardController = {
 					//.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					//.where( filters.beneficiaries )
-					.where( filters.date )
+					//.where( filters.date )
+					.where(filters.project_startDateNative)
+					.where(filters.project_endDateNative)
 					.sort( 'updatedAt DESC' )
 					.limit(1)
 					.exec( function( err, results ){
@@ -1899,7 +1901,66 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'projects_4wdashboard_projectplan':
 
+				Project
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.admin1pcode )
+					.where( filters.admin2pcode )
+					.where( filters.cluster_id )
+					//.where( filters.activity_type_id )
+					//.where( filters.acbar_partners )
+					.where( filters.organization_tag )
+					//.where( filters.beneficiaries )
+					.where( filters.activity_type)
+					.where( filters.project_startDateNative )
+					.where( filters.project_endDateNative)
+					.exec( function( err, results ){
+
+						//console.log("RESULTADOS: ", results);
 				
+					//console.log("TAMAÑO RESULTADOS: ", results.length) ;
+
+						// return error
+						if (err) return res.negotiate( err );
+
+						// latest update
+						return res.json( 200, {'value': results.length} );
+
+
+					});
+
+				break;
+
+					
+				/*Project.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate([
+						{ 
+							$match : filterObject 
+						},
+						{
+							$group: {
+								_id: '$_id'
+							}
+						},
+						{
+							$group: {
+								_id: 1,
+								total: {
+								$sum: 1
+								}
+							}
+						}
+					]).toArray(function (err, results) {
+						if (err) return res.serverError(err);
+						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+					});
+				});	*/
+				
+				/*
 
 			TargetLocation
 					.find()
@@ -1938,11 +1999,88 @@ var Cluster4wprojectplanDashboardController = {
 					return res.json(200,{'value':resultFiltersPrj.length});
 
 
-					});
+					});*/
+
+
 
 
 				
 				break;
+
+				case 'total_beneficiariespopulation_4wdashboard_projectplan':
+
+
+				// total sum
+				TargetBeneficiaries.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate(
+						[
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group:
+								{
+									_id: null,
+									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									total:  { $sum: { $add: [ "$total_beneficiaries" ] } }
+								}
+							}
+						]
+					).toArray(function (err, targetbeneficiaries) {
+						if (err) return res.serverError(err);
+
+						console.log("BENEFICIARIES: ", targetbeneficiaries);
+
+						var total = targetbeneficiaries[0]?targetbeneficiaries[0].total:0;
+
+						return res.json( 200, { 'value': total } );
+					});
+				});
+				
+		
+
+
+				break;
+
+
+					case 'total_financing_4wdashboard_projectplan':
+
+
+				// total sum
+				Project.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate(
+						[
+							{ 
+								$match : filterObject 
+							},
+							{
+								$group:
+								{
+									_id: null,
+									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									total:  { $sum: { $add: [ "$project_budget" ] } }
+								}
+							}
+						]
+					).toArray(function (err, projectbudget) {
+						if (err) return res.serverError(err);
+
+						var total = projectbudget[0]?projectbudget[0].total:0;
+
+						return res.json( 200, { 'value': total } );
+					});
+				});
+				
+		
+
+
+				break;
+
+
 
 				case 'organizations_4wdashboard_projectplan':
 				
@@ -2073,7 +2211,7 @@ var Cluster4wprojectplanDashboardController = {
 
 
 
-					TargetLocation
+					Project
 					.find()
 					.where( filters.default )
 					.where( filters.adminRpcode )
