@@ -50,6 +50,7 @@ var ClusterDashboardController = {
 			cluster_id: req.param('cluster_id'),
 			cluster_ids: req.param('cluster_ids') ? req.param('cluster_ids') : [req.param('cluster_id')],
 			activity_type_id: req.param( 'activity_type_id' ) ? req.param( 'activity_type_id' ) : 'all',
+			activity_description_id: req.param( 'activity_description_id' ) ? req.param( 'activity_description_id' ) : 'all',
 			adminRpcode: req.param('adminRpcode'),
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
@@ -69,6 +70,7 @@ var ClusterDashboardController = {
 			default: { report_year: { '>=': 2017 }, location_id: { '!': null } },
 			adminRpcode: params.adminRpcode === 'hq' ? {} : { adminRpcode: params.adminRpcode },
 			admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
+			admin0pcode_act: params.admin0pcode === 'all' ? {} : { admin0pcode: { contains: params.admin0pcode.toUpperCase()} },
 			admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
 			admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
 			cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
@@ -76,8 +78,10 @@ var ClusterDashboardController = {
 								: ( params.cluster_id !== 'cvwg' )
 									? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
 									: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
+			cluster_id_act: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
 			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
-			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
+			activity_description_id: params.activity_description_id === 'all' ? {} : { activity_description_id: params.activity_description_id},
+ 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
 			beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
 			date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
@@ -131,6 +135,7 @@ var ClusterDashboardController = {
 										filters.admin2pcode_Native,
 										filters.is_cluster_ids_array ? filters.cluster_ids_Native : filters.cluster_id_Native,
 										filters.activity_type_id,
+										filters.activity_description_id,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
 										filters.beneficiaries,
@@ -152,6 +157,7 @@ var ClusterDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
 					.where( filters.activity_type_id )
+					.where( filters.activity_description_id )
 					.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( filters.beneficiaries )
@@ -330,6 +336,7 @@ var ClusterDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
 					.where( filters.activity_type_id )
+					.where( filters.activity_description_id )
 					.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( filters.beneficiaries )
@@ -445,6 +452,7 @@ var ClusterDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
 					.where( filters.activity_type_id )
+					.where( filters.activity_description_id )
 					.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( filters.beneficiaries )
@@ -1747,7 +1755,13 @@ var ClusterDashboardController = {
 								if (err) return res.serverError(err);								
 
 								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								// if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								if (!beneficiaries.length) {
+									result.data[0].y = 100;
+									result.data[0].label = 0;
+									result.data[0].color = '#c7c7c7';
+									return res.json(200, result);
+								}
 
 
 								$beneficiaries = beneficiaries[0];
@@ -1951,7 +1965,41 @@ var ClusterDashboardController = {
 						
 										
 				break;
-				
+			case 'activities':
+
+				if (params.adminRpcode !== 'hq' && params.admin0pcode === 'all') {
+					if (params.adminRpcode === 'afro') {
+						adminRpcode_filter = { or: [{ admin0pcode: { contains: 'CD' } }, { admin0pcode: { contains: 'ET' } }, { admin0pcode: { contains: 'NG' } }, { admin0pcode: { contains: 'SS' } }] }
+					}
+					if (params.adminRpcode === 'amer') {
+						adminRpcode_filter = { admin0pcode: { contains: 'COL' } };
+					}
+					if (params.adminRpcode === 'emro') {
+						adminRpcode_filter = { or: [{ admin0pcode: { contains: 'AF' } }, { admin0pcode: { contains: 'SO' } }, { admin0pcode: { contains: 'SY' } }, { admin0pcode: { contains: 'YE' } }] }
+					}
+					if (params.adminRpcode === 'searo') {
+						adminRpcode_filter = { or: [{ admin0pcode: { contains: 'BD' } }, { admin0pcode: { contains: 'CB' } }] }
+					}
+					if (params.adminRpcode === 'euro') {
+						adminRpcode_filter = { admin0pcode: { contains: 'UA' } };
+					}
+					var filterObjectact = _.extend({}, adminRpcode_filter, filters.cluster_id_act)
+				}else{
+					var filterObjectact = _.extend({}, filters.admin0pcode_act, filters.cluster_id_act)
+				}
+				Activities
+					.find()
+					.where(filterObjectact)
+					.exec(function (err, activities) {
+						var distinct_activities = _.uniq(activities, function (x) {
+							return x.activity_type_name;
+						});
+						// return error
+						if (err) return res.negotiate(err);
+						// return project
+						return res.json(200, distinct_activities);
+					})
+				break;
 				default: 
 					return res.json( 200, { value:0 });
 					break;
