@@ -23,7 +23,7 @@ var Cluster4wprojectplanDashboardController = {
 		}
 		return array;
 	},
-	
+
 	// get params from req
 	getParams: function( req, res ){
 
@@ -41,6 +41,7 @@ var Cluster4wprojectplanDashboardController = {
 			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, admin1pcode, admin2pcode, start_date, end_date required!'});
 		}
 
+
 		// return params
 		return {
 			csv: req.param('csv') ? req.param('csv') : false,
@@ -57,8 +58,12 @@ var Cluster4wprojectplanDashboardController = {
 			admin2pcode: req.param('admin2pcode'),
 			//beneficiaries: req.param('beneficiaries'),
 			start_date: req.param('start_date'),
-			end_date: req.param('end_date')
+			end_date: req.param('end_date'),
+			//coptousd: req.param('cop')
+			coptousd: 3200,
+			eurotousd :req.param('eur')
 		}
+		
 
 	},
 
@@ -90,8 +95,8 @@ var Cluster4wprojectplanDashboardController = {
 			//activity_type: params.cluster_id === 'all' ? {} : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			//new date filter
 			
-			project_startDate: { project_start_date: {'<=': new Date(params.end_date)}},
-			project_endDate: { project_end_date: {'>=': new Date(params.start_date)}},
+			project_startDate: { project_start_date: {'>=': new Date(params.start_date)}},
+			project_endDate: { project_end_date: {'<=': new Date(params.end_date)}},
 			//default_Native: { report_year: { $gte: 2017 }, location_id: { $ne: null } },
 			
 			//new default_native
@@ -131,21 +136,21 @@ var Cluster4wprojectplanDashboardController = {
 
 
 			//new date_Native
-			project_startDateNative: { project_start_date: { $lte: new Date(params.end_date) }},
-			project_endDateNative: { project_end_date: { $gte: new Date(params.start_date) }},
+			project_startDateNative: { project_start_date: { $gte: new Date(params.start_date) }},
+			project_endDateNative: { project_end_date: { $lte: new Date(params.end_date) }},
 
 
 
 		}
 	},
-
+	
 	// indicators
 	getIndicator: function ( req, res  ) {
-		//console.log(req, "REQ QUE LLEGA");
 
 		// parmas, filters
 		var params = Cluster4wprojectplanDashboardController.getParams( req, res );
-		var filters = Cluster4wprojectplanDashboardController.getFilters( params );
+        
+        var filters = Cluster4wprojectplanDashboardController.getFilters( params );
 		// match clause for native mongo query
 		var filterObject = _.extend({},	filters.default_Native,
 										filters.adminRpcode_Native,
@@ -164,7 +169,12 @@ var Cluster4wprojectplanDashboardController = {
 										//filters.date_Native,
 										filters.project_startDateNative,
 										filters.project_endDateNative/*,
-										filters.delivery_type_id()*/ )
+										filters.delivery_type_id()*/ );
+
+
+	
+
+
 
 		// switch on indicator
 		switch( params.indicator ) {
@@ -2031,8 +2041,6 @@ var Cluster4wprojectplanDashboardController = {
 					).toArray(function (err, targetbeneficiaries) {
 						if (err) return res.serverError(err);
 
-						console.log("BENEFICIARIES: ", targetbeneficiaries);
-
 						var total = targetbeneficiaries[0]?targetbeneficiaries[0].total:0;
 
 						return res.json( 200, { 'value': total } );
@@ -2056,7 +2064,7 @@ var Cluster4wprojectplanDashboardController = {
 						[
 							{ 
 								$match : filterObject 
-							},
+							}/*,
 							{
 								$group:
 								{
@@ -2064,14 +2072,80 @@ var Cluster4wprojectplanDashboardController = {
 									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
 									total:  { $sum: { $add: [ "$project_budget" ] } }
 								}
-							}
+							}*/
 						]
-					).toArray(function (err, projectbudget) {
-						if (err) return res.serverError(err);
+					).toArray(function (err, project) {
 
-						var total = projectbudget[0]?projectbudget[0].total:0;
+					
+                       var totalfinancing = 0;
 
-						return res.json( 200, { 'value': total } );
+						project.forEach(function(pro,i){
+
+							var financing = 0;
+
+						if(pro.project_budget_currency !=='eur' && pro.project_budget_currency !== 'cop'){
+							
+							if(pro.project_budget.length){
+										var newbud = parseFloat(pro.project_budget);
+										financing = newbud;
+									}else{
+
+										financing = pro.project_budget;
+
+									}
+
+						 } else if(pro.project_budget_currency ==='eur'){
+
+									if(pro.project_budget.length){
+										var newbud = parseFloat(pro.project_budget);
+									//	console.log("EURO STRING: ",newbud);
+										//console.log("URDOL STRING:",params.eurotousd);
+
+										var budeurtodollar = newbud*params.eurotousd;
+									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
+										
+										financing = budeurtodollar;
+									}else{
+									 // console.log("EURO NO STRING: ",pro.project_budget);
+									//	console.log("EURO A DOLAR",params.eurotousd);
+										var budeurtodollar = pro.project_budget*params.eurotousd;
+										//console.log("VALOR BUDGET EN DOLAR PARA AGREGAR: ",budeurtodollar);
+										financing = budeurtodollar;
+
+									}
+
+								}else if(pro.project_budget_currency ==='cop'){
+
+
+									if(pro.project_budget.length){
+										var newbud = parseFloat(pro.project_budget);
+										//console.log("PESO COL STRING: ",pro.project_budget);
+
+										var budcoptodollar = pro.project_budget/params.coptousd;
+										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
+										financing = budcoptodollar;
+									}else{
+									//	console.log("PESO COL NO STRING: ",pro.project_budget);
+										//console.log("VALOR DEL PESO COL a 1 DOLAR:", params.coptousd);
+										var budcoptodollar = pro.project_budget/params.coptousd ;
+
+										//console.log("PESO COL YA EN DOLARES: ",budcoptodollar);
+
+										financing = budcoptodollar;
+
+									}
+
+								}
+
+								totalfinancing = totalfinancing+financing;
+							
+                       });
+						//console.log("FINANCING: ", totalfinancing);
+
+						return res.json( 200, { 'value': totalfinancing } );
+						//if (err) return res.serverError(err);
+						//var total = projectbudget[0]?projectbudget[0].total:0;
+						
 					});
 				});
 				
@@ -2122,7 +2196,7 @@ var Cluster4wprojectplanDashboardController = {
 
 
 
-						return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+						//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
 				});	
 			}else {	// count of organizations
