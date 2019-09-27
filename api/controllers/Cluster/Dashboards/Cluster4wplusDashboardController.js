@@ -23,6 +23,31 @@ var Cluster4wplusDashboardController = {
 		}
 		return array;
 	},
+
+	exchangeRatesCurrencies: function(req, res){
+
+		var excangeratescurrencies = []; 
+
+         var request = require('request');
+
+		//api to find exchange rates from EURO to others currencies
+			  request.get({
+						  url: 'https://api.exchangeratesapi.io/latest'
+						}, function(error, response, body) {
+						  if (error) {
+						  }
+						  else {
+			
+						   newbody = JSON.parse(body);
+						
+						  excangeratescurrencies.push(newbody.rates.USD);
+
+						// console.log("EURO A DOLAR1 FUNCTION: ", typeof excangeratescurrencies);
+						 return res.json( 200, excangeratescurrencies);
+						}
+					});
+	},
+
 	
 	// get params from req
 	getParams: function( req, res ){
@@ -69,7 +94,9 @@ var Cluster4wplusDashboardController = {
 			admin2pcode: req.param('admin2pcode'),
 			//beneficiaries: req.param('beneficiaries'),
 			start_date: req.param('start_date'),
-			end_date: req.param('end_date')
+			end_date: req.param('end_date'),
+			eurotousd: req.param('eur'),
+			coptousd: req.param('cop')
 		}
 
 	},
@@ -131,8 +158,8 @@ var Cluster4wplusDashboardController = {
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
 			
 			
-			project_startDate: { project_start_date : {'<=': new Date( params.end_date)}},
-			project_endDate: { project_end_date : {'>=': new Date( params.start_date)}},
+			project_startDate: { project_start_date : {'>=': new Date( params.start_date)}},
+			project_endDate: { project_end_date : {'<=': new Date( params.end_date)}},
 			
 
 
@@ -2833,7 +2860,7 @@ var Cluster4wplusDashboardController = {
 						[
 							{ 
 								$match : filterObject 
-							},
+							}/*,
 							{
 								$group:
 								{
@@ -2841,15 +2868,47 @@ var Cluster4wplusDashboardController = {
 									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
 									total:  { $sum: { $add: [ "$project_budget_amount_recieved" ] } }
 								}
-							}
+							}*/
 						]
 					).toArray(function (err, budgetprogress) {
 						if (err) return res.serverError(err);
 
+						var total_budget_progress = 0;
 
-						var total = budgetprogress[0]?budgetprogress[0].total:0;
+						budgetprogress.forEach(function(budpro,i){
 
-						return res.json( 200, { 'value': total } );
+							var bpamount = 0;
+
+							if(budpro.currency_id !== 'eur' && budpro.currency_id !== 'cop'){
+
+								bpamount = budpro.project_budget_amount_recieved;
+							}else if(budpro.currency_id ==='eur'){
+
+								bpamount = budpro.project_budget_amount_recieved * params.eurotousd;
+			
+							}else if(budpro.currency_id ==='cop'){
+
+								//console.log(" VALOR PESOS: ", budpro.project_budget_amount_recieved);
+								valuetostring=budpro.project_budget_amount_recieved.toString();
+								//console.log("EN STRING: ",Numeroaletra);
+								//nuevoNumero = Numeroaletra.indexOf('.');
+								newnumber2=valuetostring.replace(".",'');
+								//console.log("NUEVO VALOR: ",nuevoNumero2);
+								finalnumber = parseFloat(newnumber2);
+								//console.log("STRING A ENTERO: ",final);
+								
+
+								bpamount = finalnumber / params.coptousd;
+
+								
+
+							}
+
+							total_budget_progress = total_budget_progress+bpamount;
+
+						});
+
+						return res.json( 200, { 'value': total_budget_progress } );
 					});
 				});
 				
