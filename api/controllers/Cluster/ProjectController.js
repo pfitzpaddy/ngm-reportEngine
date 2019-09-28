@@ -195,7 +195,8 @@ var ProjectController = {
 
   // get projects summary
   getProjects: function(req, res){
-
+ 
+   // req.param('query').project_start_date = '$gte : 2019-01-01';
     // Guards
     if (!req.param('id')&&!req.param('query')) {
       return res.json(401, { err: 'params required!' });
@@ -215,6 +216,9 @@ var ProjectController = {
       var query = { project_id : req.param('id') };
       var queryProject = { id : req.param('id') };
     } else {
+   
+
+
       var query, queryProject = req.param('query');
       if (req.param('query').project_id){
         queryProject.id = queryProject.project_id;
@@ -244,6 +248,7 @@ var ProjectController = {
     },
 
     _getProjectData : function(queryProject, query){
+
 
                   return Promise.props({
                     project: Project.find( queryProject ),
@@ -445,10 +450,30 @@ var ProjectController = {
 
               project.urls_list = seturls(project.documents);
 
+             project.target_beneficiaries.forEach(function(tb,i){
+
+               if(!tb.beneficiary_category_name){
+                 tb.beneficiary_category_name = "Otros";
+               }
+
+               if(!tb.unit_type_id){
+                 tb.unit_type_id = "Sin Información";
+               }
+
+             });
+
+               project.target_locations.forEach(function(tb,i){
+
+               if(!tb.site_implementation_name){
+                 tb.site_implementation_name = "Otro";
+               }
+             });
+
+
             setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name', 'key:project_donor_budget'] );
-            setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
+            setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['key:beneficiary_type_name', 'key:beneficiary_category_name', 'key:activity_type_name', 'key:activity_description_name','key:indicator_name','key:strategic_objective_name','key:strategic_objective_description','key:sector_objective_name','key:sector_objective_description','key:delivery_type_name',
              'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys_0_5','key:boys_6_11', 'key:boys_12_17', 'key:girls_0_5', 'key:girls_6_11','key:girls_12_17', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:total_male', 'key:total_female','key:unit_type_id' ]  );
-            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat','key:name', 'email']  );
+            setKey( project, 'target_locations', 'target_locations_list', ['key:admin0name', 'key:admin1name','key:admin1pcode','key:admin2name','key:admin2pcode','key:site_implementation_name','key:site_type_name','key:site_name','key:admin2lng','key:admin2lat','key:name', 'key:email']  );
             
             setKey(project, 'undaf_desarrollo_paz','undaf_desarrollo_paz_list', ['code','name_tag','description'] );
             setKey(project, 'acuerdos_de_paz','acuerdos_de_paz_list',['code','name_tag','description']);
