@@ -119,52 +119,30 @@ var Cluster4wplusDashboardController = {
 			                  : (params.hrpplan === 'true')
 			                  ? { hrp_plan: true}
 			                  : { hrp_plan: {'!': true}},
-			/*clusterid:  ( params.cluster_id === 'all' ) 
-								? {} 
-								//: ( params.cluster_id !== 'cvwg' )
-									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
-									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
-			                    :{cluster_id:params.cluster_id},*/
-			                    //: { or :[{cluster_id:params.cluster_id},{ 'inter_cluster_activities.cluster_id':params.cluster_id } ] } ,
-
-			                    // ?{ cluster_id:params.cluster_id}
-			                    // : { inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
+			
             /* cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
 								: ( params.cluster_id !== 'cvwg' )
 									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
 									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
-			                          // ?{cluster_id:params.cluster_id}
-			                      ?{ or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}}]}
-			                     : { or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}}]},
-*/
+			                     : { or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}}]},*/
              cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
 								: ( params.cluster_id !== 'cvwg' )
-									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
-									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
-			                     ?{cluster_id:params.cluster_id}
-			                     //?{or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
+									 ?{cluster_id:params.cluster_id}
 			                     : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			 implementer_tag: (params.implementer === 'all')
 	                            ? {}
-	                           //: {implementing_partners : [{'organization_tag':params.implementer}]},
-	                          // : {implementing_partners : {'organization_tag': {$all:[params.implementer]}}},
-	                           : {implementing_partners: { $elemMatch:{'organization_tag':params.implementer} } },
+	                            : {implementing_partners: { $elemMatch:{'organization_tag':params.implementer} } },
 
 	        donor_tagBenef: (params.donor === 'all')
 	                        ? {}
-	                        //: { or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
 	                       : {  project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},
-									/*  : { project_donor_id: params.donor}*/
 	        donor_tagBudget: (params.donor === 'all')
 	                        ? {}
-	                        //: { or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
 
 	                        : { project_donor_id: params.donor},
-	                      /*  : { project_donor_id: params.donor}             
 
-	                        ? { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},*/
 	        project_type: (params.project_type_component === 'all')
 	                       ? {}
 	                       //: { or: [{ hrp_plan: params.project_type_component },{ interagencial_plan:params.project_type_component },{rmrp_plan: params.project_type_component}]}, 
@@ -199,15 +177,7 @@ var Cluster4wplusDashboardController = {
 								
 			                  ?{ $or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
 			                    : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}, */  
-			/*cluster_id_Native: ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
-								? {} 
-								: ( params.cluster_id !== 'cvwg' )
-								//?{ cluster_id: params.cluster_id } 
-
-								//: { inter_cluster_activities: { $elemMatch:{cluster_id:params.cluster_id}}},
-								? { cluster_id: params.cluster_id } 
-								:{ $or: [{ cluster_id: params.cluster_id }, { inter_cluster_activities: { $elemMatch:{cluster_id:params.cluster_id} }} ] } ,
-*/
+			
              cluster_id_Native1:( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
 								: { cluster_id: params.cluster_id } ,
@@ -223,48 +193,20 @@ var Cluster4wplusDashboardController = {
 			                  ? { hrp_plan: true}
 			                  : { hrp_plan: { $ne: true}},
 
-	
-           /* clusterid_Native:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
-								? {} 
-								//: ( params.cluster_id !== 'cvwg' )
-								//? { $or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
-									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
-			                          // ?{cluster_id:params.cluster_id}
-			                     // ?{'cluster_id':params.cluster_id}
-			                     //: {inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}},
-
-			                     //: {$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]},
-			                     //?{ cluster_id:params.cluster_id}
-			                    //: { inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
-             :{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]},
-			      //              : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},*/
-			                     
-
-
 			implementer_tagNative: ( params.implementer === 'all')
 	                            ? {}
 	                     
 	                           : { implementing_partners: { $elemMatch: { 'organization_tag' : params.implementer} }},
 
-	        /*donor_tagNative: ( params.donor === 'all')
-	                         ? {}
-	                        : { $or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
-	                   */
-
 	         donor_tagBenef_Native: (params.donor === 'all')
 	                        ? {}
-	                        //: { or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
 	                       : {  project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},
 									/*  : { project_donor_id: params.donor}*/
 	        donor_tagBudget_Native: (params.donor === 'all')
 	                        ? {}
-	                        //: { or : [ { project_donor_id: params.donor}, { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}}]},
 
 	                        : { project_donor_id: params.donor},
-	                      /*  : { project_donor_id: params.donor}             
-
-	                        ? { project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},*/
-
+	                      
 
 			    project_typeNative: (params.project_type_component === 'all')
 	                       ? {}
@@ -288,11 +230,6 @@ var Cluster4wplusDashboardController = {
 			is_cluster_ids_array: params.cluster_ids ? true : false,
 
 			organization_tag_Native: params.organization_tag === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: params.organization_tag },
-			
-			//date_Native: { reporting_period: { $gte: new Date( params.start_date ), $lte: new Date( params.end_date )} },
-		    //activity_typeNative: (params.cluster_id) === 'all' ? {} : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
-			//new date_Native
-
 			//dateNative: { $or : [{ reporting_period:{$gte: new Date(params.start_date), $lte: new Date(params.end_date)}},{project_budget_date_recieved: {$gte: new Date(params.start_date), $lte: new Date(params.end_date)}}]},
             report_period_ben_Native: {reporting_period:{$gte: new Date(params.start_date), $lte: new Date(params.end_date)}},
             budget_date_recieved_Native: {project_budget_date_recieved: {$gte: new Date(params.start_date), $lte: new Date(params.end_date)}}, 
@@ -355,12 +292,6 @@ var Cluster4wplusDashboardController = {
 										filters.admin2pcode_Native,
 										filters.activity_type_id,
 										filters.cluster_id_Native1,
-										//filters.cluster_id_Native2,
-
-										
-										//filters.is_cluster_ids_array ? filters.cluster_id : filters.cluster_id_Native,
-										//filters.is_cluster_ids_array ? filters.cluster_id : filters.cluster_id_Native,
-
 										filters.acbar_partners,
 										filters.organization_tag_Native,
 										filters.hrp_plan_Native,
@@ -368,16 +299,8 @@ var Cluster4wplusDashboardController = {
 										filters.implementer_tagNative,
 										//filters.donor_tagNative,
 										filters.donor_tagBudget_Native,
-										//filters.beneficiaries,
-										//filters.date_Native,
-										//filters.project_startDateNative,
-										//filters.project_endDateNative
-										//filters.dateNative,
 										filters.budget_date_recieved_Native
-										//filters.delivery_type_id()
-										//filters.is_cluster_ids_array ? filters.cluster_ids_Native : filters.cluster_id_Native,
-										//filters.cluster_id,
-										//filters.cluster_id,
+							
 
 
            );
@@ -389,12 +312,6 @@ var Cluster4wplusDashboardController = {
 										filters.admin2pcode_Native,
 										filters.activity_type_id,
 										filters.cluster_id_Native1,
-										//filters.cluster_id_Native2,
-
-										
-										//filters.is_cluster_ids_array ? filters.cluster_id : filters.cluster_id_Native,
-										//filters.is_cluster_ids_array ? filters.cluster_id : filters.cluster_id_Native,
-
 										filters.acbar_partners,
 										filters.organization_tag_Native,
 										filters.hrp_plan_Native,
@@ -402,22 +319,12 @@ var Cluster4wplusDashboardController = {
 										filters.implementer_tagNative,
 										//filters.donor_tagNative,
 										filters.donor_tagBenef_Native,
-										//filters.beneficiaries,
-										//filters.date_Native,
-										//filters.project_startDateNative,
-										//filters.project_endDateNative
-										//filters.dateNative,
 										filters.report_period_ben_Native
-										/*,
-										filters.delivery_type_id()*/
-										//filters.is_cluster_ids_array ? filters.cluster_ids_Native : filters.cluster_id_Native,
-										//filters.cluster_id,
-										//filters.cluster_id,
+										
 
 
            );
-		//console.log("FILTROS: ",filters);
-		//console.log("FILTEROBJECT: ", filtes);
+	
 
 		// switch on indicator
 		switch( params.indicator ) {
@@ -2165,16 +2072,8 @@ var Cluster4wplusDashboardController = {
                    //console.log("FILTROS IMPLEMENTING PARERS:" ,filters);
                    //console.log("FILTEROBJECT", filterObject );
                  var imppartners = [];
-                /* imppartners.unshift({
-												id : 'all',
-						   		organization_tag: 'all',
-						   		organization: 'ALL',
-						   		organization_type:'all',
-						   		admin0pcode:'COL',
-						   		organization_name : "ALL"
-										});*/
-				
-					Beneficiaries
+              
+				Beneficiaries
 					.find()
 					.where( filters.default )
 					.where( filters.adminRpcode )
@@ -2190,8 +2089,6 @@ var Cluster4wplusDashboardController = {
 					//.where( filters.donor_tag)
 					.where(filters.donor_tagBenef)
 					.where( filters.activity_type_id)
-					//.where( filters.project_startDateNative )
-					//.where( filters.project_endDateNative)
 					.where(filters.report_period_ben)
 					.exec( function( err, results ) {
 						
@@ -2216,8 +2113,6 @@ var Cluster4wplusDashboardController = {
 
 	                             if(!resultado){
 	                             	imppartners.push(partner);
-	                             	//console.log("RESULTS EN BENEF: ", partner);
-	                             	//console.log("PROYECTO en BENEF: ", d.project_id);
 	                             }
 	                            
 
@@ -2228,7 +2123,6 @@ var Cluster4wplusDashboardController = {
 						});
 
 						var partben = imppartners;
-						//console.log("PARTNERS EN BENEF: ", partben);
 					}
 
 					BudgetProgress
@@ -2262,31 +2156,6 @@ var Cluster4wplusDashboardController = {
 
 						result.forEach( function( d, i ) {
 
-							/*if(result[i].implementing_partners){
-
-								 result[i].implementing_partners.forEach(function (d, j){
-
-
-
-								 //	console.log("imple: ",results[i].implementing_partners[j]);
-
-								 //	if(results[i].implementing_partners[j]){
-
-								 		const resultado = imppartners.find( implementer => implementer.organization_tag === result[i].implementing_partners[j].organization_tag );
-
-			                             if(!resultado){
-			                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
-			                             	console.log("RESULTS EN BUDGETPROGREs: ", result[i].implementing_partners[j]);
-
-			                             	imppartners.push(result[i].implementing_partners[j]);
-
-			                             }
-
-								 //	}
-
-								});
-
-							}*/
 							if(d.implementing_partners){
 
 								d.implementing_partners.forEach(function(partner,j){
@@ -2320,11 +2189,7 @@ var Cluster4wplusDashboardController = {
 				case 'project_donors':
 
                  var donorslist = [];
-                /* donorslist.unshift({
-								project_donor_id : 'all',
-						   		porject_donor_name: 'ALL',
-						   		
-								});*/
+              
 				
 					Beneficiaries
 					.find()
@@ -2354,11 +2219,9 @@ var Cluster4wplusDashboardController = {
 
 					if(results.length){
 
-						//console.log("RESULTADOS: ",results);
 
 						results.forEach( function( d, i ) {
 
-							//console.log("DONANTE EN BENE: ",d.project_id);
 
 							if(results[i].project_donor){
 
@@ -2379,7 +2242,6 @@ var Cluster4wplusDashboardController = {
 						});
 					}
 
-					//console.log("FILTROS: ", filters);
 
 					BudgetProgress
 					.find()
@@ -2411,18 +2273,8 @@ var Cluster4wplusDashboardController = {
 
 
 						result.forEach( function( d, i ) {
-							//console.log("DONANTE EN BUDGPRO: ",d.project_id);
-
-
-							//if(result[i].project_donor){
-
-								/// result[i].project_donor.forEach(function (d, j){
-
-								 //	console.log("imple: ",results[i].implementing_partners[j]);
-
-								 //	if(results[i].implementing_partners[j]){
-
-								 		const resultado = donorslist.find( donor => donor.project_donor_id === d.project_donor_id );
+							
+							const resultado = donorslist.find( donor => donor.project_donor_id === d.project_donor_id );
 
 			                             if(!resultado){
 
@@ -2430,15 +2282,8 @@ var Cluster4wplusDashboardController = {
 			                             		'project_donor_id':d.project_donor_id,
 			                             		'project_donor_name':d.project_donor_name
 			                             	}
-			                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
 			                             	donorslist.push(donortoadd);
 			                             }
-
-								 //	}
-
-							//	});
-
-							//}
                         
 						});
 
@@ -2474,7 +2319,6 @@ var Cluster4wplusDashboardController = {
 
 						if (err) return res.negotiate( err );
 
-						//console.log("RESULTADOS EN BENEFICIARIES: ",result);
 
 						result.forEach(function(d,i){
 
@@ -2483,13 +2327,8 @@ var Cluster4wplusDashboardController = {
 							if(!exist){
 								activities.push(d);
 							}
-
-
-
 						});
 
-
-						//console.log("TOTAL ACTIVIDADES SIN CLUSTER",activities.length);
 
 					return res.json(200, { 'data': activities } );
 					});
@@ -2511,10 +2350,7 @@ var Cluster4wplusDashboardController = {
 
 						if (err) return res.negotiate( err );
 
-						//console.log("RESULTADOS EN BENEFICIARIES: ",result);
-
-
-                        result.forEach(function(d,i){
+						result.forEach(function(d,i){
 
 							exist = activities.find(act => act.activity_type_id === d.activity_type_id);
 
@@ -2526,9 +2362,8 @@ var Cluster4wplusDashboardController = {
 
 						});
 
-						//console.log("TOTAL ACTIVIDADES",activities.length);
 
-											return res.json(200, { 'data': activities } );
+						return res.json(200, { 'data': activities } );
 
 					});
 				};
@@ -2569,13 +2404,6 @@ var Cluster4wplusDashboardController = {
 
 						if (err) return res.negotiate( err );
 
-						//console.log("TOTAL PROYECTOS EN BENEFICIARIES: ",result.length);
-
-						//var añadidos = 0;
-
-
-
-
 						result.forEach(function(d,i){
 
 							const exist = total_projects.find(proj => proj.project_id === d.project_id);
@@ -2592,7 +2420,6 @@ var Cluster4wplusDashboardController = {
 
 								});
 
-						//console.log("total projects: ",añadidos);
 
 
 						BudgetProgress.find()
@@ -2610,16 +2437,12 @@ var Cluster4wplusDashboardController = {
 			              //.where( filters.donor_tag)
 			              .where(filters.donor_tagBudget)
 			              .where( filters.activity_type_id)
-			              //.where( filters.project_startDateNative)
-			             // .where( filters.project_endDateNative)
 			             .where(filters.budget_date_recieved)
 			              .exec( function(err, resultbud){
 
-			              //	console.log("TOTAL PROYCTOS EN BUDGET: ",resultbud.length);
 
 			              	if(err) return res.negotiate(err);
 
-                   //        var añadidos2 = 0
 
 			              	resultbud.forEach(function(d,i){
 
@@ -2627,16 +2450,9 @@ var Cluster4wplusDashboardController = {
 
 			              		if(!exist){
 			              			total_projects.push(d);
-			              			//añadidos2= añadidos2+1;
 			              		}else{
-			              			//console.log("EXISTE: ",d.project_id);
 			              		}
 			              	});
-
-			              							//console.log("total projects 2: ",añadidos2);
-
-
-
 
 			              	return res.json(200,{'value':total_projects.length});
 
@@ -2645,42 +2461,6 @@ var Cluster4wplusDashboardController = {
 
 
 					});
-
-			        /*  BudgetProgress.find()
-			              .where( filters.default)
-			              .where( filters.adminRpcode)
-			              .where( filters.admin0pcode)
-			              .where( filters.admin1pcode)
-			              .where( filters.admin2pcode)
-			              .where( filters.organization_tag)
-			              .where( filters.hrp_plan)
-			              .where( filters.beneficiaries)
-			              .where( filters.cluster_id)
-			              .where( filters.activity_type)
-			              .where( filters.project_startDateNative)
-			              .where( filters.project_endDateNative)
-			              .exec( function(err, result){
-
-			              	//console.log("RESULTADOS EN BUDGET: ",result);
-
-			              	if(err) return res.negotiate(err);
-
-
-			              	result.forEach(function(d,i){
-
-			              		const exist = total_projects.find(proj => proj.project_id === d.project_id);
-
-			              		if(!exist){
-			              			total_projects.push(d.project_id);
-			              		}
-			              	});
-
-			              	console.log("TOTAL PROYECTOS: ", total_projects);
-
-			              	return res.json(200,{'value':total_projects.length});
-
-			              });
-			              */
 				
 				break;
 
@@ -2688,12 +2468,6 @@ var Cluster4wplusDashboardController = {
 				
 
 				if ( params.list ) {
-
-					//console.log("IMPRIME AQUI EN 1");
-					
-					//console.log("FILTER BENEF: ",filterObjectBenef);
-					//console.log("FILTER BUDGET:" ,filterObjectBudget);
-
 
 					organizationList = [];
 
@@ -2727,16 +2501,8 @@ var Cluster4wplusDashboardController = {
 							organizations.sort(function(a, b) {
 								return a.organization.localeCompare(b.organization);
 							});
-							/*organizations.unshift({
-											organization_tag: 'all',
-											organization: 'ALL',
-										});*/
-
-					     //	console.log("ORGANIZATIONS BENEFICIARIOS: ", organizations);
-
-                            
-                           
-						   organizations.forEach( function( d, i ) {
+							
+							organizations.forEach( function( d, i ) {
 
 							 		if(d.organization_tag){
 
@@ -2753,15 +2519,7 @@ var Cluster4wplusDashboardController = {
 									
 						    	});
 
-							//console.log("RESULTADO EN BENEFICIARIOS: ",organizationList);
-
-
-
-
-
-							//NUEVO
-
-							BudgetProgress.native(function(err, collection) {
+					BudgetProgress.native(function(err, collection) {
 						if (err) return res.serverError(err);
 					
 						collection.aggregate([
@@ -2828,11 +2586,9 @@ var Cluster4wplusDashboardController = {
 
 
 
-			}else {	// count of organizations
+			}else {	
 
-					//console.log("IMPRIME AQUI EN 2");
-
-					resultsFiltersOrganizations = [];
+				resultsFiltersOrganizations = [];
 
 					Beneficiaries.native(function(err, collection) {
 						if (err) return res.serverError(err);
@@ -2870,20 +2626,10 @@ var Cluster4wplusDashboardController = {
 
 									resultsFiltersOrganizations.push(d);
 									
-
-
-
 								}
 
 							});
 
-						//	console.log("RESULTS EN 2: ",results);
-							//console.log("TOTAL ORGANIZATIONS en Beneficiarios: ",resultsFiltersOrganizations[0].total);
-
-
-							//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
-
-							
 						BudgetProgress.native(function(err, collection) {
 						if (err) return res.serverError(err);
 					
@@ -2938,7 +2684,7 @@ var Cluster4wplusDashboardController = {
 				});	
 
 
-				}
+			}
 				
 				break;
 
@@ -3031,12 +2777,6 @@ var Cluster4wplusDashboardController = {
 
 				case 'budgetprogress_4wplusdashboard':
 
-				// total sum
-				//console.log("FILTERS: ", filters);
-				//console.log("FILTROS: ", filterObject);
-
-				//console.log("FILTROS: ",filters);
-
 				BudgetProgress.find()
 					.where( filters.default )
 					.where( filters.adminRpcode )
@@ -3084,11 +2824,8 @@ var Cluster4wplusDashboardController = {
 
 								bpamount = finalnumber / params.coptousd;
 
-								
-
-							}
-
 							
+							}
 
 
 							total_budget_progress = total_budget_progress+bpamount;
@@ -3157,7 +2894,8 @@ var Cluster4wplusDashboardController = {
 
 						});
 					   var partners =	imppartners;
-					  // console.log("TOTAL PARTNERS EN BENEF: ", partners.length);
+
+					
 					}
 
 
@@ -3198,11 +2936,7 @@ var Cluster4wplusDashboardController = {
 
 								 result[i].implementing_partners.forEach(function (d, j){
 
-								 //	console.log("imple: ",results[i].implementing_partners[j]);
-
-								 //	if(results[i].implementing_partners[j]){
-
-								 		const resultado = imppartners.find( implementer => implementer.organization_tag === result[i].implementing_partners[j].organization_tag );
+								 const resultado = imppartners.find( implementer => implementer.organization_tag === result[i].implementing_partners[j].organization_tag );
 
 			                             if(!resultado){
 			                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
@@ -3210,8 +2944,6 @@ var Cluster4wplusDashboardController = {
 			                             	console.log("add IMP BUDG: ",results[i].implementing_partners[j]);
 
 			                             }
-
-								 //	}
 
 								});
 
@@ -3281,7 +3013,6 @@ var Cluster4wplusDashboardController = {
 
 						});
 
-						//console.log("UBICACIONES EN BENEFICIARIES", locationsTotal);
 
 
 				BudgetProgress.native(function(err, collection) {
@@ -3330,20 +3061,16 @@ var Cluster4wplusDashboardController = {
 									site_lng: d._id.admin2lng,
 								    site_name: d._id.admin2name + ', '+d._id.admin1name
 
-
 								};
-
 
 								locationsTotal.push(objlocat);
 							}
 
 						});
 
-				//	console.log("UBICACIONES EN FINANCIERO", locationsTotal);
 
 				    return res.json(200, {'value': locationsTotal.length});
 
-						//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 					});
 				  });
 			    });
@@ -3459,16 +3186,11 @@ var Cluster4wplusDashboardController = {
 								}*/
 							]).toArray( function (err, resultsLocations) {
 
-							   //	console.log("RESULTADOS BUDGETPRO: ",resultsLocations);
-
-						
-
-						    	resultsLocations.forEach(function(d,i){
+							   resultsLocations.forEach(function(d,i){
 	 
 								const exist = locationsMarkTotal.find(locati => (locati._id.site_lat === d._id.admin2lat && locati._id.site_lng === d._id.admin2lng));
 
 								if(!exist){
-
 
 
 									d._id = {
