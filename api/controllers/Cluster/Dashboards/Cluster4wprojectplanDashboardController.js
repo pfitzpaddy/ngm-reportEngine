@@ -2081,63 +2081,104 @@ var Cluster4wprojectplanDashboardController = {
 
 						project.forEach(function(pro,i){
 
-							var financing = 0;
-
-						if(pro.project_budget_currency !=='eur' && pro.project_budget_currency !== 'cop'){
 							
-							if(pro.project_budget.length){
-										var newbud = parseFloat(pro.project_budget);
-										financing = newbud;
-									}else{
+							//console.log("VALOR ENTRA: ",pro.project_budget);
 
-										financing = pro.project_budget;
+							if(typeof pro.project_budget === 'string'){
 
-									}
+								//console.log("ES STRING: ",pro.project_budget);
 
-						 } else if(pro.project_budget_currency ==='eur'){
 
-									if(pro.project_budget.length){
-										var newbud = parseFloat(pro.project_budget);
-									//	console.log("EURO STRING: ",newbud);
-										//console.log("URDOL STRING:",params.eurotousd);
+								var stringval = pro.project_budget.replace(".",'');
+								var stringtonum = parseFloat(stringval);
+								if(stringtonum){
+									if(pro.project_budget_currency !=='eur' && pro.project_budget_currency !== 'cop'){
 
-										var budeurtodollar = newbud*params.eurotousd;
+										var financing = stringtonum;
+
+									}else if(pro.project_budget_currency ==='eur'){
+
+										var budeurtodollar = stringtonum*params.eurotousd;
+ 										
+ 										//console.log("FINAL BUDG EUR STRING: ",budeurtodollar);
+
 									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
 										
-										financing = budeurtodollar;
-									}else{
-									 // console.log("EURO NO STRING: ",pro.project_budget);
-									//	console.log("EURO A DOLAR",params.eurotousd);
-										var budeurtodollar = pro.project_budget*params.eurotousd;
-										//console.log("VALOR BUDGET EN DOLAR PARA AGREGAR: ",budeurtodollar);
-										financing = budeurtodollar;
-
-									}
-
-								}else if(pro.project_budget_currency ==='cop'){
+										var  financing = budeurtodollar;
 
 
-									if(pro.project_budget.length){
-										var newbud = parseFloat(pro.project_budget);
-										//console.log("PESO COL STRING: ",pro.project_budget);
+									}else if(pro.project_budget_currency ==='cop'){
 
-										var budcoptodollar = pro.project_budget/params.coptousd;
+
+										var budcoptodollar = stringtonum/params.coptousd;
+
+										//console.log("FINAL BUDG COP STRING: ",budcoptodollar);
+
 										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
-										financing = budcoptodollar;
-									}else{
-									//	console.log("PESO COL NO STRING: ",pro.project_budget);
-										//console.log("VALOR DEL PESO COL a 1 DOLAR:", params.coptousd);
-										var budcoptodollar = pro.project_budget/params.coptousd ;
+										var financing = budcoptodollar;
 
-										//console.log("PESO COL YA EN DOLARES: ",budcoptodollar);
-
-										financing = budcoptodollar;
 
 									}
+
+
+								}else{
+
+									//console.log("NO ES VALIDO: ", stringtonum);
+									var financing = 0;
 
 								}
 
-								totalfinancing = totalfinancing+financing;
+							}else{
+
+								//console.log("NO ES STRING: ",pro.project_budget);
+
+								var valtostring2 = pro.project_budget.toString();
+								var stringtonum2 = valtostring2.replace(".",'');
+										var valnum = parseFloat(stringtonum2);
+									//	console.log("VALNUM: ",valnum);
+								if(valnum ){
+
+									if(pro.project_budget_currency !=='eur' && pro.project_budget_currency !== 'cop'){
+
+									var	financing = valnum;
+
+									}else if(pro.project_budget_currency ==='eur'){
+
+										var budeurtodollar2 = valnum*params.eurotousd;
+ 										
+ 										//console.log("FINAL BUDG EUR NO STRING: ",budeurtodollar2);
+
+									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
+										
+										var financing = budeurtodollar2;
+
+
+									}else if(pro.project_budget_currency ==='cop'){
+
+
+										var budcoptodollar2 = valnum/params.coptousd;
+
+										//console.log("FINAL BUDG COP NO STRING: ",budcoptodollar2);
+
+										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
+										var financing = budcoptodollar2;
+
+
+									}
+
+
+
+								} else{	
+								//	console.log("NO ES VALIDO: ", valnum);
+									var financing =0;
+								}
+
+							}
+
+							//console.log("VALOR A GUARDAR:", financing);
+
+						totalfinancing = totalfinancing+financing;
+					
 							
                        });
 						//console.log("FINANCING: ", totalfinancing);
