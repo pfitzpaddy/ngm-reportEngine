@@ -33,12 +33,13 @@ var Cluster4wprojectplanDashboardController = {
 					!req.param('adminRpcode') ||
 					!req.param('admin0pcode') ||
 					!req.param('organization_tag') ||
+					!req.param('donor_tag') ||
 					!req.param('admin1pcode') ||
 					!req.param('admin2pcode') ||
 					//!req.param('beneficiaries') ||
 					!req.param('start_date') ||
 					!req.param('end_date') ) {
-			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, admin1pcode, admin2pcode, start_date, end_date required!'});
+			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, donor_tag, admin1pcode, admin2pcode, start_date, end_date required!'});
 		}
 
 
@@ -54,6 +55,7 @@ var Cluster4wprojectplanDashboardController = {
 			adminRpcode: req.param('adminRpcode'),
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
+			donor_tag: req.param('donor_tag'),
 			admin1pcode: req.param('admin1pcode'),
 			admin2pcode: req.param('admin2pcode'),
 			//beneficiaries: req.param('beneficiaries'),
@@ -94,6 +96,8 @@ var Cluster4wprojectplanDashboardController = {
 			//date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
 			//activity_type: params.cluster_id === 'all' ? {} : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			//new date filter
+
+			donor_tag: params.donor_tag === 'all' ? {} : {  project_donor : { $elemMatch : { 'project_donor_id' : params.donor_tag}}},
 			
 			project_startDate: { project_start_date: {'>=': new Date(params.start_date)}},
 			project_endDate: { project_end_date: {'<=': new Date(params.end_date)}},
@@ -133,7 +137,7 @@ var Cluster4wprojectplanDashboardController = {
 			//date_Native: { reporting_period: { $gte: new Date( params.start_date ), $lte: new Date( params.end_date )} },
 		    //activity_typeNative: (params.cluster_id) === 'all' ? {} : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
 
-
+			donor_tagNative: params.donor_tag === 'all' ? {} : {  project_donor : { $elemMatch : { 'project_donor_id' : params.donor_tag}}},
 
 			//new date_Native
 			project_startDateNative: { project_start_date: { $gte: new Date(params.start_date) }},
@@ -165,6 +169,7 @@ var Cluster4wprojectplanDashboardController = {
 										//filters.cluster_id,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
+										filters.donor_tagNative,
 										//filters.beneficiaries,
 										//filters.date_Native,
 										filters.project_startDateNative,
@@ -193,6 +198,7 @@ var Cluster4wprojectplanDashboardController = {
 					//.where( filters.activity_type_id )
 					//.where( filters.acbar_partners )
 					.where( filters.organization_tag )
+					.where(filters.donor_tag)
 					//.where( filters.beneficiaries )
 					//.where( filters.date )
 					.where(filters.project_startDateNative)
@@ -1922,6 +1928,7 @@ var Cluster4wprojectplanDashboardController = {
 					//.where( filters.activity_type_id )
 					//.where( filters.acbar_partners )
 					.where( filters.organization_tag )
+					.where(filters.donor_tag)
 					//.where( filters.beneficiaries )
 					.where( filters.activity_type)
 					.where( filters.project_startDateNative )
@@ -2271,6 +2278,66 @@ var Cluster4wprojectplanDashboardController = {
 				
 				break;
 
+				case 'project_donors':
+
+				var donorslist = [];
+				//console.log("FILTROS: ", filters);
+
+				Project.find()
+				.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+				.exec(function (err, results){
+
+					if (err) return res.serverError(err);
+
+						//var imppartners = [];
+						
+
+
+					if(results.length){
+
+
+						results.forEach( function( d, i ) {
+
+
+							if(d.project_donor.length > 0){
+
+								 d.project_donor.forEach(function (projdonor, j){
+
+
+	                             const resultado = donorslist.find( donor => donor.project_donor_id === projdonor.project_donor_id );
+
+	                             if(!resultado){
+	                             	donorslist.push(projdonor);
+	                             	//console.log("METI EL DONANTE: ", projdonor);
+
+	                             }
+	                            
+
+								});
+
+							};
+
+						});
+
+					  }
+					 // console.log("MIS DONANTES: ",donorslist);
+
+
+				return res.json(200, {'data':donorslist});
+
+
+				});
+
+
+				break;
+
 				case 'total_donors_4wdashboard_projectplan':
 
 
@@ -2284,6 +2351,7 @@ var Cluster4wprojectplanDashboardController = {
 					.where( filters.organization_tag )
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
+					.where(filters.donor_tag)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
 					.exec( function( err, results ){
@@ -2336,6 +2404,7 @@ var Cluster4wprojectplanDashboardController = {
 					.where( filters.organization_tag )
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
+					.where(filters.donor_tag)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
 					.exec( function( err, results ) {
