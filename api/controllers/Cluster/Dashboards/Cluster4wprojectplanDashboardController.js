@@ -237,6 +237,60 @@ var Cluster4wprojectplanDashboardController = {
 
 				break;
 
+
+
+				/*case 'projects_apc_4wplus':
+
+//http://192.168.33.16/api/cluster/indicator4wprojectplan?adminRpcode=amer&admin0pcode=col&admin1pcode=all&cluster_id=all&organization_tag=all&donor_tag=all&implementer_tag=all&activity_type=all&start_date=2019-01-01&end_date=2019-12-31&csv=true&indicator=projects_apc_4wplus
+
+				// beneficiaries
+
+				//filters.active_project = { project_status: 'active'};
+				console.log("FILTROS: ",filters);
+
+				Project
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.admin1pcode )
+					.where( filters.admin2pcode )
+					.where( filters.cluster_id )
+					//.where( filters.active_project)
+					//.where( filters.activity_type_id )
+					//.where( filters.acbar_partners )
+					//.where( filters.organization_tag )
+					.where(filters.donor_tag)
+					//.where( filters.implementer_tag)
+					//.where(filters.activity_type)
+					//.where( filters.beneficiaries )
+					//.where( filters.date )
+					.where(filters.project_startDateNative)
+					.where(filters.project_endDateNative)
+					.sort( 'updatedAt DESC' )
+					//.limit(1)
+					.exec( function( err, results ){
+
+						// return error
+						if (err) return res.negotiate( err );
+
+						results.forEach(function(d,i){
+
+							console.log("STATUS: ", d.project_status);
+
+						});
+						
+
+						// latest update
+						return res.json( 200, results );
+
+					});
+
+				break;*/
+
+
+
+
 			/*	
 
 			case 'contacts':
