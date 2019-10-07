@@ -246,7 +246,9 @@ var Cluster4wprojectplanDashboardController = {
 				// beneficiaries
 
 				//filters.active_project = { project_status: 'active'};
-				console.log("FILTROS: ",filters);
+				console.log("PARAMETROS: ", req.param('donor_tag'));
+				console.log("PARAMS: ", params.donor_tag);
+				//console.log("FILTROS: ",filters);
 
 				Project
 					.find()
@@ -276,7 +278,7 @@ var Cluster4wprojectplanDashboardController = {
 
 						results.forEach(function(d,i){
 
-							console.log("STATUS: ", d.project_status);
+							//console.log("STATUS: ", d.project_status);
 
 						});
 						
@@ -286,8 +288,8 @@ var Cluster4wprojectplanDashboardController = {
 
 					});
 
-				break;*/
-
+				break;
+*/
 
 
 
