@@ -148,33 +148,10 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-			//Response components COL
 
-		humanitarian_component:{
-			type:'boolean'
-		},
-
-		construccion_de_paz_component:{
-			type:'boolean'
-		},
-
-		desarrollo_sostenible_component:{
-			type:'boolean'
-		},
-
-		flujos_migratorios_component:{
-			type:'boolean'
-		},
-
-		//plan hrp/rmrp/undaf COL
-		hrp_plan: {
-			type: 'boolean'
-		},
-		rmrp_plan: {
-			type: 'boolean'
-		},
-		interagencial_plan: {
-			type: 'boolean'
+		//New column plans and components
+		plan_component: {
+			type: 'array'
 		},
 		
 		project_code: {

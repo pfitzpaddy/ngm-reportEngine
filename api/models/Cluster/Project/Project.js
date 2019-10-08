@@ -136,6 +136,10 @@ module.exports = {
 		},
 
 		//Response components COL
+		plan_component: {
+			type: 'array'
+		},
+		/*
 
 		humanitarian_component:{
 			type:'boolean'
@@ -163,6 +167,7 @@ module.exports = {
 		interagencial_plan: {
 			type: 'boolean'
 		},
+		*/
 
 		project_status: {
 			type: 'string',
