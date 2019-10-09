@@ -33,15 +33,17 @@ var Cluster4wprojectplanDashboardController = {
 					!req.param('adminRpcode') ||
 					!req.param('admin0pcode') ||
 					!req.param('organization_tag') ||
-					!req.param('donor_tag') ||
+					!req.param('project_type_component') ||
+					!req.param('hrpplan')||
 					!req.param('implementer_tag')||
+					!req.param('donor_tag') ||
 					!req.param('activity_type') ||
 					!req.param('admin1pcode') ||
 					!req.param('admin2pcode') ||
 					//!req.param('beneficiaries') ||
 					!req.param('start_date') ||
 					!req.param('end_date') ) {
-			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, donor_tag, implementer_tag, activity_type, admin1pcode, admin2pcode, start_date, end_date required!'});
+			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, project_type_component, hrpplan, implementer_tag, donor_tag, activity_type, admin1pcode, admin2pcode, start_date, end_date required!'});
 		}
 
 
@@ -72,6 +74,56 @@ var Cluster4wprojectplanDashboardController = {
 		
 
 	},
+
+
+    //start COL 4WPLUS API-APC functions
+	getParamsAPCCOL:function(req,res){
+
+		if ( !req.param('indicator') ||
+					!req.param('adminRpcode') ||
+					!req.param('admin0pcode') ||
+					!req.param('donor_tag') ||
+					!req.param('start_date') ||
+					!req.param('end_date') ) {
+			return res.json(401, {err: 'indicator, adminRpcode, admin0pcode, donor_tag,start_date, end_date required!'});
+		}
+
+
+		// return params
+		return {
+			indicator: req.param('indicator'),
+			adminRpcode: req.param('adminRpcode'),
+			admin0pcode: req.param('admin0pcode'),
+			donor_tag: req.param('donor_tag'),
+			start_date: req.param('start_date'),
+			end_date: req.param('end_date'),
+		}
+
+	},
+
+	getFiltersAPCCOL:function(paramsapccol){
+
+		if(paramsapccol.donor_tag !== 'all'){
+			paramsapccol.donor_tag = paramsapccol.donor_tag.split(",");
+		//console.log("DONOR: ",paramsapccol.donor_tag);
+
+		};
+
+		
+
+		return {
+			adminRpcode: paramsapccol.adminRpcode === 'all' ? {adminRpcode: 'amer'} : { adminRpcode: paramsapccol.adminRpcode },
+			admin0pcode: paramsapccol.admin0pcode === 'all' ? {adminRpcode: 'col'} : { admin0pcode: paramsapccol.admin0pcode },
+		
+			donor_tag: paramsapccol.donor_tag === 'all' ? {} : {  project_donor : { $elemMatch : { 'project_donor_id' : paramsapccol.donor_tag}}},
+			project_startDate: { project_start_date: {'>=': new Date(paramsapccol.start_date)}},
+			project_endDate: { project_end_date: {'<=': new Date(paramsapccol.end_date)}},
+
+		}
+	},
+
+	//end COL 4WPLUS API-APC functions
+
 
 	// return filters
 	getFilters: function( params ){
@@ -166,8 +218,17 @@ var Cluster4wprojectplanDashboardController = {
 	// indicators
 	getIndicator: function ( req, res  ) {
 
-		// parmas, filters
-		var params = Cluster4wprojectplanDashboardController.getParams( req, res );
+		//IF REQUESTS ITS FROM 4WPLUS API-APC COL
+
+		if(req.param('indicator') === 'projects_apc_4wplus'){
+			var params = Cluster4wprojectplanDashboardController.getParamsAPCCOL(req,res);
+
+        	var filters_apc_col = Cluster4wprojectplanDashboardController.getFiltersAPCCOL(params);
+
+
+		}else{
+			
+			var params = Cluster4wprojectplanDashboardController.getParams( req, res );
         
         var filters = Cluster4wprojectplanDashboardController.getFilters( params );
 		// match clause for native mongo query
@@ -191,8 +252,10 @@ var Cluster4wprojectplanDashboardController = {
 										//filters.beneficiaries,
 										//filters.date_Native,
 										filters.project_startDateNative,
-										filters.project_endDateNative/*,
-										filters.delivery_type_id()*/ );
+										filters.project_endDateNative,
+										//filters.delivery_type_id()
+										 );
+		};
 
 
 
@@ -237,59 +300,187 @@ var Cluster4wprojectplanDashboardController = {
 
 				break;
 
+				//4WPLUS API-APC
+
+				case 'projects_apc_4wplus':
 
 
-				/*case 'projects_apc_4wplus':
-
-//http://192.168.33.16/api/cluster/indicator4wprojectplan?adminRpcode=amer&admin0pcode=col&admin1pcode=all&cluster_id=all&organization_tag=all&donor_tag=all&implementer_tag=all&activity_type=all&start_date=2019-01-01&end_date=2019-12-31&csv=true&indicator=projects_apc_4wplus
-
-				// beneficiaries
-
-				//filters.active_project = { project_status: 'active'};
-				console.log("PARAMETROS: ", req.param('donor_tag'));
-				console.log("PARAMS: ", params.donor_tag);
-				//console.log("FILTROS: ",filters);
 
 				Project
 					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
+					.where( filters_apc_col.default )
+					.where( filters_apc_col.adminRpcode )
+					.where( filters_apc_col.admin0pcode )
+					//.where( filters_apc_col.cluster_id )
 					//.where( filters.active_project)
 					//.where( filters.activity_type_id )
 					//.where( filters.acbar_partners )
 					//.where( filters.organization_tag )
-					.where(filters.donor_tag)
+					.where(filters_apc_col.donor_tag)
 					//.where( filters.implementer_tag)
 					//.where(filters.activity_type)
 					//.where( filters.beneficiaries )
 					//.where( filters.date )
-					.where(filters.project_startDateNative)
-					.where(filters.project_endDateNative)
-					.sort( 'updatedAt DESC' )
+					.where(filters_apc_col.project_startDate)
+					.where(filters_apc_col.project_endDate)
+					.sort( 'updatedAt DESC' ).limit(20)
 					//.limit(1)
 					.exec( function( err, results ){
 
 						// return error
 						if (err) return res.negotiate( err );
+						newresults = [];
 
 						results.forEach(function(d,i){
 
 							//console.log("STATUS: ", d.project_status);
 
+
+							/* d.project = Project.find( queryProject );
+			                 d.budget = BudgetProgress.find( query );
+			                 d.beneficiaries = TargetBeneficiaries.find( query );
+			                 d.targetlocations = TargetLocation.find( query );
+			                    //project documents
+			                 d.documents = Documents.find(query);
+			                 dorganizations =  Organizations.find(query);*/
+			                 if(d.project_status === 'active'){
+			                 	project_status = 'Activo';
+			                 }else if(d.project_status === 'complete'){
+			                 	project_status = 'Completo'
+			                 };
+
+			                 if(d.project_donor){
+
+			                 	d.donantes_proyecto = [];
+
+			                 	d.project_donor.forEach(function (donante,i){
+
+			                 		donante_nuevo = {
+			                 			'id_donante':donante.project_donor_id,
+			                 			'nombre_donante':donante.project_donor_name,
+			                 			'monto_aporte_donante':donante.project_donor_budget
+			                 		}
+
+			                 		d.donantes_proyecto.push(donante_nuevo);
+
+			                 	});
+
+			                 };
+
+			                 if(d.implementing_partners){
+			                 	d.socios_implementadores =[];
+
+			                 	d.implementing_partners.forEach(function(socio,i){
+
+			                 		socio_nuevo = {
+
+			                 			'id_socio_implementador' : socio.organization_tag,
+			                 			'nombre_socio_implementador': socio.organization_name,
+			                 			'tipo_de_organizacion': socio.organization_type
+			                 		};
+
+			                 		d.socios_implementadores.push(socio_nuevo);
+
+			                 	});
+			                 };
+
+			                 if(d.dac_oecd_development_assistance_committee){
+
+			                 	d.relacion_dac = [];
+
+			                 	d.dac_oecd_development_assistance_committee.forEach(function(dac,i){
+
+			                 		dac_nuevo = {
+
+			                 			'id':dac.sidi_id,
+			                 			'codigo':dac.code,
+			                 			'nombre':dac.name_tag,
+			                 			'descripcion':dac.description
+
+			                 		};
+
+			                 		d.relacion_dac.push(dac_nuevo);
+
+			                 	});
+
+			                 };
+
+			                 if(d.acuerdos_de_paz){
+
+			                 	d.relacion_acuerdos_de_paz = [];
+
+			                 	d.acuerdos_de_paz.forEach(function(acuerdo,i){
+
+			                 		acuerdo_paz_nuevo = {
+
+			                 			'id':acuerdo.sidi_id,
+			                 			'codigo':acuerdo.code,
+			                 			'nombre':acuerdo.name_tag,
+			                 			'descripcion':acuerdo.description
+
+			                 		};
+
+			                 		d.relacion_acuerdos_de_paz.push(acuerdo_paz_nuevo);
+			                 	});
+			                 };
+
+
+			                 if(d.ods_objetivos_de_desarrollo_sostenible){
+
+			                 	d.relacion_ods = [];
+
+			                 	d.ods_objetivos_de_desarrollo_sostenible.forEach(function(ods,i){
+
+			                 		ods_nuevo = {
+
+			                 			'id':ods.sidi_id,
+			                 			'codigo':ods.code,
+			                 			'nombre':ods.name_tag,
+			                 			'descripcion':ods.description
+
+			                 		};
+
+			                 		d.relacion_ods.push(ods_nuevo);
+
+			                 	});
+			                 }
+
+
+
+
+
+			             var pro = {
+			                 
+			                 	'titulo_del_proyecto' : d.project_title,
+			                 	'estado_del_royecto' : project_status,
+			                 	'fecha_inicio_del_proyecto' : d.project_start_date,
+			                 	'fecha_final_del_proyecto' : d.project_end_date,
+			                 	'fecha_ultima_modificacion' : d.updatedAt,
+			                 	'codigo_del_proyecto': d.project_code,
+			                 	'descripcion' : d.description,
+			                 	'moneda_del_proyecto': d.project_budget_currency,
+			                 	'id_agencia_ejecutora': d.organization_tag,
+			                 	'nombre_agencia_ejecutora': d.organization_name,
+			                 	'agencias_donantes_del_proyecto': d.donantes_proyecto,
+			                 	'agencias_socios_implementadores':d.socios_implementadores,
+			                 	'relacion_con_cad' : d.relacion_dac,
+			                 	'relacion_con_pmi_acuerdo_de_paz)': d.relacion_acuerdos_de_paz,
+			                 	'relacion_con_ods': d.relacion_ods,
+			                 	
+
+						    };
+						    newresults.push(pro);
+
 						});
 						
 
 						// latest update
-						return res.json( 200, results );
+						return res.json( 200, newresults );
 
 					});
 
 				break;
-*/
+
 
 
 
