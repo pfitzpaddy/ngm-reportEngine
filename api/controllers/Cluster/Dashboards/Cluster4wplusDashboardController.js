@@ -113,22 +113,21 @@ var Cluster4wplusDashboardController = {
 			admin0pcode: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode },
 			admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
 			admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
-			//hrp_plan: params.hrpplan === 'all' ? {} : { hrp_plan: params.hrpplan}, 
 			
-            hrp_plan: ( params.hrpplan === 'all')
-			                   ? {} 
-			                  : ( params.hrpplan === 'true')
-			                  ? { plan_component : {$in: ["hrp_plan"]}}
-			                  : { plan_component : {$nin : ["hrp_plan"] }},
+            project_plan_component: (params.project_type_component === 'all' && params.hrpplan === 'all')
+			     ? {}
+			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
+			     ? { plan_component: {$in: [params.project_type_component]}}
+			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
+			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
+			     ? { plan_component: {$in:[params.project_type_component]}}
+			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
+			     ? { plan_component: {$in : ["hrp_plan"]}}
+			     : { plan_component: { $nin : ["hrp_plan"]}},
 			                
 			
-            /* cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
-								? {} 
-								: ( params.cluster_id !== 'cvwg' )
-									//? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } } ] }
-									//: { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id } }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
-			                     : { or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}}]},*/
-             cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
+           cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
 								: ( params.cluster_id !== 'cvwg' )
 									 ?{cluster_id:params.cluster_id}
@@ -145,20 +144,8 @@ var Cluster4wplusDashboardController = {
 
 	                        : { project_donor_id: params.donor},
 
-	       /* project_type: (params.project_type_component === 'all')
-	                       ? {}
-	                       //: { or: [{ hrp_plan: params.project_type_component },{ interagencial_plan:params.project_type_component },{rmrp_plan: params.project_type_component}]}, 
-			                 : ( params.project_type_component === 'hrp_plan')
-			                 ? { hrp_plan :  true}
-			                 : ( params.project_type_component === 'interagencial_plan')
-			                 ? { interagencial_plan: true}
-			                 : ( params.project_type_component === 'rmrp_plan')
-			                 ? { rmrp_plan : true}
-			                 : {} ,*/
-			project_type: (params.project_type_component === 'all')
-			                 ?{}
-			                 : { plan_component : {$in: [params.project_type_component]}},
-			                 //: { plan_component:{ $elemMatch:{'plan': { $regex: 'hrp_plan'}}}
+	    
+		
 
 			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
@@ -193,11 +180,18 @@ var Cluster4wplusDashboardController = {
 
 								 //: { $in:[{ cluster_id: params.cluster_id }, { inter_cluster_activities: { $elemMatch:{cluster_id:params.cluster_id} }} ]} ,
 
-			hrp_plan_Native: ( params.hrpplan === 'all')
-			                   ? {} 
-			                  : ( params.hrpplan === 'true')
-			                  ? { plan_component : {$in: ["hrp_plan"]}}
-			                  : { plan_component : {$nin : ["hrp_plan"] }},
+			project_plan_componentNative: (params.project_type_component === 'all' && params.hrpplan === 'all')
+			     ? {}
+			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
+			     ? { plan_component: {$in: [params.project_type_component]}}
+			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
+			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
+			     ? { plan_component: {$in:[params.project_type_component]}}
+			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
+			     ? { plan_component: {$in : ["hrp_plan"]}}
+			     : { plan_component: { $nin : ["hrp_plan"]}},
+
 
 			implementer_tagNative: ( params.implementer === 'all')
 	                            ? {}
@@ -213,21 +207,6 @@ var Cluster4wplusDashboardController = {
 
 	                        : { project_donor_id: params.donor},
 	                      
-
-			/*project_typeNative: (params.project_type_component === 'all')
-	                       ? {}
-	                       //: { or: [{ hrp_plan: params.project_type_component },{ interagencial_plan:params.project_type_component },{rmrp_plan: params.project_type_component}]}, 
-			                 : ( params.project_type_component === 'hrp_plan')
-			                 ? { hrp_plan :  true}
-			                 : ( params.project_type_component === 'interagencial_plan')
-			                 ? { interagencial_plan: true}
-			                 : ( params.project_type_component === 'rmrp_plan')
-			                 ? { rmrp_plan : true}
-			                 : {} , */   
-			project_typeNative: (params.project_type_component === 'all')
-			                 ?{}
-			                 : { 'plan_component' : {$in: [params.project_type_component]}},                 
-			
 
 			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') ) 
 								? {} 
@@ -303,8 +282,9 @@ var Cluster4wplusDashboardController = {
 										filters.cluster_id_Native1,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
-										filters.hrp_plan_Native,
-										filters.project_typeNative,
+										//filters.hrp_plan_Native,
+										//filters.project_typeNative,
+										filters.project_plan_componentNative,
 										filters.implementer_tagNative,
 										//filters.donor_tagNative,
 										filters.donor_tagBudget_Native,
@@ -323,8 +303,9 @@ var Cluster4wplusDashboardController = {
 										filters.cluster_id_Native1,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
-										filters.hrp_plan_Native,
-										filters.project_typeNative,
+										//filters.hrp_plan_Native,
+										//filters.project_typeNative,
+										filters.project_plan_componentNative,
 										filters.implementer_tagNative,
 										//filters.donor_tagNative,
 										filters.donor_tagBenef_Native,
@@ -341,7 +322,6 @@ var Cluster4wplusDashboardController = {
 			case 'latest_update':
 
 				// beneficiaries
-         console.log("PROJECT TYPE FILTER: ",filters.project_typeNative);
 				Beneficiaries
 					.find()
 					.where( filters.default )
@@ -352,8 +332,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.clusterid )
 					.where( filters.activity_type_id )
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.implementer_tag)
 					//.where( filters.donor_tag)
 					.where(filters.donor_tagBenef)
@@ -2108,8 +2089,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.implementer_tag)
@@ -2160,8 +2142,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.implementer_tag)
@@ -2226,8 +2209,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.implementer_tag)
@@ -2278,8 +2262,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.implementer_tag)
@@ -2797,8 +2782,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.cluster_id)
 
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.implementer_tag)
 					//.where( filters.donor_tag)
@@ -2864,8 +2850,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.implementer_tag)
@@ -2919,8 +2906,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					.where( filters.hrp_plan)
-					.where( filters.project_type)
+					//.where( filters.hrp_plan)
+					//.where( filters.project_type)
+					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
 					.where( filters.implementer_tag)
@@ -3118,7 +3106,7 @@ var Cluster4wplusDashboardController = {
 										site_name:'$site_name',
 										cluster:'$cluster',
 										organization:'$organization',
-										hrp_plan: '$hrp_plan',
+										plan_component: '$plan_component',
 										project_title:'$project_title',
 										admin0name:'$admin0name',
 										admin1name:'$admin1name',
@@ -3172,7 +3160,7 @@ var Cluster4wplusDashboardController = {
 											admin2name: '$admin2name',
 											cluster:'$cluster',
 												organization:'$organization',
-												hrp_plan: '$hrp_plan',
+												plan_component: '$plan_component',
 												project_title:'$project_title',
 												admin0name:'$admin0name',
 												admin3name:'$admin3name',
@@ -3214,7 +3202,7 @@ var Cluster4wplusDashboardController = {
 										admin2name: d._id.admin2name,
 										cluster: d._id.cluster,
 											organization: d._id.organization,
-											hrp_plan: d._id.hrp_plan,
+											plan_component: d._id.plan_component,
 											project_title: d._id.project_title,
 											admin0name: d._id.admin0name,
 											admin3name: d._id.admin3name,
