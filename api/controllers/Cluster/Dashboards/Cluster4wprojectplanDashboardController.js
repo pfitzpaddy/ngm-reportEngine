@@ -24,6 +24,30 @@ var Cluster4wprojectplanDashboardController = {
 		return array;
 	},
 
+	exchangeRatesCurrencies: function(req, res){
+
+		var excangeratescurrencies = []; 
+
+         var request = require('request');
+
+		//api to find exchange rates from EURO to others currencies
+			  request.get({
+						  url: 'https://api.exchangeratesapi.io/latest'
+						}, function(error, response, body) {
+						  if (error) {
+						  }
+						  else {
+			
+						   newbody = JSON.parse(body);
+						
+						  excangeratescurrencies.push(newbody.rates.USD);
+
+						// console.log("EURO A DOLAR1 FUNCTION: ", typeof excangeratescurrencies);
+						 return res.json( 200, excangeratescurrencies);
+						}
+					});
+	},
+
 	// get params from req
 	getParams: function( req, res ){
 
