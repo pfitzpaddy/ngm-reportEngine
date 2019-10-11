@@ -200,6 +200,9 @@ module.exports.routes = {
   'GET /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator',
   'POST /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator', 
 
+//COL API - APC
+  'GET /cluster/project/getProjectsColAPC': 'Cluster/ProjectController.getProjectsColAPC',
+
   // -------- HEALTH --------
   // 4W Dashboard
   'POST /health/indicator': 'Cluster/Health/HealthDashboardController.getHealthDetails',

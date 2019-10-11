@@ -193,11 +193,13 @@ var ProjectController = {
 
   },
 
+ 
   // get projects summary
   getProjects: function(req, res){
  
    // req.param('query').project_start_date = '$gte : 2019-01-01';
     // Guards
+    console.log("REQ QUERY: ",req.param('query'));
     if (!req.param('id')&&!req.param('query')) {
       return res.json(401, { err: 'params required!' });
     }
@@ -248,6 +250,9 @@ var ProjectController = {
     },
 
     _getProjectData : function(queryProject, query){
+
+      console.log("QUERY EN GETPROJECTS: ",query);
+    console.log("queryProject EN GETPROJECTS",queryProject);
 
 
                   return Promise.props({
@@ -993,7 +998,308 @@ var ProjectController = {
         });
 
       });
-  }
+  },
+
+  getProjectsColAPC: function(req,res){
+
+   
+    
+    // if dissallowed parameters sent
+    if ( 
+          !req.param('adminRpcode') ||
+          !req.param('admin0pcode') ||
+          !req.param('donor_tag') ||
+          !req.param('start_date') ||
+          !req.param('end_date') ) {
+     return res.json(401, {err: 'adminRpcode, admin0pcode, donor_tag,start_date, end_date required!'});
+    }else{
+
+      if(req.param('donor_tag') !== 'all'){
+      donor_tag = req.param('donor_tag').split(",");
+       allowedParams ={
+          adminRpcode : 'AMER',
+          admin0pcode :'COL',
+          
+         project_donor : {$elemMatch:{project_donor_id : { $in :  donor_tag}}},
+        project_start_date: {$gte : new Date(req.param('start_date'))},
+         project_end_date: {$lte : new Date(req.param('end_date'))}
+      };
+
+    }else{
+       allowedParams ={
+          adminRpcode : 'AMER',
+          admin0pcode :'COL',
+          //project_donor: req.param('donor_tag') === 'all' ? {} : {  "project_donor.project_donor_id" : { $in :  donor_tag}},
+          project_start_date: {$gte : new Date(req.param('start_date'))},
+         project_end_date: {$lte : new Date(req.param('end_date'))}
+      };
+    };
+
+
+     
+
+     // console.log("REQ PARAM QUERY: ",allowedParams);
+    }
+
+
+     var pipe = Promise.resolve()
+      .then(function(){ return actions._getProjectDataColAPC(allowedParams) })
+      .then(function(res){ return actions._processCollectionsColAPC(res) })
+      .then(function($project){ return actions._doResponseColAPC($project) })
+      .catch(function(err){ return err === 'NO PROJECT' } , function(err) { return actions._errorNoProjectRes(err) })
+      .catch(function(err){ return actions._error(err) });
+
+ 
+      var actions = {
+
+           _error : function(err){
+      return res.negotiate(err);
+    },
+
+    _errorNoProjectRes : function(err){
+      return res.json( 200, [] );
+    },
+          _getProjectDataColAPC : function(queryProject){
+
+
+                  return Promise.props({
+                          project: Project.find( queryProject),
+                          //budget: BudgetProgress.find( queryProject ),
+                         // beneficiaries: TargetBeneficiaries.find( queryProject ),
+                          //targetlocations: TargetLocation.find( queryProject ),
+                          //project documents
+                          documents: Documents.find(queryProject),
+                          //organizations: Organizations.find(queryProject),
+                          //Report.find( findProject, updatedRelationsUser ),
+                          //Location.update( findProject, updatedRelationsUser ),
+                          //Beneficiaries.find( findProject, updatedRelationsUser ),
+                        });
+
+                    
+
+          },
+
+          _processCollectionsColAPC : function(data){
+
+
+            // no project found
+            if ( !data.project.length ) return Promise.reject('NO PROJECT');
+
+            // all projects
+            $project = [];
+
+            var _comparatorBuilder = this._comparatorBuilder
+
+            // populate&sort fields
+                              // TODO maybe realate models via populate
+            var uppendDataToProject = function(project){
+
+                          var projectId = project.id;
+                          var i = data.project.indexOf(project);
+                          // assemble project data
+                          $project[i] = {};
+                          $project[i].id_proyecto = project.id;
+                          $project[i].titulo_del_proyecto = project.project_title;
+                          if(project.project_status === 'active'){
+                         $project[i].estado_del_proyecto = 'Activo';
+                       }else if(project.project_status === 'complete'){
+                         $project[i].estado_del_proyecto = 'Completo'
+                       };
+
+                       $project[i].codigo_del_proyecto =project.project_code;
+                       $project[i].descripcion =project.description;
+                       $project[i].moneda_del_proyecto =project.project_budget_currency;
+                       $project[i].id_agencia_ejecutora =project.organization_tag;
+                       $project[i].nombre_agencia_ejecutora =project.organization_name;
+                       $project[i].nombre_agencia_ejecutora =project.organization_name;
+
+                       if(project.project_donor){
+
+                         var donantes_proyecto = [];
+
+                         project.project_donor.forEach(function (don,i){
+
+                           donor = {
+                             'id_donante':don.project_donor_id,
+                             'nombre_donante':don.project_donor_name,
+                             'monto_aporte_donante':don.project_donor_budget
+                           }
+
+                           donantes_proyecto.push(donor);
+
+                         });
+
+                         $project[i].agencias_donantes_del_proyecto = donantes_proyecto;
+
+                       };
+
+
+                       if(project.implementing_partners){
+                         
+                         var socios =[];
+
+                         project.implementing_partners.forEach(function(socioimp,i){
+
+                           nuevo_socio = {
+
+                             'id_socio_implementador' : socioimp.organization_tag,
+                             'nombre_socio_implementador': socioimp.organization_name,
+                             'tipo_de_organizacion': socioimp.organization_type
+                           };
+
+                           socios.push(nuevo_socio);
+
+                         });
+                          $project[i].agencias_socios_implementadores = socios;
+
+                       };
+
+
+                        if(project.dac_oecd_development_assistance_committee){
+
+                        var dac_relacion = [];
+
+                         project.dac_oecd_development_assistance_committee.forEach(function(dac,i){
+
+                           dac_nuevo = {
+
+                             'id':dac.sidi_id,
+                             'codigo':dac.code,
+                             'nombre':dac.name_tag,
+                             'descripcion':dac.description
+
+                           };
+
+                           dac_relacion.push(dac_nuevo);
+
+                         });
+
+                         $project[i].relacion_con_cad = dac_relacion;
+
+                       };
+
+
+                        if(project.acuerdos_de_paz){
+
+                         var acuerdos_de_paz_relacion = [];
+
+                         project.acuerdos_de_paz.forEach(function(acuerdo,i){
+
+                           acuerdo_paz_nuevo = {
+
+                             'id':acuerdo.sidi_id,
+                             'codigo':acuerdo.code,
+                             'nombre':acuerdo.name_tag,
+                             'descripcion':acuerdo.description
+
+                           };
+
+                           acuerdos_de_paz_relacion.push(acuerdo_paz_nuevo);
+                         });
+
+                         $project[i].relacion_con_pmi_acuerdo_de_paz = acuerdos_de_paz_relacion;
+                       };
+
+
+                        if(project.ods_objetivos_de_desarrollo_sostenible){
+
+                         var relacion_ods = [];
+
+                         project.ods_objetivos_de_desarrollo_sostenible.forEach(function(ods,i){
+
+                           ods_nuevo = {
+
+                             'id':ods.sidi_id,
+                             'codigo':ods.code,
+                             'nombre':ods.name_tag,
+                             'descripcion':ods.description
+
+                           };
+
+                           relacion_ods.push(ods_nuevo);
+
+                         });
+
+                         $project[i].relacion_con_ods = relacion_ods;
+                       }
+
+
+
+                        //  $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
+                          $project[i].target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
+                          $project[i].target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
+                          project.documents = _.filter(data.documents,       { 'project_id' : projectId}) ;
+
+                          if(project.documents){
+
+                            var documentos = [];
+
+                            project.documents.forEach(function(docu,i){
+
+                              docu.url = 'https://drive.google.com/uc?export=download&id='+docu.fileid;
+                              documentos.push(docu.url);
+
+                            });
+
+                            $project[i].documentos = documentos.join();
+
+
+                          }
+
+                          /// order
+                          $project[i].target_beneficiaries
+                                     .sort(function(a, b){ return a.id.localeCompare( b.id ) });
+                        //  $project[i].project_budget_progress
+                        //            .sort(function(a, b){ return a.id > b.id });
+                          $project[i].target_locations
+                                     .sort(function(a, b){
+                                        if (a.site_type_name){
+                                          if(a.admin3name){
+                                            return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_type_name','site_name']));
+                                          } else {
+                                            return eval(_comparatorBuilder(['admin1name','admin2name','site_type_name','site_name']));
+                                          }
+                                        } else {
+                                            if( a.admin3name){
+                                              return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_name']));
+                                            } else {
+                                              return eval(_comparatorBuilder(['admin1name','admin2name','site_name']));
+                                            }
+                                          }
+                          });
+
+                          $project[i].fecha_inicio_del_proyecto = moment($project[i].project_start_date).format('YYYY-MM-DD');
+                          $project[i].fecha_final_del_proyecto   = moment($project[i].project_end_date).format('YYYY-MM-DD');
+                          $project[i].fecha_ultima_modificacion   = moment( $project[i].updatedAt ).format('YYYY-MM-DD');
+                          // callback if error or post work can be called here `cb()`;
+                      };
+
+            async.each(data.project, uppendDataToProject);
+
+            return $project;
+          },
+
+           // build a to b localeCompare from array of props
+        _comparatorBuilder : function(compareObj){
+            var compareArr = [];
+            compareObj.forEach( function (criteria, i ) {
+              compareArr.push('a'+'.'+criteria + '.' + 'localeCompare(b.' + criteria + ')');
+            });
+            return compareArr.join('||')
+        },
+
+
+          _doResponseColAPC : function($project){
+
+            console.log("IMPRIMO: ",$project);
+
+            return res.json( 200, $project.length===1?$project[0]:$project );
+
+          }
+     
+       }
+
+  },
 
 };
 
