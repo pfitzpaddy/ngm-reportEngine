@@ -199,7 +199,6 @@ var ProjectController = {
  
    // req.param('query').project_start_date = '$gte : 2019-01-01';
     // Guards
-    console.log("REQ QUERY: ",req.param('query'));
     if (!req.param('id')&&!req.param('query')) {
       return res.json(401, { err: 'params required!' });
     }
@@ -250,9 +249,6 @@ var ProjectController = {
     },
 
     _getProjectData : function(queryProject, query){
-
-      console.log("QUERY EN GETPROJECTS: ",query);
-    console.log("queryProject EN GETPROJECTS",queryProject);
 
 
                   return Promise.props({
@@ -1035,10 +1031,6 @@ var ProjectController = {
       };
     };
 
-
-     
-
-     // console.log("REQ PARAM QUERY: ",allowedParams);
     }
 
 
@@ -1065,8 +1057,8 @@ var ProjectController = {
                   return Promise.props({
                           project: Project.find( queryProject),
                           //budget: BudgetProgress.find( queryProject ),
-                         // beneficiaries: TargetBeneficiaries.find( queryProject ),
-                          //targetlocations: TargetLocation.find( queryProject ),
+                          beneficiaries: TargetBeneficiaries.find( queryProject ),
+                          targetlocations: TargetLocation.find( queryProject ),
                           //project documents
                           documents: Documents.find(queryProject),
                           //organizations: Organizations.find(queryProject),
@@ -1226,8 +1218,8 @@ var ProjectController = {
 
 
                         //  $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
-                          $project[i].target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
-                          $project[i].target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
+                          project.target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
+                          project.target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
                           project.documents = _.filter(data.documents,       { 'project_id' : projectId}) ;
 
                           if(project.documents){
@@ -1243,30 +1235,84 @@ var ProjectController = {
 
                             $project[i].documentos = documentos.join();
 
-
                           }
 
                           /// order
-                          $project[i].target_beneficiaries
-                                     .sort(function(a, b){ return a.id.localeCompare( b.id ) });
-                        //  $project[i].project_budget_progress
-                        //            .sort(function(a, b){ return a.id > b.id });
-                          $project[i].target_locations
-                                     .sort(function(a, b){
-                                        if (a.site_type_name){
-                                          if(a.admin3name){
-                                            return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_type_name','site_name']));
-                                          } else {
-                                            return eval(_comparatorBuilder(['admin1name','admin2name','site_type_name','site_name']));
-                                          }
-                                        } else {
-                                            if( a.admin3name){
-                                              return eval(_comparatorBuilder(['admin1name','admin2name','admin3name','site_name']));
-                                            } else {
-                                              return eval(_comparatorBuilder(['admin1name','admin2name','site_name']));
-                                            }
-                                          }
+                         /* $project[i].target_beneficiaries
+                                     .sort(function(a, b){ return a.id.localeCompare( b.id ) });*/
+                          if(project.target_beneficiaries.length > 0){           
+                           var beneficiarios  = [];         
+
+                          project.target_beneficiaries.forEach(function(registrobeneficiarios,j){
+
+                            var newbenef = {};
+
+                            newbenef.id = registrobeneficiarios.id;
+
+                            newbenef.total_hombres = registrobeneficiarios.total_male;
+                            newbenef.total_mujeres = registrobeneficiarios.total_female;
+
+                            newbenef.niños_0_5 = registrobeneficiarios.boys_0_5;
+                            newbenef.niños_6_11 = registrobeneficiarios.boys_6_11;
+                            newbenef.niños_12_17 = registrobeneficiarios.boys_12_17;
+                            newbenef.total_niños = newbenef.niños_0_5 + newbenef.niños_6_11 + newbenef.niños_12_17;
+
+                            newbenef.hombres_18_59 = registrobeneficiarios.men;
+                            newbenef.hombres_60_mas = registrobeneficiarios.elderly_men;
+
+
+                            newbenef.niñas_0_5 = registrobeneficiarios.girls_0_5;
+                            newbenef.niñas_6_11 = registrobeneficiarios.girls_6_11;
+                            newbenef.niñas_12_17 = registrobeneficiarios.girls_12_17;
+                            newbenef.total_niñas = newbenef.niñas_0_5 + newbenef.niñas_6_11 + newbenef.niñas_12_17;
+
+                            newbenef.mujeres_18_59 = registrobeneficiarios.women;
+                            newbenef.mujeres_60_mas = registrobeneficiarios.elderly_women;
+
+                            newbenef.total_niños_niñas_0_5 =  newbenef.niños_0_5 + newbenef.niñas_0_5;
+                            newbenef.total_niños_niñas_6_11 = newbenef.niños_6_11 + newbenef.niñas_6_11;
+                            newbenef.total_niños_niñas_12_17 = newbenef.niños_12_17 + newbenef.niñas_12_17;
+                            newbenef.total_hombres_mujeres_18_59 = newbenef.hombres_18_59 + newbenef.mujeres_18_59;
+                            newbenef.total_hombres_mujeres_60_mas = newbenef.hombres_60_mas + newbenef.mujeres_60_mas; 
+
+                            newbenef.enfoque_diferencial = registrobeneficiarios.beneficiary_type_name;
+                            newbenef.tipo_de_actividad = registrobeneficiarios.activity_type_name
+                            newbenef.descripcion = registrobeneficiarios.activity_description_name;
+                             
+                             beneficiarios.push(newbenef);
+
+
                           });
+
+                          $project[i].beneficiarios = beneficiarios;
+                        }
+                       
+
+                          if(project.target_locations){
+
+                            var ubicaciones = [];
+
+                            project.target_locations.forEach(function(ubi,i){
+
+                              var nuevaubi = {};
+
+                              nuevaubi.id = ubi.id;
+
+                              nuevaubi.tipo_de_lugar = ubi.site_type_name;
+                              nuevaubi.nombre_del_lugar = ubi.site_name;
+
+                              nuevaubi.dipola_departamento = ubi.admin1pcode;
+                              nuevaubi.nombre_departamento = ubi.admin1name;
+                              nuevaubi.dipola_municipio = ubi.admin2pcode;
+                              nuevaubi.nombre_municipio = ubi.admin2name;
+
+                              ubicaciones.push(nuevaubi);
+
+                            });
+
+                            $project[i].territorios = ubicaciones;
+
+                          }           
 
                           $project[i].fecha_inicio_del_proyecto = moment($project[i].project_start_date).format('YYYY-MM-DD');
                           $project[i].fecha_final_del_proyecto   = moment($project[i].project_end_date).format('YYYY-MM-DD');
@@ -1291,7 +1337,7 @@ var ProjectController = {
 
           _doResponseColAPC : function($project){
 
-            console.log("IMPRIMO: ",$project);
+          
 
             return res.json( 200, $project.length===1?$project[0]:$project );
 
