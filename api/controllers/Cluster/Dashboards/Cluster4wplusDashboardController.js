@@ -2402,12 +2402,25 @@ var Cluster4wplusDashboardController = {
 						{ 
 							//$match : filterObject 
 							$match: filterObjectBenef
+						},
+						{
+							$group: {
+								_id: {project_id:'$project_id'}
+							}
 						}
 
 					]).toArray(function (err, result) {
 						if (err) return res.serverError(err);
 
-						result.forEach(function(d,i){
+						projects=_.pluck(result,'_id')		
+							projects.sort(function(a, b) {
+								if(a.project_id !== null && b.project_id !== null ){
+								
+								return a.project_id.localeCompare(b.project_id);
+							   }
+							});
+
+						projects.forEach(function(d,i){
 
 							const exist = total_projects.find(proj => proj.project_id === d.project_id);
 
@@ -2430,13 +2443,27 @@ var Cluster4wplusDashboardController = {
 							{ 
 								//$match : filterObject 
 								$match: filterObjectBudget
+							},
+							{
+							$group: {
+								_id: {project_id:'$project_id'}
 							}
+						}
 						]).toArray(function (err, resultbudg) {
 
 							if(err) return res.negotiate(err);
 
+							projectsbud=_.pluck(resultbudg,'_id')		
+							projectsbud.sort(function(a, b) {
 
-			              	resultbudg.forEach(function(d,i){
+								if(a.project_id !== null && b.project_id !== null ){
+									
+									return a.project_id.localeCompare(b.project_id);
+								}
+							});
+
+
+			              	projectsbud.forEach(function(d,i){
 
 			              		const exist = total_projects.find(proj => proj.project_id === d.project_id);
 
@@ -2841,30 +2868,16 @@ var Cluster4wplusDashboardController = {
 				var imppartners = [];
 
 
+						Beneficiaries.native(function(err, collection) {
+					if (err) return res.serverError(err);
+				
+					collection.aggregate([
+						{ 
+							//$match : filterObject 
+							$match: filterObjectBenef
+						}
 
-					Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
-					.where( filters.implementer_tag)
-					//.where( filters.donor_tag)
-					.where(filters.donor_tagBenef)
-					.where( filters.activity_type_id)
-					//.where( filters.project_startDateNative )
-					//.where( filters.project_endDateNative)
-					.where(filters.report_period_ben)
-					.exec( function( err, results ) {
-
-
+					]).toArray(function (err, results) {
 						if (err) return res.serverError(err);
 
 
@@ -2874,15 +2887,15 @@ var Cluster4wplusDashboardController = {
 								//console.log("IMPL TOTAL BENEF: ", d.project_id);
 
 
-							if(results[i].implementing_partners){
+							if(d.implementing_partners){
 
-								 results[i].implementing_partners.forEach(function (d, j){
+								d.implementing_partners.forEach(function (im, j){
 
 
-	                             const resultado = imppartners.find( implementer => implementer.organization_tag === results[i].implementing_partners[j].organization_tag );
+	                             const resultado = imppartners.find( implementer => implementer.organization_tag === im.organization_tag );
 
 	                             if(!resultado){
-	                             	imppartners.push(results[i].implementing_partners[j]);
+	                             	imppartners.push(im);
 	                             }
 	                            
 
@@ -2894,53 +2907,40 @@ var Cluster4wplusDashboardController = {
 					   var partners =	imppartners;
 
 					
-					}
+				    }
 
 
-
-					BudgetProgress
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
-					.where( filters.implementer_tag)
-					//.where( filters.donor_tag)
-					.where(filters.donor_tagBudget)
-					.where( filters.activity_type_id)
-					//.where( filters.project_startDateNative )
-					//.where( filters.project_endDateNative)
-					.where(filters.budget_date_recieved)
-					.exec( function( err, result ) {
-						
+						BudgetProgress.native(function(err, collection) {
 						if (err) return res.serverError(err);
+					
+						collection.aggregate([
+							{ 
+								//$match : filterObject 
+								$match: filterObjectBudget
+							}
+						]).toArray(function (err, resultsbudg) {
+
+								if (err) return res.serverError(err);
 
 						//var imppartners = [];
 
 
-					if(result.length){
+					if(resultsbudg.length){
 
 
-						result.forEach( function( d, i ) {
-								
+						resultsbudg.forEach( function( d, i ) {
 
-							if(result[i].implementing_partners){
 
-								 result[i].implementing_partners.forEach(function (d, j){
+							if(d.implementing_partners){
 
-								 const resultado = imppartners.find( implementer => implementer.organization_tag === result[i].implementing_partners[j].organization_tag );
+								 d.implementing_partners.forEach(function (im, j){
+
+								 const resultado = imppartners.find( implementer => implementer.organization_tag === im.organization_tag );
 
 			                             if(!resultado){
 			                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
-			                             	imppartners.push(result[i].implementing_partners[j]);
-			                             	console.log("add IMP BUDG: ",results[i].implementing_partners[j]);
+			                             	imppartners.push(im);
+			                             	
 
 			                             }
 
@@ -2954,10 +2954,14 @@ var Cluster4wplusDashboardController = {
 					  return res.json( 200, { 'value': imppartners.length } );
 
 					});
+			
 
 
 
 					});
+					});
+
+				});
 				
 
 				break;
