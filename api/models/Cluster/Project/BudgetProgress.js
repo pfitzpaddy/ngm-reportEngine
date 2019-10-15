@@ -131,7 +131,7 @@ module.exports = {
 		comments: {
 			type: 'string'
 		},
-
+ 
 		// project
 		project_acbar_partner: {
 			type: 'boolean'
@@ -140,6 +140,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
+	//New column plans and components
+		plan_component: {
+			type: 'array'
+		},
+
 		project_code: {
 			type: 'string'
 		},
@@ -182,6 +188,9 @@ module.exports = {
 			type: 'string'
 		},
 		inter_cluster_activities: {
+			type: 'array'
+		},
+		implementing_partners: {
 			type: 'array'
 		},
 

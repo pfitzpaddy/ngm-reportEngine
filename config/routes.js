@@ -200,6 +200,15 @@ module.exports.routes = {
   'GET /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator',
   'POST /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator', 
 
+   
+  //4wplus dashboard 
+
+  'GET /cluster/indicator4wplusdashboard': 'Cluster/Dashboards/Cluster4wplusDashboardController.getIndicator',
+  'POST /cluster/indicator4wplusdashboard': 'Cluster/Dashboards/Cluster4wplusDashboardController.getIndicator', 
+
+  //find exchange rates from EURO to others currencies
+  'GET /cluster/exchangeRatesCurrencies': 'Cluster/Dashboards/Cluster4wplusDashboardController.exchangeRatesCurrencies',
+
   // -------- HEALTH --------
   // 4W Dashboard
   'POST /health/indicator': 'Cluster/Health/HealthDashboardController.getHealthDetails',

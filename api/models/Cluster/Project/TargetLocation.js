@@ -148,6 +148,12 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
+
+		//New column plans and components
+		plan_component: {
+			type: 'array'
+		},
+		
 		project_code: {
 			type: 'string'
 		},
