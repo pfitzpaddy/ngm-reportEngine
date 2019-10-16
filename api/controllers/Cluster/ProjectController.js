@@ -193,9 +193,11 @@ var ProjectController = {
 
   },
 
+ 
   // get projects summary
   getProjects: function(req, res){
-
+ 
+   // req.param('query').project_start_date = '$gte : 2019-01-01';
     // Guards
     if (!req.param('id')&&!req.param('query')) {
       return res.json(401, { err: 'params required!' });
@@ -215,6 +217,9 @@ var ProjectController = {
       var query = { project_id : req.param('id') };
       var queryProject = { id : req.param('id') };
     } else {
+   
+
+
       var query, queryProject = req.param('query');
       if (req.param('query').project_id){
         queryProject.id = queryProject.project_id;
@@ -245,11 +250,15 @@ var ProjectController = {
 
     _getProjectData : function(queryProject, query){
 
+
                   return Promise.props({
                     project: Project.find( queryProject ),
                     budget: BudgetProgress.find( query ),
                     beneficiaries: TargetBeneficiaries.find( query ),
                     targetlocations: TargetLocation.find( query ),
+                    //project documents
+                    documents: Documents.find(query),
+                    organizations: Organizations.find(query),
                     //Report.find( findProject, updatedRelationsUser ),
                     //Location.update( findProject, updatedRelationsUser ),
                     //Beneficiaries.find( findProject, updatedRelationsUser ),
@@ -278,6 +287,7 @@ var ProjectController = {
                     $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
                     $project[i].target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
                     $project[i].target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
+                    $project[i].documents = _.filter(data.documents,       { 'project_id' : projectId}) ;
 
                     /// order
                     $project[i].target_beneficiaries
@@ -324,15 +334,32 @@ var ProjectController = {
     // do response
     _doResponse : function($project){
       if (csv) {
- 
-        var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
-      
-          fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target locations','Created' ];
 
-    
+
+        //columns to COL or columns to others countries
+        if(queryProject.admin0pcode === 'col'){
+       
+       
+      // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','componente_humanitario','plan_hrp_plan','componente_construccion_de_paz','componente_desarrollo_sostenible','plan_interagencial','componente_flujos_migratorios','plan_rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+
+       // fieldNames = [ 'Cluster', 'Organización',  'País', 'Project ID', 'Estado del Proyecto', 'Punto Focal', 'Email', 'Teléfono', 'Código del Proyecto','Título del Proyecto',  'Descripción del Proyecto', 'Fecha Inicio del Proyecto', 'Fecha Finalización del Proyecto', 'Presupuesto del Proyecto', 'Moneda de Presupuesto del Proyecto','Soporte Documentos del Proyecto','Marcador de Género - GAM', 'Donantes del Proyecto'  ,  'Socios Implementadores', 'Componente Humanitario', 'Plan HRP','Componente Construcción de Paz','Componente Desarrollo Sostenible','Plan Interagencial','Componente Flujos Migratorios','Plan RMRP','Strategic Objectives', 'Beneficiary types','Tipos de Actividades','Beneficiarios Objetivo', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Ubicaciones Objetivo','Fecha Creación'];
+         var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','plan_component_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+
+        fieldNames = [ 'Cluster', 'Organization',  'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Organization Code','Project Title',  'Project Description', 'Project Start Date', 'Project End Date', 'Project Budget', 'Project Budget Currency','Project Documents','Gender Marker - GAM', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Componentes de Respuesta','Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target Locations','Creation Date'];
+        
+      
+
+        }else{
+          var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list', 'target_locations_list','createdAt']
+
+         fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Target locations','Created' ];
+
+
+        }
+
         $project = this._projectJson2Csv($project);
 
-        json2csv({ data: $project, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+        json2csv({ data: $project, fields: fields, fieldNames: fieldNames}, function( err, csv ) {
           if ( err ) return res.negotiate( err );
           return res.json( 200, { data: csv } );
         });
@@ -370,24 +397,106 @@ var ProjectController = {
               p[keyto] = pa.join('; ');
             }
           };
+
+          //to COL: change true, false values in components and plan columns
+
+          var changevalues = function(val){
+            var object;
+
+            if(val == undefined){
+              object = "";
+            }else if(val == false){
+              object = "NO";
+            }else if(val == true){
+              object = "SI";
+            }
+            return object;
+          };
+
+          //function to set urls as string
+
+          var seturls = function (docs){
+
+            var urls = [];
+
+            docs.forEach(function (d,i){
+
+              d.url = 'https://drive.google.com/uc?export=download&id='+d.fileid;
+              urls.push(d.url);
+              
+            });
+            urlsfinal = urls.join('; ');
+            console.log("URLS: ",urls);
+            console.log("URLSFINAL: ",urlsfinal);
+            return urlsfinal;
+
+          }
+
+
         // takes subdocuments key and produces flattened list of its values ->key_list
         var updateJson = function(project){
             setKey( project, 'implementing_partners','implementing_partners_list',['organization_name']);
             setKey( project, 'strategic_objectives', 'strategic_objectives_list', ['objective_type_name', 'objective_type_description'] );
             setKey( project, 'beneficiary_type', 'beneficiary_type_list', ['beneficiary_type_name'] );
-            setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
+            //setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
             setKey( project, 'inter_cluster_activities', 'inter_cluster_activities_list', ['cluster']  );
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
-            setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
+
+            //values in columns to COL or values to others countries
+
+            if(queryProject.admin0pcode == 'col'){
+
+              project.urls_list = seturls(project.documents);
+
+             project.target_beneficiaries.forEach(function(tb,i){
+
+               if(!tb.beneficiary_category_name){
+                 tb.beneficiary_category_name = "Otros";
+               }
+
+               if(!tb.unit_type_id){
+                 tb.unit_type_id = "Sin Información";
+               }
+
+             });
+
+               project.target_locations.forEach(function(tb,i){
+
+               if(!tb.site_implementation_name){
+                 tb.site_implementation_name = "Otro";
+               }
+             });
+
+               if(project.plan_component){
+                 project.plan_component_list = project.plan_component.join('; ');
+               }
+
+               
+
+               
+
+
+            setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name', 'key:project_donor_budget'] );
+            setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['key:beneficiary_type_name', 'key:beneficiary_category_name', 'key:activity_type_name', 'key:activity_description_name','key:indicator_name','key:strategic_objective_name','key:strategic_objective_description','key:sector_objective_name','key:sector_objective_description','key:delivery_type_name',
+             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys_0_5','key:boys_6_11', 'key:boys_12_17', 'key:girls_0_5', 'key:girls_6_11','key:girls_12_17', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:total_male', 'key:total_female','key:unit_type_id' ]  );
+            setKey( project, 'target_locations', 'target_locations_list', ['key:admin0name', 'key:admin1name','key:admin1pcode','key:admin2name','key:admin2pcode','key:site_implementation_name','key:site_type_name','key:site_name','key:admin2lng','key:admin2lat','key:name', 'key:email']  );
+            
+            setKey(project, 'undaf_desarrollo_paz','undaf_desarrollo_paz_list', ['code','name_tag','description'] );
+            setKey(project, 'acuerdos_de_paz','acuerdos_de_paz_list',['code','name_tag','description']);
+            setKey(project, 'dac_oecd_development_assistance_committee','dac_oecd_development_assistance_committee_list',['code','name_tag','description']);
+            setKey(project, 'ods_objetivos_de_desarrollo_sostenible','ods_objetivos_de_desarrollo_sostenible_list',['code','name_tag','description']);
+
+            }else{
+                setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
+                setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
-            setKey(project, 'undaf_desarrollo_paz','undaf_desarrollo_paz_list', ['code','name_tag','description'] ),
-            setKey(project, 'acuerdos_de_paz','acuerdos_de_paz_list',['code','name_tag','description']),
-            setKey(project, 'dac_oecd_development_assistance_committee','dac_oecd_development_assistance_committee_list',['code','name_tag','description']),
-            setKey(project, 'ods_objetivos_de_desarrollo_sostenible','ods_objetivos_de_desarrollo_sostenible_list',['code','name_tag','description']),
+                 setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
 
-
-            setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+            }
+           // setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
+            //'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
+          //setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
 
         };
 
@@ -410,11 +519,13 @@ var ProjectController = {
     var project = {
       project_budget_progress: [],
       target_beneficiaries: [],
-      target_locations: []
+      target_locations: [],
+     project_components_plan: []
     };
     var project_budget_progress;
     var target_beneficiaries;
     var target_locations;
+    var project_components_plan;
 
     // promise
     Promise.all([
@@ -434,6 +545,7 @@ var ProjectController = {
         project_budget_progress = result[ 1 ];
         target_beneficiaries = result[ 2 ];
         target_locations = result[ 3 ];
+        project_components_plan = result[4];
       }
 
       // create project
@@ -441,6 +553,8 @@ var ProjectController = {
       project.target_beneficiaries = target_beneficiaries;
 
       project.target_locations = target_locations;
+
+      project.project_components_plan = project_components_plan;
 
       project.target_locations.forEach( function(location,element2){
 
@@ -883,7 +997,358 @@ var ProjectController = {
         });
 
       });
-  }
+  },
+
+  getProjectsColAPC: function(req,res){
+
+   
+    
+    // if dissallowed parameters sent
+    if ( 
+          !req.param('adminRpcode') ||
+          !req.param('admin0pcode') ||
+          !req.param('donor_tag') ||
+          !req.param('start_date') ||
+          !req.param('end_date') ) {
+     return res.json(401, {err: 'adminRpcode, admin0pcode, donor_tag,start_date, end_date required!'});
+    }else{
+
+      if(req.param('donor_tag') !== 'all'){
+      donor_tag = req.param('donor_tag').split(",");
+       allowedParams ={
+          adminRpcode : 'AMER',
+          admin0pcode :'COL',
+          
+         project_donor : {$elemMatch:{project_donor_id : { $in :  donor_tag}}},
+        project_start_date: {$gte : new Date(req.param('start_date'))},
+         project_end_date: {$lte : new Date(req.param('end_date'))}
+      };
+
+    }else{
+       allowedParams ={
+          adminRpcode : 'AMER',
+          admin0pcode :'COL',
+          //project_donor: req.param('donor_tag') === 'all' ? {} : {  "project_donor.project_donor_id" : { $in :  donor_tag}},
+          project_start_date: {$gte : new Date(req.param('start_date'))},
+         project_end_date: {$lte : new Date(req.param('end_date'))}
+      };
+    };
+
+    }
+
+
+     var pipe = Promise.resolve()
+      .then(function(){ return actions._getProjectDataColAPC(allowedParams) })
+      .then(function(res){ return actions._processCollectionsColAPC(res) })
+      .then(function($project){ return actions._doResponseColAPC($project) })
+      .catch(function(err){ return err === 'NO PROJECT' } , function(err) { return actions._errorNoProjectRes(err) })
+      .catch(function(err){ return actions._error(err) });
+
+ 
+      var actions = {
+
+           _error : function(err){
+      return res.negotiate(err);
+    },
+
+    _errorNoProjectRes : function(err){
+      return res.json( 200, [] );
+    },
+          _getProjectDataColAPC : function(queryProject){
+
+
+                  return Promise.props({
+                          project: Project.find( queryProject),
+                          //budget: BudgetProgress.find( queryProject ),
+                          beneficiaries: TargetBeneficiaries.find( queryProject ),
+                          targetlocations: TargetLocation.find( queryProject ),
+                          //project documents
+                          documents: Documents.find(queryProject),
+                          //organizations: Organizations.find(queryProject),
+                          //Report.find( findProject, updatedRelationsUser ),
+                          //Location.update( findProject, updatedRelationsUser ),
+                          //Beneficiaries.find( findProject, updatedRelationsUser ),
+                        });
+
+                    
+
+          },
+
+          _processCollectionsColAPC : function(data){
+
+
+            // no project found
+            if ( !data.project.length ) return Promise.reject('NO PROJECT');
+
+            // all projects
+            $project = [];
+
+            var _comparatorBuilder = this._comparatorBuilder
+
+            // populate&sort fields
+                              // TODO maybe realate models via populate
+            var uppendDataToProject = function(project){
+
+                          var projectId = project.id;
+                          var i = data.project.indexOf(project);
+                          // assemble project data
+                          $project[i] = {};
+                          $project[i].id_proyecto = project.id;
+                          $project[i].titulo_del_proyecto = project.project_title;
+                          if(project.project_status === 'active'){
+                         $project[i].estado_del_proyecto = 'Activo';
+                       }else if(project.project_status === 'complete'){
+                         $project[i].estado_del_proyecto = 'Completo'
+                       };
+
+                       $project[i].codigo_del_proyecto =project.project_code;
+                       $project[i].descripcion =project.description;
+                       $project[i].moneda_del_proyecto =project.project_budget_currency;
+                       $project[i].id_agencia_ejecutora =project.organization_tag;
+                       $project[i].nombre_agencia_ejecutora =project.organization_name;
+                       $project[i].nombre_agencia_ejecutora =project.organization_name;
+
+                       if(project.project_donor){
+
+                         var donantes_proyecto = [];
+
+                         project.project_donor.forEach(function (don,i){
+
+                           donor = {
+                             'id_donante':don.project_donor_id,
+                             'nombre_donante':don.project_donor_name,
+                             'monto_aporte_donante':don.project_donor_budget
+                           }
+
+                           donantes_proyecto.push(donor);
+
+                         });
+
+                         $project[i].agencias_donantes_del_proyecto = donantes_proyecto;
+
+                       };
+
+
+                       if(project.implementing_partners){
+                         
+                         var socios =[];
+
+                         project.implementing_partners.forEach(function(socioimp,i){
+
+                           nuevo_socio = {
+
+                             'id_socio_implementador' : socioimp.organization_tag,
+                             'nombre_socio_implementador': socioimp.organization_name,
+                             'tipo_de_organizacion': socioimp.organization_type
+                           };
+
+                           socios.push(nuevo_socio);
+
+                         });
+                          $project[i].agencias_socios_implementadores = socios;
+
+                       };
+
+
+                        if(project.dac_oecd_development_assistance_committee){
+
+                        var dac_relacion = [];
+
+                         project.dac_oecd_development_assistance_committee.forEach(function(dac,i){
+
+                           dac_nuevo = {
+
+                             'id':dac.sidi_id,
+                             'codigo':dac.code,
+                             'nombre':dac.name_tag,
+                             'descripcion':dac.description
+
+                           };
+
+                           dac_relacion.push(dac_nuevo);
+
+                         });
+
+                         $project[i].relacion_con_cad = dac_relacion;
+
+                       };
+
+
+                        if(project.acuerdos_de_paz){
+
+                         var acuerdos_de_paz_relacion = [];
+
+                         project.acuerdos_de_paz.forEach(function(acuerdo,i){
+
+                           acuerdo_paz_nuevo = {
+
+                             'id':acuerdo.sidi_id,
+                             'codigo':acuerdo.code,
+                             'nombre':acuerdo.name_tag,
+                             'descripcion':acuerdo.description
+
+                           };
+
+                           acuerdos_de_paz_relacion.push(acuerdo_paz_nuevo);
+                         });
+
+                         $project[i].relacion_con_pmi_acuerdo_de_paz = acuerdos_de_paz_relacion;
+                       };
+
+
+                        if(project.ods_objetivos_de_desarrollo_sostenible){
+
+                         var relacion_ods = [];
+
+                         project.ods_objetivos_de_desarrollo_sostenible.forEach(function(ods,i){
+
+                           ods_nuevo = {
+
+                             'id':ods.sidi_id,
+                             'codigo':ods.code,
+                             'nombre':ods.name_tag,
+                             'descripcion':ods.description
+
+                           };
+
+                           relacion_ods.push(ods_nuevo);
+
+                         });
+
+                         $project[i].relacion_con_ods = relacion_ods;
+                       }
+
+
+
+                        //  $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
+                          project.target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
+                          project.target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
+                          project.documents = _.filter(data.documents,       { 'project_id' : projectId}) ;
+
+                          if(project.documents){
+
+                            var documentos = [];
+
+                            project.documents.forEach(function(docu,i){
+
+                              docu.url = 'https://drive.google.com/uc?export=download&id='+docu.fileid;
+                              documentos.push(docu.url);
+
+                            });
+
+                            $project[i].documentos = documentos.join();
+
+                          }
+
+                          /// order
+                         /* $project[i].target_beneficiaries
+                                     .sort(function(a, b){ return a.id.localeCompare( b.id ) });*/
+                          if(project.target_beneficiaries.length > 0){           
+                           var beneficiarios  = [];         
+
+                          project.target_beneficiaries.forEach(function(registrobeneficiarios,j){
+
+                            var newbenef = {};
+
+                            newbenef.id = registrobeneficiarios.id;
+
+                            newbenef.total_hombres = registrobeneficiarios.total_male;
+                            newbenef.total_mujeres = registrobeneficiarios.total_female;
+
+                            newbenef.niños_0_5 = registrobeneficiarios.boys_0_5;
+                            newbenef.niños_6_11 = registrobeneficiarios.boys_6_11;
+                            newbenef.niños_12_17 = registrobeneficiarios.boys_12_17;
+                            newbenef.total_niños = newbenef.niños_0_5 + newbenef.niños_6_11 + newbenef.niños_12_17;
+
+                            newbenef.hombres_18_59 = registrobeneficiarios.men;
+                            newbenef.hombres_60_mas = registrobeneficiarios.elderly_men;
+
+
+                            newbenef.niñas_0_5 = registrobeneficiarios.girls_0_5;
+                            newbenef.niñas_6_11 = registrobeneficiarios.girls_6_11;
+                            newbenef.niñas_12_17 = registrobeneficiarios.girls_12_17;
+                            newbenef.total_niñas = newbenef.niñas_0_5 + newbenef.niñas_6_11 + newbenef.niñas_12_17;
+
+                            newbenef.mujeres_18_59 = registrobeneficiarios.women;
+                            newbenef.mujeres_60_mas = registrobeneficiarios.elderly_women;
+
+                            newbenef.total_niños_niñas_0_5 =  newbenef.niños_0_5 + newbenef.niñas_0_5;
+                            newbenef.total_niños_niñas_6_11 = newbenef.niños_6_11 + newbenef.niñas_6_11;
+                            newbenef.total_niños_niñas_12_17 = newbenef.niños_12_17 + newbenef.niñas_12_17;
+                            newbenef.total_hombres_mujeres_18_59 = newbenef.hombres_18_59 + newbenef.mujeres_18_59;
+                            newbenef.total_hombres_mujeres_60_mas = newbenef.hombres_60_mas + newbenef.mujeres_60_mas; 
+
+                            newbenef.enfoque_diferencial = registrobeneficiarios.beneficiary_type_name;
+                            newbenef.tipo_de_actividad = registrobeneficiarios.activity_type_name
+                            newbenef.descripcion = registrobeneficiarios.activity_description_name;
+                             
+                             beneficiarios.push(newbenef);
+
+
+                          });
+
+                          $project[i].beneficiarios = beneficiarios;
+                        }
+                       
+
+                          if(project.target_locations){
+
+                            var ubicaciones = [];
+
+                            project.target_locations.forEach(function(ubi,i){
+
+                              var nuevaubi = {};
+
+                              nuevaubi.id = ubi.id;
+
+                              nuevaubi.tipo_de_lugar = ubi.site_type_name;
+                              nuevaubi.nombre_del_lugar = ubi.site_name;
+
+                              nuevaubi.dipola_departamento = ubi.admin1pcode;
+                              nuevaubi.nombre_departamento = ubi.admin1name;
+                              nuevaubi.dipola_municipio = ubi.admin2pcode;
+                              nuevaubi.nombre_municipio = ubi.admin2name;
+
+                              ubicaciones.push(nuevaubi);
+
+                            });
+
+                            $project[i].territorios = ubicaciones;
+
+                          }           
+
+                          $project[i].fecha_inicio_del_proyecto = moment($project[i].project_start_date).format('YYYY-MM-DD');
+                          $project[i].fecha_final_del_proyecto   = moment($project[i].project_end_date).format('YYYY-MM-DD');
+                          $project[i].fecha_ultima_modificacion   = moment( $project[i].updatedAt ).format('YYYY-MM-DD');
+                          // callback if error or post work can be called here `cb()`;
+                      };
+
+            async.each(data.project, uppendDataToProject);
+
+            return $project;
+          },
+
+           // build a to b localeCompare from array of props
+        _comparatorBuilder : function(compareObj){
+            var compareArr = [];
+            compareObj.forEach( function (criteria, i ) {
+              compareArr.push('a'+'.'+criteria + '.' + 'localeCompare(b.' + criteria + ')');
+            });
+            return compareArr.join('||')
+        },
+
+
+          _doResponseColAPC : function($project){
+
+          
+
+            return res.json( 200, $project.length===1?$project[0]:$project );
+
+          }
+     
+       }
+
+  },
 
 };
 
