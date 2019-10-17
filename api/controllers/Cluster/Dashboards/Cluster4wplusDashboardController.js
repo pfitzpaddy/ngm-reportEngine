@@ -62,16 +62,13 @@ var Cluster4wplusDashboardController = {
 					!req.param('adminRpcode') ||
 					!req.param('admin0pcode') ||
 					!req.param('organization_tag') ||
-					!req.param('project_type_component') ||
-					!req.param('hrpplan')||
-					!req.param('implementer')||
 					!req.param('donor')||
 					!req.param('admin1pcode') ||
 					!req.param('admin2pcode') ||
 					//!req.param('beneficiaries') ||
 					!req.param('start_date') ||
 					!req.param('end_date') ) {
-			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, project_type_component, hrpplan, implementer, donor, admin1pcode, admin2pcode, start_date, end_date required!'});
+			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, donor, admin1pcode, admin2pcode, start_date, end_date required!'});
 		}
 
 		// return params
@@ -82,13 +79,9 @@ var Cluster4wplusDashboardController = {
 			indicator: req.param('indicator'),
 			cluster_id: req.param('cluster_id'),
 			cluster_ids: req.param('cluster_ids') ? req.param('cluster_ids') : [req.param('cluster_id')],
-			activity_type_id: req.param( 'activity_type_id' ) ? req.param( 'activity_type_id' ) : 'all',
 			adminRpcode: req.param('adminRpcode'),
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
-			project_type_component: req.param('project_type_component'),
-			hrpplan: req.param('hrpplan'),
-			implementer: req.param('implementer'),
 			donor: req.param('donor'),
 			admin1pcode: req.param('admin1pcode'),
 			admin2pcode: req.param('admin2pcode'),
@@ -114,28 +107,12 @@ var Cluster4wplusDashboardController = {
 			admin1pcode: params.admin1pcode === 'all' ? {} : { admin1pcode: params.admin1pcode },
 			admin2pcode: params.admin2pcode === 'all' ? {} : { admin2pcode: params.admin2pcode },
 			
-            project_plan_component: (params.project_type_component === 'all' && params.hrpplan === 'all')
-			     ? {}
-			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
-			     ? { plan_component: {$in: [params.project_type_component]}}
-			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
-			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
-			     ? { plan_component: {$in:[params.project_type_component]}}
-			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
-			     ? { plan_component: {$in : ["hrp_plan"]}}
-			     : { plan_component: { $nin : ["hrp_plan"]}},
-			                
-			
            cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
 								: ( params.cluster_id !== 'cvwg' )
 									 ?{cluster_id:params.cluster_id}
 			                     : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
-			 implementer_tag: (params.implementer === 'all')
-	                            ? {}
-	                            : {implementing_partners: { $elemMatch:{'organization_tag':params.implementer} } },
-
+			 
 	        donor_tagBenef: (params.donor === 'all')
 	                        ? {}
 	                       : {  project_donor : { $elemMatch : { 'project_donor_id' : params.donor}}},
@@ -145,10 +122,7 @@ var Cluster4wplusDashboardController = {
 	                        : { project_donor_id: params.donor},
 
 	    
-		
-
-			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
-			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
+					acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
 			
 			//date: { or : [{ reporting_period:{'>=': new Date(params.start_date), '<=': new Date(params.end_date)}},{project_budget_date_recieved: {'>=': new Date(params.start_date), '<=': new Date(params.end_date)}}]},
@@ -179,24 +153,6 @@ var Cluster4wplusDashboardController = {
 								: { inter_cluster_activities: { $elemMatch:{cluster_id:params.cluster_id}}} ,
 
 								 //: { $in:[{ cluster_id: params.cluster_id }, { inter_cluster_activities: { $elemMatch:{cluster_id:params.cluster_id} }} ]} ,
-
-			project_plan_componentNative: (params.project_type_component === 'all' && params.hrpplan === 'all')
-			     ? {}
-			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
-			     ? { plan_component: {$in: [params.project_type_component]}}
-			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
-			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
-			     ? { plan_component: {$in:[params.project_type_component]}}
-			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
-			     ? { plan_component: {$in : ["hrp_plan"]}}
-			     : { plan_component: { $nin : ["hrp_plan"]}},
-
-
-			implementer_tagNative: ( params.implementer === 'all')
-	                            ? {}
-	                     
-	                           : { implementing_partners: { $elemMatch: { 'organization_tag' : params.implementer} }},
 
 	         donor_tagBenef_Native: (params.donor === 'all')
 	                        ? {}
@@ -278,15 +234,9 @@ var Cluster4wplusDashboardController = {
 										filters.admin0pcode_Native,
 										filters.admin1pcode_Native,
 										filters.admin2pcode_Native,
-										filters.activity_type_id,
 										filters.cluster_id_Native1,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
-										//filters.hrp_plan_Native,
-										//filters.project_typeNative,
-										filters.project_plan_componentNative,
-										filters.implementer_tagNative,
-										//filters.donor_tagNative,
 										filters.donor_tagBudget_Native,
 										filters.budget_date_recieved_Native
 							
@@ -299,15 +249,9 @@ var Cluster4wplusDashboardController = {
 										filters.admin0pcode_Native,
 										filters.admin1pcode_Native,
 										filters.admin2pcode_Native,
-										filters.activity_type_id,
 										filters.cluster_id_Native1,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
-										//filters.hrp_plan_Native,
-										//filters.project_typeNative,
-										filters.project_plan_componentNative,
-										filters.implementer_tagNative,
-										//filters.donor_tagNative,
 										filters.donor_tagBenef_Native,
 										filters.report_period_ben_Native
 										
@@ -330,13 +274,7 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.clusterid )
-					.where( filters.activity_type_id )
 					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
-					.where( filters.implementer_tag)
-					//.where( filters.donor_tag)
 					.where(filters.donor_tagBenef)
 					//.where( filters.beneficiaries )
 					.where(filters.report_period_ben)
@@ -2089,15 +2027,10 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
-					.where( filters.implementer_tag)
 					//.where( filters.donor_tag)
 					.where(filters.donor_tagBenef)
-					.where( filters.activity_type_id)
 					.where(filters.report_period_ben)
 					.exec( function( err, results ) {
 						
@@ -2142,15 +2075,10 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
-					.where( filters.implementer_tag)
 					//.where( filters.donor_tag)
 					.where(filters.donor_tagBudget)
-					.where( filters.activity_type_id)
 					//.where( filters.project_startDateNative )
 					//.where( filters.project_endDateNative)
 					.where(filters.budget_date_recieved)
@@ -2209,15 +2137,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
-					.where( filters.implementer_tag)
-					//.where( filters.donor_tag)
 					.where(filters.donor_tagBenef)
-					.where( filters.activity_type_id)
 					//.where( filters.project_startDateNative )
 					//.where( filters.project_endDateNative)
 					.where(filters.report_period_ben)
@@ -2262,15 +2184,10 @@ var Cluster4wplusDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
 					.where( filters.cluster_id)
-					.where( filters.implementer_tag)
 					//.where( filters.donor_tag)
 					.where(filters.donor_tagBudget)
-					.where( filters.activity_type_id)
 					//.where( filters.project_startDateNative )
 					//.where( filters.project_endDateNative)
 					.where(filters.budget_date_recieved)
@@ -2310,79 +2227,6 @@ var Cluster4wplusDashboardController = {
 
 
 				break;
-
-
-				case 'activities_activity_type':
-
-
-
-
-				activities = [];
-
-				if(filters.clusterid === 'all'){
-
-					Activities
-					.find()
-					.where( filters.default )
-					.where( filters.admin0pcode )
-			
-					.exec( function( err, result ){
-
-
-						if (err) return res.negotiate( err );
-
-
-						result.forEach(function(d,i){
-
-							exist = activities.find(act => act.activity_type_id === d.activity_type_id);
-
-							if(!exist){
-								activities.push(d);
-							}
-						});
-
-
-					return res.json(200, { 'data': activities } );
-					});
-
-
-				}else{
-
-
-
-		         	Activities
-					.find()
-					.where( filters.default )
-					.where( filters.admin0pcode )
-					.where( filters.cluster_id)
-					//.where( filters.activity_type)
-			
-					.exec( function( err, result ){
-
-
-						if (err) return res.negotiate( err );
-
-						result.forEach(function(d,i){
-
-							exist = activities.find(act => act.activity_type_id === d.activity_type_id);
-
-							if(!exist){
-								activities.push(d);
-							}
-
-
-
-						});
-
-
-						return res.json(200, { 'data': activities } );
-
-					});
-				};
-
-				
-				break;
-
 
 
 				case 'projects_4wplusdashboard':
@@ -2768,8 +2612,6 @@ var Cluster4wplusDashboardController = {
 				Beneficiaries.native(function(err, collection) {
 					if (err) return res.serverError(err);
 
-					//console.log("FILTER: ",filterObject);
-					//console.log("FILTROS: ", filters);
 				
 					collection.aggregate(
 						[
@@ -2809,14 +2651,9 @@ var Cluster4wplusDashboardController = {
 					.where( filters.cluster_id)
 
 					.where( filters.organization_tag )
-					//.where( filters.hrp_plan)
-					//.where( filters.project_type)
-					.where( filters.project_plan_componentNative)
 					.where( filters.beneficiaries )
-					.where( filters.implementer_tag)
 					//.where( filters.donor_tag)
 					.where(filters.donor_tagBudget)
-					.where( filters.activity_type_id)
 					.where(filters.budget_date_recieved)
 					.exec( function( err, budgetprogress )  {
 						if (err) return res.serverError(err);
@@ -3289,996 +3126,6 @@ var Cluster4wplusDashboardController = {
 				        
 				      
                 break;
-
-
-
-
-			case 'pieChart':
-			// labels
-				var result = {
-					label: {
-						left: {
-							label: {
-								prefix: 'M',
-								label: 0,
-								postfix: '%'
-							},
-							subLabel: {
-											label: 0
-										}
-									},
-									center: {
-										label: {
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									},
-									right: {
-										label: {
-											prefix: 'F',
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									}
-								},
-								data: [{
-									'y': 0,
-									'color': '#f48fb1',
-									'name': 'Female',
-									'label': 0,
-								},{
-									'y': 0,
-									'color': '#90caf9',
-									'name': 'Male',
-									'label': 0,
-								}]
-							};
-						// beneficiaries
-						
-										
-						Beneficiaries.native(function (err, results) {
-							if(err) return res.serverError(err);
-			
-							results.aggregate([
-								{
-									//$match : filterObject
-									$match: filterObjectBenef
-								},
-								{
-									$group: {
-										_id: null,
-										men: { $sum: "$men" },
-										women: { $sum: "$women" },
-										elderly_men: { $sum: "$elderly_men" },
-										elderly_women: { $sum: "$elderly_women" },
-										boys: { $sum: "$boys" },
-										girls: { $sum: "$girls" },
-										childTotal: { $sum: { $add: ["$boys", "$girls"] } },
-										adultTotal: { $sum: { $add: ["$men", "$women"] } },
-										elderTotal: { $sum: { $add: ["$elderly_men", "$elderly_women"] } },
-										maleTotal: { $sum: "$total_male"},
-										femaleTotal: { $sum: "$total_female"},
-										sexTotal: { $sum: { $add: ["$total_male","$total_female"]}},
-										age_0_5: { $sum: {$add: ["$boys_0_5","$girls_0_5"]}},
-										age_6_11: { $sum: {$add: ["$boys_6_11","$girls_6_11"]}},
-										age_12_17: { $sum: {$add: ["$boys_12_17","$girls_12_17"]}}
-									}
-								}
-							]).toArray(function (err, beneficiaries) {
-								if (err) return res.serverError(err);								
-
-								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
-
-
-								$beneficiaries = beneficiaries[0];
-
-
-								switch (req.param('chart_for')) {
-									case 'children':
-										if ($beneficiaries.boys < 1 && $beneficiaries.girls < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var boysPerCent = ($beneficiaries.boys / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var girlsPerCent = ($beneficiaries.girls / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var totalPerCent = ($beneficiaries.childTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-
-											//var malePerCent = ($beneficiaries.maleTotal / ($beneficiaries.maleTotal + $beneficiaries.femaleTotal))*100;
-											//var femalePerCent = ($beneficiaries.femaleTotal / ($beneficiaries.maleTotal + $beneficiaries.femaleTotal))*100;
-											
-											var malePerCent = ($beneficiaries.maleTotal / $beneficiaries.sexTotal)*100;
-											var femalePerCent = ($beneficiaries.femaleTotal / $beneficiaries.sexTotal)*100;
-											var sexTotalPerCent = ($beneficiaries.sexTotal/ ($beneficiaries.maleTotal+$beneficiaries.femaleTotal))*100 ;
-
-
-											/*// assign data left
-											//result.label.left.label.label = boysPerCent;
-											//result.label.left.subLabel.label = $beneficiaries.boys;
-											// assign data center
-
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.childTotal;
-											// assign data right
-											result.label.right.label.label = girlsPerCent;
-											result.label.right.subLabel.label = $beneficiaries.girls;
-
-											// highcharts girls
-											result.data[0].y = girlsPerCent;
-											result.data[0].label = $beneficiaries.childTotal;
-											// highcharts boys
-											result.data[1].y = boysPerCent;
-											result.data[1].label = $beneficiaries.childTotal;*/
-
-											result.label.left.label.label = malePerCent;
-											result.label.left.subLabel.label = $beneficiaries.maleTotal;
-											// assign data center
-
-											result.label.center.label.label = sexTotalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.sexTotal;
-											// assign data right
-											result.label.right.label.label = femalePerCent;
-											result.label.right.subLabel.label = $beneficiaries.femaleTotal;
-
-											// highcharts girls
-											result.data[0].y = femalePerCent;
-											result.data[0].label = $beneficiaries.sexTotal;
-											// highcharts boys
-											result.data[1].y = malePerCent;
-											result.data[1].label = $beneficiaries.sexTotal;
-
-
-											
-											return res.json(200, result);
-										}
-
-										break;
-
-									case 'edad':
-										if ($beneficiaries.maleTotal < 1 && $beneficiaries.femaleTotal < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-										
-											
-
-											var TotalAge_0_5 = $beneficiaries.age_0_5;
-											var TotalAge_6_11 = $beneficiaries.age_6_11;
-											var TotalAge_12_17 = $beneficiaries.age_12_17;
-											var TotalAge = TotalAge_6_11 + TotalAge_0_5;
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = TotalAge_0_5;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = TotalAge;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = TotalAge_6_11;
-
-											// // highcharts women
-											result.data[0].y = TotalAge_0_5;
-											result.data[0].label = $beneficiaries.age_0_5;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts men
-											result.data[1].y = TotalAge_6_11;
-											result.data[1].label = $beneficiaries.age_6_11;
-											result.data[1].color = '#c7c7c7';
-
-											result.data[2].y = TotalAge_12_17;
-											result.data[2].label = $beneficiaries.age_12_17;
-											result.data[2].color = '#c7c7c7';
-
-											/*result.data[2].x = womensPerCent;
-											result.data[2].label = $beneficiaries.adultTotal;
-											result.data[2].color = '#c7c7c7';
-											// // highcharts men
-											result.data[3].x = mensPerCent;
-											result.data[3].label = $beneficiaries.adultTotal;
-											result.data[3].color = '#c7c7c7';
-
-											result.data[4].x = womensPerCent;
-											result.data[4].label = $beneficiaries.adultTotal;
-											result.data[4].color = '#c7c7c7';*/
-									
-
-
-											
-											return res.json(200, result);
-
-										}
-
-										break;
-
-									case 'elderly':
-										if ($beneficiaries.elderly_men < 1 && $beneficiaries.elderly_women < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-											var elmensPerCent = ($beneficiaries.elderly_men / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var elwomensPerCent = ($beneficiaries.elderly_women / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var totalPerCent = ($beneficiaries.elderTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-											
-											// // assign data left
-											result.label.left.label.label = elmensPerCent;
-											result.label.left.subLabel.label = $beneficiaries.elderly_men;
-											// // assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.elderTotal;
-											// // assign data right
-											result.label.right.label.label = elwomensPerCent;
-											result.label.right.subLabel.label = $beneficiaries.elderly_women;
-
-											// // highcharts elderWomen
-											result.data[0].y = elwomensPerCent;
-											result.data[0].label = $beneficiaries.elderTotal;
-											// // highcharts elderMen
-											result.data[1].y = elmensPerCent;
-											result.data[1].label = $beneficiaries.elderTotal;
-											
-											return res.json(200, result);
-
-										}
-										break;
-
-										default:
-											return res.json( 200, { value:0 });
-											break;
-									}
-
-			
-								})
-							})					
-						
-										
-				break;
-
-
-				case 'BarChartAges':
-			// labels
-				var result = {
-					/*label: {
-						left: {
-							label: {
-								prefix: 'Age 0_5',
-								label: 0,
-								postfix: '%'
-							},
-							subLabel: {
-											label: 0
-										}
-								},
-						center: {
-										label: {
-											prefix: "Age 6_11",
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									},
-						right: {
-										label: {
-											prefix: 'Age 12_17',
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									}
-								},*/
-								data: [{
-									'y': 0,
-									'color': '#f48fb1',
-									'name': 'Age 0-5',
-									'label': 0,
-									'drilldown': "Age 0-5"
-								},{
-									'y': 0,
-									'color': '#90caf9',
-									'name': 'Age 6-11',
-									'label': 0,
-								},
-								{
-									'y': 0,
-									'color': 'red',
-									'name': '12-17',
-									'label': 0,
-								},
-								{
-									'y': 0,
-									'color': 'blue',
-									'name': '18-59',
-									'label': 0,
-
-								},{
-									'y': 0,
-									'color': 'orange',
-									'name': '60 more',
-									'label': 0,
-
-								}]
-							};
-						// beneficiaries
-						
-										
-						Beneficiaries.native(function (err, results) {
-							if(err) return res.serverError(err);
-			
-							results.aggregate([
-								{
-									//$match : filterObject
-									$match: filterObjectBenef
-								},
-								{
-									$group: {
-										_id: null,
-										men: { $sum: "$men" },
-										women: { $sum: "$women" },
-										elderly_men: { $sum: "$elderly_men" },
-										elderly_women: { $sum: "$elderly_women" },
-										boys: { $sum: "$boys" },
-										girls: { $sum: "$girls" },
-										childTotal: { $sum: { $add: ["$boys", "$girls"] } },
-										adultTotal: { $sum: { $add: ["$men", "$women"] } },
-										elderTotal: { $sum: { $add: ["$elderly_men", "$elderly_women"] } },
-										maleTotal: { $sum: "$total_male"},
-										femaleTotal: { $sum: "$total_female"},
-										sexTotal: { $sum: { $add: ["$total_male","$total_female"]}},
-										age_0_5: { $sum: {$add: ["$boys_0_5","$girls_0_5"]}},
-										age_6_11: { $sum: {$add: ["$boys_6_11","$girls_6_11"]}},
-										age_12_17: { $sum: {$add: ["$boys_12_17","$girls_12_17"]}},
-										age_18_59: { $sum: {$add: ["$men","$women"]}},
-										age_60_more: { $sum: {$add: ["$elderly_men","$elderly_women"]}}
-									}
-								}
-							]).toArray(function (err, beneficiaries) {
-								if (err) return res.serverError(err);								
-
-								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
-
-
-								$beneficiaries = beneficiaries[0];
-
-
-								switch (req.param('chart_for')) {
-									case 'children':
-										if ($beneficiaries.boys < 1 && $beneficiaries.girls < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var boysPerCent = ($beneficiaries.boys / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var girlsPerCent = ($beneficiaries.girls / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var totalPerCent = ($beneficiaries.childTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-
-											//var malePerCent = ($beneficiaries.maleTotal / ($beneficiaries.maleTotal + $beneficiaries.femaleTotal))*100;
-											//var femalePerCent = ($beneficiaries.femaleTotal / ($beneficiaries.maleTotal + $beneficiaries.femaleTotal))*100;
-											
-											var malePerCent = ($beneficiaries.maleTotal / $beneficiaries.sexTotal)*100;
-											var femalePerCent = ($beneficiaries.femaleTotal / $beneficiaries.sexTotal)*100;
-											var sexTotalPerCent = ($beneficiaries.sexTotal/ ($beneficiaries.maleTotal+$beneficiaries.femaleTotal))*100 ;
-
-
-											/*// assign data left
-											//result.label.left.label.label = boysPerCent;
-											//result.label.left.subLabel.label = $beneficiaries.boys;
-											// assign data center
-
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.childTotal;
-											// assign data right
-											result.label.right.label.label = girlsPerCent;
-											result.label.right.subLabel.label = $beneficiaries.girls;
-
-											// highcharts girls
-											result.data[0].y = girlsPerCent;
-											result.data[0].label = $beneficiaries.childTotal;
-											// highcharts boys
-											result.data[1].y = boysPerCent;
-											result.data[1].label = $beneficiaries.childTotal;*/
-
-											result.label.left.label.label = malePerCent;
-											result.label.left.subLabel.label = $beneficiaries.maleTotal;
-											// assign data center
-
-											result.label.center.label.label = sexTotalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.sexTotal;
-											// assign data right
-											result.label.right.label.label = femalePerCent;
-											result.label.right.subLabel.label = $beneficiaries.femaleTotal;
-
-											// highcharts girls
-											result.data[0].y = femalePerCent;
-											result.data[0].label = $beneficiaries.sexTotal;
-											// highcharts boys
-											result.data[1].y = malePerCent;
-											result.data[1].label = $beneficiaries.sexTotal;
-
-
-											
-											return res.json(200, result);
-										}
-
-										break;
-
-									case 'ages':
-										if ($beneficiaries.maleTotal < 1 && $beneficiaries.femaleTotal < 1) {
-
-											// // assign data left
-											/*result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;*/
-
-											// // highcharts elderly_women
-											result.data[0].y = 0;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											result.data[1].color = '#c7c7c7';
-
-
-											result.data[2].y = 0;
-											result.data[2].label = 0;
-											result.data[2].color = '#c7c7c7';
-
-											result.data[3].y = 0;
-											result.data[3].label = 0;
-											result.data[3].color = '#c7c7c7';
-
-											result.data[4].y = 0;
-											result.data[4].label = 0;
-											result.data[4].color = '#c7c7c7';
-
-
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-										
-											
-
-											var TotalAge_0_5 = $beneficiaries.age_0_5;
-											var TotalAge_6_11 = $beneficiaries.age_6_11;
-											var TotalAge_12_17 = $beneficiaries.age_12_17;
-											var TotalAge_18_59 = $beneficiaries.age_18_59;
-											var TotalAge_60_more = $beneficiaries.age_60_more;
-
-
-											var TotalAges = TotalAge_6_11 + TotalAge_0_5 +TotalAge_12_17 +  TotalAge_18_59 + TotalAge_60_more;
-
-											var age_0_5PerCent = ($beneficiaries.age_0_5 / (TotalAges))*100;
-											var age_6_11PerCent = ($beneficiaries.age_6_11 / (TotalAges))*100;
-											var age_12_17PerCent = ($beneficiaries.age_12_17 / (TotalAges))*100;
-											var age_18_59PerCent = ($beneficiaries.age_18_59 / (TotalAges))*100;
-											var age_60_morePerCent = ($beneficiaries.age_60_more / (TotalAges))*100;
-
-
-
-
-											//var PercentAge0_5 = (TotalAge_0_5/TotalAges)*100;
-											//var PercentAge6_11 = (TotalAge_6_11/TotalAges)*100;
-											//var PercentAge12_17 = (TotalAge_12_17/TotalAges)*100;
-
-											// // assign data left
-											/*result.label.left.label.label = PercentAge0_5;
-											result.label.left.subLabel.label = TotalAge_0_5;
-											// // assign data center
-											result.label.center.label.label = PercentAge12_17;
-											result.label.center.subLabel.label = TotalAge_12_17;
-											// // assign data right
-											result.label.right.label.label = PercentAge6_11;
-											result.label.right.subLabel.label = TotalAge_6_11;*/
-
-											// // highcharts women
-											var string0_5label = 'Age 0-5: ' + $beneficiaries.age_0_5 + ' - ' + age_0_5PerCent.toFixed(1)+'%';
-											result.data[0].y = $beneficiaries.age_0_5;
-											result.data[0].color = '#c7c7c7';
-											result.data[0].label = age_0_5PerCent;
-											// // highcharts men
-											result.data[1].y = TotalAge_6_11 ;
-											//result.data[1].y = 579 ;
-											result.data[1].label = age_6_11PerCent ;
-											//console.log("LABEL: ",result.data[1]);
-											result.data[1].color = '#90caf9';
-
-											result.data[2].y = TotalAge_12_17;
-											result.data[2].label = age_12_17PerCent ;
-											result.data[2].color = 'red';
-
-											result.data[3].y = TotalAge_18_59;
-											result.data[3].label = age_18_59PerCent ;
-											result.data[3].color = 'blue';
-
-											result.data[4].y = TotalAge_60_more;
-											result.data[4].label = age_60_morePerCent ;
-											result.data[4].color = 'orange';
-
-											/*result.data[2].x = womensPerCent;
-											result.data[2].label = $beneficiaries.adultTotal;
-											result.data[2].color = '#c7c7c7';
-											// // highcharts men
-											result.data[3].x = mensPerCent;
-											result.data[3].label = $beneficiaries.adultTotal;
-											result.data[3].color = '#c7c7c7';
-
-											result.data[4].x = womensPerCent;
-											result.data[4].label = $beneficiaries.adultTotal;
-											result.data[4].color = '#c7c7c7';*/
-									
-
-
-											
-											return res.json(200, result);
-
-										}
-
-										break;
-
-									case 'elderly':
-										if ($beneficiaries.elderly_men < 1 && $beneficiaries.elderly_women < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-											var elmensPerCent = ($beneficiaries.elderly_men / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var elwomensPerCent = ($beneficiaries.elderly_women / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var totalPerCent = ($beneficiaries.elderTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-											
-											// // assign data left
-											result.label.left.label.label = elmensPerCent;
-											result.label.left.subLabel.label = $beneficiaries.elderly_men;
-											// // assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.elderTotal;
-											// // assign data right
-											result.label.right.label.label = elwomensPerCent;
-											result.label.right.subLabel.label = $beneficiaries.elderly_women;
-
-											// // highcharts elderWomen
-											result.data[0].y = elwomensPerCent;
-											result.data[0].label = $beneficiaries.elderTotal;
-											// // highcharts elderMen
-											result.data[1].y = elmensPerCent;
-											result.data[1].label = $beneficiaries.elderTotal;
-											
-											return res.json(200, result);
-
-										}
-										break;
-
-										default:
-											return res.json( 200, { value:0 });
-											break;
-									}
-
-			
-								})
-							})					
-						
-										
-				break;
-
-
-
-				//BeneficiarioCategoria
-
-				case 'BarChartCluster':
-			// labels
-				var result = {
-					/*label: {
-						left: {
-							label: {
-								prefix: 'Age 0_5',
-								label: 0,
-								postfix: '%'
-							},
-							subLabel: {
-											label: 0
-										}
-								},
-						center: {
-										label: {
-											prefix: "Age 6_11",
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									},
-						right: {
-										label: {
-											prefix: 'Age 12_17',
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									}
-								},*/
-								data: [{
-									'y': 0,
-									'color': '#f48fb1',
-									'name': 'Salud',
-									'label': 0,
-								},{
-									'y': 0,
-									'color': '#90caf9',
-									'name': 'SAN',
-									'label': 0,
-								},
-								{
-									'y': 0,
-									'color': 'red',
-									'name': 'EeE',
-									'label': 0,
-								},
-								{
-									'y': 0,
-									'color': 'blue',
-									'name': 'Alojamientos/Asentamientos',
-									'label': 0,
-
-								},{
-									'y': 0,
-									'color': 'orange',
-									'name': 'Recuperación Temprana',
-									'label': 0,
-
-								},
-								{
-									'y': 0,
-									'color': 'orange',
-									'name': 'Protección',
-									'label': 0,
-
-								},{
-									'y': 0,
-									'color': 'orange',
-									'name': 'WASH',
-									'label': 0,
-
-								},
-								{
-									'y': 0,
-									'color': 'orange',
-									'name': 'Coordinación/Información',
-									'label': 0,
-
-								}, 
-								{
-									'y': 0,
-									'color': 'orange',
-									'name': 'Site Management and Site development',
-									'label': 0,
-
-								}]
-							};
-						// beneficiaries
-						
-										
-						Beneficiaries.native(function (err, results) {
-							if(err) return res.serverError(err);
-			
-							results.aggregate([
-								{
-									//$match : filterObject
-									$match: filterObjectBenef
-								}/*, 
-						{
-							$group: {
-								_id: '$project_id'
-							}
-						},
-								{
-									$group: {
-									
-										//health: {'cluster_id':'health'},count: { $sum: 1 },
-										//protection: {'cluster_id':'protection'},count: { $sum: 1 }
-										_id: {cluster_id:"$cluster_id"}
-
-										//health: {cluster_id: 'health'},
-										//protection: {cluster_id:'protection'}
-										//_id: {organization_tag:'$organization_tag', organization:'$organization'}
-
-
-
-								}
-							}*//*,
-							
-							{
-								$group: {
-									_id: 1,
-									total: {
-									$sum: 1
-									}
-								}
-							}*/
-							]).toArray(function (err, beneficiaries) {
-								if (err) return res.serverError(err);	
-
-									//console.log("CLUSTERS: ",beneficiaries)	;
-
-									var health=[];
-									var healthTotalBene=0;
-									var wash = [];
-
-								beneficiaries.forEach(function(d,i){
-
-									if(d.cluster_id === 'protection'){
-
-										//education.push(d);
-
-									}
-									else if(d.cluster_id === 'health'){
-										wash.push(d);
-										healthTotalBene += d.total_beneficiaries;
-										}	
-								});
-
-								//console.log("Educación: ", education.length);		
-								console.log("Wash: ", wash.length);
-								console.log("total HEALTH: ", healthTotalBene);	
-
-
-
-								// if no length
-								/*if (!beneficiaries.length) return res.json(200, { 'value': 0 });
-
-
-								$beneficiaries = beneficiaries[0];
-
-
-
-								switch (req.param('chart_for')) {
-									case 'beneficiarioCluster':
-
-										if ($beneficiaries.maleTotal < 1 && $beneficiaries.femaleTotal < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											result.data[0].color = '#c7c7c7';
-
-
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-										
-											
-
-											var TotalAge_0_5 = $beneficiaries.age_0_5;
-											var TotalAge_6_11 = $beneficiaries.age_6_11;
-											var TotalAge_12_17 = $beneficiaries.age_12_17;
-											var TotalAge_18_59 = $beneficiaries.age_18_59;
-											var TotalAge_60_more = $beneficiaries.age_60_more;
-
-											var TotalAges = TotalAge_6_11 + TotalAge_0_5 +TotalAge_12_17 +  TotalAge_18_59 + TotalAge_60_more;
-
-											var age_0_5PerCent = ($beneficiaries.age_0_5 / (TotalAges))*100;
-											var age_6_11PerCent = ($beneficiaries.age_6_11 / (TotalAges))*100;
-											var age_12_17PerCent = ($beneficiaries.age_12_17 / (TotalAges))*100;
-											var age_18_59PerCent = ($beneficiaries.age_18_59 / (TotalAges))*100;
-											var age_60_morePerCent = ($beneficiaries.age_60_more / (TotalAges))*100;
-
-
-
-
-											//var PercentAge0_5 = (TotalAge_0_5/TotalAges)*100;
-											//var PercentAge6_11 = (TotalAge_6_11/TotalAges)*100;
-											//var PercentAge12_17 = (TotalAge_12_17/TotalAges)*100;
-
-											// // assign data left
-											
-
-											// // highcharts women
-											result.data[0].y = TotalAge_0_5;
-											result.data[0].label = $beneficiaries.age_0_5+ ' - ' + age_0_5PerCent;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts men
-											result.data[1].y = TotalAge_6_11 ;
-											result.data[1].label = $beneficiaries.age_6_11+ '-'+ age_6_11PerCent ;
-											//console.log("LABEL: ",result.data[1]);
-											result.data[1].color = '#90caf9';
-
-											result.data[2].y = TotalAge_12_17;
-											result.data[2].label = $beneficiaries.age_12_17+ ' - '+ age_12_17PerCent ;
-											result.data[2].color = 'red';
-
-											result.data[3].y = TotalAge_18_59;
-											result.data[3].label = $beneficiaries.age_18_59+ ' - '+ age_18_59PerCent ;
-											result.data[3].color = 'blue';
-
-											result.data[4].y = TotalAge_60_more;
-											result.data[4].label = $beneficiaries.age_60_more+ ' - '+ age_60_morePerCent ;
-											result.data[4].color = 'orange';
-
-											result.data[2].x = womensPerCent;
-											result.data[2].label = $beneficiaries.adultTotal;
-											result.data[2].color = '#c7c7c7';
-											// // highcharts men
-											result.data[3].x = mensPerCent;
-											result.data[3].label = $beneficiaries.adultTotal;
-											result.data[3].color = '#c7c7c7';
-
-											result.data[4].x = womensPerCent;
-											result.data[4].label = $beneficiaries.adultTotal;
-											result.data[4].color = '#c7c7c7';
-									
-
-
-											
-											return res.json(200, result);
-
-										}
-
-										break;
-									
-
-										default:
-											return res.json( 200, { value:0 });
-											break;
-									}*/
-
-			
-								});
-							})					
-						
-										
-				break;
-
-
 				
 				default: 
 
