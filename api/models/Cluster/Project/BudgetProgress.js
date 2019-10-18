@@ -113,6 +113,9 @@ module.exports = {
 		multi_year_funding_name: {
 			type: 'string'
 		},
+		multi_year_array:{
+			type: 'array'
+		},
 		funding_2017: {
 			type: 'float',
 		},
