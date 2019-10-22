@@ -2115,14 +2115,18 @@ var Cluster4wplusDashboardController = {
 							if(d.implementing_partners){
 
 								 d.implementing_partners.forEach(function (partner, j){
+
+								 	if(partner.organization_tag){
 								 	//console.log("RESULTS EN BENEF: ", partner);
 
 
-	                             const resultado = imppartners.find( implementer => implementer.organization_tag === partner.organization_tag );
+			                             const resultado = imppartners.find( implementer => implementer.organization_tag === partner.organization_tag );
 
-	                             if(!resultado){
-	                             	imppartners.push(partner);
-	                             }
+			                             if(!resultado){
+			                             	imppartners.push(partner);
+			                             }
+
+			                         }
 	                            
 
 								});
@@ -2170,12 +2174,15 @@ var Cluster4wplusDashboardController = {
 
 								d.implementing_partners.forEach(function(partner,j){
 									if(partner){
+
+										if(partner.organization_tag){
 										const resultado = imppartners.find( implementer => implementer.organization_tag === partner.organization_tag);
 
-										if (!resultado){
-											//console.log("RESULTS en BUDGETPROGRESS: ", partner);
-											imppartners.push(partner);
-										//	console.log("PROJECT EN BUDGET: ", d.project_id);
+											if (!resultado){
+												//console.log("RESULTS en BUDGETPROGRESS: ", partner);
+												imppartners.push(partner);
+											//	console.log("PROJECT EN BUDGET: ", d.project_id);
+											}
 										}
 									}
 								})
@@ -2891,12 +2898,16 @@ var Cluster4wplusDashboardController = {
 
 								d.implementing_partners.forEach(function (im, j){
 
+									if(im.organization_tag){
 
-	                             const resultado = imppartners.find( implementer => implementer.organization_tag === im.organization_tag );
 
-	                             if(!resultado){
-	                             	imppartners.push(im);
-	                             }
+			                             const resultado = imppartners.find( implementer => implementer.organization_tag === im.organization_tag );
+
+			                             if(!resultado){
+			                             	imppartners.push(im);
+			                             }
+
+			                         }
 	                            
 
 								});
@@ -2935,14 +2946,18 @@ var Cluster4wplusDashboardController = {
 
 								 d.implementing_partners.forEach(function (im, j){
 
-								 const resultado = imppartners.find( implementer => implementer.organization_tag === im.organization_tag );
+								 	if(im.organization_tag){
 
-			                             if(!resultado){
-			                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
-			                             	imppartners.push(im);
-			                             	
+									 const resultado = imppartners.find( implementer => implementer.organization_tag === im.organization_tag );
 
-			                             }
+				                             if(!resultado){
+				                             //	console.log("IMPL: ",result[i].implementing_partners[j]);
+				                             	imppartners.push(im);
+				                             	
+
+				                             }
+
+				                       }
 
 								});
 
