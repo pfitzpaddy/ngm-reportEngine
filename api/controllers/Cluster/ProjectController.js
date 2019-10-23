@@ -1020,8 +1020,9 @@ var ProjectController = {
           admin0pcode :'COL',
           
          project_donor : {$elemMatch:{project_donor_id : { $in :  donor_tag}}},
-        project_start_date: {$gte : new Date(req.param('start_date'))},
-         project_end_date: {$lte : new Date(req.param('end_date'))}
+        //project_start_date: {$gte : new Date(req.param('start_date'))},
+        // project_end_date: {$lte : new Date(req.param('end_date'))}
+        project_start_date: { $gte: new Date( req.param('start_date')), $lte: new Date( req.param('end_date') )} 
       };
 
     }else{
@@ -1029,8 +1030,9 @@ var ProjectController = {
           adminRpcode : 'AMER',
           admin0pcode :'COL',
           //project_donor: req.param('donor_tag') === 'all' ? {} : {  "project_donor.project_donor_id" : { $in :  donor_tag}},
-          project_start_date: {$gte : new Date(req.param('start_date'))},
-         project_end_date: {$lte : new Date(req.param('end_date'))}
+         // project_start_date: {$gte : new Date(req.param('start_date'))},
+        // project_end_date: {$lte : new Date(req.param('end_date'))}
+        project_start_date: { $gte: new Date( req.param('start_date')), $lte: new Date( req.param('end_date') )} 
       };
     };
 
@@ -1317,9 +1319,9 @@ var ProjectController = {
 
                           }           
 
-                          $project[i].fecha_inicio_del_proyecto = moment($project[i].project_start_date).format('YYYY-MM-DD');
-                          $project[i].fecha_final_del_proyecto   = moment($project[i].project_end_date).format('YYYY-MM-DD');
-                          $project[i].fecha_ultima_modificacion   = moment( $project[i].updatedAt ).format('YYYY-MM-DD');
+                          $project[i].fecha_inicio_del_proyecto = moment(project.project_start_date).format('YYYY-MM-DD');
+                          $project[i].fecha_final_del_proyecto   = moment(project.project_end_date).format('YYYY-MM-DD');
+                          $project[i].fecha_ultima_modificacion   = moment( project.updatedAt ).format('YYYY-MM-DD');
                           // callback if error or post work can be called here `cb()`;
                       };
 
