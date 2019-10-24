@@ -426,8 +426,7 @@ var ProjectController = {
               
             });
             urlsfinal = urls.join('; ');
-            console.log("URLS: ",urls);
-            console.log("URLSFINAL: ",urlsfinal);
+            
             return urlsfinal;
 
           }
