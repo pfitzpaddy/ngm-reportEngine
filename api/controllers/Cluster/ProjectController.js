@@ -259,6 +259,7 @@ var ProjectController = {
                     //project documents
                     documents: Documents.find(query),
                     organizations: Organizations.find(query),
+                    organizationsOfOrganizationCollection: Organization.find(query),
                     //Report.find( findProject, updatedRelationsUser ),
                     //Location.update( findProject, updatedRelationsUser ),
                     //Beneficiaries.find( findProject, updatedRelationsUser ),
@@ -288,6 +289,18 @@ var ProjectController = {
                     $project[i].target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
                     $project[i].target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
                     $project[i].documents = _.filter(data.documents,       { 'project_id' : projectId}) ;
+                   
+                    $project[i].organization_info = _.filter(data.organizationsOfOrganizationCollection, { 'id': project.organization_id });
+
+                    if($project[i].organization_info.length ){
+
+                      $project[i].organization_name = $project[i].organization_info[0].organization_name;
+
+                    }else{
+                      $project[i].organization_name = '';
+                    };
+
+
 
                     /// order
                     $project[i].target_beneficiaries
@@ -343,9 +356,9 @@ var ProjectController = {
       // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','componente_humanitario','plan_hrp_plan','componente_construccion_de_paz','componente_desarrollo_sostenible','plan_interagencial','componente_flujos_migratorios','plan_rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
 
        // fieldNames = [ 'Cluster', 'Organización',  'País', 'Project ID', 'Estado del Proyecto', 'Punto Focal', 'Email', 'Teléfono', 'Código del Proyecto','Título del Proyecto',  'Descripción del Proyecto', 'Fecha Inicio del Proyecto', 'Fecha Finalización del Proyecto', 'Presupuesto del Proyecto', 'Moneda de Presupuesto del Proyecto','Soporte Documentos del Proyecto','Marcador de Género - GAM', 'Donantes del Proyecto'  ,  'Socios Implementadores', 'Componente Humanitario', 'Plan HRP','Componente Construcción de Paz','Componente Desarrollo Sostenible','Plan Interagencial','Componente Flujos Migratorios','Plan RMRP','Strategic Objectives', 'Beneficiary types','Tipos de Actividades','Beneficiarios Objetivo', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Ubicaciones Objetivo','Fecha Creación'];
-         var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','plan_component_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+         var fields = [ 'cluster', 'organization', 'organization_name', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','plan_component_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
 
-        fieldNames = [ 'Cluster', 'Organization',  'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Organization Code','Project Title',  'Project Description', 'Project Start Date', 'Project End Date', 'Project Budget', 'Project Budget Currency','Project Documents','Gender Marker - GAM', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Componentes de Respuesta','Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target Locations','Creation Date'];
+        fieldNames = [ 'Cluster', 'Organization', 'Organization Name', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Organization Code','Project Title',  'Project Description', 'Project Start Date', 'Project End Date', 'Project Budget', 'Project Budget Currency','Project Documents','Gender Marker - GAM', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Componentes de Respuesta','Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target Locations','Creation Date'];
         
       
 
@@ -426,8 +439,6 @@ var ProjectController = {
               
             });
             urlsfinal = urls.join('; ');
-            console.log("URLS: ",urls);
-            console.log("URLSFINAL: ",urlsfinal);
             return urlsfinal;
 
           }
