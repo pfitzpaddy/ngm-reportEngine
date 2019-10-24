@@ -3282,6 +3282,8 @@ var Cluster4wplusDashboardController = {
 				      
                 break;
 
+                //Work in Graphics
+
 
                 case 'pieChart':
 			// labels
