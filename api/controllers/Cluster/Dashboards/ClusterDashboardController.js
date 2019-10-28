@@ -559,6 +559,49 @@ var ClusterDashboardController = {
 			case 'financial_report':
 
 				// fields
+
+
+				if(params.admin0pcode.toUpperCase() === 'COL'){
+
+					var fields = [ 
+							'cluster',
+							'organization',
+							'admin0name',
+							'project_title',
+							'project_description',
+							'project_budget',
+							'project_budget_currency',
+							'project_donor_name',
+							'grant_id',
+							'currency_id',
+							'project_budget_amount_recieved',
+							'contribution_status',
+							'project_budget_date_recieved',
+							'budget_funds_name',
+							'email',
+							'createdAt',
+							'comments'
+						],
+						fieldNames = [
+							'Cluster',
+							'Organization',
+							'Country',
+							'Project Title',
+							'Project Description',
+							'Project Budget',
+							'Project Budget Currency',
+							'Project Donor',
+							'Donor Grant ID',
+							'Currency Recieved',
+							'Ammount Received',
+							'Contribution Status',
+							'Date of Payment',
+							'Incoming Funds',
+							'Email',
+							'createdAt',
+							'Comments'
+						];
+				}else{
 				var fields = [ 
 							'cluster',
 							'organization',
@@ -609,6 +652,7 @@ var ClusterDashboardController = {
 							'createdAt',
 							'Comments'
 						];
+					}
 
 				// get beneficiaries by project
 				BudgetProgress
@@ -757,6 +801,7 @@ var ClusterDashboardController = {
 								'_id',
 								'cluster_id',
 								'cluster',
+								'plan_component',
 								'name',
 								'phone',
 								'email',
@@ -872,6 +917,7 @@ var ClusterDashboardController = {
 								'beneficiary_id',
 								'cluster_id',
 								'cluster',
+								'plan_component',
 								'focal_point_name',
 								'focal_point_phone',
 								'focal_point_email',
@@ -1234,6 +1280,12 @@ var ClusterDashboardController = {
 									});
 									im.sort();
 									d.implementing_partners = im.join(', ');
+								}
+
+								//plan_component
+								if (Array.isArray(d.plan_component)) {
+									
+									d.plan_component = d.plan_component.join(', ');
 								}
 
 								// sum
