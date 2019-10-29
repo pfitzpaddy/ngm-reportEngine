@@ -204,7 +204,7 @@ var ProjectController = {
     }
 
     var allowedParams =
-        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode'];
+        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode', 'project_start_date', 'project_end_date'];
 
     // if dissallowed parameters sent
     if ( req.param('query') && _.difference(Object.keys(req.param('query')),allowedParams).length > 0 ) {
@@ -225,9 +225,21 @@ var ProjectController = {
         queryProject.id = queryProject.project_id;
         delete queryProject.project_id;
       }
+
+     //project_start_date and project_end_date filters
+
+      if( req.param('query').project_start_date && req.param('query').project_end_date){
+         queryProject.project_start_date = { $gte: new Date( req.param('query').project_start_date )};
+         queryProject.project_end_date = { $lte: new Date( req.param('query').project_end_date )};
+             
+      }
     }
 
     var csv = req.param('csv');
+    
+
+   
+
 
     // process request pipeline
     var pipe = Promise.resolve()
