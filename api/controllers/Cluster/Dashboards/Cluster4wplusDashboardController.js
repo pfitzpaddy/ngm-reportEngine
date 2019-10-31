@@ -2693,7 +2693,6 @@ var Cluster4wplusDashboardController = {
 							total_budget_progress = total_budget_progress+bpamount;
 
 						});
-						console.log("TOTAL A MOSTRAR: ",total_budget_progress);
 
 						return res.json( 200, { 'value': total_budget_progress } );
 					});
