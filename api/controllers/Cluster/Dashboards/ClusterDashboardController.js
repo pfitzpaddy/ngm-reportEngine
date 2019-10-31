@@ -804,7 +804,7 @@ var ClusterDashboardController = {
 
 						//fiter donor from projects plan or 4wplus activities dasbhoards
 
-						if(req.param('donor')){
+						if(req.param('donor') && req.param('donor') !== 'all'){
 							filterObject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('donor')}};
 
 						}
