@@ -2673,17 +2673,18 @@ var Cluster4wplusDashboardController = {
 			
 							}else if(budpro.currency_id ==='cop'){
 
-								//console.log(" VALOR PESOS: ", budpro.project_budget_amount_recieved);
+								
+
 								valuetostring=budpro.project_budget_amount_recieved.toString();
-								//console.log("EN STRING: ",Numeroaletra);
-								//nuevoNumero = Numeroaletra.indexOf('.');
+
+
 								newnumber2=valuetostring.replace(".",'');
-								//console.log("NUEVO VALOR: ",nuevoNumero2);
+
 								finalnumber = parseFloat(newnumber2);
-								//console.log("STRING A ENTERO: ",final);
 								
 
 								bpamount = finalnumber / params.coptousd;
+
 
 							
 							}
@@ -2692,6 +2693,7 @@ var Cluster4wplusDashboardController = {
 							total_budget_progress = total_budget_progress+bpamount;
 
 						});
+						console.log("TOTAL A MOSTRAR: ",total_budget_progress);
 
 						return res.json( 200, { 'value': total_budget_progress } );
 					});
