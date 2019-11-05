@@ -2970,7 +2970,7 @@ var Cluster4wprojectplanDashboardController = {
 
 								results.forEach(function(projrecord,i){
 
-
+console.log("PROJRECORD: ",projrecord.project_donor);
 
 										if(projrecord.project_donor.length > 0){
 
@@ -3015,6 +3015,10 @@ var Cluster4wprojectplanDashboardController = {
 
 										}else{
 											counter ++;
+											 if ( counter === length ) {
+							                      // table
+													return res.json( 200, {'data': donorslist} );
+							                    }
 										}
 				              });
 							}
@@ -3308,6 +3312,11 @@ var Cluster4wprojectplanDashboardController = {
 
 										}else{
 											counter ++;
+											if ( counter === length ) {
+
+							                      // table
+													return res.json( 200, {'value': implementpartnerslist.length} );
+							                    }
 										}
 				              });
 							}
@@ -3463,6 +3472,12 @@ var Cluster4wprojectplanDashboardController = {
 
 										}else{
 											counter ++;
+											if ( counter === length ) {
+
+							                    	
+							                      // table
+													return res.json( 200, {'data': implementpartnerslist} );
+							                    }
 										}
 				              });
 							}

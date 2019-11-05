@@ -8,7 +8,7 @@
 // require
 var moment = require( 'moment' );
 var json2csv = require( 'json2csv' );
-var $nin_organizations = [ 'immap', 'arcs' ];
+var $nin_organizations = [ 'immap', 'arcs' ]; 
 var async = require('async');
 
 var ClusterDashboardController = {
@@ -559,6 +559,49 @@ var ClusterDashboardController = {
 			case 'financial_report':
 
 				// fields
+
+
+				if(params.admin0pcode.toUpperCase() === 'COL'){
+
+					var fields = [ 
+							'cluster',
+							'organization',
+							'admin0name',
+							'project_title',
+							'project_description',
+							'project_budget',
+							'project_budget_currency',
+							'project_donor_name',
+							'grant_id',
+							'currency_id',
+							'project_budget_amount_recieved',
+							'contribution_status',
+							'project_budget_date_recieved',
+							'budget_funds_name',
+							'email',
+							'createdAt',
+							'comments'
+						],
+						fieldNames = [
+							'Cluster',
+							'Organization',
+							'Country',
+							'Project Title',
+							'Project Description',
+							'Project Budget',
+							'Project Budget Currency',
+							'Project Donor',
+							'Donor Grant ID',
+							'Currency Recieved',
+							'Ammount Received',
+							'Contribution Status',
+							'Date of Payment',
+							'Incoming Funds',
+							'Email',
+							'createdAt',
+							'Comments'
+						];
+				}else{
 				var fields = [ 
 							'cluster',
 							'organization',
@@ -609,6 +652,7 @@ var ClusterDashboardController = {
 							'createdAt',
 							'Comments'
 						];
+					}
 
 				// get beneficiaries by project
 				BudgetProgress
@@ -748,6 +792,242 @@ var ClusterDashboardController = {
 					
 						collection.find(filterObject).toArray(function (err, beneficiaries) {
 							if (err) return res.serverError(err);
+
+							if(params.admin0pcode.toUpperCase() === 'COL'){
+
+								var fields = [
+								'project_id',
+								'report_id',
+								'_id',
+								'cluster_id',
+								'cluster',
+								'plan_component',
+								'name',
+								'phone',
+								'email',
+								//'mpc_purpose_cluster_id',
+								//'mpc_purpose_type_name',
+								'organization',
+								'implementing_partners',
+								//'project_hrp_code',
+								'project_code',
+								'project_title',
+								'project_start_date',
+								'project_end_date',
+								'donor',
+								'report_month_number',
+								'report_month',
+								'report_year',
+								'reporting_period',
+								'admin0pcode',
+								'admin0name',
+								'admin1pcode',
+								'admin1name',
+								'admin2pcode',
+								'admin2name',
+								/*'admin3pcode',
+								'admin3name',
+								'admin4pcode',
+								'admin4name',
+								'admin5pcode',
+								'admin5name',
+								'conflict',*/
+								'site_id',
+								/*'site_class',
+								'site_status',
+								'site_hub_id',
+								'site_hub_name',*/
+								'site_implementation_name',
+								'site_type_name',
+								'site_name',
+								/*'category_type_id',
+								'category_type_name',*/
+								'beneficiary_type_id',
+								'beneficiary_type_name',
+								'beneficiary_category_name',
+								'strategic_objective_id',
+								'strategic_objective_name',
+								'strategic_objective_description',
+								'sector_objective_id',
+								'sector_objective_name',
+								'sector_objective_description',
+								'activity_type_id',
+								'activity_type_name',
+								'activity_description_id',
+								'activity_description_name',
+								/*'activity_detail_id',
+								'activity_detail_name',
+								'remarks',*/
+								'indicator_id',
+								'indicator_name',
+								/*'activity_status_id',
+								'activity_status_name',*/
+								'delivery_type_id',
+								'delivery_type_name',
+								/*'distribution_status',
+								'distribution_start_date',
+								'distribution_end_date',
+								'partial_kits',
+								'kit_details',*/
+								'units',
+								'unit_type_id',
+								'unit_type_name',
+								//'transfer_type_value',
+								'mpc_delivery_type_id',
+								'mpc_delivery_type_name',
+								'mpc_mechanism_type_id',
+								'mpc_mechanism_type_name',
+								//'package_type_id',
+								'households',
+								'families',
+								'boys_0_5',
+								'boys_6_11',
+								'boys_12_17',
+								'boys',
+								'men',
+								'elderly_men',
+								'total_male',
+								'girls_0_5',
+								'girls_6_11',
+								'girls_12_17',
+								'girls',
+								'women',
+								'elderly_women',
+								'total_female',
+								'total_beneficiaries',
+								'admin1lng',
+								'admin1lat',
+								'admin2lng',
+								'admin2lat',
+								//'admin3lng',
+								//'admin3lat',
+								//'admin4lng',
+								//'admin4lat',
+								//'admin5lng',
+								//'admin5lat',
+								'site_lng',
+								'site_lat',
+								'updatedAt',
+								'createdAt'
+							],
+
+						fieldNames = [
+								'project_id',
+								'report_id',
+								'beneficiary_id',
+								'cluster_id',
+								'cluster',
+								'plan_component',
+								'focal_point_name',
+								'focal_point_phone',
+								'focal_point_email',
+								//'mpc_purpose_cluster_id',
+								//'mpc_purpose_type_name',
+								'organization',
+								'implementing_partners',
+								//'project_hrp_code',
+								'project_code',
+								'project_title',
+								'project_start_date',
+								'project_end_date',
+								'donor',
+								'report_month_number',
+								'report_month',
+								'report_year',
+								'reporting_period',
+								'admin0pcode',
+								'admin0name',
+								'admin1pcode',
+								'admin1name',
+								'admin2pcode',
+								'admin2name',
+								/*'admin3pcode',
+								'admin3name',
+								'admin4pcode',
+								'admin4name',
+								'admin5pcode',
+								'admin5name',
+								'conflict',*/
+								'site_id',
+								/*'site_class',
+								'site_status',
+								'site_hub_id',
+								'site_hub_name',*/
+								'site_implementation_name',
+								'site_type_name',
+								'site_name',
+								/*'category_type_id',
+								'category_type_name',*/
+								'beneficiary_type_id',
+								'beneficiary_type_name',
+								'beneficiary_category_name',
+								'strategic_objective_id',
+								'strategic_objective_name',
+								'strategic_objective_description',
+								'sector_objective_id',
+								'sector_objective_name',
+								'sector_objective_description',
+								'activity_type_id',
+								'activity_type_name',
+								'activity_description_id',
+								'activity_description_name',
+								/*'activity_detail_id',
+								'activity_detail_name',
+								'remarks',*/
+								'indicator_id',
+								'indicator_name',
+								/*'activity_status_id',
+								'activity_status_name',*/
+								'delivery_type_id',
+								'delivery_type_name',
+								/*'distribution_status',
+								'distribution_start_date',
+								'distribution_end_date',
+								'partial_kits',
+								'kit_details',*/ 
+								'units',
+								'unit_type_id',
+								'unit_type_name',
+								//'transfer_type_value',
+								'mpc_delivery_type_id',
+								'mpc_delivery_type_name',
+								'mpc_mechanism_type_id',
+								'mpc_mechanism_type_name',
+								//'package_type_id',
+								'households',
+								'families',
+								'boys_0_5',
+								'boys_6_11',
+								'boys_12_17',
+								'boys',
+								'men',
+								'elderly_men',
+								'total_male',
+								'girls_0_5',
+								'girls_6_11',
+								'girls_12_17',
+								'girls',
+								'women',
+								'elderly_women',
+								'total_female',
+								'total',
+								'admin1lng',
+								'admin1lat',
+								'admin2lng',
+								'admin2lat',
+								//'admin3lng',
+								//'admin3lat',
+								//'admin4lng',
+								//'admin4lat',
+								//'admin5lng',
+								//'admin5lat',
+								'site_lng',
+								'site_lat',
+								'updatedAt',
+								'createdAt'
+							];
+
+							}else{
 							
 							var fields = [
 								'project_id',
@@ -962,6 +1242,7 @@ var ClusterDashboardController = {
 								'updatedAt',
 								'createdAt'
 							];
+						};
 
               if (params.admin0pcode.toUpperCase() === 'AF') {
                 ix = fields.indexOf('activity_description_name') + 1;
@@ -999,6 +1280,12 @@ var ClusterDashboardController = {
 									});
 									im.sort();
 									d.implementing_partners = im.join(', ');
+								}
+
+								//plan_component
+								if (Array.isArray(d.plan_component)) {
+									
+									d.plan_component = d.plan_component.join(', ');
 								}
 
 								// sum
