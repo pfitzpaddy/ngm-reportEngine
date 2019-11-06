@@ -2488,6 +2488,8 @@ var Cluster4wprojectplanDashboardController = {
 
 					var totalfinancing = 0;
 
+					if(results.length){
+
 						results.forEach(function(project,i){
 
 							//console.log("PROJECT ID: ", project.id);
@@ -2595,6 +2597,9 @@ var Cluster4wprojectplanDashboardController = {
 							});
 
 						});
+					}else{
+						return res.json( 200, {'value': totalfinancing} );
+					}
 
 					});
 
@@ -2686,6 +2691,7 @@ var Cluster4wprojectplanDashboardController = {
 								length = results.length;
 
 								
+								if(results.length){
 
 								results.forEach(function(proj, i){
 
@@ -2740,7 +2746,14 @@ var Cluster4wprojectplanDashboardController = {
 											});
 
 								});
-							});
+							}else{
+								orgs.unshift({
+									organization_tag: 'all',
+									organization: 'ALL'}
+									);
+								return res.json( 200,  orgs );
+							}
+						});
 				
 
 						
@@ -2814,7 +2827,7 @@ var Cluster4wprojectplanDashboardController = {
 
 								length = results.length;
 
-								
+								if(results.length){
 
 								results.forEach(function(proj, i){
 
@@ -2867,7 +2880,11 @@ var Cluster4wprojectplanDashboardController = {
 											});
 
 								});
-							});
+							}else{
+						
+								return res.json( 200,  {'value':orgstotal.length} );
+							}
+						});
 				
 
 						
@@ -2970,7 +2987,6 @@ var Cluster4wprojectplanDashboardController = {
 
 								results.forEach(function(projrecord,i){
 
-console.log("PROJRECORD: ",projrecord.project_donor);
 
 										if(projrecord.project_donor.length > 0){
 
@@ -3021,6 +3037,8 @@ console.log("PROJRECORD: ",projrecord.project_donor);
 							                    }
 										}
 				              });
+							}else{
+								return res.json( 200, {'data': donorslist} );
 							}
 						});
 
@@ -3238,7 +3256,7 @@ console.log("PROJRECORD: ",projrecord.project_donor);
 
 				}else{
 
-				var implementpartnerslist = [];
+				var implementpartnerstotal = [];
 
 
 				Project
@@ -3289,7 +3307,7 @@ console.log("PROJRECORD: ",projrecord.project_donor);
 					                                  const resultado = implementpartnerslist.find( implpartner => implpartner.organization_tag === partner.organization_tag );
 
 							                             if(!resultado){
-							                             	implementpartnerslist.push(partner);
+							                             	implementpartnerstotal.push(partner);
 							                             	//console.log("METI EL PARTNER: ", partner);
 
 							                             }
@@ -3306,7 +3324,7 @@ console.log("PROJRECORD: ",projrecord.project_donor);
 							                    if ( counter === length ) {
 
 							                      // table
-													return res.json( 200, {'value': implementpartnerslist.length} );
+													return res.json( 200, {'value': implementpartnerstotal.length} );
 							                    }
 											});
 
@@ -3315,10 +3333,14 @@ console.log("PROJRECORD: ",projrecord.project_donor);
 											if ( counter === length ) {
 
 							                      // table
-													return res.json( 200, {'value': implementpartnerslist.length} );
+													return res.json( 200, {'value': implementpartnerstotal.length} );
 							                    }
 										}
 				              });
+							}else{
+
+								
+								return res.json( 200, {'value': implementpartnerstotal.length} );
 							}
 						});
 
@@ -3480,6 +3502,10 @@ console.log("PROJRECORD: ",projrecord.project_donor);
 							                    }
 										}
 				              });
+							}else{
+
+								return res.json( 200, {'data': implementpartnerslist} );
+
 							}
 						});
 
