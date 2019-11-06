@@ -204,7 +204,7 @@ var ProjectController = {
     }
 
     var allowedParams =
-        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode', 'project_start_date', 'project_end_date'];
+        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode','admin1pcode', 'project_start_date', 'project_end_date'];
 
     // if dissallowed parameters sent
     if ( req.param('query') && _.difference(Object.keys(req.param('query')),allowedParams).length > 0 ) {
@@ -225,6 +225,22 @@ var ProjectController = {
         queryProject.id = queryProject.project_id;
         delete queryProject.project_id;
       }
+
+
+
+
+
+
+
+
+       if(req.param('query').admin1pcode){
+        console.log("ADMIN1PCODE: ", req.param('query').admin1pcode);
+        var querylocations = { admin1pcode: req.param('query').admin1pcode};
+
+      }
+
+      //delete admin1pcode filter of queryProject
+       delete queryProject.admin1pcode;
 
      //project_start_date and project_end_date filters
 
@@ -262,12 +278,17 @@ var ProjectController = {
 
     _getProjectData : function(queryProject, query){
 
+            console.log("QUERYPROYEJ: ", queryProject);
+
+      console.log("QUERY: ",querylocations);
+
 
                   return Promise.props({
                     project: Project.find( queryProject ),
                     budget: BudgetProgress.find( query ),
                     beneficiaries: TargetBeneficiaries.find( query ),
-                    targetlocations: TargetLocation.find( query ),
+                   // targetlocations: TargetLocation.find( query ),
+                   targetlocations: TargetLocation.find(querylocations),
                     //project documents
                     documents: Documents.find(query),
                     organizations: Organizations.find(query),
@@ -284,6 +305,22 @@ var ProjectController = {
       // no project found
       if ( !data.project.length ) return Promise.reject('NO PROJECT');
 
+       $projectsToPrint = [];
+
+                    async.each(data.project, function(pro){
+
+                      const exist2  = _.filter(data.targetlocations, { 'project_id': pro.id});
+                        //console.log("TAMAÑO existe2? : ",exist2.length);
+
+                        if(exist2.length >0){
+
+                          $projectsToPrint.push(pro);
+
+                        }
+
+
+
+                    });
       // all projects
       $project = [];
 
@@ -294,7 +331,9 @@ var ProjectController = {
       var uppendDataToProject = function(project){
 
                     var projectId = project.id;
-                    var i = data.project.indexOf(project);
+                    //var i = data.project.indexOf(project);
+                    var i = $projectsToPrint.indexOf(project);
+
                     // assemble project data
                     $project[i] = project;
                     $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
@@ -342,7 +381,13 @@ var ProjectController = {
                     // callback if error or post work can be called here `cb()`;
                 };
 
-      async.each(data.project, uppendDataToProject);
+      //async.each(data.project, uppendDataToProject);
+
+            console.log("PROJECT TO PRINT: ", $projectsToPrint);
+
+      async.each($projectsToPrint, uppendDataToProject);
+
+      console.log("PROJECTOS: ", $project);
 
       return $project;
     },
