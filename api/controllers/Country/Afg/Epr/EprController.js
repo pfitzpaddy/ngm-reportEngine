@@ -60,8 +60,6 @@ module.exports = {
 
 			if ( error ) {
 
-				console.log(error);
-
 				// return error
 			  res.json( 400, { error: 'Request error! Please try again...' } );
 

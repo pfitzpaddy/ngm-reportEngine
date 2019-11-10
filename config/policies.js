@@ -140,6 +140,12 @@ module.exports.policies = {
     '*': true
   },
 
+
+  // Gfa (public)
+  'Country/Cxb/Gfa/GfaTaskController': {
+    '*': true
+  }, 
+
   /***************************************************************************
   *                                                                          *
   * Here's an example of mapping some policies to run before a controller    *

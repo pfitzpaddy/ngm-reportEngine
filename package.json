@@ -37,7 +37,8 @@
     "sails-hook-email": "^0.12.1",
     "sails-mongo": "^0.11.4",
     "sails-postgresql": "^0.11.4",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "xlsx": "^0.15.1"
   },
   "scripts": {
     "debug": "node debug app.js",
