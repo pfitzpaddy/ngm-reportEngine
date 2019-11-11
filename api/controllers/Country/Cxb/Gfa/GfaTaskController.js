@@ -849,7 +849,7 @@ var GfaTaskController = {
 	getKoboData: function( req, res ){
 
 		// 
-		console.log( req );
+		console.log( req.body );
 
 		return res.json( 200, { msg: 'Success!' });
 
