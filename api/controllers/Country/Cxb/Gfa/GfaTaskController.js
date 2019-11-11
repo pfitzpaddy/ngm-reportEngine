@@ -647,6 +647,10 @@ var GfaTaskController = {
 						choices_list.push( [ 'list name',	'name', 'label'] );
 						choices_list.push( [ 'beneficiary_type',	'planned_beneficiary', 'Planned Beneficiary'] );
 						choices_list.push( [ 'beneficiary_type',	'unplanned_new_beneficiary', 'Unplanned / New Beneficiary'] );
+						
+						// choices update status
+						choices_list.push( [ 'edit_status',	'updated', 'updated'] );
+						choices_list.push( [ 'edit_status',	'resolved', 'resolved'] );
 
 						// generate fcn ids
 						for ( i = 0; i < planned_beneficiaries.length; i++ ) {
@@ -847,14 +851,12 @@ var GfaTaskController = {
 	},
 
 	// kobo POSTed service
+		// http://support.kobotoolbox.org/en/articles/592398-api-and-rest-services
 	getKoboData: function( req, res ){
 
 		// report
 		var report_round = req.body[ 'distribution_information/report_round' ];
 		var report_distribution = req.body[ 'distribution_information/report_distribution' ];
-
-		// update?
-		console.log( req.body );
 		
 		// process record
 		GfaTaskController.processKoboData( report_round, report_distribution, [ req.body ], res );
@@ -972,7 +974,23 @@ var GfaTaskController = {
 	}, 
 
 	// run batch for kobo data
-	getBatchKoboData: function( req, res ){
+	getUpdatedKoboData: function( req, res ){
+
+		// records to update
+		var update_records = [];
+
+		// forms
+		GfdForms
+			.find()
+			.exec( function( err, form ) {
+
+				// return error
+				if ( err ) return res.negotiate( err );
+
+				// fetch data where validation status is updated
+				return res.json( 200, { msg: 'Success!' });
+
+			});
 
 	},
 
@@ -1156,7 +1174,6 @@ var GfaTaskController = {
 			// 		// return success
 			// 		return res.json( 200, { msg: 'Success!' });
 			// 	});
-
 
       // ASYNC REQUEST 1
       // async loop target_beneficiaries
