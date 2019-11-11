@@ -641,9 +641,12 @@ var GfaTaskController = {
 						if (err) return res.negotiate( err );
 						
 						// fcn_list
-						var external_choices_list = [ 'list_name', 'name', 'label' ];
+						var external_choices_list = [];
+						
+						// choices beneficiary_type
+						external_choices_list.push( [ 'list_name', 'name', 'label'] );
 
-						// external_choices fcn ids
+						// generate fcn ids
 						for ( i = 0; i < planned_beneficiaries.length; i++ ) {
 							external_choices_list.push( [ 'fcn_id', planned_beneficiaries[ i ].fcn_id, planned_beneficiaries[ i ].fcn_id ] );
 						}
