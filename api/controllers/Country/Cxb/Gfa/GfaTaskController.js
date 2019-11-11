@@ -847,11 +847,13 @@ var GfaTaskController = {
 
 	// kobo POSTed service
 	getKoboData: function( req, res ){
-
-		// 
-		console.log( req.body );
-
-		return res.json( 200, { msg: 'Success!' });
+		
+		// report
+		var report_round = req.body[ 'distribution_information/report_round' ];
+		var report_distribution = req.body[ 'distribution_information/report_distribution' ];
+		
+		// process record
+		GfaTaskController.processKoboData( report_round, report_distribution, [ req.body ], res );
 
 	},
 
