@@ -1162,7 +1162,7 @@ var GfaTaskController = {
       // async loop target_beneficiaries
       async.each( actual_beneficiaries, function ( d, next ) {
         ActualBeneficiaries
-        	.updateOrCreate( { _kobo_id: d._kobo_id }, d ).exec(function( err, result ){
+        	.updateOrCreate( { _kobo_id: d._kobo_id }, d, function( err, result ){
 						// return error
 						if ( err ) return res.negotiate( err );
           	next();
