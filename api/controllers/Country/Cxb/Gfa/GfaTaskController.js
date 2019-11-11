@@ -981,6 +981,8 @@ var GfaTaskController = {
 		var length = kobo_data.length;
 		var actual_beneficiaries = [];
 
+		console.log( kobo_data );
+
 		// set to planned_beneficiaries
 		async.each( kobo_data, function ( k_data, next ) {
 
