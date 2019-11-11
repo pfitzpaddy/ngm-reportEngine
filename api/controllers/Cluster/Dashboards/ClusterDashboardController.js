@@ -572,7 +572,6 @@ var ClusterDashboardController = {
 							'project_budget',
 							'project_budget_currency',
 							'project_donor_name',
-							'grant_id',
 							'currency_id',
 							'project_budget_amount_recieved',
 							'contribution_status',
@@ -591,7 +590,6 @@ var ClusterDashboardController = {
 							'Project Budget',
 							'Project Budget Currency',
 							'Project Donor',
-							'Donor Grant ID',
 							'Currency Recieved',
 							'Ammount Received',
 							'Contribution Status',
@@ -652,7 +650,20 @@ var ClusterDashboardController = {
 							'createdAt',
 							'Comments'
 						];
-					}
+					};
+
+					//fiter donor from projects plan or 4wplus activities dasbhoards
+
+					if(req.param('donor') && req.param('donor') !== 'all'){
+
+						project_donor_id = req.param('donor');
+						filters.project_donor_id = {  project_donor_id };
+						
+					}else{
+							filters.project_donor_id = {};
+
+						};
+		                       
 
 				// get beneficiaries by project
 				BudgetProgress
@@ -663,6 +674,7 @@ var ClusterDashboardController = {
 					.where( filters.admin1pcode )
 					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
+					.where( filters.project_donor_id )
 					.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -789,6 +801,13 @@ var ClusterDashboardController = {
 					// get beneficiaries export
 					Beneficiaries.native(function(err, collection) {
 						if (err) return res.serverError(err);
+
+						//fiter donor from projects plan or 4wplus activities dasbhoards
+
+						if(req.param('donor') && req.param('donor') !== 'all'){
+							filterObject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('donor')}};
+
+						}
 					
 						collection.find(filterObject).toArray(function (err, beneficiaries) {
 							if (err) return res.serverError(err);
