@@ -641,14 +641,16 @@ var GfaTaskController = {
 						if (err) return res.negotiate( err );
 						
 						// fcn_list
-						var external_choices_list = [];
+						var choices_list = [];
 						
 						// choices beneficiary_type
-						external_choices_list.push( [ 'list_name', 'name', 'label'] );
+						choices_list.push( [ 'list_name', 'name', 'label'] );
+						choices_list.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary'] );
+						choices_list.push( [ 'beneficiary_type', 'unplanned_new_beneficiary', 'Unplanned / New Beneficiary'] );
 
 						// generate fcn ids
 						for ( i = 0; i < planned_beneficiaries.length; i++ ) {
-							external_choices_list.push( [ 'fcn_id', planned_beneficiaries[ i ].fcn_id, planned_beneficiaries[ i ].fcn_id ] );
+							choices_list.push( [ 'fcn_id', planned_beneficiaries[ i ].fcn_id, planned_beneficiaries[ i ].fcn_id ] );
 						}
 						
 						// deployments
@@ -679,7 +681,7 @@ var GfaTaskController = {
 							survey_sheet[ 'B2' ].v = forms[ xls_complete ].form_template;
 
 							// choices per form
-							XLSX_UTILS.book_append_sheet( workbook, XLSX_UTILS.aoa_to_sheet( external_choices_list ), 'external_choices' );
+							XLSX_UTILS.book_append_sheet( workbook, XLSX_UTILS.aoa_to_sheet( choices_list ), 'choices' );
 
 							// writefile
 							XLSX.writeFile( workbook, XLSX_PATH + '/forms/' + forms[ xls_complete ].organization_tag + '/' + forms[ xls_complete ].form_template + '_current.xlsx' );
