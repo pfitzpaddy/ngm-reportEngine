@@ -644,13 +644,9 @@ var GfaTaskController = {
 						var choices_list = [];
 						
 						// choices beneficiary_type
-						choices_list.push( [ 'list name',	'name', 'label'] );
-						choices_list.push( [ 'beneficiary_type',	'planned_beneficiary', 'Planned Beneficiary'] );
-						choices_list.push( [ 'beneficiary_type',	'unplanned_new_beneficiary', 'Unplanned / New Beneficiary'] );
-						
-						// choices update status
-						choices_list.push( [ 'edit_status',	'updated', 'updated'] );
-						choices_list.push( [ 'edit_status',	'resolved', 'resolved'] );
+						choices_list.push( [ 'list name',	'name', 'label' ] );
+						choices_list.push( [ 'beneficiary_type',	'planned_beneficiary', 'Planned Beneficiary' ] );
+						choices_list.push( [ 'beneficiary_type',	'unplanned_new_beneficiary', 'Unplanned / New Beneficiary' ] );
 
 						// generate fcn ids
 						for ( i = 0; i < planned_beneficiaries.length; i++ ) {
