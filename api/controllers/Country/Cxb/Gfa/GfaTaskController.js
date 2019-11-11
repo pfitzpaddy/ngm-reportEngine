@@ -780,7 +780,7 @@ var GfaTaskController = {
 									EXEC.exec( cmd_3, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
 
 										// err
-										if ( error ) {
+										if ( error || stderr ) {
 
 											// cmd_3
 											console.log( error );
@@ -791,6 +791,7 @@ var GfaTaskController = {
 													name: 'WFP GFA Team',
 													form: form.title,
 													error: error,
+													error: stderr,
 													cmd: cmd_3,
 													sendername: 'ReportHub'
 												}, {
@@ -847,7 +848,7 @@ var GfaTaskController = {
 
 	// kobo POSTed service
 	getKoboData: function( req, res ){
-		
+
 		// report
 		var report_round = req.body[ 'distribution_information/report_round' ];
 		var report_distribution = req.body[ 'distribution_information/report_distribution' ];
