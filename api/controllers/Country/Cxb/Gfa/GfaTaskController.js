@@ -981,8 +981,6 @@ var GfaTaskController = {
 		var length = kobo_data.length;
 		var actual_beneficiaries = [];
 
-		console.log( kobo_data );
-
 		// set to planned_beneficiaries
 		async.each( kobo_data, function ( k_data, next ) {
 
@@ -1125,6 +1123,7 @@ var GfaTaskController = {
 
 							// kobo params
 							data.uuid = k_data[ 'formhub/uuid' ];
+							data._kobo_id = k_data[ '_id' ];
 							data._status = k_data._status;
 							data._submission_time = k_data._submission_time;
 
