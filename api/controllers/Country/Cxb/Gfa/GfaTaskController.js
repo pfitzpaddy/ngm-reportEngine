@@ -852,6 +852,9 @@ var GfaTaskController = {
 		// report
 		var report_round = req.body[ 'distribution_information/report_round' ];
 		var report_distribution = req.body[ 'distribution_information/report_distribution' ];
+
+		// update?
+		console.log( req.body );
 		
 		// process record
 		GfaTaskController.processKoboData( report_round, report_distribution, [ req.body ], res );
@@ -1143,14 +1146,33 @@ var GfaTaskController = {
 			if ( err ) return cb( err, false );
 
 			// create records
-			ActualBeneficiaries
-				.create( actual_beneficiaries )
-				.exec( function( err, form ) {
-					// return error
-					if ( err ) return res.negotiate( err );
-					// return success
-					return res.json( 200, { msg: 'Success!' });
-				});
+			// ActualBeneficiaries
+			// 	// .updateOrCreate( { _kobo_id: _id }, report, 
+			// 	// function( err, distribution ){
+			// 	.create( actual_beneficiaries )
+			// 	.exec( function( err, form ) {
+			// 		// return error
+			// 		if ( err ) return res.negotiate( err );
+			// 		// return success
+			// 		return res.json( 200, { msg: 'Success!' });
+			// 	});
+
+
+      // ASYNC REQUEST 1
+      // async loop target_beneficiaries
+      async.each( actual_beneficiaries, function ( d, next ) {
+        ActualBeneficiaries
+        	.updateOrCreate( { _kobo_id: d._kobo_id }, d ).exec(function( err, result ){
+						// return error
+						if ( err ) return res.negotiate( err );
+          	next();
+        	});
+      }, function ( err ) {
+				// return error
+				if ( err ) return res.negotiate( err );
+				// return success
+				return res.json( 200, { msg: 'Success!' });
+      });
 
 		});
 	
