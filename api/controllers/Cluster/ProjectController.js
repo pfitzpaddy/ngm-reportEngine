@@ -278,11 +278,6 @@ var ProjectController = {
 
     _getProjectData : function(queryProject, query){
 
-            console.log("QUERYPROYEJ: ", queryProject);
-
-      console.log("QUERY: ",querylocations);
-
-
                   return Promise.props({
                     project: Project.find( queryProject ),
                     budget: BudgetProgress.find( query ),
