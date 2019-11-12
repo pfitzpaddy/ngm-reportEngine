@@ -3304,7 +3304,7 @@ var Cluster4wprojectplanDashboardController = {
 												if(partner.organization_tag){
 
 
-					                                  const resultado = implementpartnerslist.find( implpartner => implpartner.organization_tag === partner.organization_tag );
+					                                  const resultado = implementpartnerstotal.find( implpartner => implpartner.organization_tag === partner.organization_tag );
 
 							                             if(!resultado){
 							                             	implementpartnerstotal.push(partner);

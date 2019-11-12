@@ -288,6 +288,42 @@ module.exports.routes = {
 	'GET /drought/afghanistan/beneficiaries/data': 'Country/Afg/Drought/DroughtDashboardController.getDroughtData',
 	'POST /drought/afghanistan/beneficiaries/data': 'Country/Afg/Drought/DroughtDashboardController.getDroughtData',
 
+
+  
+  
+  // -------- CXB GFA ------------
+  // setDistributionRound
+  'GET /wfp/gfa/gfd/getDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.getDistributionRound',
+  'POST /wfp/gfa/gfd/getDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.getDistributionRound',
+  // setDistributionRound
+  'GET /wfp/gfa/gfd/setDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.setDistributionRound',
+  'POST /wfp/gfa/gfd/setDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.setDistributionRound',
+  // uploadPlannedBeneficiaries
+  'GET /wfp/gfa/gfd/processPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processPlannedBeneficiaries',
+  'POST /wfp/gfa/gfd/processPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processPlannedBeneficiaries',
+  // setKoboXlsxForm
+  'GET /wfp/gfa/gfd/setKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.setKoboXlsxForm',
+  'POST /wfp/gfa/gfd/setKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.setKoboXlsxForm',
+  // deployKoboXlsxForm
+  'GET /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
+  'POST /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
+  // getKoboData
+  'GET /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
+  'POST /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
+  // getBatchKoboData
+  'GET /wfp/gfa/gfd/getLatestKoboData': 'Country/Cxb/Gfa/GfaTaskController.getLatestKoboData',
+  'POST /wfp/gfa/gfd/getLatestKoboData': 'Country/Cxb/Gfa/GfaTaskController.getLatestKoboData',  
+
+  // get PlannedBeneficiaries
+  'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
+  'POST /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
+  // get PlannedBeneficiaries Indicator
+  'GET /wfp/gfa/gfd/getPlannedBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiariesIndicator',
+  'POST /wfp/gfa/gfd/getPlannedBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiariesIndicator',
+  // get ActualBeneficiaries Indicator
+  'GET /wfp/gfa/gfd/getActualBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getActualBeneficiariesIndicator',
+  'POST /wfp/gfa/gfd/getActualBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getActualBeneficiariesIndicator',
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
