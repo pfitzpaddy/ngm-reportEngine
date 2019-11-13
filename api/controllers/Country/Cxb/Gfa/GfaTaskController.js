@@ -903,6 +903,8 @@ var GfaTaskController = {
 
 					// cmd
 					var cmd = 'curl -X GET http://dev.reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataRefresh?admin0pcode=' + admin0pcode +'&organization_tag=' + organization_tag + '&report_round=' + report_round + '&report_distribution=' + report_distribution;
+					console.log('--------- BATCH')
+					console.log(cmd)
 
 					// run curl command
 					EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
@@ -994,6 +996,10 @@ var GfaTaskController = {
 
 				// do fetch
 				function fetchData( fetch_complete, fetch_pending, form ) {
+
+					console.log('--------- FN')
+					console.log( report_round )
+					console.log( form )
 
 					// get latest submission from actual based on form.uuid
 					ActualBeneficiaries
