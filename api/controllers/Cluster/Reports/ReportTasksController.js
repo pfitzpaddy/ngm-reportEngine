@@ -282,6 +282,8 @@ var ReportTasksController = {
 
           // create report
           var new_report = _under.extend( {}, p, r );
+          delete new_report.createdAt;
+          delete new_report.updatedAt;
 
           // find reports
           Report.findOne( { project_id: new_report.project_id, report_month: new_report.report_month, report_year: new_report.report_year } ).then( function ( report ){
