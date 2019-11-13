@@ -977,6 +977,12 @@ var GfaTaskController = {
 		// if wfp, select all
 		var organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
 
+		console.log('--------- ATTR')
+		console.log( admin0pcode )
+		console.log( organization_tag_filter )
+		console.log( report_round )
+		console.log( report_distribution )
+
 		// gfd forms
 		GfdForms
 			.find()
@@ -997,7 +1003,7 @@ var GfaTaskController = {
 				// do fetch
 				function fetchData( fetch_complete, fetch_pending, form ) {
 
-					console.log('--------- FN')
+					console.log('--------- FETCHDATA')
 					console.log( report_round )
 					console.log( form )
 
