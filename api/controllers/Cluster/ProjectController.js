@@ -206,6 +206,7 @@ var ProjectController = {
     var allowedParams =
         ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode','admin1pcode', 'project_start_date', 'project_end_date'];
 
+
     // if dissallowed parameters sent
     if ( req.param('query') && _.difference(Object.keys(req.param('query')),allowedParams).length > 0 ) {
       return res.json(401, { err: 'ivalid query params!' });
@@ -226,13 +227,6 @@ var ProjectController = {
         delete queryProject.project_id;
       }
 
-
-
-
-
-
-
-
        if(req.param('query').admin1pcode){
         console.log("ADMIN1PCODE: ", req.param('query').admin1pcode);
         var querylocations = { admin1pcode: req.param('query').admin1pcode};
@@ -242,6 +236,12 @@ var ProjectController = {
       //delete admin1pcode filter of queryProject
        delete queryProject.admin1pcode;
 
+
+      if( req.param('query').donor_id){
+         queryProject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('query').donor_id}};
+         delete queryProject.donor_id;
+             
+      }
      //project_start_date and project_end_date filters
 
       if( req.param('query').project_start_date && req.param('query').project_end_date){
@@ -252,9 +252,6 @@ var ProjectController = {
     }
 
     var csv = req.param('csv');
-    
-
-   
 
 
     // process request pipeline

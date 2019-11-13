@@ -3803,13 +3803,13 @@ var Cluster4wprojectplanDashboardController = {
 								data: [{
 									'y': 0,
 									'color': '#f48fb1',
-									'name': 'Age 0-5',
+									'name': '0-5',
 									'label': 0,
-									'drilldown': "Age 0-5"
+							
 								},{
 									'y': 0,
 									'color': '#90caf9',
-									'name': 'Age 6-11',
+									'name': '6-11',
 									'label': 0,
 								},
 								{
@@ -4113,10 +4113,6 @@ var Cluster4wprojectplanDashboardController = {
 								// if no length
 								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
 
-
-								//$beneficiaries = beneficiaries[0];
-
-								console.log("BENEF: ",beneficiaries);
 
 
 								switch (req.param('chart_for')) {

@@ -2786,7 +2786,7 @@ var Cluster4wplusDashboardController = {
 
 				case 'budgetprogress_4wplusdashboard':
 
-				BudgetProgress.find()
+				/*BudgetProgress.find()
 					.where( filters.default )
 					.where( filters.adminRpcode )
 					.where( filters.admin0pcode )
@@ -2802,12 +2802,35 @@ var Cluster4wplusDashboardController = {
 					.where(filters.donor_tagBudget)
 					.where( filters.activity_type_id)
 					.where(filters.budget_date_recieved)
-					.exec( function( err, budgetprogress )  {
+					.exec( function( err, budgetprogress )  {*/
+						BudgetProgress.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBudget
+								},
+								/*{
+									$group:{
+										_id: {cluster_id:'$cluster_id',cluster: '$cluster', project_budget_currency:'$project_budget_currency'},
+										totalBudgetProgress: {
+											$sum:  "$project_budget_amount_recieved"
+										},
+										
+
+									}
+								}*/
+							]).toArray(function (err, budgetprogress) {
 						if (err) return res.serverError(err);
+
+
 
 						var total_budget_progress = 0;
 
 						budgetprogress.forEach(function(budpro,i){
+
+							//console.log("Cada Uno: ",budpro.project_budget_amount_recieved + '  - '+budpro.currency_id);
 
 							var bpamount = 0;
 
@@ -2820,17 +2843,18 @@ var Cluster4wplusDashboardController = {
 			
 							}else if(budpro.currency_id ==='cop'){
 
-								//console.log(" VALOR PESOS: ", budpro.project_budget_amount_recieved);
+								
+
 								valuetostring=budpro.project_budget_amount_recieved.toString();
-								//console.log("EN STRING: ",Numeroaletra);
-								//nuevoNumero = Numeroaletra.indexOf('.');
+
+
 								newnumber2=valuetostring.replace(".",'');
-								//console.log("NUEVO VALOR: ",nuevoNumero2);
+
 								finalnumber = parseFloat(newnumber2);
-								//console.log("STRING A ENTERO: ",final);
 								
 
 								bpamount = finalnumber / params.coptousd;
+
 
 							
 							}
@@ -2842,6 +2866,7 @@ var Cluster4wplusDashboardController = {
 
 						return res.json( 200, { 'value': total_budget_progress } );
 					});
+						});
 			
 				
 				break;
@@ -3634,13 +3659,13 @@ var Cluster4wplusDashboardController = {
 								{
 									'y': 0,
 									'color': '#f48fb1',
-									'name': 'Age 0-5',
+									'name': '0-5',
 									'label': 0,
 									
 								},{
 									'y': 0,
 									'color': '#90caf9',
-									'name': 'Age 6-11',
+									'name': '6-11',
 									'label': 0,
 								},
 								{
@@ -4007,7 +4032,7 @@ var Cluster4wplusDashboardController = {
 							]).toArray(function (err, beneficiaries) {
 								if (err) return res.serverError(err);	
 
-									console.log("TIPOS: ",beneficiaries)	;
+								
 								// if no length
 								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
 
@@ -4191,6 +4216,335 @@ var Cluster4wplusDashboardController = {
 												result.data.push(newclusterbeneficiary)
 
 											});
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							})					
+						
+										
+				break;
+
+
+				//financing
+
+				case 'BarChartFinancingCluster':
+			// labels
+			//console.log("FILTER BUDGET: ",filterObjectBudget);
+										
+						BudgetProgress.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBudget
+								},
+								{
+									$group:{
+										_id: {cluster_id:'$cluster_id',cluster: '$cluster', currency_id:'$currency_id'},
+										totalBudgetProgress: {
+											$sum:  "$project_budget_amount_recieved"
+										},
+										
+
+									}
+								}
+							]).toArray(function (err, budgetprogress) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!budgetprogress.length) return res.json(200, { 'value': 0 });
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(budgetprogress.length){
+
+
+									var result = {data:[]};
+
+									budgetprogress.totalBudgetProgressCluster = 0
+
+									budgetprogress.forEach(function(clus,i){
+										//console.log("BUDGETPROGRESS: ", clus);
+
+										if(clus._id.currency_id === 'cop'){
+											var clustotalBudgetsCOPtoUSD = clus.totalBudgetProgress/params.coptousd;
+											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+clustotalBudgetsCOPtoUSD;
+
+										}else if(clus._id.currency_id === 'eur'){
+
+
+											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+(clus.totalBudgetProgress*params.eurotousd);
+										
+
+										}else{
+											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+clus.totalBudgetProgress
+
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									//console.log("BUDGETPROGRESS: ", budgetprogress);
+
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Cluster',
+											'label': 0,
+										}]
+									};
+
+									budgetprogress = [{totalBudgetProgress:0}];
+									
+
+								}
+
+								$beneficiariesBudgetOne = budgetprogress[0];
+
+								//console.log("TOTAL-1: ", budgetprogress.totalBudgetProgressCluster);
+
+
+							
+								
+								switch (req.param('chart_for')) {
+									case 'FinancingCluster':
+
+									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
+										if ($beneficiariesBudgetOne.totalBudgetProgress < 1 && $beneficiariesBudgetOne.totalBudgetProgress < 1) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											budgetprogress.forEach(function(clus,i){
+
+												if(clus._id.currency_id === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = clus.totalBudgetProgress/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSDChart;
+											
+
+										}else if(clus._id.currency_id === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = clus.totalBudgetProgress*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsEURtoUSDChart;
+										}
+
+
+
+											var newclusterbudgetProgress = {
+												'y':clus.totalBudgetProgress,
+												'color':'blue',
+												'name': clus._id.cluster+' ('+clus._id.currency_id+')',
+												'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressCluster))*100
+											};
+
+
+												result.data.push(newclusterbudgetProgress)
+
+											});
+
+											//console.log("RESULT DATA: ",result.data);
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							})					
+						
+										
+				break;
+
+
+				case 'BarChartFinancingTop5ExecutorOrganizations':
+			// labels
+			//console.log("FILTER BUDGET: ",filterObjectBudget);
+										
+						BudgetProgress.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBudget
+								},
+								{
+									$group:{
+										_id: {organization_tag:'$organization_tag',organization: '$organization', currency_id:'$currency_id'},
+										totalBudgetProgress: {
+											$sum:  "$project_budget_amount_recieved"
+										}
+
+									}
+								}
+							]).toArray(function (err, budgetprogress) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!budgetprogress.length) return res.json(200, { 'value': 0 });
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(budgetprogress.length){
+
+								//	console.log("ANTES  BUD: ",budgetprogress);
+
+									
+
+
+									var result = {data:[]};
+
+									budgetprogress.totalBudgetProgressExecutorOrg = 0
+
+									budgetprogress.forEach(function(clus,i){
+										//console.log("BUDGETPROGRESS: ", clus);
+
+										if(clus._id.currency_id === 'cop'){
+											var clustotalBudgetsCOPtoUSD = clus.totalBudgetProgress/params.coptousd;
+
+											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSD;
+
+											budgetprogress.totalBudgetProgressExecutorOrg = budgetprogress.totalBudgetProgressExecutorOrg+clus.totalBudgetProgress;
+
+
+										}else if(clus._id.currency_id === 'eur'){
+
+
+											var clustotalBudgetsEURtoUSD = clus.totalBudgetProgress*params.eurotousd;
+											clus.totalBudgetProgress = clustotalBudgetsEURtoUSD;
+
+											budgetprogress.totalBudgetProgressExecutorOrg = budgetprogress.totalBudgetProgressExecutorOrg+clus.totalBudgetProgress;
+											
+										
+
+										}else{
+											budgetprogress.totalBudgetProgressExecutorOrg = budgetprogress.totalBudgetProgressExecutorOrg+clus.totalBudgetProgress;
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									//console.log("BUDGETPROGRESS: ", budgetprogress);
+
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Organization',
+											'label': 0,
+										}]
+									};
+
+									budgetprogress = [{totalBudgetProgress:0}];
+									
+
+								}
+
+							
+							
+								
+								switch (req.param('chart_for')) {
+									case 'FinancingExecutorOrganization':
+
+									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
+										if (!budgetprogress.length) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+											budgetprogress.sort(function(a, b) {
+										  return b.totalBudgetProgress - a.totalBudgetProgress;
+											});
+
+									//	console.log("DESPUES BUD: ",budgetprogress);
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											budgetprogress.forEach(function(clus,i){
+
+											/*	if(clus._id.currency_id === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = clus.totalBudgetProgress/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSDChart;
+											
+
+										}else if(clus._id.currency_id === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = clus.totalBudgetProgress*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsEURtoUSDChart;
+										}*/
+									//	console.log("UBICA; ",i);
+											if(i<5){
+											var org_name;
+											if(clus._id.organization){
+												org_name = clus._id.organization;
+
+											}else{
+												clus._id.organization_tag;
+
+											}
+
+
+
+												var newclusterbudgetProgress = {
+													'y':clus.totalBudgetProgress,
+													'color':'blue',
+													'name': org_name+' ('+clus._id.currency_id+')',
+													'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressExecutorOrg))*100
+												};
+
+
+												result.data.push(newclusterbudgetProgress);
+											}
+
+
+
+											});
+
+										//	console.log("RESULT DATA: ",result.data);
 											
 											return res.json(200, result);
 										}
