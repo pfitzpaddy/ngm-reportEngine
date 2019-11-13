@@ -57,13 +57,17 @@ var Cluster4wprojectplanDashboardController = {
 					!req.param('adminRpcode') ||
 					!req.param('admin0pcode') ||
 					!req.param('organization_tag') ||
+					!req.param('project_type_component') ||
+					!req.param('hrpplan')||
+					!req.param('implementer_tag')||
 					!req.param('donor_tag') ||
+					!req.param('activity_type') ||
 					!req.param('admin1pcode') ||
 					!req.param('admin2pcode') ||
 					//!req.param('beneficiaries') ||
 					!req.param('start_date') ||
 					!req.param('end_date') ) {
-			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, donor_tag, admin1pcode, admin2pcode, start_date, end_date required!'});
+			return res.json(401, {err: 'indicator, cluster_id, adminRpcode, admin0pcode, organization_tag, project_type_component, hrpplan, implementer_tag, donor_tag, activity_type, admin1pcode, admin2pcode, start_date, end_date required!'});
 		}
 
 
@@ -79,7 +83,11 @@ var Cluster4wprojectplanDashboardController = {
 			adminRpcode: req.param('adminRpcode'),
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
+			project_type_component:req.param('project_type_component'),
+			hrpplan:req.param('hrpplan'),
 			donor_tag: req.param('donor_tag'),
+			implementer_tag: req.param('implementer_tag'),
+			activity_type:req.param('activity_type'),
 			admin1pcode: req.param('admin1pcode'),
 			admin2pcode: req.param('admin2pcode'),
 			//beneficiaries: req.param('beneficiaries'),
@@ -109,17 +117,31 @@ var Cluster4wprojectplanDashboardController = {
 								: ( params.cluster_id !== 'cvwg' )
 			                    ?{or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}}]}
 			                    : {inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}},
+			 activity_type: params.activity_type === 'all' ? {} : {activity_type:{$elemMatch:{activity_type_id:params.activity_type}}},
 			
+			project_plan_component: (params.project_type_component === 'all' && params.hrpplan === 'all')
+			     ? {}
+			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
+			     ? { plan_component: {$in: [params.project_type_component]}}
+			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
+			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
+			     ? { plan_component: {$in:[params.project_type_component]}}
+			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
+			     ? { plan_component: {$in : ["hrp_plan"]}}
+			     : { plan_component: { $nin : ["hrp_plan"]}},
 			                                
 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
-			
-
 			donor_tag: params.donor_tag === 'all' ? {} : {  project_donor : { $elemMatch : { 'project_donor_id' : params.donor_tag}}},
+
+			implementer_tag: (params.implementer_tag === 'all')
+	                            ? {}
+	                            : {implementing_partners: { $elemMatch:{'organization_tag':params.implementer_tag} } },
+			
 			
 			project_startDate: { project_start_date: {'>=': new Date(params.start_date)}},
 			project_endDate: { project_end_date: {'<=': new Date(params.end_date)}},
-	
 
 			adminRpcode_Native: params.adminRpcode === 'hq'  ? {} : { adminRpcode: params.adminRpcode.toUpperCase() },
 			admin0pcode_Native: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode.toUpperCase() },
@@ -128,9 +150,25 @@ var Cluster4wprojectplanDashboardController = {
 			cluster_id_Native: ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
 								: ( params.cluster_id !== 'cvwg' )
-							
+								
 			                    ?{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
 			                    : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}} ,
+			activity_typeNative: params.activity_type === 'all' ? {} : {activity_type:{$elemMatch:{'activity_type_id':params.activity_type}}},
+              
+		
+			  project_plan_componentNative: (params.project_type_component === 'all' && params.hrpplan === 'all')
+			     ? {}
+			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
+			     ? { plan_component: {$in: [params.project_type_component]}}
+			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
+			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
+			     ? { plan_component: {$in:[params.project_type_component]}}
+			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
+			     ? { plan_component: {$in : ["hrp_plan"]}}
+			     : { plan_component: { $nin : ["hrp_plan"]}},
+			                  
+
 			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') ) 
 								? {} 
 								: ( params.cluster_ids.includes('cvwg') )
@@ -142,6 +180,11 @@ var Cluster4wprojectplanDashboardController = {
 
 			donor_tagNative: params.donor_tag === 'all' ? {} : {  project_donor : { $elemMatch : { 'project_donor_id' : params.donor_tag}}},
 
+			implementer_tagNative: ( params.implementer_tag === 'all')
+	                            ? {}
+	                     
+	                           : { implementing_partners: { $elemMatch: { 'organization_tag' : params.implementer_tag} }},
+			
 			project_startDateNative: { project_start_date: { $gte: new Date(params.start_date) }},
 			project_endDateNative: { project_end_date: { $lte: new Date(params.end_date) }},
 
@@ -166,16 +209,17 @@ var Cluster4wprojectplanDashboardController = {
 										filters.admin0pcode_Native,
 										filters.admin1pcode_Native,
 										filters.admin2pcode_Native,
-										
+										filters.activity_typeNative,
 										filters.cluster_id_Native,
 										filters.acbar_partners,
 										filters.organization_tag_Native,
-										
+										filters.project_plan_componentNative,
 										filters.donor_tagNative,
-										
+										filters.implementer_tagNative,
+										filters.activity_typeNative,
 										filters.project_startDateNative,
 										filters.project_endDateNative,
-										//filters.delivery_type_id()
+						
 										 );
 
 
@@ -187,17 +231,19 @@ var Cluster4wprojectplanDashboardController = {
 
 			case 'latest_update':
 
-				// beneficiaries
+ 			if(params.admin1pcode === 'all'){
+
 				Project
 					.find()
 					.where( filters.default )
 					.where( filters.adminRpcode )
 					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
 					.where( filters.organization_tag )
 					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.activity_type)
+					.where(filters.project_plan_component)
 					.where(filters.project_startDateNative)
 					.where(filters.project_endDateNative)
 					.sort( 'updatedAt DESC' )
@@ -211,6 +257,79 @@ var Cluster4wprojectplanDashboardController = {
 						return res.json( 200, results[0] );
 
 					});
+
+			 }else{
+
+			 	totalprojectsupdated = [];
+
+					Project
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id )
+					.where( filters.organization_tag )
+					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.activity_type)
+					.where(filters.project_plan_component)
+					.where(filters.project_startDateNative)
+					.where(filters.project_endDateNative)
+					.exec( function( err, results ){
+
+						// return error
+						if (err) return res.negotiate( err );
+
+						if(results.length){
+
+
+
+						
+						counter = 0;
+
+						length = results.length;
+
+						results.forEach(function(project,i){
+
+							//console.log("PROJECT ID: ", project.id);
+
+							TargetLocation.find()
+							.where( {project_id: project.id})
+							.where( filters.admin1pcode )
+							.where( filters.admin2pcode ).exec(function(err,targloc){
+
+								//console.log("TOTAL: ",targloc.length + ' - '+project.id);
+
+								if(targloc.length){
+								//	console.log("VOY A DAR PUSH: ",project.id);
+									totalprojectsupdated.push(project);
+								}
+
+								counter++;
+			                    if ( counter === length ) {
+			                      // table
+			                    //   console.log("TOTAL PROYECTOS: ",totalprojects.length);
+
+			                    
+			                    totalprojectsupdated.sort(function(a,b){return  b.updatedAt - a.updatedAt});
+
+
+									return res.json( 200, totalprojectsupdated[0] );
+			                    }
+							});
+
+						});
+
+					}else{
+
+						return res.json( 200,  totalprojectsupdated );
+
+					}		
+
+					});
+
+
+			 }
 
 				break;
 
@@ -1914,16 +2033,19 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'projects_4wdashboard_projectplan':
 
+				if(params.admin1pcode === 'all'){
+
 				Project
 					.find()
 					.where( filters.default )
 					.where( filters.adminRpcode )
 					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
 					.where( filters.organization_tag )
 					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.project_plan_component)
+					.where( filters.activity_type)
 					.where( filters.project_startDateNative )
 					.where( filters.project_endDateNative)
 					.exec( function( err, results ){
@@ -1941,38 +2063,268 @@ var Cluster4wprojectplanDashboardController = {
 
 					});
 
+				}else{
+
+					totalprojects = [];
+
+					Project
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id )
+					.where( filters.organization_tag )
+					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.project_plan_component)
+					.where( filters.activity_type)
+					.where( filters.project_startDateNative )
+					.where( filters.project_endDateNative)
+					.exec( function( err, results ){
+
+						// return error
+						if (err) return res.negotiate( err );
+
+						if(results.length){
+
+
+
+						
+						counter = 0;
+
+						length = results.length;
+
+						results.forEach(function(project,i){
+
+							//console.log("PROJECT ID: ", project.id);
+
+							TargetLocation.find()
+							.where( {project_id: project.id})
+							.where( filters.admin1pcode )
+							.where( filters.admin2pcode ).exec(function(err,targloc){
+
+								//console.log("TOTAL: ",targloc.length + ' - '+project.id);
+
+								if(targloc.length){
+								//	console.log("VOY A DAR PUSH: ",project.id);
+									totalprojects.push(project);
+								}
+
+								counter++;
+			                    if ( counter === length ) {
+			                      // table
+			                    //   console.log("TOTAL PROYECTOS: ",totalprojects.length);
+									return res.json( 200, {'value': totalprojects.length} );
+			                    }
+							});
+
+						});
+
+					}else{
+
+						return res.json( 200, {'value': totalprojects.length} );
+
+					}		
+
+					});
+
+
+				}
+
+				break;
+
+				case 'activities_activity_type':
+
+
+
+
+				activities = [];
+
+				if(filters.cluster_id === 'all'){
+
+					Activities
+					.find()
+					.where( filters.default )
+					.where( filters.admin0pcode )
+			
+					.exec( function( err, result ){
+
+
+						if (err) return res.negotiate( err );
+
+
+						result.forEach(function(d,i){
+
+							exist = activities.find(act => act.activity_type_id === d.activity_type_id);
+
+							if(!exist){
+								activities.push(d);
+							}
+						});
+
+
+					return res.json(200, { 'data': activities } );
+					});
+
+
+				}else{
+
+
+
+		         	Activities
+					.find()
+					.where( filters.default )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id)
+					//.where( filters.activity_type)
+			
+					.exec( function( err, result ){
+
+
+						if (err) return res.negotiate( err );
+
+						result.forEach(function(d,i){
+
+							exist = activities.find(act => act.activity_type_id === d.activity_type_id);
+
+							if(!exist){
+								activities.push(d);
+							}
+
+
+
+						});
+
+
+						return res.json(200, { 'data': activities } );
+
+					});
+				};
+
+				
 				break;
 
 				case 'total_beneficiariespopulation_4wdashboard_projectplan':
 
 
+				if(params.admin1pcode === 'all'){
+
+
+
 				// total sum
-				TargetBeneficiaries.native(function(err, collection) {
-					if (err) return res.serverError(err);
-				
-					collection.aggregate(
-						[
-							{ 
-								$match : filterObject 
-							},
-							{
-								$group:
-								{
-									_id: null,
-									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
-									//total:  { $sum: { $add: [ "$total_beneficiaries" ] } }
-									total:  { $sum: { $add: [ "$total_male","$total_female" ] } }
-								}
-							}
-						]
-					).toArray(function (err, targetbeneficiaries) {
-						if (err) return res.serverError(err);
+				totalBeneficiariesAll = 0;
 
-						var total = targetbeneficiaries[0]?targetbeneficiaries[0].total:0;
+					TargetBeneficiaries
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id )
+					.where( filters.organization_tag )
+					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.project_plan_component)
+					.where( filters.activity_type)
+					.where( filters.project_startDateNative )
+					.where( filters.project_endDateNative)
+					.exec( function( err, results ){
+						
+						if (err) return res.negotiate( err );
 
-						return res.json( 200, { 'value': total } );
+						if(results.length){
+
+							counter = 0;
+
+						    length = results.length;
+
+
+							results.forEach(function(benefrecordAll,i){
+
+								totalBeneficiariesAll = totalBeneficiariesAll + benefrecordAll.total_male + benefrecordAll.total_female;
+
+								counter++;
+			                    if ( counter === length ) {
+			                      // table
+									return res.json( 200, {'value': totalBeneficiariesAll} );
+			                    }
+
+
+							});
+						}else{
+
+
+							return res.json( 200, {'value': results.length} );
+
+						}
 					});
-				});
+				
+
+			}else{
+
+				totalBeneficiaries = 0;
+
+					TargetBeneficiaries
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id )
+					.where( filters.organization_tag )
+					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.project_plan_component)
+					.where( filters.activity_type)
+					.where( filters.project_startDateNative )
+					.where( filters.project_endDateNative)
+					.exec( function( err, results ){
+
+						//console.log("TargBenef", results);
+						// return error
+						if (err) return res.negotiate( err );
+
+
+						if(results.length){
+
+					
+
+						counter = 0;
+
+						length = results.length;
+
+						
+
+						results.forEach(function(benefrecord,i){
+
+
+							TargetLocation.find()
+							.where( {project_id: benefrecord.project_id})
+							.where( filters.admin1pcode )
+							.where( filters.admin2pcode ).exec(function(err,targloc){
+
+
+								if(targloc.length){
+									totalBeneficiaries = totalBeneficiaries + benefrecord.total_male + benefrecord.total_female;
+									
+								}
+
+								counter++;
+			                    if ( counter === length ) {
+			                      // table
+									return res.json( 200, {'value': totalBeneficiaries} );
+			                    }
+							});
+
+						});
+
+					}else{
+
+						return res.json( 200, {'value': results.length} );
+
+					}
+
+					});
+
+			}
 				
 		
 
@@ -1984,29 +2336,27 @@ var Cluster4wprojectplanDashboardController = {
 
 
 				// total sum
-				Project.native(function(err, collection) {
-					if (err) return res.serverError(err);
-				
-					collection.aggregate(
-						[
-							{ 
-								$match : filterObject 
-							}/*,
-							{
-								$group:
-								{
-									_id: null,
-									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
-									total:  { $sum: { $add: [ "$project_budget" ] } }
-								}
-							}*/
-						]
-					).toArray(function (err, project) {
+				if(params.admin1pcode === 'all'){
+
+					Project
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id )
+					.where( filters.organization_tag )
+					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.project_plan_component)
+					.where( filters.activity_type)
+					.where( filters.project_startDateNative )
+					.where( filters.project_endDateNative)
+					.exec( function( err, results ){
 
 					
                        var totalfinancing = 0;
 
-						project.forEach(function(pro,i){
+						results.forEach(function(pro,i){
 
 							
 							//console.log("VALOR ENTRA: ",pro.project_budget);
@@ -2110,7 +2460,151 @@ var Cluster4wprojectplanDashboardController = {
 						//var total = projectbudget[0]?projectbudget[0].total:0;
 						
 					});
-				});
+
+				}else{
+
+
+					Project
+					.find()
+					.where( filters.default )
+					.where( filters.adminRpcode )
+					.where( filters.admin0pcode )
+					.where( filters.cluster_id )
+					.where( filters.organization_tag )
+					.where(filters.donor_tag)
+					.where( filters.implementer_tag)
+					.where(filters.project_plan_component)
+					.where( filters.activity_type)
+					.where( filters.project_startDateNative )
+					.where( filters.project_endDateNative)
+					.exec( function( err, results ){
+
+						// return error
+						if (err) return res.negotiate( err );
+
+						counter = 0;
+
+						length = results.length;
+
+					var totalfinancing = 0;
+
+					if(results.length){
+
+						results.forEach(function(project,i){
+
+							//console.log("PROJECT ID: ", project.id);
+
+							TargetLocation.find()
+							.where( {project_id: project.id})
+							.where( filters.admin1pcode )
+							.where( filters.admin2pcode ).exec(function(err,targloc){
+
+								//console.log("TOTAL: ",targloc.length + ' - '+project.id);
+
+								if(targloc.length){
+									
+									if(typeof project.project_budget === 'string'){
+
+
+								var stringtonum = parseFloat(project.project_budget);
+
+
+								if(stringtonum){
+									if(pro.project_budget_currency !=='eur' && project.project_budget_currency !== 'cop'){
+
+										var financing = stringtonum;
+
+									}else if(project.project_budget_currency ==='eur'){
+
+										var budeurtodollar = stringtonum*params.eurotousd;
+ 										
+ 										//console.log("FINAL BUDG EUR STRING: ",budeurtodollar);
+
+									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
+										
+										var  financing = budeurtodollar;
+
+
+									}else if(project.project_budget_currency ==='cop'){
+
+										var budcoptodollar = stringtonum/params.coptousd;
+
+										//console.log("FINAL BUDG COP STRING: ",budcoptodollar);
+
+										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
+										var financing = budcoptodollar;
+
+
+									}
+
+
+								}else{
+
+									var financing = 0;
+
+								}
+
+							}else if(project.project_budget ){
+
+									if(project.project_budget_currency !=='eur' && project.project_budget_currency !== 'cop'){
+
+									var	financing = project.project_budget;
+
+									}else if(project.project_budget_currency ==='eur'){
+
+										var budeurtodollar2 = project.project_budget*params.eurotousd;
+ 										
+ 										//console.log("FINAL BUDG EUR NO STRING: ",budeurtodollar2);
+
+									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
+										
+										var financing = budeurtodollar2;
+
+
+									}else if(project.project_budget_currency ==='cop'){
+
+
+										var budcoptodollar2 = project.project_budget/params.coptousd;
+
+										//console.log("FINAL BUDG COP NO STRING: ",budcoptodollar2);
+
+										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
+										var financing = budcoptodollar2;
+
+
+									}
+
+
+
+								} else{	
+								//	console.log("NO ES VALIDO: ", valnum);
+									var financing =0;
+								}
+
+
+									totalfinancing = totalfinancing + financing;
+
+
+
+								}
+
+								counter++;
+			                    if ( counter === length ) {
+			                      // table
+			                    //   console.log("TOTAL PROYECTOS: ",totalprojects.length);
+									return res.json( 200, {'value': totalfinancing} );
+			                    }
+							});
+
+						});
+					}else{
+						return res.json( 200, {'value': totalfinancing} );
+					}
+
+					});
+
+
+				}
 				
 		
 
@@ -2121,79 +2615,280 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'organizations_4wdashboard_projectplan':
 				
-				resultsFiltersOrganizations = [];
-
 				if ( params.list ) {
 
-				Project.native(function(err, collection) {
+					if(params.admin1pcode === 'all'){
+
+						//console.log("FILTEROBJECT1: ",filterObject);
 
 					
-					if (err) return res.serverError(err);
-				
-					collection.aggregate([
-						{ 
-							$match : filterObject 
-						},
-						{
-							$group: {
-								_id: {organization_tag:'$organization_tag', organization:'$organization'}
-							}
-						}
-						]).toArray(function (err, results) {
-						
-						if (err) return res.serverError(err);
+						Project.native(function(err, collection) {
 
-					
+							
 							if (err) return res.serverError(err);
-
-							organizations=_.pluck(results,'_id')		
-							organizations.sort(function(a, b) {
-								//console.log(a.organization.localeCompare(b.organization), "LO QUE RETORNA");
-								return a.organization.localeCompare(b.organization);
-							});
-							organizations.unshift({
-											organization_tag: 'all',
-											organization: 'ALL',
-										});
-
-
-							return res.json( 200, organizations );
-
-
-
-						//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
-					});
-				});	
-			}else {	// count of organizations
-					Project.native(function(err, collection) {
-						if (err) return res.serverError(err);
-					
-						collection.aggregate([
-							{ 
-								$match : filterObject 
-							},
-							{
-								$group: {
-									_id: '$organization_tag'
-								}
-							},
-							{
-								$group: {
-									_id: 1,
-									total: {
-									$sum: 1
+						
+							collection.aggregate([
+								{ 
+									$match : filterObject 
+								},
+								{
+									$group: {
+										_id: {organization_tag:'$organization_tag', organization:'$organization'}
 									}
 								}
+								]).toArray(function (err, results) {
+								
+								if (err) return res.serverError(err);
+
+							
+									if (err) return res.serverError(err);
+
+									organizations=_.pluck(results,'_id')		
+									organizations.sort(function(a, b) {
+										//console.log(a.organization.localeCompare(b.organization), "LO QUE RETORNA");
+										return a.organization.localeCompare(b.organization);
+									});
+									organizations.unshift({
+													organization_tag: 'all',
+													organization: 'ALL',
+												});
+
+
+									return res.json( 200, organizations );
+
+
+
+									//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+								});
+							});	
+						}else{
+
+
+							
+							orgs = [];
+
+							Project
+							.find()
+							.where( filters.default )
+							.where( filters.adminRpcode )
+							.where( filters.admin0pcode )
+							.where( filters.cluster_id )
+							.where( filters.organization_tag )
+							.where(filters.donor_tag)
+							.where( filters.implementer_tag)
+							.where(filters.project_plan_component)
+							.where( filters.activity_type)
+							.where( filters.project_startDateNative )
+							.where( filters.project_endDateNative)
+							.exec( function( err, results ){
+								
+								if (err) return res.serverError(err);
+
+								//console.log("results:  ", results);
+
+								counter = 0;
+
+								length = results.length;
+
+								
+								if(results.length){
+
+								results.forEach(function(proj, i){
+
+
+									TargetLocation.find()
+									        .where( {project_id: proj.id})
+											.where( filters.admin1pcode )
+											.where( filters.admin2pcode ).exec(function(err,targloc){
+
+												if(targloc.length){
+
+
+
+					                                  const exist = orgs.find( org => org.organization_tag === proj.organization_tag );
+
+							                             if(!exist){
+
+							                             	var neworg = {
+							                             		organization_tag:'',
+							                             		organization:'',
+
+							                             	};
+
+							                             	if(proj.organization_tag){
+							                             		neworg.organization_tag = proj.organization_tag;
+
+							                             	}
+
+							                             	if(proj.organization_tag){
+							                             		neworg.organization = proj.organization;
+
+							                             	}
+							                             	//console.log("HAGO PUSH: ",neworg);
+							                             	
+							                             	orgs.push(neworg);
+
+							                             }
+					                            
+												}
+
+												counter++;
+							                    if ( counter === length ) {
+							                    	
+
+							                    	orgs.unshift({
+													organization_tag: 'all',
+													organization: 'ALL',
+												});
+													return res.json( 200,  orgs );
+							                    }
+
+											});
+
+								});
+							}else{
+								orgs.unshift({
+									organization_tag: 'all',
+									organization: 'ALL'}
+									);
+								return res.json( 200,  orgs );
 							}
-						]).toArray(function (err, results) {
-
-														//console.log("ORGANIZATIONS2 : ",results);
-
-
-
-							return res.json( 200, { 'value': results[0]?results[0].total:0 } );
 						});
-					});	
+				
+
+						
+					}
+
+
+			}else {	// count of organizations
+					
+
+
+					if(params.admin1pcode === 'all'){
+
+					
+						Project.native(function(err, collection) {
+
+							
+							if (err) return res.serverError(err);
+						
+							collection.aggregate([
+								{ 
+									$match : filterObject 
+								},
+								{
+									$group: {
+										_id: {organization_tag:'$organization_tag', organization:'$organization'}
+									}
+								}
+								]).toArray(function (err, resultstotal) {
+								
+								if (err) return res.serverError(err);
+
+							
+									if (err) return res.serverError(err);
+
+									organizationstotal=_.pluck(resultstotal,'_id')		
+									organizationstotal.sort(function(a, b) {
+										//console.log(a.organization.localeCompare(b.organization), "LO QUE RETORNA");
+										return a.organization.localeCompare(b.organization);
+									});
+									
+
+									return res.json( 200, {'value':organizationstotal.length} );
+
+
+
+									//return res.json( 200, { 'value': results[0]?results[0].total:0 } );
+								});
+							});	
+						}else{
+							
+							var orgstotal = [];
+
+							Project.find()
+								.where( filters.default )
+								.where( filters.adminRpcode )
+								.where( filters.admin0pcode )
+								.where( filters.cluster_id )
+								.where( filters.organization_tag )
+								.where(filters.donor_tag)
+								.where( filters.implementer_tag)
+								.where(filters.project_plan_component)
+								.where( filters.activity_type)
+								.where( filters.project_startDateNative )
+								.where( filters.project_endDateNative)
+							.exec( function( err, results ){
+								
+								if (err) return res.serverError(err);
+
+
+								counter = 0;
+
+								length = results.length;
+
+								if(results.length){
+
+								results.forEach(function(proj, i){
+
+
+									TargetLocation.find()
+									        .where( {project_id: proj.id})
+											.where( filters.admin1pcode )
+											.where( filters.admin2pcode ).exec(function(err,targloc){
+
+
+												if(targloc.length){
+
+					                                  const exist = orgstotal.find( org => org.organization_tag === proj.organization_tag );
+
+
+							                             if(!exist){
+
+
+
+
+							                             	var neworg = {
+							                             		organization_tag:'',
+							                             		organization:'',
+
+							                             	};
+
+							                             	if(proj.organization_tag){
+							                             		neworg.organization_tag = proj.organization_tag;
+
+							                             	}
+
+							                             	if(proj.organization_tag){
+							                             		neworg.organization = proj.organization;
+
+							                             	}
+							                             	
+							                             	orgstotal.push(neworg);
+
+							                             }
+
+					                            
+												}
+												counter++;
+							                    if ( counter === length ) {
+							                    	
+													return res.json( 200,  {'value':orgstotal.length} );
+							                    }
+
+
+											});
+
+								});
+							}else{
+						
+								return res.json( 200,  {'value':orgstotal.length} );
+							}
+						});
+				
+
+						
+					}
 				}
 				
 				break;
@@ -2201,6 +2896,9 @@ var Cluster4wprojectplanDashboardController = {
 				case 'project_donors':
 
 				//console.log("FILTROS: ", filters);
+
+				if(params.admin1pcode === 'all'){
+
 
 				var donorslist = [];
 
@@ -2212,6 +2910,165 @@ var Cluster4wprojectplanDashboardController = {
 				.where( filters.organization_tag )
 				.where( filters.cluster_id)
 				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+				.exec(function (err, results){
+
+					if (err) return res.serverError(err);
+
+						
+
+
+					if(results.length){
+
+
+						results.forEach( function( d, i ) {
+
+
+							if(d.project_donor.length > 0){
+
+								 d.project_donor.forEach(function (projdonor, j){
+
+								 	if(projdonor.project_donor_id){
+
+
+			                             const resultado = donorslist.find( donor => donor.project_donor_id === projdonor.project_donor_id );
+
+			                             if(!resultado){
+			                             	donorslist.push(projdonor);
+			                             	//console.log("METI EL DONANTE: ", projdonor);
+
+			                             }
+			                         }
+			                            
+
+								});
+
+							};
+
+						});
+
+					  }
+
+					return res.json(200, {'data':donorslist});
+
+					
+
+				});
+			}else{
+
+				var donorslist = [];
+
+				Project.find()
+				.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+				.exec(function (err, results){
+
+					if (err) return res.serverError(err);
+
+								if(results.length){
+
+
+								counter = 0;
+
+								length = results.length;
+
+								results.forEach(function(projrecord,i){
+
+
+										if(projrecord.project_donor.length > 0){
+
+
+
+											TargetLocation.find()
+											.where( {project_id: projrecord.id})
+											.where( filters.admin1pcode )
+											.where( filters.admin2pcode ).exec(function(err,targloc){
+
+
+												if(targloc.length){
+
+											projrecord.project_donor.forEach(function (projdonor, j){
+
+													if(projdonor.project_donor_id){
+
+
+					                                  const resultado = donorslist.find( donor => donor.project_donor_id === projdonor.project_donor_id );
+
+							                             if(!resultado){
+							                             	donorslist.push(projdonor);
+
+							                             }
+
+
+							                              }
+					                            
+
+													});
+
+
+													
+												}
+
+												counter++;
+							                    if ( counter === length ) {
+							                      // table
+													return res.json( 200, {'data': donorslist} );
+							                    }
+											});
+
+										}else{
+											counter ++;
+											 if ( counter === length ) {
+							                      // table
+													return res.json( 200, {'data': donorslist} );
+							                    }
+										}
+				              });
+							}else{
+								return res.json( 200, {'data': donorslist} );
+							}
+						});
+
+			}
+
+
+
+				break;
+
+
+				/*case 'total_donors_4wdashboard_projectplan':
+
+				//console.log("FILTROS: ", filters);
+
+				if(params.admin1pcode === 'all'){
+
+
+				var donorslist = [];
+
+
+				Project.find()
+				.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
 				.where( filters.project_startDateNative )
 				.where( filters.project_endDateNative)
 				.exec(function (err, results){
@@ -2249,89 +3106,114 @@ var Cluster4wprojectplanDashboardController = {
 
 					  }
 
-					return res.json(200, {'data':donorslist});
+					return res.json(200, {'value':donorslist.length});
 
 					
 
 				});
+			}else{
+
+				var donorslist = [];
+
+				Project.find()
+				.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+				.exec(function (err, results){
+
+					if (err) return res.serverError(err);
+
+								if(results.length){
+
+								counter = 0;
 
 
-				break;
+								length = results.length;
 
-				case 'total_donors_4wdashboard_projectplan':
-
-
-					Project
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
-					.where(filters.donor_tag)
-					.where( filters.project_startDateNative )
-					.where( filters.project_endDateNative)
-					.exec( function( err, results ){
-						if (err) return res.serverError(err);
-
-						if(results.length){
+								results.forEach(function(projrecord,i){
 
 
-						results.forEach( function( d, i ) {
+
+										if(projrecord.project_donor.length > 0){
 
 
-							if(d.project_donor.length > 0){
 
-								 d.project_donor.forEach(function (projdonor, j){
+											TargetLocation.find()
+											.where( {project_id: projrecord.id})
+											.where( filters.admin1pcode )
+											.where( filters.admin2pcode ).exec(function(err,targloc){
 
 
-	                             const resultado = donorslist.find( donor => donor.project_donor_id === projdonor.project_donor_id );
+												if(targloc.length){
 
-	                             if(!resultado){
-	                             	donorslist.push(projdonor);
-	                             	//console.log("METI EL DONANTE: ", projdonor);
+											projrecord.project_donor.forEach(function (projdonor, j){
 
-	                             }
-	                            
 
-								});
+					                                  const resultado = donorslist.find( donor => donor.project_donor_id === projdonor.project_donor_id );
 
-							};
+							                             if(!resultado){
+							                             	donorslist.push(projdonor);
 
+							                             }
+					                            
+
+														});
+
+													
+												}
+
+												counter++;
+							                    if ( counter === length ) {
+							                      // table
+													return res.json( 200, {'value': donorslist.length} );
+							                    }
+											});
+
+										}else{
+											counter ++;
+										}
+				              });
+							}
 						});
 
-					  }
-					return res.json(200, {'value':donorslist.length});
+			}
 
 
 
-					});
-				
-				
 				break;
+				*/
+				
 
 
 				case 'total_implementing_partners_4wdashboard_projectplan':
 
 
+				if(params.admin1pcode === 'all'){
 
-					Project
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.cluster_id)
-					.where(filters.donor_tag)
-					.where( filters.project_startDateNative )
-					.where( filters.project_endDateNative)
-					.exec( function( err, results ) {
+
+				Project.find()
+				.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+				.exec(function (err, results){
+
+
 						if (err) return res.serverError(err);
 
 						var imppartners = [];
@@ -2342,16 +3224,19 @@ var Cluster4wprojectplanDashboardController = {
 
 						results.forEach( function( d, i ) {
 
-							if(results[i].implementing_partners){
+							if(d.implementing_partners){
 
-								 results[i].implementing_partners.forEach(function (d, j){
+								 d.implementing_partners.forEach(function (imppart, j){
 
 
-	                             const resultado = imppartners.find( implementer => implementer.organization_tag === results[i].implementing_partners[j].organization_tag );
+								 	if(imppart.organization_tag){
 
-	                             if(!resultado){
-	                             	imppartners.push(results[i].implementing_partners[j]);
-	                             }
+			                             const resultado = imppartners.find( implementer => implementer.organization_tag === imppart.organization_tag );
+
+			                             if(!resultado){
+			                             	imppartners.push(imppart);
+			                             }
+			                         }
 	                            
 
 								});
@@ -2368,6 +3253,99 @@ var Cluster4wprojectplanDashboardController = {
 
 						return res.json( 200, { 'value': imppartners.length } );
 					});
+
+				}else{
+
+				var implementpartnerstotal = [];
+
+
+				Project
+				.find()
+				.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+				.exec(function (err, results){
+
+					if (err) return res.serverError(err);
+
+								if(results.length){
+
+
+								counter = 0;
+
+								length = results.length;
+
+								results.forEach(function(projrecord,i){
+
+
+
+										if(projrecord.implementing_partners.length > 0){
+
+
+
+											TargetLocation.find()
+											.where( {project_id: projrecord.id})
+											.where( filters.admin1pcode )
+											.where( filters.admin2pcode ).exec(function(err,targloc){
+
+
+											if(targloc.length){
+
+											projrecord.implementing_partners.forEach(function (partner, j){
+
+												if(partner.organization_tag){
+
+
+					                                  const resultado = implementpartnerstotal.find( implpartner => implpartner.organization_tag === partner.organization_tag );
+
+							                             if(!resultado){
+							                             	implementpartnerstotal.push(partner);
+							                             	//console.log("METI EL PARTNER: ", partner);
+
+							                             }
+
+							                         }
+					                            
+
+												});
+
+													
+												}
+
+												counter++;
+							                    if ( counter === length ) {
+
+							                      // table
+													return res.json( 200, {'value': implementpartnerstotal.length} );
+							                    }
+											});
+
+										}else{
+											counter ++;
+											if ( counter === length ) {
+
+							                      // table
+													return res.json( 200, {'value': implementpartnerstotal.length} );
+							                    }
+										}
+				              });
+							}else{
+
+								
+								return res.json( 200, {'value': implementpartnerstotal.length} );
+							}
+						});
+
+
+				}
 				
 
 				break;
@@ -2375,22 +3353,26 @@ var Cluster4wprojectplanDashboardController = {
 
 				case 'implementing_partners_list_4wdashboard_projectplan':
 
+					if(params.admin1pcode === 'all'){
+
+
 						var imppartners = [];
 
 
 					Project
 					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.organization_tag )
-					//.where( filters.beneficiaries )
-					.where( filters.cluster_id)
-					.where(filters.donor_tag)
-					.where( filters.project_startDateNative )
-					.where( filters.project_endDateNative)
+					.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+
 					.exec( function( err, results ) {
 						if (err) return res.serverError(err);
 
@@ -2405,12 +3387,17 @@ var Cluster4wprojectplanDashboardController = {
 
 								 d.implementing_partners.forEach(function (implpartner, j){
 
+								 	if(implpartner.organization_tag){
 
-	                             const resultado = imppartners.find( implementer => implementer.organization_tag === implpartner.organization_tag );
 
-	                             if(!resultado){
-	                             	imppartners.push(implpartner);
-	                             }
+
+			                             const resultado = imppartners.find( implementer => implementer.organization_tag === implpartner.organization_tag );
+
+			                             if(!resultado){
+			                             	imppartners.push(implpartner);
+			                             }
+
+	                         		}
 	                            
 
 								});
@@ -2425,6 +3412,104 @@ var Cluster4wprojectplanDashboardController = {
 
 
 				});
+
+			}else{
+
+				var implementpartnerslist = [];
+
+
+				Project
+					.find()
+					.where(filters.default)
+				.where( filters.adminRpcode )
+				.where( filters.admin0pcode )
+				.where( filters.organization_tag )
+				.where( filters.cluster_id)
+				.where( filters.donor_tag)
+				.where (filters.implementer_tag)
+				.where(filters.project_plan_component)
+				.where( filters.activity_type)
+				.where( filters.project_startDateNative )
+				.where( filters.project_endDateNative)
+					.exec( function( err, results ) {
+
+
+						if (err) return res.serverError(err);
+
+								if(results.length){
+
+
+								counter = 0;
+
+								length = results.length;
+
+								results.forEach(function(projrecord,i){
+
+
+
+										if(projrecord.implementing_partners.length > 0){
+
+
+
+											TargetLocation.find()
+											.where( {project_id: projrecord.id})
+											.where( filters.admin1pcode )
+											.where( filters.admin2pcode ).exec(function(err,targloc){
+
+
+											if(targloc.length){
+
+											//console.log("ID PRJ: ",projrecord.id);
+									//console.log("ID PRJ: ",projrecord.implementing_partners);
+
+
+												 	projrecord.implementing_partners.forEach(function (partner, j){
+
+
+												 		if(partner.organization_tag){
+
+												 			 const resultado = implementpartnerslist.find( implpartner => implpartner.organization_tag === partner.organization_tag );
+
+									                             if(!resultado){
+									                             	implementpartnerslist.push(partner);
+									                             	//console.log("METI EL PARTNER: ", partner);
+
+									                             }
+									                         }
+					                            
+
+														});
+
+													
+												}
+
+												counter++;
+							                    if ( counter === length ) {
+
+							                    	
+							                      // table
+													return res.json( 200, {'data': implementpartnerslist} );
+							                    }
+											});
+
+										}else{
+											counter ++;
+											if ( counter === length ) {
+
+							                    	
+							                      // table
+													return res.json( 200, {'data': implementpartnerslist} );
+							                    }
+										}
+				              });
+							}else{
+
+								return res.json( 200, {'data': implementpartnerslist} );
+
+							}
+						});
+
+			}
 				
 
 				break;
