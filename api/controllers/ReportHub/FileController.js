@@ -15,7 +15,7 @@ const { google } = require('googleapis');
 
 module.exports = {
 
-	//
+	// upload
 	upload: function  (req, res) {
 
 		//	call to /upload via GET is error

@@ -307,12 +307,19 @@ module.exports.routes = {
   // deployKoboXlsxForm
   'GET /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
   'POST /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
+  
   // getKoboData
   'GET /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
   'POST /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
-  // getBatchKoboData
-  'GET /wfp/gfa/gfd/getLatestKoboData': 'Country/Cxb/Gfa/GfaTaskController.getLatestKoboData',
-  'POST /wfp/gfa/gfd/getLatestKoboData': 'Country/Cxb/Gfa/GfaTaskController.getLatestKoboData',  
+  // getKoboDataRefreshBatch
+  'GET /wfp/gfa/gfd/getKoboDataRefreshBatch': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefreshBatch',
+  'POST /wfp/gfa/gfd/getKoboDataRefreshBatch': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefreshBatch',
+  // getKoboDataRefresh
+  'GET /wfp/gfa/gfd/getKoboDataRefresh': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefresh',
+  'POST /wfp/gfa/gfd/getKoboDataRefresh': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefresh',
+  // getKoboDataUpdates
+  'GET /wfp/gfa/gfd/getKoboDataUpdates': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataUpdates',
+  'POST /wfp/gfa/gfd/getKoboDataUpdates': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataUpdates',
 
   // get PlannedBeneficiaries
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
