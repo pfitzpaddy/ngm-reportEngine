@@ -317,6 +317,7 @@ var GfaTaskController = {
 		}
 
 		// set params
+		var cmd = '';
 		var file = req.param('file');
 		var admin0pcode = req.param('admin0pcode');
 		var organization_tag = req.param('organization_tag');
@@ -571,52 +572,37 @@ var GfaTaskController = {
 				// if error
 				if ( err ) return cb( err, false );
 
-				// find existing ?
-				PlannedBeneficiaries
-					.find()
-					.where({ admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution  })
-					.limit(1)
-					.exec( function( err, existing ) {
+					// add to scheduled planned updates
+					PlannedUpdates
+						.create( { admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution, update: true } )
+						.exec( function( err, scheduled_update ) {
 
-						// return error
-						if (err) return res.negotiate( err );
+							// return error
+							if (err) return res.negotiate( err );
 
-						// update
-						var update = existing.length ? true : false;
+							// remove existing
+							PlannedBeneficiaries
+								.destroy({ admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution  })
+								.exec( function( err, destroy ) {
 
-						// add to scheduled planned updates
-						PlannedUpdates
-							.create( { admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution, update: update } )
-							.exec( function( err, scheduled_update ) {
+									// return error
+									if (err) return res.negotiate( err );
 
-								// return error
-								if (err) return res.negotiate( err );
+									// replace with updated plan
+									PlannedBeneficiaries
+										.create( planned_beneficiaries )
+										.exec( function( err, update ){
 
-								// remove existing
-								PlannedBeneficiaries
-									.destroy({ admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution  })
-									.exec( function( err, destroy ) {
+											// return error
+											if (err) return res.negotiate( err );
 
-										// return error
-										if (err) return res.negotiate( err );
+											// remove file upload 
+											if ( fs.existsSync( file ) ) { fs.unlinkSync( file ); }
 
-										// replace with updated plan
-										PlannedBeneficiaries
-											.create( planned_beneficiaries )
-											.exec( function( err, update ){
+											// return the reports for the project period
+											return res.json( 200, { msg: 'Updating Kobo Daily Reporting Forms...' });
 
-												// return error
-												if (err) return res.negotiate( err );
-
-												// remove file upload 
-												if ( fs.existsSync( file ) ) { fs.unlinkSync( file ); }
-
-												// return the reports for the project period
-												return res.json( 200, { msg: 'Updating Kobo Daily Reporting Forms...' });
-
-											});
-
-									});
+										});
 
 								});
 
@@ -882,7 +868,11 @@ var GfaTaskController = {
 	// clear report_distribution and re-process latest kobo data
 	getKoboDataRefreshBatch: function( req, res ){
 
-		// check table for processed planned beneficiaires
+		// curl refresh
+		var keys = []
+		var update_cmds = '';
+
+		// planned updates
 		PlannedUpdates
 			.find()
 			.where({ update: true })
@@ -891,71 +881,37 @@ var GfaTaskController = {
 				// return error
 				if (err) return res.negotiate( err );
 
-				// counters
-				var counter = 0;
-				var length = planned_updates.length;
-
-				// run process
-				doUpdateProcess( planned_updates[ counter ].admin0pcode, planned_updates[ counter ].organization_tag, planned_updates[ counter ].report_round, planned_updates[ counter ].report_distribution );
-
-				// do deployment
-				function doUpdateProcess( admin0pcode, organization_tag, report_round, report_distribution ) {
-
-					// cmd
-					var cmd = 'curl -X GET http://dev.reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataRefresh?admin0pcode=' + admin0pcode +'&organization_tag=' + organization_tag + '&report_round=' + report_round + '&report_distribution=' + report_distribution;
-					console.log('--------- BATCH')
-					console.log(cmd)
-
-					// run curl command
-					EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
-						
-						// if error
-						if ( error ) {
-							// return error
-							res.json( 400, { error: 'Request error! Please try again...' } );
-						} else {
-
-							// next
-							counter++;
-							if ( counter === length ) {
-								
-								// then run getKoboDataUpdates
-								var cmd = 'curl -X GET http://dev.reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataUpdates'
-								
-								// run curl command
-								EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
-									// if error
-									if ( error ) {
-										// return error
-										res.json( 400, { error: 'Request error! Please try again...' } );
-									} else {
-										
-										// then
-										PlannedUpdates
-											.update( {}, { update: false } )
-											.exec( function( err, distribution ){
-												
-												// update all PlannedUpdates status to false (update)
-												if (err) return res.negotiate( err );
-
-												// return
-												return res.json( 200, { msg: 'Success!' });
-
-											});
-									}
-								});
-							} else {
-								// run process
-								doUpdateProcess( planned_updates[ counter ].admin0pcode, planned_updates[ counter ].organization_tag, planned_updates[ counter ].report_round, planned_updates[ counter ].report_distribution )
-							}
-
-						}
-
-					});
-
+				// for each
+				for( i=0; i<planned_updates.length; i++ ) {
+					if ( !keys[ planned_updates[ i ].admin0pcode + '_' + planned_updates[ i ].organization_tag + '_' + planned_updates[ i ].report_round + '_' + planned_updates[ i ].report_distribution ] ) {
+						// getKoboDataRefresh
+						keys[ planned_updates[ i ].admin0pcode + '_' + planned_updates[ i ].organization_tag + '_' + planned_updates[ i ].report_round + '_' + planned_updates[ i ].report_distribution ] = 1;
+						update_cmds += "curl -X GET 'https://reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataRefresh?admin0pcode=" + planned_updates[ i ].admin0pcode +"&organization_tag=" + planned_updates[ i ].organization_tag + "&report_round=" + planned_updates[ i ].report_round + "&report_distribution=" + planned_updates[ i ].report_distribution + "' \n";
+					}
 				}
+						
+				// then run getKoboDataUpdates
+				update_cmds += "curl -X GET 'https://reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataUpdates'";
 
-			});
+				// write file
+				fs.writeFile( '/home/ubuntu/nginx/www/ngm-reportEngine/tasks/reports/ngm_reporthub_gfd_run_updates.sh', update_cmds, function( err ) {
+
+					// planned updates
+					PlannedUpdates
+						.update({}, { update: false })
+						.exec( function( err, planned_updates ) {
+
+							// return error
+							if (err) return res.negotiate( err );
+
+							// return
+							return res.json( 200, { msg: 'Success!' });
+
+						});
+
+				});
+
+		});
 
 	},	
 
@@ -977,12 +933,6 @@ var GfaTaskController = {
 		// if wfp, select all
 		var organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
 
-		console.log('--------- ATTR')
-		console.log( admin0pcode )
-		console.log( organization_tag_filter )
-		console.log( report_round )
-		console.log( report_distribution )
-
 		// gfd forms
 		GfdForms
 			.find()
@@ -1002,10 +952,6 @@ var GfaTaskController = {
 
 				// do fetch
 				function fetchData( fetch_complete, fetch_pending, form ) {
-
-					console.log('--------- FETCHDATA')
-					console.log( report_round )
-					console.log( form )
 
 					// get latest submission from actual based on form.uuid
 					ActualBeneficiaries

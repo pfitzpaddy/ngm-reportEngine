@@ -1,0 +1,2 @@
+curl -X GET 'https://reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataRefresh?admin0pcode=CB&organization_tag=ric&report_round=1&report_distribution=51' 
+curl -X GET 'https://reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataUpdates'
