@@ -4004,6 +4004,126 @@ var Cluster4wplusDashboardController = {
 				break;
 
 
+				case 'BarChartBeneficiaryAdmin1pcode':
+
+				Beneficiaries.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBenef
+								},
+								{
+									$group:{
+										_id: {admin1pcode:'$admin1pcode',admin1name: '$admin1name'},
+										totalBeneficiaries: {
+											$sum: { $add: ["$total_male", "$total_female"] }
+										},
+										
+
+									}
+								}
+							]).toArray(function (err, beneficiaries) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+
+
+								if(beneficiaries.length){
+
+
+									var result = {data:[]};
+
+									beneficiaries.totalBeneficiariesAdmin1 = 0
+
+									beneficiaries.forEach(function(clus,i){
+
+										beneficiaries.totalBeneficiariesAdmin1 = beneficiaries.totalBeneficiariesAdmin1+clus.totalBeneficiaries 
+
+										/*var newclusterbeneficiary = {
+											'y':clus.totalBeneficiaries,
+											'color':'blue',
+											'name': clus._id.cluster,
+											'label':0
+										};
+
+										result.data.push(newclusterbeneficiary)*/
+
+									});
+								}else{
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Cluster',
+											'label': 0,
+										}]
+									};
+
+									beneficiaries = [{totalBeneficiaries:0}];
+									
+
+								}
+
+								$beneficiariesOne = beneficiaries[0];
+
+
+							
+								
+								switch (req.param('chart_for')) {
+									case 'beneficiaryAdmin1pcode':
+										if ($beneficiariesOne.totalBeneficiaries < 1 && $beneficiariesOne.totalBeneficiaries < 1) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+												beneficiaries.sort(function(a, b) {
+										  return b.totalBeneficiaries - a.totalBeneficiaries;
+											});
+
+											beneficiaries.forEach(function(benadmin1,i){
+
+												if(i<5){
+
+
+
+													var newadmin1beneficiary = {
+														'y':benadmin1.totalBeneficiaries,
+														'color':'blue',
+														'name': benadmin1._id.admin1name,
+														'label': (benadmin1.totalBeneficiaries / (beneficiaries.totalBeneficiariesAdmin1))*100
+													};
+
+
+												result.data.push(newadmin1beneficiary);
+												}
+
+											});
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							});	
+
+				break;
+
+
 
 				//BeneficiarioCategoria
 

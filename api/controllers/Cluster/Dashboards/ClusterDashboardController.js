@@ -808,6 +808,13 @@ var ClusterDashboardController = {
 							filterObject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('donor')}};
 
 						}
+
+						if(req.param('implementer') && req.param('implementer') !== 'all'){
+							filterObject.implementing_partners = { $elemMatch : { 'organization_tag' : req.param('implementer')}};
+
+						}
+
+						
 					
 						collection.find(filterObject).toArray(function (err, beneficiaries) {
 							if (err) return res.serverError(err);

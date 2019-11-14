@@ -204,7 +204,7 @@ var ProjectController = {
     }
 
     var allowedParams =
-        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode','admin1pcode', 'project_start_date', 'project_end_date'];
+        ['project_id','organization_id','cluster_id','organization_id','organization_tag','implementer_id','adminRpcode', 'admin0pcode','admin1pcode','admin2pcode', 'project_start_date', 'project_end_date'];
 
 
     // if dissallowed parameters sent
@@ -228,18 +228,29 @@ var ProjectController = {
       }
 
        if(req.param('query').admin1pcode){
-        console.log("ADMIN1PCODE: ", req.param('query').admin1pcode);
         var querylocations = { admin1pcode: req.param('query').admin1pcode};
 
       }
 
-      //delete admin1pcode filter of queryProject
        delete queryProject.admin1pcode;
+
+        if(req.param('query').admin2pcode){
+        var querylocations = { admin2pcode: req.param('query').admin2pcode};
+
+      }
+
+      delete queryProject.admin2pcode;
 
 
       if( req.param('query').donor_id){
          queryProject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('query').donor_id}};
          delete queryProject.donor_id;
+             
+      }
+
+      if( req.param('query').implementer_id){
+         queryProject.implementing_partners = { $elemMatch : { 'organization_tag' : req.param('query').implementer_id}};
+         delete queryProject.implementer_id;
              
       }
      //project_start_date and project_end_date filters
@@ -375,11 +386,9 @@ var ProjectController = {
 
       //async.each(data.project, uppendDataToProject);
 
-            console.log("PROJECT TO PRINT: ", $projectsToPrint);
 
       async.each($projectsToPrint, uppendDataToProject);
 
-      console.log("PROJECTOS: ", $project);
 
       return $project;
     },
