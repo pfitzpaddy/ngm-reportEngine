@@ -654,7 +654,7 @@ var GfaTaskController = {
 						// choices beneficiary_type
 						choices_list.push( [ 'list_name', 'name', 'label'] );
 						choices_list.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary'] );
-						choices_list.push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found in list'] );
+						choices_list.push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)'] );
 						choices_list.push( [ 'beneficiary_type', 'unplanned_new_beneficiary', 'Unplanned / New Beneficiary'] );
 
 						// generate fcn ids
