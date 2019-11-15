@@ -3435,23 +3435,6 @@ var Cluster4wplusDashboardController = {
 											var femalePerCent = ($beneficiaries.femaleTotal / $beneficiaries.sexTotal)*100;
 											var sexTotalPerCent = ($beneficiaries.sexTotal/ ($beneficiaries.maleTotal+$beneficiaries.femaleTotal))*100 ;
 
-
-											/*// assign data left
-											//result.label.left.label.label = boysPerCent;
-											//result.label.left.subLabel.label = $beneficiaries.boys;
-											// assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.childTotal;
-											// assign data right
-											result.label.right.label.label = girlsPerCent;
-											result.label.right.subLabel.label = $beneficiaries.girls;
-											// highcharts girls
-											result.data[0].y = girlsPerCent;
-											result.data[0].label = $beneficiaries.childTotal;
-											// highcharts boys
-											result.data[1].y = boysPerCent;
-											result.data[1].label = $beneficiaries.childTotal;*/
-
 											result.label.left.label.label = malePerCent;
 											result.label.left.subLabel.label = $beneficiaries.maleTotal;
 											// assign data center
@@ -3476,137 +3459,6 @@ var Cluster4wplusDashboardController = {
 
 										break;
 
-									case 'edad':
-										if ($beneficiaries.maleTotal < 1 && $beneficiaries.femaleTotal < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-										
-											
-
-											var TotalAge_0_5 = $beneficiaries.age_0_5;
-											var TotalAge_6_11 = $beneficiaries.age_6_11;
-											var TotalAge_12_17 = $beneficiaries.age_12_17;
-											var TotalAge = TotalAge_6_11 + TotalAge_0_5;
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = TotalAge_0_5;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = TotalAge;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = TotalAge_6_11;
-
-											// // highcharts women
-											result.data[0].y = TotalAge_0_5;
-											result.data[0].label = $beneficiaries.age_0_5;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts men
-											result.data[1].y = TotalAge_6_11;
-											result.data[1].label = $beneficiaries.age_6_11;
-											result.data[1].color = '#c7c7c7';
-
-											result.data[2].y = TotalAge_12_17;
-											result.data[2].label = $beneficiaries.age_12_17;
-											result.data[2].color = '#c7c7c7';
-
-											/*result.data[2].x = womensPerCent;
-											result.data[2].label = $beneficiaries.adultTotal;
-											result.data[2].color = '#c7c7c7';
-											// // highcharts men
-											result.data[3].x = mensPerCent;
-											result.data[3].label = $beneficiaries.adultTotal;
-											result.data[3].color = '#c7c7c7';
-											result.data[4].x = womensPerCent;
-											result.data[4].label = $beneficiaries.adultTotal;
-											result.data[4].color = '#c7c7c7';*/
-									
-
-
-											
-											return res.json(200, result);
-
-										}
-
-										break;
-
-									case 'elderly':
-										if ($beneficiaries.elderly_men < 1 && $beneficiaries.elderly_women < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-											var elmensPerCent = ($beneficiaries.elderly_men / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var elwomensPerCent = ($beneficiaries.elderly_women / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var totalPerCent = ($beneficiaries.elderTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-											
-											// // assign data left
-											result.label.left.label.label = elmensPerCent;
-											result.label.left.subLabel.label = $beneficiaries.elderly_men;
-											// // assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.elderTotal;
-											// // assign data right
-											result.label.right.label.label = elwomensPerCent;
-											result.label.right.subLabel.label = $beneficiaries.elderly_women;
-
-											// // highcharts elderWomen
-											result.data[0].y = elwomensPerCent;
-											result.data[0].label = $beneficiaries.elderTotal;
-											// // highcharts elderMen
-											result.data[1].y = elmensPerCent;
-											result.data[1].label = $beneficiaries.elderTotal;
-											
-											return res.json(200, result);
-
-										}
-										break;
-
 										default:
 											return res.json( 200, { value:0 });
 											break;
@@ -3623,38 +3475,7 @@ var Cluster4wplusDashboardController = {
 				case 'BarChartAges':
 			// labels
 				var result = {
-					/*label: {
-						left: {
-							label: {
-								prefix: 'Age 0_5',
-								label: 0,
-								postfix: '%'
-							},
-							subLabel: {
-											label: 0
-										}
-								},
-						center: {
-										label: {
-											prefix: "Age 6_11",
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									},
-						right: {
-										label: {
-											prefix: 'Age 12_17',
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									}
-								},*/
+					
 								data: [
 								{
 									'y': 0,
@@ -3732,98 +3553,12 @@ var Cluster4wplusDashboardController = {
 
 
 								switch (req.param('chart_for')) {
-									case 'children':
-										if ($beneficiaries.boys < 1 && $beneficiaries.girls < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var boysPerCent = ($beneficiaries.boys / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var girlsPerCent = ($beneficiaries.girls / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var totalPerCent = ($beneficiaries.childTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-
-											//var malePerCent = ($beneficiaries.maleTotal / ($beneficiaries.maleTotal + $beneficiaries.femaleTotal))*100;
-											//var femalePerCent = ($beneficiaries.femaleTotal / ($beneficiaries.maleTotal + $beneficiaries.femaleTotal))*100;
-											
-											var malePerCent = ($beneficiaries.maleTotal / $beneficiaries.sexTotal)*100;
-											var femalePerCent = ($beneficiaries.femaleTotal / $beneficiaries.sexTotal)*100;
-											var sexTotalPerCent = ($beneficiaries.sexTotal/ ($beneficiaries.maleTotal+$beneficiaries.femaleTotal))*100 ;
-
-
-											/*// assign data left
-											//result.label.left.label.label = boysPerCent;
-											//result.label.left.subLabel.label = $beneficiaries.boys;
-											// assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.childTotal;
-											// assign data right
-											result.label.right.label.label = girlsPerCent;
-											result.label.right.subLabel.label = $beneficiaries.girls;
-											// highcharts girls
-											result.data[0].y = girlsPerCent;
-											result.data[0].label = $beneficiaries.childTotal;
-											// highcharts boys
-											result.data[1].y = boysPerCent;
-											result.data[1].label = $beneficiaries.childTotal;*/
-
-											result.label.left.label.label = malePerCent;
-											result.label.left.subLabel.label = $beneficiaries.maleTotal;
-											// assign data center
-
-											result.label.center.label.label = sexTotalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.sexTotal;
-											// assign data right
-											result.label.right.label.label = femalePerCent;
-											result.label.right.subLabel.label = $beneficiaries.femaleTotal;
-
-											// highcharts girls
-											result.data[0].y = femalePerCent;
-											result.data[0].label = $beneficiaries.sexTotal;
-											// highcharts boys
-											result.data[1].y = malePerCent;
-											result.data[1].label = $beneficiaries.sexTotal;
-
-
-											
-											return res.json(200, result);
-										}
-
-										break;
+									
 
 									case 'ages':
 										if ($beneficiaries.maleTotal < 1 && $beneficiaries.femaleTotal < 1) {
 
-											// // assign data left
-											/*result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;*/
-
-											// // highcharts elderly_women
+										
 											result.data[0].y = 0;
 											result.data[0].label = 0;
 											result.data[0].color = '#c7c7c7';
@@ -3876,23 +3611,6 @@ var Cluster4wplusDashboardController = {
 											var age_60_morePerCent = ($beneficiaries.age_60_more / (TotalAges))*100;
 
 
-
-
-											//var PercentAge0_5 = (TotalAge_0_5/TotalAges)*100;
-											//var PercentAge6_11 = (TotalAge_6_11/TotalAges)*100;
-											//var PercentAge12_17 = (TotalAge_12_17/TotalAges)*100;
-
-											// // assign data left
-											/*result.label.left.label.label = PercentAge0_5;
-											result.label.left.subLabel.label = TotalAge_0_5;
-											// // assign data center
-											result.label.center.label.label = PercentAge12_17;
-											result.label.center.subLabel.label = TotalAge_12_17;
-											// // assign data right
-											result.label.right.label.label = PercentAge6_11;
-											result.label.right.subLabel.label = TotalAge_6_11;*/
-
-											// // highcharts women
 											var string0_5label = 'Age 0-5: ' + $beneficiaries.age_0_5 + ' - ' + age_0_5PerCent.toFixed(1)+'%';
 											
 							
@@ -3920,76 +3638,14 @@ var Cluster4wplusDashboardController = {
 											result.data[4].label = age_60_morePerCent ;
 											result.data[4].color = 'orange';
 
-											/*result.data[2].x = womensPerCent;
-											result.data[2].label = $beneficiaries.adultTotal;
-											result.data[2].color = '#c7c7c7';
-											// // highcharts men
-											result.data[3].x = mensPerCent;
-											result.data[3].label = $beneficiaries.adultTotal;
-											result.data[3].color = '#c7c7c7';
-											result.data[4].x = womensPerCent;
-											result.data[4].label = $beneficiaries.adultTotal;
-											result.data[4].color = '#c7c7c7';*/
+											
+											return res.json(200, result);
+
+										}
+
+										break;
+
 									
-
-
-											
-											return res.json(200, result);
-
-										}
-
-										break;
-
-									case 'elderly':
-										if ($beneficiaries.elderly_men < 1 && $beneficiaries.elderly_women < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-											var elmensPerCent = ($beneficiaries.elderly_men / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var elwomensPerCent = ($beneficiaries.elderly_women / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var totalPerCent = ($beneficiaries.elderTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-											
-											// // assign data left
-											result.label.left.label.label = elmensPerCent;
-											result.label.left.subLabel.label = $beneficiaries.elderly_men;
-											// // assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.elderTotal;
-											// // assign data right
-											result.label.right.label.label = elwomensPerCent;
-											result.label.right.subLabel.label = $beneficiaries.elderly_women;
-
-											// // highcharts elderWomen
-											result.data[0].y = elwomensPerCent;
-											result.data[0].label = $beneficiaries.elderTotal;
-											// // highcharts elderMen
-											result.data[1].y = elmensPerCent;
-											result.data[1].label = $beneficiaries.elderTotal;
-											
-											return res.json(200, result);
-
-										}
-										break;
 
 										default:
 											return res.json( 200, { value:0 });
@@ -4356,156 +4012,6 @@ var Cluster4wplusDashboardController = {
 
 				//financing
 
-				case 'BarChartFinancingCluster':
-			// labels
-			//console.log("FILTER BUDGET: ",filterObjectBudget);
-										
-						BudgetProgress.native(function (err, results) {
-							if(err) return res.serverError(err);
-			
-							results.aggregate([
-								{
-									//$match : filterObject
-									$match: filterObjectBudget
-								},
-								{
-									$group:{
-										_id: {cluster_id:'$cluster_id',cluster: '$cluster', currency_id:'$currency_id'},
-										totalBudgetProgress: {
-											$sum:  "$project_budget_amount_recieved"
-										},
-										
-
-									}
-								}
-							]).toArray(function (err, budgetprogress) {
-								if (err) return res.serverError(err);	
-
-								
-								// if no length
-								if (!budgetprogress.length) return res.json(200, { 'value': 0 });
-
-								//console.log("TAMAÑO: ",budgetprogress.lenth);
-
-
-								if(budgetprogress.length){
-
-
-									var result = {data:[]};
-
-									budgetprogress.totalBudgetProgressCluster = 0
-
-									budgetprogress.forEach(function(clus,i){
-										//console.log("BUDGETPROGRESS: ", clus);
-
-										if(clus._id.currency_id === 'cop'){
-											var clustotalBudgetsCOPtoUSD = clus.totalBudgetProgress/params.coptousd;
-											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+clustotalBudgetsCOPtoUSD;
-
-										}else if(clus._id.currency_id === 'eur'){
-
-
-											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+(clus.totalBudgetProgress*params.eurotousd);
-										
-
-										}else{
-											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+clus.totalBudgetProgress
-
-										}
-
-										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
-
-										
-
-									});
-								}else{
-									//console.log("BUDGETPROGRESS: ", budgetprogress);
-
-									var result = {	
-										data: [{
-											'y': 0,
-											'color': '#f48fb1',
-											'name': 'Cluster',
-											'label': 0,
-										}]
-									};
-
-									budgetprogress = [{totalBudgetProgress:0}];
-									
-
-								}
-
-								$beneficiariesBudgetOne = budgetprogress[0];
-
-								//console.log("TOTAL-1: ", budgetprogress.totalBudgetProgressCluster);
-
-
-							
-								
-								switch (req.param('chart_for')) {
-									case 'FinancingCluster':
-
-									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
-										if ($beneficiariesBudgetOne.totalBudgetProgress < 1 && $beneficiariesBudgetOne.totalBudgetProgress < 1) {
-											
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											
-											
-											return res.json(200, result);
-										} else {
-
-											//console.log("LOS CLUSTERS: ",budgetprogress);
-
-											budgetprogress.forEach(function(clus,i){
-
-												if(clus._id.currency_id === 'cop'){
-											//console.log("Antes2 : ", clus.totalBudgetProgress);
-											var clustotalBudgetsCOPtoUSDChart = clus.totalBudgetProgress/params.coptousd;
-											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
-											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSDChart;
-											
-
-										}else if(clus._id.currency_id === 'eur'){
-
-											var clustotalBudgetsEURtoUSDChart = clus.totalBudgetProgress*params.eurotousd;
-											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
-											clus.totalBudgetProgress = clustotalBudgetsEURtoUSDChart;
-										}
-
-
-
-											var newclusterbudgetProgress = {
-												'y':clus.totalBudgetProgress,
-												'color':'blue',
-												'name': clus._id.cluster+' ('+clus._id.currency_id+')',
-												'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressCluster))*100
-											};
-
-
-												result.data.push(newclusterbudgetProgress)
-
-											});
-
-											//console.log("RESULT DATA: ",result.data);
-											
-											return res.json(200, result);
-										}
-										break;
-									
-										default:
-											return res.json( 200, { value:0 });
-											break;
-									}
-
-			
-								});
-							})					
-						
-										
-				break;
-
 
 				case 'BarChartFinancingTop5ExecutorOrganizations':
 			// labels
@@ -4681,6 +4187,299 @@ var Cluster4wplusDashboardController = {
 						
 										
 				break;
+
+
+				case 'BarChartFinancingAdmin1pcode':
+
+				BudgetProgress.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBudget
+								},
+								{
+									$group:{
+										_id: {admin1pcode:'$admin1pcode',admin1name: '$admin1name',currency_id:'$currency_id'},
+										totalBudgetProgress: {
+											$sum:  "$project_budget_amount_recieved"
+										},
+										
+
+									}
+								}
+							]).toArray(function (err, budgetprogress) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!budgetprogress.length) return res.json(200, { 'value': 0 });
+
+
+								if(budgetprogress.length){
+
+								//	console.log("ANTES  BUD: ",budgetprogress);
+
+									
+
+
+									var result = {data:[]};
+
+									budgetprogress.totalBudgetProgressAdmin1pcode = 0
+
+									budgetprogress.forEach(function(clus,i){
+										console.log("BUDGETPROGRESS: ", clus);
+
+										if(clus._id.currency_id === 'cop'){
+											var clustotalBudgetsCOPtoUSD = clus.totalBudgetProgress/params.coptousd;
+
+											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSD;
+
+											budgetprogress.totalBudgetProgressAdmin1pcode = budgetprogress.totalBudgetProgressAdmin1pcode+clus.totalBudgetProgress;
+
+
+										}else if(clus._id.currency_id === 'eur'){
+
+
+											var clustotalBudgetsEURtoUSD = clus.totalBudgetProgress*params.eurotousd;
+											clus.totalBudgetProgress = clustotalBudgetsEURtoUSD;
+
+											budgetprogress.totalBudgetProgressAdmin1pcode = budgetprogress.totalBudgetProgressAdmin1pcode+clus.totalBudgetProgress;
+											
+										
+
+										}else{
+											budgetprogress.totalBudgetProgressAdmin1pcode = budgetprogress.totalBudgetProgressAdmin1pcode+clus.totalBudgetProgress;
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Province',
+											'label': 0,
+										}]
+									};
+
+									budgetprogress = [{totalBudgetProgress:0}];
+									
+
+								}
+
+								$financingOne = budgetprogress[0];
+
+
+							
+								
+								switch (req.param('chart_for')) {
+									case 'financingAdmin1pcode':
+										if ($financingOne.totalBudgetProgress < 1 && $financingOne.totalBudgetProgress < 1) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+												budgetprogress.sort(function(a, b) {
+										  return b.totalBudgetProgress - a.totalBudgetProgress;
+											});
+
+											budgetprogress.forEach(function(budprogadmin1,i){
+
+												if(i<5){
+
+
+
+													var newadmin1financing = {
+														'y':budprogadmin1.totalBudgetProgress,
+														'color':'blue',
+														'name': budprogadmin1._id.admin1name+' ('+budprogadmin1._id.currency_id+')',
+														'label': (budprogadmin1.totalBudgetProgress / (budgetprogress.totalBudgetProgressAdmin1pcode))*100
+													};
+
+
+												result.data.push(newadmin1financing);
+												}
+
+											});
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							});	
+
+				break;
+
+				case 'BarChartFinancingCluster':
+			// labels
+			//console.log("FILTER BUDGET: ",filterObjectBudget);
+										
+						BudgetProgress.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBudget
+								},
+								{
+									$group:{
+										_id: {cluster_id:'$cluster_id',cluster: '$cluster', currency_id:'$currency_id'},
+										totalBudgetProgress: {
+											$sum:  "$project_budget_amount_recieved"
+										},
+										
+
+									}
+								}
+							]).toArray(function (err, budgetprogress) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!budgetprogress.length) return res.json(200, { 'value': 0 });
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(budgetprogress.length){
+
+
+									var result = {data:[]};
+
+									budgetprogress.totalBudgetProgressCluster = 0
+
+									budgetprogress.forEach(function(clus,i){
+										//console.log("BUDGETPROGRESS: ", clus);
+
+										if(clus._id.currency_id === 'cop'){
+											var clustotalBudgetsCOPtoUSD = clus.totalBudgetProgress/params.coptousd;
+											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+clustotalBudgetsCOPtoUSD;
+
+										}else if(clus._id.currency_id === 'eur'){
+
+
+											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+(clus.totalBudgetProgress*params.eurotousd);
+										
+
+										}else{
+											budgetprogress.totalBudgetProgressCluster = budgetprogress.totalBudgetProgressCluster+clus.totalBudgetProgress
+
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									//console.log("BUDGETPROGRESS: ", budgetprogress);
+
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Cluster',
+											'label': 0,
+										}]
+									};
+
+									budgetprogress = [{totalBudgetProgress:0}];
+									
+
+								}
+
+								$beneficiariesBudgetOne = budgetprogress[0];
+
+								//console.log("TOTAL-1: ", budgetprogress.totalBudgetProgressCluster);
+
+
+							
+								
+								switch (req.param('chart_for')) {
+									case 'FinancingCluster':
+
+									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
+										if ($beneficiariesBudgetOne.totalBudgetProgress < 1 && $beneficiariesBudgetOne.totalBudgetProgress < 1) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											budgetprogress.forEach(function(clus,i){
+
+												if(clus._id.currency_id === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = clus.totalBudgetProgress/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSDChart;
+											
+
+										}else if(clus._id.currency_id === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = clus.totalBudgetProgress*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsEURtoUSDChart;
+										}
+
+
+
+											var newclusterbudgetProgress = {
+												'y':clus.totalBudgetProgress,
+												'color':'blue',
+												'name': clus._id.cluster+' ('+clus._id.currency_id+')',
+												'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressCluster))*100
+											};
+
+
+												result.data.push(newclusterbudgetProgress)
+
+											});
+
+											//console.log("RESULT DATA: ",result.data);
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							})					
+						
+										
+				break;
+
+
+				
 				
 				default: 
 

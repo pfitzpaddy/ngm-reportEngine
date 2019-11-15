@@ -204,7 +204,7 @@ var ProjectController = {
     }
 
     var allowedParams =
-        ['project_id','organization_id','cluster_id','organization_id','organization_tag','implementer_id','adminRpcode', 'admin0pcode','admin1pcode','admin2pcode', 'project_start_date', 'project_end_date'];
+        ['project_id','organization_id','cluster_id','organization_tag','implementer_id','project_type_component','adminRpcode', 'admin0pcode','admin1pcode','admin2pcode', 'project_start_date', 'project_end_date', 'donor_id'];
 
 
     // if dissallowed parameters sent
@@ -253,6 +253,16 @@ var ProjectController = {
          delete queryProject.implementer_id;
              
       }
+
+       if( req.param('query').project_type_component){
+         queryProject.plan_component = {$in: [req.param('query').project_type_component]};
+         delete queryProject.project_type_component;
+             
+      }
+      
+
+       
+      
      //project_start_date and project_end_date filters
 
       if( req.param('query').project_start_date && req.param('query').project_end_date){

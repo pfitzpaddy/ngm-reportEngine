@@ -15,7 +15,7 @@ const { google } = require('googleapis');
 
 module.exports = {
 
-	//
+	// upload
 	upload: function  (req, res) {
 
 		//	call to /upload via GET is error
@@ -23,7 +23,7 @@ module.exports = {
 
 		// skipper
 		req.file('file').upload(function onUploadComplete (err, files) {
-			
+
 			//	if error return and send 500 error with error
 			if (err) return res.serverError(err);
 
@@ -37,10 +37,10 @@ module.exports = {
 	// save file to local
 	uploadLocal: function  (req, res) {
 
-		//	call to /upload via GET is 
+		//	call to /upload via GET is
 
 		if(req.method === 'GET') return res.json({ 'status':'GET not allowed' });
-		
+
 		var uploadPath = sails.config.documents.UPLOAD_PATH;
 		// skipper
 		req.file('file').upload({ dirname:uploadPath },function onUploadComplete (err, files) {
@@ -106,7 +106,7 @@ module.exports = {
 						return res.download(sails.config.documents.UPLOAD_PATH + "/" + doc.fileid_local, doc.filename)
 					})
 					.catch( err => res.negotiate(err) )
-					
+
 	},
 
 	// delete local file
@@ -123,7 +123,7 @@ module.exports = {
 				return res.json( 200, { "deleted" : true });
 			})
         });
-		
+
 	},
 	// delete permanently
 	deleteGDriveFilePermanently: function(req, res){
@@ -234,7 +234,7 @@ module.exports = {
 		var privatkey = sails.config.documents.CREDENTIALS;
 		var folderId = sails.config.documents.GDRIVE_FOLDER_ID;
 		var uploadPath = sails.config.documents.UPLOAD_PATH;
-		var maxBytes = sails.config.documents.MAX_BYTES || 15000000; 
+		var maxBytes = sails.config.documents.MAX_BYTES || 15000000;
 		var timeout = sails.config.documents.REQUEST_TIMEOUT_UPLOAD || 10*60*1000;
 		req.setTimeout(timeout);
 		var hrstart = process.hrtime()
@@ -248,14 +248,14 @@ module.exports = {
 				null,
 				privatkey.private_key,
 				['https://www.googleapis.com/auth/drive']);
-		   
+
 			// prepare gdrive client
 			var drive = google.drive({
 				version: 'v3',
 				auth: jwtClient
 			});
-					
-			// set file gdrive metadata 
+
+			// set file gdrive metadata
 			var fileMetadata = {
 				parents: [folderId],
 				name: files[0].filename,
@@ -275,17 +275,17 @@ module.exports = {
 				mimeType: files[0].type,
 				body: fs.createReadStream(files[0].fd)
 			};
-			
+
 			// set permissions
 			permission = {
 				role:"reader",
 				type:"anyone",
 				allowFileDiscovery: true
 			};
-			
+
 			// upload to gdrive
 			drive.files.create({
-				resource: fileMetadata,			
+				resource: fileMetadata,
 				media: media,
 				}, function (err, file) {
 					if (err) {
@@ -310,7 +310,7 @@ module.exports = {
 								if (doc) {
 									return res.json({ status:200, file:doc });
 								}
-								
+
 							})
 						})
 
@@ -319,7 +319,7 @@ module.exports = {
 
 			var saveFileMetadata = function(file,cb){
 
-				// set metadata 
+				// set metadata
 				fileDescriptor = {
 					fileid_local : path.parse(files[0].fd).base,
 					// filename_extension : path.extname(files[0].fd),
@@ -332,7 +332,7 @@ module.exports = {
 
 				// set variable metadata TODO: refactor
 				setFileMetaOptionalParam(fileDescriptor);
-				
+
 				// save metadata
 				Documents.create( fileDescriptor ).exec(function(err, doc) {
 					if (err) {
@@ -384,16 +384,16 @@ module.exports = {
 				// set user's meta, who does action ( TODO: action permissions )
 				if (req.session.session_user && req.session.session_user.username){
 					fileDescriptor.fileowner = req.session.session_user.username;
-				}	
+				}
 				// if (req.session.session_user && req.body.adminRpcode){
 				// 	fileDescriptor.adminRpcode = req.session.session_user.adminRpcode.toUpperCase();
 				// }
 				// if (req.session.session_user && req.session.session_user.admin0pcode){
 				// 	fileDescriptor.admin0pcode = req.session.session_user.admin0pcode.toUpperCase();
-				// }				
+				// }
 				// if (req.session.session_user && req.session.session_user.organization_tag){
 				// 	fileDescriptor.organization_tag = req.session.session_user.organization_tag;
-				// }				
+				// }
 				// if (req.session.session_user && req.session.session_user.cluster_id){
 				// 	fileDescriptor.cluster_id = req.session.session_user.cluster_id;
 				// }
@@ -401,14 +401,14 @@ module.exports = {
 				return fileDescriptor
 			}
 		});
-		
+
 	},
-	
+
 	// get documents` request params and validate
 	_getParams: function( req, res ){
 
 		allowed_params = [ 'project_id','report_id','organization_tag','cluster_id','admin0pcode','adminRpcode', 'start_date', 'end_date', 'type' ];
-		
+
 		// types of documents
 		types = { monthly:'monthly', project: 'project', weekly: 'weekly', custom: 'custom', all: 'all' };
 
@@ -448,13 +448,13 @@ module.exports = {
 			organization_tag: params.organization_tag ? params.organization_tag : null,
 			project_id: params.project_id ? params.project_id : null,
 			report_id: params.report_id ? params.report_id : null,
-			reporting_period: params.type===params.types.monthly && params.start_date && params.end_date ? 
+			reporting_period: params.type===params.types.monthly && params.start_date && params.end_date ?
 								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null,
-			project_start_date: params.type===params.types.project && params.start_date && params.end_date ? 
+			project_start_date: params.type===params.types.project && params.start_date && params.end_date ?
 								{ '<=' : new Date( params.end_date ) } : null,
-			project_end_date: params.type===params.types.project && params.start_date && params.end_date ? 
+			project_end_date: params.type===params.types.project && params.start_date && params.end_date ?
 								{ '>=' : new Date( params.start_date ) } : null,
-			createdAt: params.type===params.types.all ? 
+			createdAt: params.type===params.types.all ?
 								{ '>=' : new Date( params.start_date ), '<=' : new Date( params.end_date ) } : null
 		}
 
@@ -544,7 +544,7 @@ module.exports = {
 
 		Documents.find( filter , { fields: { 'fileid': 1 } }).then(documents => {
 			if (!documents.length) return res.json( 200, { message: 'NO DOCUMENTS FOUND' } )
-			
+
 			var files = []
 
 			// construct array of file ids for request
@@ -556,7 +556,7 @@ module.exports = {
 			})
 
 			// request to start a zip job
-			fetch( serverUrl + '?key=' + TAKE_OUT_API_KEY, { 
+			fetch( serverUrl + '?key=' + TAKE_OUT_API_KEY, {
 				method: 'POST',
 				headers: { 'origin': 'https://drive.google.com', 'content-type': 'application/json' },
 				body:    JSON.stringify({"archiveFormat":null,"archivePrefix":null,"conversions":null,"items": files,"locale":null}),
@@ -569,7 +569,7 @@ module.exports = {
 				}
 				// poll every pollTime for status
 				var intervalObj = setInterval( () => {
-					fetch( serverUrl + '/' + json.exportJob.id + '?key=' + TAKE_OUT_API_KEY, { 
+					fetch( serverUrl + '/' + json.exportJob.id + '?key=' + TAKE_OUT_API_KEY, {
 					method: 'GET',
 					headers: { 'origin': 'https://drive.google.com', 'content-type': 'application/json' },
 					})
@@ -595,7 +595,7 @@ module.exports = {
 			return res.serverError({ error:{ message:"SERVER ERROR", type: err.type, original_message: err.message } });
 		}
 	},
-	
+
 	//
 	process: function  (req, res) {
 
@@ -612,11 +612,11 @@ module.exports = {
 		PythonShell.run(req.param('importScript'), options, function (err, results) {
 		  if (err) {
 		  	// return error
-		  	res.json(400, { 
-		  		error: 'Data import error, please try again!' 
+		  	res.json(400, {
+		  		error: 'Data import error, please try again!'
 		  	});
 		  } else {
-			
+
 			// remove file
 			fs.unlink(req.param('file'));
 
@@ -632,8 +632,8 @@ module.exports = {
 						res.json({ status:200 });
 					} else {
 						// return error
-					  	res.json(400, { 
-					  		error: 'Data processing error, please try again!' 
+					  	res.json(400, {
+					  		error: 'Data processing error, please try again!'
 					  	});
 					}
 				});
@@ -749,7 +749,7 @@ module.exports = {
         // display download date
         $("#ngm-report-extracted").css({ 'display': 'block' });
         // adjust to left donuts
-        $(".highcharts-series-group").css({ 'transform': 'translateX(-25px)' });
+        $(".highcharts-series-group").css({ 'transform': 'translateX(-12px)' });
 
       });
 
@@ -791,19 +791,19 @@ module.exports = {
 			viewportWidth = req.param('viewportWidth'),
 			viewportHeight = req.param('viewportHeight'),
 			exec = require('child_process').exec,
-			cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-print.js ' + report + ' ' 
-																																						 + printUrl + ' ' 
-																																						 + user.adminRpcode + ' ' 
-																																						 + user.adminRname + ' ' 
-																																						 + user.admin0pcode + ' ' 
+			cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-print.js ' + report + ' '
+																																						 + printUrl + ' '
+																																						 + user.adminRpcode + ' '
+																																						 + user.adminRname + ' '
+																																						 + user.admin0pcode + ' '
 																																						 + user.admin0name + ' '
 																																						 + user.cluster + ' '
-																																						 + user.cluster_id + ' ' 
-																																						 + user.organization + ' ' 
-																																						 + user.organization_tag + ' ' 
+																																						 + user.cluster_id + ' '
+																																						 + user.organization + ' '
+																																						 + user.organization_tag + ' '
 																																						 + user.username + ' '
-																																						 + user.roles.toString() + ' ' 
-																																						 + user.token + ' ' 
+																																						 + user.roles.toString() + ' '
+																																						 + user.token + ' '
 																																						 + pageLoadTime;
 
 		// width opts
@@ -815,14 +815,14 @@ module.exports = {
 			function( error, stdout, stderr ) {
 				if (!error) {
 					// success
-					res.json({ 
-						status:200, 
-						report: report + '.pdf' 
+					res.json({
+						status:200,
+						report: report + '.pdf'
 					});
 				} else {
 					// return error
 				  	res.json(400, {
-				  		error: 'PDF export error, please try again!' 
+				  		error: 'PDF export error, please try again!'
 				  	});
 				}
 			}
@@ -975,11 +975,11 @@ module.exports = {
 
 			// request
 			request( options, function ( err, response, body ) {
-			  
+
 			  // error
 			  if ( err ) return res.json( 200, err );
 
-			  // 
+			  //
 			  data[ i ] = body;
 
 			  // add province details
@@ -993,7 +993,7 @@ module.exports = {
 			  if ( counter === length ) {
 		      // return csv
 		      json2csv({ data: data, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-		        
+
 		        // error
 		        if ( err ) return res.negotiate( err );
 
@@ -1002,11 +1002,11 @@ module.exports = {
 					  res.set('Content-Type', 'text/csv');
 					  res.status( 200 ).send( csv );
 
-		      }); 
+		      });
 			  }
 
-			});				
-		
+			});
+
 
 		});
 
@@ -1022,13 +1022,13 @@ module.exports = {
     Beneficiaries
       .find()
       .exec( function( err, b ){
-        
+
         // error
         if ( err ) return res.negotiate( err );
 
         // return csv
         json2csv({ data: b }, function( err, csv ) {
-          
+
 		        // error
 		        if ( err ) return res.negotiate( err );
 
@@ -1037,7 +1037,7 @@ module.exports = {
 					  res.set('Content-Type', 'text/csv');
 					  res.status( 200 ).send( csv );
 
-        });        
+        });
 
       });
 

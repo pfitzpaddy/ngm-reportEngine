@@ -662,7 +662,30 @@ var ClusterDashboardController = {
 					}else{
 							filters.project_donor_id = {};
 
-						};
+					};
+
+
+					if(req.param('implementer') && req.param('implementer') !== 'all'){
+
+						implementing_partner = req.param('implementer');
+						filters.implementing_partners = { 'implementing_partners' :{ $elemMatch : { 'organization_tag' : implementing_partner}}};
+						
+					}else{
+							filters.implementing_partners = {};
+
+					};
+
+
+					if(req.param('project_type_component') && req.param('project_type_component') !== 'all'){
+
+						plan_component = req.param('project_type_component')
+						filters.plan_component = { 'plan_component': {$in: [plan_component]}};
+
+					}else{
+						filters.plan_component = {};
+
+					}
+
 		                       
 
 				// get beneficiaries by project
@@ -675,6 +698,8 @@ var ClusterDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
 					.where( filters.project_donor_id )
+					.where( filters.implementing_partners)
+					.where( filters.plan_component)
 					.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -814,6 +839,12 @@ var ClusterDashboardController = {
 
 						}
 
+						if(req.param('project_type_component') && req.param('project_type_component') !== 'all'){
+							filterObject.plan_component = {$in: [req.param('project_type_component')]};
+
+						}
+
+						
 						
 					
 						collection.find(filterObject).toArray(function (err, beneficiaries) {
