@@ -4229,7 +4229,6 @@ var Cluster4wplusDashboardController = {
 									budgetprogress.totalBudgetProgressAdmin1pcode = 0
 
 									budgetprogress.forEach(function(clus,i){
-										console.log("BUDGETPROGRESS: ", clus);
 
 										if(clus._id.currency_id === 'cop'){
 											var clustotalBudgetsCOPtoUSD = clus.totalBudgetProgress/params.coptousd;
