@@ -6,13 +6,16 @@
  */
 
 // require
+const fs = require('fs');
 const _ = require('underscore');
 const moment = require( 'moment' );
 const json2csv = require( 'json2csv' );
+const EXEC = require('child_process').exec;
 
 // task controller
 var GfaDashboardController = {
 
+	// 
 	filterByProperty: function ( array, propertyName ) {
 		var occurrences = {}
 
@@ -393,6 +396,149 @@ var GfaDashboardController = {
 
 					// indicator
 					switch ( indicator ) {
+
+						case 'print_distribution_pdf':
+
+							// html
+							var page_html_start;
+							var page_html_body;
+							var page_html_end;
+							var report = organization_tag + '_' + site_id_filter.site_id + '_' + moment().unix();
+							var template = '/home/ubuntu/data/html/template/' + report + '.html';
+
+							// get form details
+							GfdForms
+							 .findOne()
+							 .where( site_id_filter )
+							 .where({ report_round: report_round })
+							 .exec( function( err, form ){
+
+									// return error
+									if (err) return res.negotiate( err );
+
+									// title
+									var title_1 = 'Master Roll - Distribution Date: ' + end_date;
+									var title_2 = form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + report_distribution;
+									var footer = 'Funded by World Food Programme (WFP)';
+
+									// html content
+									page_html_start = '' +
+										'<!DOCTYPE html>' +
+										'<html lang="en">' +
+											'<head>' +
+												'<title>WFP GFD Distribution List</title>' +
+												'<meta http-equiv="content-type" content="text/html; charset=UTF-8">' +
+												'<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+												'<style type="text/css" media="all">' +
+													'html {' +
+														'margin: 0;' +
+														'zoom: 1;' +
+													'}' +
+												'</style>' +
+											'</head>' +
+											'<style>'											
+													'table {' +
+														'page-break-after: always;' +
+														'font-family: verdana, arial, sans-serif;' +
+														'color: #333333;' +
+														'border-width: 1px;' +
+														'border-color: #3A3A3A;' +
+														'border-collapse: collapse;' +
+													'}' +
+													'thead { display: table-header-group !important; }' +
+													'tbody { display: table-row-group !important; }' +
+													'table th {' +
+														'break-inside: avoid !important;' +
+														'border-width: 1px;' +
+														'font-size: 8px;' +
+														'padding: 4px;' +
+														'border-style: solid;' +
+														'border-color: #517994;' +
+														'background-color: #B2CFD8;' +
+													'}' +
+													'table td {' +
+														'border-width: 1px;' +
+														'font-size: 7px;' +
+														'padding: 4px;' +
+														'border-style: solid;' +
+														'border-color: #517994;' +
+														'background-color: #ffffff;' +
+													'}' +
+											'</style>' +
+											'<body>';
+
+									// theader
+									page_html_body = '' +
+											'<table style="width:100%">' +
+												'<thead>' +
+													'<tr>' +
+														'<th>SL#</th>' +
+														'<th>Scope No.</th>' +
+														'<th>HH Name</th>' +
+														'<th>Location</th>' +
+														'<th>Family Size</th>' +
+														'<th>FCN</th>' +
+														'<th>Thumb</th>' +
+													'</tr>' +
+												'</thead>' +
+												'<tbody>';
+
+									// foreach record
+									for( i=0; i < planned_beneficiaries.length; i++ ){
+										page_html_body += '' +
+												'<tr>' +
+													'<td>' + planned_beneficiaries[ i ].sl_number  + '</td>' +
+													'<td>' + planned_beneficiaries[ i ].scope_id + '</td>' +
+													'<td>' + planned_beneficiaries[ i ].hh_name + '</td>' +
+													'<td>' + planned_beneficiaries[ i ].admin4name + '</td>' +
+													'<td>' + planned_beneficiaries[ i ].gfd_family_size + '</td>' +
+													'<td>' + planned_beneficiaries[ i ].fcn_id + '</td>' +
+													'<td width="25%" height="30px;"></td>' +
+												'</tr>';
+									}
+
+										// end
+										page_html_body += '' +
+											'</tbody>' +
+										'</table>' +
+									'</body>';
+
+									// html page end
+									page_html_end = '' +
+									'</html>';
+
+									// fs write template
+									fs.writeFile( template, page_html_start + page_html_body + page_html_end, function( err ) {
+
+										// err
+										if( err ) {
+											return console.log(err);
+										}
+
+										// import updated form
+										var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + title_1 + '" "' + title_2 + '" "' + footer + '" ' + template + ' /home/ubuntu/nginx/www/ngm-reportPrint/pdf/' + report + '.pdf';
+
+										// run curl command
+										EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
+											// err
+											if ( error ) {
+												// return error
+												res.json( 400, { error: 'PDF error!', details: error  } );
+											} else {
+												// delete template
+												fs.unlink( template, function ( err ) {
+														if ( err ) throw err;
+														// success
+														return res.json( 200, { report: report + '.pdf' });
+												});
+											}
+										});
+
+									});
+
+							 });
+
+							break;
 
 						case 'downloads_duplicates':
 
