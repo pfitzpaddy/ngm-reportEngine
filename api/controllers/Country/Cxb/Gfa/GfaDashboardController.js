@@ -407,7 +407,7 @@ var GfaDashboardController = {
 							var template = '/home/ubuntu/data/html/template/' + report + '.html';
 
 							// sort
-							planned_beneficiaries = _.sortBy( planned_beneficiaries, 'fcn_id' );
+							planned_beneficiaries = _.sortBy( planned_beneficiaries, 'sl_number' );
 
 							// get form details
 							GfdForms
@@ -420,9 +420,9 @@ var GfaDashboardController = {
 									if (err) return res.negotiate( err );
 
 									// title
-									var title_1 = 'Master Roll - Distribution Date: ' + moment( end_date ).format( 'MMMM Do YYYY' );
-									var title_2 = form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + report_distribution;
-									var footer = 'Funded by World Food Programme (WFP)';
+									var title_1 = 'Master Roll - ' + form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + report_distribution;
+									var title_2 = 'Distribution Date: ' + moment( end_date ).format( 'MMMM Do YYYY' );
+									var footer = 'Funded by the World Food Programme (WFP)';
 
 									// html content
 									page_html_start = '' +
@@ -451,7 +451,7 @@ var GfaDashboardController = {
 													'table th {' +
 														'break-inside: avoid !important;' +
 														'border-width: 1px;' +
-														'font-size: 9px;' +
+														'font-size: 10px;' +
 														'padding: 4px;' +
 														'border-style: solid;' +
 														'border-color: #517994;' +
@@ -459,7 +459,7 @@ var GfaDashboardController = {
 													'}' +
 													'table td {' +
 														'border-width: 1px;' +
-														'font-size: 8px;' +
+														'font-size: 9px;' +
 														'padding: 4px;' +
 														'border-style: solid;' +
 														'border-color: #517994;' +
