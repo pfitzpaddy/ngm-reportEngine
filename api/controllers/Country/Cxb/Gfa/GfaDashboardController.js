@@ -406,6 +406,9 @@ var GfaDashboardController = {
 							var report = organization_tag + '_' + site_id_filter.site_id + '_' + moment().unix();
 							var template = '/home/ubuntu/data/html/template/' + report + '.html';
 
+							// sort
+							planned_beneficiaries = _.sortBy( planned_beneficiaries, 'fcn_id' );
+
 							// get form details
 							GfdForms
 							 .findOne()
@@ -417,7 +420,7 @@ var GfaDashboardController = {
 									if (err) return res.negotiate( err );
 
 									// title
-									var title_1 = 'Master Roll - Distribution Date: ' + end_date;
+									var title_1 = 'Master Roll - Distribution Date: ' + moment( end_date ).format( 'MMMM Do YYYY' );
 									var title_2 = form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + report_distribution;
 									var footer = 'Funded by World Food Programme (WFP)';
 
@@ -436,21 +439,19 @@ var GfaDashboardController = {
 													'}' +
 												'</style>' +
 											'</head>' +
-											'<style>'											
+											'<style>' +
 													'table {' +
-														'page-break-after: always;' +
+														'page-break-after: always !important;' +
 														'font-family: verdana, arial, sans-serif;' +
 														'color: #333333;' +
 														'border-width: 1px;' +
 														'border-color: #3A3A3A;' +
 														'border-collapse: collapse;' +
 													'}' +
-													'thead { display: table-header-group !important; }' +
-													'tbody { display: table-row-group !important; }' +
 													'table th {' +
 														'break-inside: avoid !important;' +
 														'border-width: 1px;' +
-														'font-size: 8px;' +
+														'font-size: 9px;' +
 														'padding: 4px;' +
 														'border-style: solid;' +
 														'border-color: #517994;' +
@@ -458,12 +459,20 @@ var GfaDashboardController = {
 													'}' +
 													'table td {' +
 														'border-width: 1px;' +
-														'font-size: 7px;' +
+														'font-size: 8px;' +
 														'padding: 4px;' +
 														'border-style: solid;' +
 														'border-color: #517994;' +
 														'background-color: #ffffff;' +
 													'}' +
+													'tr {' +
+														'page-break-inside: avoid !important;' +
+													'}' +
+													'table tr {' +
+														'break-inside: avoid !important;' +
+													'}' +
+													'thead { display: table-header-group !important; }' +
+													'tbody { display: table-row-group !important; }' +
 											'</style>' +
 											'<body>';
 
@@ -473,11 +482,11 @@ var GfaDashboardController = {
 												'<thead>' +
 													'<tr>' +
 														'<th>SL#</th>' +
-														'<th>Scope No.</th>' +
+														'<th>FCN</th>' +
+														'<th>Scope</th>' +
 														'<th>HH Name</th>' +
 														'<th>Location</th>' +
 														'<th>Family Size</th>' +
-														'<th>FCN</th>' +
 														'<th>Thumb</th>' +
 													'</tr>' +
 												'</thead>' +
@@ -485,15 +494,38 @@ var GfaDashboardController = {
 
 									// foreach record
 									for( i=0; i < planned_beneficiaries.length; i++ ){
+										
+										// check if /10
+										if ( i !== 0 && i % 10 === 0 ) {
+											page_html_body += '' +
+											'</tbody>' +
+										'</table>' +
+												'<div style="page-break-before: always;"></div>' +
+												// theader
+													'<table style="width:100%">' +
+														'<thead>' +
+															'<tr>' +
+																'<th>SL#</th>' +
+																'<th>FCN</th>' +
+																'<th>Scope</th>' +
+																'<th>HH Name</th>' +
+																'<th>Location</th>' +
+																'<th>Family Size</th>' +
+																'<th>Thumb</th>' +
+															'</tr>' +
+														'</thead>' +
+														'<tbody>';
+										}
+
 										page_html_body += '' +
 												'<tr>' +
 													'<td>' + planned_beneficiaries[ i ].sl_number  + '</td>' +
+													'<td>' + planned_beneficiaries[ i ].fcn_id + '</td>' +
 													'<td>' + planned_beneficiaries[ i ].scope_id + '</td>' +
 													'<td>' + planned_beneficiaries[ i ].hh_name + '</td>' +
 													'<td>' + planned_beneficiaries[ i ].admin4name + '</td>' +
-													'<td>' + planned_beneficiaries[ i ].gfd_family_size + '</td>' +
-													'<td>' + planned_beneficiaries[ i ].fcn_id + '</td>' +
-													'<td width="25%" height="30px;"></td>' +
+													'<td align="center">' + planned_beneficiaries[ i ].gfd_family_size + '</td>' +
+													'<td width="25%" height="55px;"></td>' +
 												'</tr>';
 									}
 
@@ -512,7 +544,7 @@ var GfaDashboardController = {
 
 										// err
 										if( err ) {
-											return console.log(err);
+											res.json( 400, { error: 'HTML Template error!', details: error  } );
 										}
 
 										// import updated form
@@ -527,9 +559,9 @@ var GfaDashboardController = {
 											} else {
 												// delete template
 												fs.unlink( template, function ( err ) {
-														if ( err ) throw err;
-														// success
-														return res.json( 200, { report: report + '.pdf' });
+													if ( err ) throw err;
+													// success
+													return res.json( 200, { report: report + '.pdf' });
 												});
 											}
 										});
