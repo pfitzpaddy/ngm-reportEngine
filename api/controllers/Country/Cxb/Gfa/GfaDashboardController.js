@@ -84,6 +84,8 @@ var GfaDashboardController = {
 		var admin3pcode = req.param('admin3pcode');
 		var admin4pcode = req.param('admin4pcode');
 		var admin5pcode = req.param('admin5pcode');
+		var start_date = req.param('start_date');
+		var end_date = req.param('end_date');
 
 		// if wfp, select all
 		var organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
@@ -105,6 +107,7 @@ var GfaDashboardController = {
 			.where( admin3pcode_filter )
 			.where( admin4pcode_filter )
 			.where( admin5pcode_filter )
+			.where( { distribution_date: { '>=': moment( start_date ).format( 'YYYY-MM-DD' ), '<=': moment( end_date ).format( 'YYYY-MM-DD' ) } } )
 			.exec( function( err, planned_beneficiaries ){
 
 				// return error
@@ -118,6 +121,18 @@ var GfaDashboardController = {
 
 					// indicator
 					switch ( indicator ) {
+
+						case 'latest':
+							// avoid -Infinity
+							value = { updatedAt: 0 }
+							// filter by _.max date
+							if ( planned_beneficiaries.length ) {
+								filter = _.max( planned_beneficiaries, function( b ) { 
+									return moment( b.updatedAt ).unix();
+								});
+								value = filter;
+							}
+							break;
 						
 						case 'duplicates':
 							filter = _.chain( planned_beneficiaries ).groupBy( 'fcn_id' ).filter(function(v){ return v.length > 1 }).flatten().uniq().value();
@@ -128,7 +143,7 @@ var GfaDashboardController = {
 							// food distribution plan
 							planned = 0;
 							for( i=0; i<planned_beneficiaries.length; i++ ){
-								planned += planned_beneficiaries[ i ].planned_rice;
+								planned += planned_beneficiaries[ i ].rice;
 							}
 							value = { 'value': planned };
 							break;
@@ -137,7 +152,7 @@ var GfaDashboardController = {
 							// food distribution plan
 							planned = 0;
 							for( i=0; i<planned_beneficiaries.length; i++ ){
-								planned += planned_beneficiaries[ i ].planned_lentils;
+								planned += planned_beneficiaries[ i ].lentils;
 							}
 							value = { 'value': planned };
 							break;
@@ -146,7 +161,7 @@ var GfaDashboardController = {
 							// food distribution plan
 							planned = 0;
 							for( i=0; i<planned_beneficiaries.length; i++ ){
-								planned += planned_beneficiaries[ i ].planned_oil;
+								planned += planned_beneficiaries[ i ].oil;
 							}
 							value = { 'value': planned };
 							break;
@@ -155,7 +170,7 @@ var GfaDashboardController = {
 							// food distribution plan
 							planned = 0;
 							for( i=0; i<planned_beneficiaries.length; i++ ){
-								planned += planned_beneficiaries[ i ].planned_entitlements;
+								planned += planned_beneficiaries[ i ].entitlements;
 							}
 							value = { 'value': planned };
 							break;
@@ -226,8 +241,20 @@ var GfaDashboardController = {
 							break;
 
 						case 'menu':
-							filter = _.uniq( planned_beneficiaries, 'admin3pcode');
-							value = filter;
+							// admin
+							var admin3 = _.sortBy( _.unique( planned_beneficiaries, 'admin3pcode' ), 'admin3name' ); 
+							var admin4 = _.sortBy( _.unique( planned_beneficiaries, 'admin4pcode' ), 'admin4name' ); 
+							var admin5 = _.sortBy( _.unique( planned_beneficiaries, 'admin5pcode' ), 'admin5name' );
+							var site_id = _.sortBy( _.unique( planned_beneficiaries, 'site_id' ), 'site_name' );
+							var dates = _.sortBy( _.unique( planned_beneficiaries, 'distribution_date' ), 'distribution_date' );
+							// set
+							value = {
+								admin3: admin3,
+								admin4: admin4,
+								admin5: admin5,
+								site_id: site_id,
+								dates: dates,
+							}
 							break;
 
 						case 'markers':
@@ -426,10 +453,10 @@ var GfaDashboardController = {
 								'family_8_to_10',
 								'family_11+',
 								'hh_total',
-								'planned_rice',
-								'planned_lentils',
-								'planned_oil',
-								'planned_entitlements',
+								'rice',
+								'lentils',
+								'oil',
+								'entitlements',
 								'site_lng',
 								'site_lat',
 							];
@@ -437,8 +464,8 @@ var GfaDashboardController = {
 							// food distribution plan
 							var filter = [];
 							planned_beneficiaries.reduce( function( res, value ) {
-								// group by organization_tag + admin5pcode
-								var id = value.organization_tag + '_' + value.admin5pcode;
+								// group by organization_tag + admin5pcode + distribution_date
+								var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date;
 								if ( !res[ id ] ) {
 									res[ id ] = value;
 									res[ id ][ 'family_1_to_3' ] = 0;
@@ -449,10 +476,10 @@ var GfaDashboardController = {
 									filter.push( res[ id ] );
 								} else {
 									// tally (initial values set with res[ id ] = value )
-									res[ id ].planned_rice += value.planned_rice;
-									res[ id ].planned_lentils += value.planned_lentils;
-									res[ id ].planned_oil += value.planned_oil;
-									res[ id ].planned_entitlements += value.planned_entitlements;
+									res[ id ].rice += value.rice;
+									res[ id ].lentils += value.lentils;
+									res[ id ].oil += value.oil;
+									res[ id ].entitlements += value.entitlements;
 								}
 
 								// family size
@@ -555,12 +582,12 @@ var GfaDashboardController = {
 		var end_date = req.param('end_date');
 
 		// if wfp, select all
-		var organization_tag_filter = organization_tag === 'wfp' ? {} : { actual_organization_tag: organization_tag };
+		var organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
 		// report round
-		var report_round_filter = report_round === 'all' ? {} : { actual_report_round: report_round }; 
-		var report_distribution_filter = !report_distribution ? {} : { actual_report_distribution: report_distribution };
+		var report_round_filter = report_round === 'all' ? {} : { report_round: report_round }; 
+		var report_distribution_filter = !report_distribution ? {} : { report_distribution: report_distribution };
 		// if site eq all, select all
-		var site_id_filter = site_id === 'all' ? {} : { actual_site_id: site_id };
+		var site_id_filter = site_id === 'all' ? {} : { site_id: site_id };
 		// admin3pcode
 		var admin3pcode_filter = admin3pcode === 'all' ? {} : { admin3pcode: admin3pcode };
 		var admin4pcode_filter = admin4pcode === 'all' ? {} : { admin4pcode: admin4pcode };
@@ -577,7 +604,7 @@ var GfaDashboardController = {
 			.where( admin3pcode_filter )
 			.where( admin4pcode_filter )
 			.where( admin5pcode_filter )
-			.where( { actual_distribution_date: { '>=': moment( start_date ).format( 'YYYY-MM-DD' ), '<=': moment( end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { distribution_date: { '>=': moment( start_date ).format( 'YYYY-MM-DD' ), '<=': moment( end_date ).format( 'YYYY-MM-DD' ) } } )
 			.exec( function( err, actual_beneficiaries ){
 
 				// return error
@@ -620,7 +647,7 @@ var GfaDashboardController = {
 							// food distribution plan
 							actual = 0;
 							for( i=0; i<actual_beneficiaries.length; i++ ){
-								actual += actual_beneficiaries[ i ].actual_rice;
+								actual += actual_beneficiaries[ i ].rice;
 							}
 							value = { 'value': actual };
 							break;
@@ -629,7 +656,7 @@ var GfaDashboardController = {
 							// food distribution plan
 							actual = 0;
 							for( i=0; i<actual_beneficiaries.length; i++ ){
-								actual += actual_beneficiaries[ i ].actual_lentils;
+								actual += actual_beneficiaries[ i ].lentils;
 							}
 							value = { 'value': actual };
 							break;
@@ -638,7 +665,7 @@ var GfaDashboardController = {
 							// food distribution plan
 							actual = 0;
 							for( i=0; i<actual_beneficiaries.length; i++ ){
-								actual += actual_beneficiaries[ i ].actual_oil;
+								actual += actual_beneficiaries[ i ].oil;
 							}
 							value = { 'value': actual };
 							break;
@@ -647,35 +674,35 @@ var GfaDashboardController = {
 							// food distribution plan
 							actual = 0;
 							for( i=0; i<actual_beneficiaries.length; i++ ){
-								actual += actual_beneficiaries[ i ].actual_entitlements;
+								actual += actual_beneficiaries[ i ].entitlements;
 							}
 							value = { 'value': actual };
 							break;
 
 						case 'family_size_1_3':
 							filter = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 0 && b.actual_gfd_family_size <= 3;
+								return b.gfd_family_size >= 0 && b.gfd_family_size <= 3;
 							});
 							value = { 'value': filter.length };
 							break;
 
 						case 'family_size_4_7':
 							filter = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 4 && b.actual_gfd_family_size <= 7;
+								return b.gfd_family_size >= 4 && b.gfd_family_size <= 7;
 							});
 							value = { 'value': filter.length };
 							break;
 
 						case 'family_size_8_10':
 							filter = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 8 && b.actual_gfd_family_size <= 10;
+								return b.gfd_family_size >= 8 && b.gfd_family_size <= 10;
 							});
 							value = { 'value': filter.length };
 							break;
 
 						case 'family_size_11+':
 							filter = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 11;
+								return b.gfd_family_size >= 11;
 							});
 							value = { 'value': filter.length };
 							break;
@@ -725,8 +752,20 @@ var GfaDashboardController = {
 							break;
 
 						case 'menu':
-							filter = _.uniq( actual_beneficiaries, 'admin3pcode');
-							value = filter;
+							// admin
+							var admin3 = _.sortBy( _.unique( actual_beneficiaries, 'admin3pcode' ), 'admin3name' ); 
+							var admin4 = _.sortBy( _.unique( actual_beneficiaries, 'admin4pcode' ), 'admin4name' ); 
+							var admin5 = _.sortBy( _.unique( actual_beneficiaries, 'admin5pcode' ), 'admin5name' );
+							var site_id = _.sortBy( _.unique( actual_beneficiaries, 'site_id' ), 'site_name' );
+							var dates = _.sortBy( _.unique( actual_beneficiaries, 'distribution_date' ), 'distribution_date' );
+							// set
+							value = {
+								admin3: admin3,
+								admin4: admin4,
+								admin5: admin5,
+								site_id: site_id,
+								dates: dates,
+							}
 							break;
 
 						case 'markers':
@@ -829,16 +868,16 @@ var GfaDashboardController = {
 						case 'family_size_chart':
 							
 							var family_size_1_3 = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 0 && b.actual_gfd_family_size <= 3;
+								return b.gfd_family_size >= 0 && b.gfd_family_size <= 3;
 							});
 							var family_size_4_7 = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 4 && b.actual_gfd_family_size <= 7;
+								return b.gfd_family_size >= 4 && b.gfd_family_size <= 7;
 							});
 							var family_size_8_10 = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 8 && b.actual_gfd_family_size <= 10;
+								return b.gfd_family_size >= 8 && b.gfd_family_size <= 10;
 							});
 							var family_size_11 = _.filter( actual_beneficiaries, function ( b ) {
-								return b.actual_gfd_family_size >= 11;
+								return b.gfd_family_size >= 11;
 							});
 							value = { 
 								data: [
@@ -949,10 +988,10 @@ var GfaDashboardController = {
 								'family_8_to_10',
 								'family_11+',
 								'hh_total',
-								'actual_rice',
-								'actual_lentils',
-								'actual_oil',
-								'actual_entitlements',
+								'rice',
+								'lentils',
+								'oil',
+								'entitlements',
 								'site_lng',
 								'site_lat',
 							];
@@ -960,8 +999,8 @@ var GfaDashboardController = {
 							// food distribution plan
 							var filter = [];
 							actual_beneficiaries.reduce( function( res, value ) {
-								// group by organization_tag + admin5pcode
-								var id = value.organization_tag + '_' + value.admin5pcode;
+								// group by organization_tag + admin5pcode + distribution_date
+								var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date;
 								if ( !res[ id ] ) {
 									res[ id ] = value;
 									res[ id ][ 'family_1_to_3' ] = 0;
@@ -972,23 +1011,23 @@ var GfaDashboardController = {
 									filter.push( res[ id ] );
 								} else {
 									// tally (initial values set with res[ id ] = value )
-									res[ id ].actual_rice += value.actual_rice;
-									res[ id ].actual_lentils += value.actual_lentils;
-									res[ id ].actual_oil += value.actual_oil;
-									res[ id ].actual_entitlements += value.actual_entitlements;
+									res[ id ].rice += value.rice;
+									res[ id ].lentils += value.lentils;
+									res[ id ].oil += value.oil;
+									res[ id ].entitlements += value.entitlements;
 								}
 
 								// family size
-								if ( value.actual_gfd_family_size >= 0 && value.actual_gfd_family_size <= 3 ) {
+								if ( value.gfd_family_size >= 0 && value.gfd_family_size <= 3 ) {
 									res[ id ][ 'family_1_to_3' ]++;
 								}
-								if ( value.actual_gfd_family_size >= 4 && value.actual_gfd_family_size <= 7 ) {
+								if ( value.gfd_family_size >= 4 && value.gfd_family_size <= 7 ) {
 									res[ id ][ 'family_4_to_7' ]++;
 								}
-								if ( value.actual_gfd_family_size >= 8 && value.actual_gfd_family_size <= 10 ) {
+								if ( value.gfd_family_size >= 8 && value.gfd_family_size <= 10 ) {
 									res[ id ][ 'family_8_to_10' ]++;
 								}
-								if ( value.actual_gfd_family_size >= 11 ) {
+								if ( value.gfd_family_size >= 11 ) {
 									res[ id ][ 'family_11+' ]++;
 								}
 								// count hh's

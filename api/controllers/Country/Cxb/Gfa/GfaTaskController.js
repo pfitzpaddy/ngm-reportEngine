@@ -317,7 +317,6 @@ var GfaTaskController = {
 		}
 
 		// set params
-		var cmd = '';
 		var file = req.param('file');
 		var admin0pcode = req.param('admin0pcode');
 		var organization_tag = req.param('organization_tag');
@@ -404,7 +403,7 @@ var GfaTaskController = {
 
 					// get distribution_site
 					site = _.filter( food_distribution_points, function ( s ) {
-						return s.site_id === food_distribution_point_lookup[ d[ 5 ] ];
+						return s.site_id === food_distribution_point_lookup[ d[ 6 ] ];
 					});
 
 					// set distribution_site
@@ -420,18 +419,18 @@ var GfaTaskController = {
 					}
 					
 
-					// create key
-					if ( d[ 8 ].length === 1 ) {
-						var camp_number = d[ 6 ].match( /\d+/g ).map( Number )[ 0 ];
+					// create camp_block key
+					if ( d[ 9 ].length === 1 ) {
+						var camp_number = d[ 8 ].match( /\d+/g ).map( Number )[ 0 ];
 						var key = 'C';
 								key += camp_number > 9 ? camp_number : '0' + camp_number;
-								key += '_' + d[ 8 ];
-						d[ 8 ] = key;
+								key += '_' + d[ 9 ];
+						d[ 9 ] = key;
 					}
 					
 					// set camp_block 
 					admin = _.filter( admin4, function ( b ) {
-						return b.admin4pcode === camp_block_lookup[ d[ 8 ] ];
+						return b.admin4pcode === camp_block_lookup[ d[ 9 ] ];
 					});
 
 					// camp_block
@@ -453,65 +452,65 @@ var GfaTaskController = {
 					}
 
 					// add to planned
-					planned = Object.assign( {}, organization, distribution, distribution_site, camp_block );
+					planned = Object.assign( { sl_number: d[ 0 ], distribution_date: moment( d[ 1 ] ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
 
 					// variables
-					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 9 ] : d[ 9 ];
-					planned.admin5name = d[ 9 ];
+					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ] : d[ 10 ];
+					planned.admin5name = d[ 10 ];
 
 					// majee
-					planned.majee_name = d[ 10 ];
-					planned.majee_phone = d[ 11 ];
-					planned.fh_name = d[ 13 ];
-					planned.hh_name = d[ 12 ];
-					planned.hh_age = d[ 22 ];
-					planned.hh_gender = d[ 21 ] === 'M' || d[ 21 ] === 'Male' ? 'Male' : 'Female';
+					planned.majee_name = d[ 11 ];
+					planned.majee_phone = d[ 12 ];
+					planned.fh_name = d[ 14 ];
+					planned.hh_name = d[ 13 ];
+					planned.hh_age = d[ 23 ];
+					planned.hh_gender = d[ 22 ] === 'M' || d[ 22 ] === 'Male' ? 'Male' : 'Female';
 					
 					// ids
-					planned.scope_id = d[ 14 ].toString();
-					planned.gfd_id = d[ 16 ].toString();
-					planned.fcn_id = d[ 17 ].toString();
-					planned.govt_id = d[ 18 ].toString();
-					planned.unhcr_case_id = d[ 19 ].toString();
-					planned.progres_id = d[ 20 ].toString();
-					planned.gfd_modality = d[ 15 ];
+					planned.scope_id = d[ 15 ].toString();
+					planned.gfd_id = d[ 17 ].toString();
+					planned.fcn_id = d[ 18 ].toString();
+					planned.govt_id = d[ 19 ].toString();
+					planned.unhcr_case_id = d[ 20 ].toString();
+					planned.progres_id = d[ 21 ].toString();
+					planned.gfd_modality = d[ 16 ];
 
 					// demographics
-					planned.gfd_family_size = d[ 33 ] ? parseInt( d[ 33 ] ) : 0;
-					planned.boys_0_5 = d[ 26 ] ? parseInt( d[ 26 ] ) : 0;
-					planned.girls_0_5 = d[ 25 ] ? parseInt( d[ 25 ] ) : 0;
-					planned.boys_5_17 = d[ 28 ] ? parseInt( d[ 28 ] ) :0;
-					planned.girls_5_17 = d[ 27 ] ? parseInt( d[ 27 ] ) : 0;
+					planned.gfd_family_size = d[ 34 ] ? parseInt( d[ 34 ] ) : 0;
+					planned.boys_0_5 = d[ 27 ] ? parseInt( d[ 27 ] ) : 0;
+					planned.girls_0_5 = d[ 26 ] ? parseInt( d[ 26 ] ) : 0;
+					planned.boys_5_17 = d[ 29 ] ? parseInt( d[ 29 ] ) :0;
+					planned.girls_5_17 = d[ 28 ] ? parseInt( d[ 28 ] ) : 0;
 					planned.boys = parseInt( planned.boys_0_5 ) + parseInt( planned.boys_5_17 );
 					planned.girls = parseInt( planned.girls_0_5 ) + parseInt( planned.girls_5_17 );
-					planned.men = d[ 30 ] ? parseInt( d[ 30 ] ) : 0;
-					planned.women = d[ 29 ] ? parseInt( d[ 29 ] ) : 0;
-					planned.elderly_men = d[ 32 ] ? parseInt( d[ 32 ] ) : 0;
-					planned.elderly_women = d[ 31 ] ? parseInt( d[ 31 ] ) : 0;
+					planned.men = d[ 31 ] ? parseInt( d[ 31 ] ) : 0;
+					planned.women = d[ 30 ] ? parseInt( d[ 30 ] ) : 0;
+					planned.elderly_men = d[ 33 ] ? parseInt( d[ 33 ] ) : 0;
+					planned.elderly_women = d[ 32 ] ? parseInt( d[ 32 ] ) : 0;
 					planned.total_male = parseInt( planned.boys ) + parseInt( planned.men ) + parseInt( planned.elderly_men );
 					planned.total_female = parseInt( planned.girls ) + parseInt( planned.women ) + parseInt( planned.elderly_women );
 					planned.total_beneficiaries = parseInt( planned.total_male ) + parseInt( planned.total_female );
 
 					// special needs
-					planned.pregnant_hh = d[ 34 ] ? true : false;
-					planned.lactating_hh = d[ 35 ] ? true : false;
-					planned.disabled_hh = d[ 44 ] ? true : false;
+					planned.pregnant_hh = d[ 35 ] ? true : false;
+					planned.lactating_hh = d[ 36 ] ? true : false;
+					planned.disabled_hh = d[ 45 ] ? true : false;
 
 					// special needs demographics
-					planned.pregnant_women = d[ 34 ] ? parseInt( d[ 34 ] ) : 0;
-					planned.lactating_women = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
+					planned.pregnant_women = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
+					planned.lactating_women = d[ 36 ] ? parseInt( d[ 36 ] ) : 0;
 
 					// disabled
-					planned.boys_0_5_disabled = d[ 37 ] ? parseInt( d[ 37 ] ) : 0;
-					planned.girls_0_5_disabled = d[ 36 ] ? parseInt( d[ 36 ] ) : 0;
-					planned.boys_5_17_disabled = d[ 39 ] ? parseInt( d[ 39 ] ) : 0;
-					planned.girls_5_17_disabled = d[ 38 ] ? parseInt( d[ 38 ] ) : 0;
+					planned.boys_0_5_disabled = d[ 38 ] ? parseInt( d[ 38 ] ) : 0;
+					planned.girls_0_5_disabled = d[ 37 ] ? parseInt( d[ 37 ] ) : 0;
+					planned.boys_5_17_disabled = d[ 40 ] ? parseInt( d[ 40 ] ) : 0;
+					planned.girls_5_17_disabled = d[ 39 ] ? parseInt( d[ 39 ] ) : 0;
 					planned.boys_disabled = parseInt( planned.boys_0_5_disabled ) + parseInt( planned.boys_5_17_disabled );
 					planned.girls_disabled = parseInt( planned.girls_0_5_disabled ) + parseInt( planned.girls_5_17_disabled );
-					planned.men_disabled = d[ 41 ] ? parseInt( d[ 41 ] ) : 0;
-					planned.women_disabled = d[ 40 ] ? parseInt( d[ 40 ] ) : 0;
-					planned.elderly_men_disabled = d[ 43 ] ? parseInt( d[ 43 ] ) : 0;
-					planned.elderly_women_disabled = d[ 42 ] ? parseInt( d[ 42 ] ) : 0;
+					planned.men_disabled = d[ 42 ] ? parseInt( d[ 42 ] ) : 0;
+					planned.women_disabled = d[ 41 ] ? parseInt( d[ 41 ] ) : 0;
+					planned.elderly_men_disabled = d[ 44 ] ? parseInt( d[ 44 ] ) : 0;
+					planned.elderly_women_disabled = d[ 43 ] ? parseInt( d[ 43 ] ) : 0;
 					planned.total_male_disabled = parseInt( planned.boys_disabled ) + parseInt( planned.men_disabled ) + parseInt( planned.elderly_men_disabled );
 					planned.total_women_disabled = parseInt( planned.girls_disabled ) + parseInt( planned.women_disabled ) + parseInt( planned.elderly_women_disabled );
 					planned.total_beneficiaries_disabled = parseInt( planned.total_male_disabled ) + parseInt( planned.total_women_disabled );
@@ -522,42 +521,39 @@ var GfaTaskController = {
 					// round 1
 					if ( report_round === '1' ) {
 						if ( planned.gfd_family_size <= 10  ) {
-							planned.planned_rice = 30 / 1000;
-							planned.planned_lentils = 9 / 1000;
-							planned.planned_oil = ( 3 * 0.92 ) / 1000;
-							planned.planned_entitlements = planned.planned_rice + planned.planned_lentils + planned.planned_oil;
+							planned.rice = 30 / 1000;
+							planned.lentils = 9 / 1000;
+							planned.oil = ( 3 * 0.92 ) / 1000;
+							planned.entitlements = planned.rice + planned.lentils + planned.oil;
 						} else {
-							planned.planned_rice = 60 / 1000;
-							planned.planned_lentils = 18 / 1000;
-							planned.planned_oil = ( 6 * 0.92 ) / 1000;
-							planned.planned_entitlements = planned.planned_rice + planned.planned_lentils + planned.planned_oil;
+							planned.rice = 60 / 1000;
+							planned.lentils = 18 / 1000;
+							planned.oil = ( 6 * 0.92 ) / 1000;
+							planned.entitlements = planned.rice + planned.lentils + planned.oil;
 						}
 					}
 
 					// round 2
 					if ( report_round === '2' ) {
 						if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
-							planned.planned_rice = 30 / 1000;
-							planned.planned_lentils = 9 / 1000;
-							planned.planned_oil = ( 3 * 0.92 ) / 1000;
-							planned.planned_entitlements = planned.planned_rice + planned.planned_lentils + planned.planned_oil;
+							planned.rice = 30 / 1000;
+							planned.lentils = 9 / 1000;
+							planned.oil = ( 3 * 0.92 ) / 1000;
+							planned.entitlements = planned.rice + planned.lentils + planned.oil;
 						}
 						if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
-							planned.planned_rice = 60 / 1000;
-							planned.planned_lentils = 18 / 1000;
-							planned.planned_oil = ( 6 * 0.92 ) / 1000;
-							planned.planned_entitlements = planned.planned_rice + planned.planned_lentils + planned.planned_oil;
+							planned.rice = 60 / 1000;
+							planned.lentils = 18 / 1000;
+							planned.oil = ( 6 * 0.92 ) / 1000;
+							planned.entitlements = planned.rice + planned.lentils + planned.oil;
 						}
 						if ( planned.gfd_family_size >= 11 ) {
-							planned.planned_rice = 60 / 1000;
-							planned.planned_lentils = 18 / 1000;
-							planned.planned_oil = ( 6 * 0.92 ) / 1000;
-							planned.planned_entitlements = planned.planned_rice + planned.planned_lentils + planned.planned_oil;
+							planned.rice = 60 / 1000;
+							planned.lentils = 18 / 1000;
+							planned.oil = ( 6 * 0.92 ) / 1000;
+							planned.entitlements = planned.rice + planned.lentils + planned.oil;
 						}
 					}
-
-					// remarks
-					planned.remarks = d[ 45 ];
 					
 					// add report with p to reports
 					planned_beneficiaries.push( planned );
@@ -572,41 +568,31 @@ var GfaTaskController = {
 				// if error
 				if ( err ) return cb( err, false );
 
-					// add to scheduled planned updates
-					PlannedUpdates
-						.create( { admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution, update: true } )
-						.exec( function( err, scheduled_update ) {
+				// remove existing
+				PlannedBeneficiaries
+					.destroy({ admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution  })
+					.exec( function( err, destroy ) {
 
-							// return error
-							if (err) return res.negotiate( err );
+						// return error
+						if (err) return res.negotiate( err );
 
-							// remove existing
-							PlannedBeneficiaries
-								.destroy({ admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution  })
-								.exec( function( err, destroy ) {
+						// replace with updated plan
+						PlannedBeneficiaries
+							.create( planned_beneficiaries )
+							.exec( function( err, update ){
 
-									// return error
-									if (err) return res.negotiate( err );
+								// return error
+								if (err) return res.negotiate( err );
 
-									// replace with updated plan
-									PlannedBeneficiaries
-										.create( planned_beneficiaries )
-										.exec( function( err, update ){
+								// remove file upload 
+								if ( fs.existsSync( file ) ) { fs.unlinkSync( file ); }
 
-											// return error
-											if (err) return res.negotiate( err );
+								// return the reports for the project period
+								return res.json( 200, { msg: 'Updating Kobo Daily Reporting Forms...' });
 
-											// remove file upload 
-											if ( fs.existsSync( file ) ) { fs.unlinkSync( file ); }
+							});
 
-											// return the reports for the project period
-											return res.json( 200, { msg: 'Updating Kobo Daily Reporting Forms...' });
-
-										});
-
-								});
-
-						});
+					});
 
 			});
 
@@ -649,17 +635,20 @@ var GfaTaskController = {
 						if (err) return res.negotiate( err );
 						
 						// fcn_list
-						var choices_list = [];
-						
-						// choices beneficiary_type
-						choices_list.push( [ 'list_name', 'name', 'label'] );
-						choices_list.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary'] );
-						choices_list.push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)'] );
-						choices_list.push( [ 'beneficiary_type', 'unplanned_new_beneficiary', 'Unplanned / New Beneficiary'] );
+						var choices_list = {};
 
 						// generate fcn ids
 						for ( i = 0; i < planned_beneficiaries.length; i++ ) {
-							choices_list.push( [ 'fcn_id', planned_beneficiaries[ i ].fcn_id, planned_beneficiaries[ i ].fcn_id ] );
+							if ( !choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ] ) {
+								// set empty
+								choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ] = [];
+								// choices beneficiary_type
+								choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'list_name', 'name', 'label'] );
+								// choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary'] );
+								// choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)'] );
+							}
+							// each beneficiary
+							choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'fcn_id', planned_beneficiaries[ i ].fcn_id + '_' + planned_beneficiaries[ i ].scope_id, planned_beneficiaries[ i ].fcn_id + ' / ' + planned_beneficiaries[ i ].scope_id ] );
 						}
 						
 						// deployments
@@ -670,7 +659,7 @@ var GfaTaskController = {
 						doXlsUpdate( xls_complete, xls_pending, forms[ xls_complete ] );
 
 						// do deployment
-						function doXlsUpdate( xls_complete, xls_pending, form  ) {
+						function doXlsUpdate( xls_complete, xls_pending, form ) {
 							
 							// workbook template
 							var workbook = XLSX.readFile( XLSX_TEMPLATE );
@@ -690,7 +679,14 @@ var GfaTaskController = {
 							survey_sheet[ 'B2' ].v = forms[ xls_complete ].form_template;
 
 							// choices per form
-							XLSX_UTILS.book_append_sheet( workbook, XLSX_UTILS.aoa_to_sheet( choices_list ), 'choices' );
+							var choices = choices_list[ forms[ xls_complete ][ 'site_id' ] ];
+							if ( !choices.length ) {
+								choices = [];
+								choices.push( [ 'list_name', 'name', 'label' ] );
+								// choices.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary' ] );
+								// choices.push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)' ] );
+							}
+							XLSX_UTILS.book_append_sheet( workbook, XLSX_UTILS.aoa_to_sheet( choices ), 'choices' );
 
 							// writefile
 							XLSX.writeFile( workbook, XLSX_PATH + '/forms/' + forms[ xls_complete ].organization_tag + '/' + forms[ xls_complete ].form_template + '_current.xlsx' );
@@ -758,7 +754,7 @@ var GfaTaskController = {
 						// if error
 						if ( error ) {
 							// return error
-							res.json( 400, { error: 'Form import error! Please try again...' } );
+							res.json( 400, { error: 'Form import error! Please try again...', details: error } );
 						} else {
 
 							// import updated form
@@ -770,7 +766,7 @@ var GfaTaskController = {
 								// err
 								if ( error ) {
 									// return error
-									res.json( 400, { error: 'Form version error! Please try again...' } );
+									res.json( 400, { error: 'Form version error! Please try again...', details: error  } );
 								} else {
 
 									// success
@@ -788,16 +784,10 @@ var GfaTaskController = {
 										// err
 										if ( error || stderr ) {
 
-											// cmd_3
-											console.log( error );
-											console.log( cmd_3 );
-											
 											// send email
 											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 													name: 'WFP GFA Team',
 													form: form.title,
-													error: error,
-													error: stderr,
 													cmd: cmd_3,
 													sendername: 'ReportHub'
 												}, {
@@ -856,466 +846,87 @@ var GfaTaskController = {
 		// http://support.kobotoolbox.org/en/articles/592398-api-and-rest-services
 	getKoboData: function( req, res ){
 
-		// report
-		var report_round = req.body[ 'distribution_information/report_round' ];
-		var report_distribution = req.body[ 'distribution_information/report_distribution' ];
-		
-		// process record
-		GfaTaskController.processKoboData( false, [ req.body ], res );
+		// kobo data
+		var k_data = req.body;
 
-	},
+		// set actual_fcn_id
+		var actual_fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
+		var actual_scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
 
-	// clear report_distribution and re-process latest kobo data
-	getKoboDataRefreshBatch: function( req, res ){
-
-		// curl refresh
-		var keys = []
-		var update_cmds = '';
-
-		// planned updates
-		PlannedUpdates
-			.find()
-			.where({ update: true })
-			.exec( function( err, planned_updates ) {
-				
-				// return error
-				if (err) return res.negotiate( err );
-
-				// for each
-				for( i=0; i<planned_updates.length; i++ ) {
-					if ( !keys[ planned_updates[ i ].admin0pcode + '_' + planned_updates[ i ].organization_tag + '_' + planned_updates[ i ].report_round + '_' + planned_updates[ i ].report_distribution ] ) {
-						// getKoboDataRefresh
-						keys[ planned_updates[ i ].admin0pcode + '_' + planned_updates[ i ].organization_tag + '_' + planned_updates[ i ].report_round + '_' + planned_updates[ i ].report_distribution ] = 1;
-						update_cmds += "curl -X GET 'https://reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataRefresh?admin0pcode=" + planned_updates[ i ].admin0pcode +"&organization_tag=" + planned_updates[ i ].organization_tag + "&report_round=" + planned_updates[ i ].report_round + "&report_distribution=" + planned_updates[ i ].report_distribution + "' \n";
-					}
-				}
-						
-				// then run getKoboDataUpdates
-				update_cmds += "curl -X GET 'https://reporthub.immap.org/api/wfp/gfa/gfd/getKoboDataUpdates'";
-
-				// write file
-				fs.writeFile( '/home/ubuntu/nginx/www/ngm-reportEngine/tasks/reports/ngm_reporthub_gfd_run_updates.sh', update_cmds, function( err ) {
-
-					// planned updates
-					PlannedUpdates
-						.update({}, { update: false })
-						.exec( function( err, planned_updates ) {
-
-							// return error
-							if (err) return res.negotiate( err );
-
-							// return
-							return res.json( 200, { msg: 'Success!' });
-
-						});
-
-				});
-
-		});
-
-	},	
-
-	// clear report_distribution and re-process latest kobo data
-	getKoboDataRefresh: function( req, res ){
-
-		// check req
-		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
-			return res.json( 401, { err: 'admin0pcode, organization_tag, report_round, report_distribution required!' });
+		// filter
+		var filter = { fcn_id: actual_fcn_id }
+		if ( actual_scope_id ) {
+			filter.scope_id = actual_scope_id;
 		}
 
-		// set params
-		var kobo_data = [];
-		var admin0pcode = req.param('admin0pcode');
-		var organization_tag = req.param('organization_tag');
-		var report_round = req.param('report_round');
-		var report_distribution = req.param('report_distribution');
-
-		// if wfp, select all
-		var organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
-
-		// gfd forms
-		GfdForms
-			.find()
-			.where( organization_tag_filter )
-			.where({ report_round: report_round })
-			.exec( function( err, forms ) {
-				
+		// find from plan
+		PlannedBeneficiaries
+			.findOne()
+			.where( filter )
+			.exec( function( err, planned ) {
 				// return error
-				if (err) return res.negotiate( err );
+				if ( err ) return res.negotiate( err );
+		
+				// update absent table
+				AbsentBeneficiaries
+					.updateOrCreate( filter, planned, function ( err, destroy_result ) {
+						// return error
+						if ( err ) return res.negotiate( err );
 
-				// deployments
-				var fetch_complete = 0;
-				var fetch_pending = forms.length;
-
-				// set process
-				fetchData( fetch_complete, fetch_pending, forms[ fetch_complete ] );
-
-				// do fetch
-				function fetchData( fetch_complete, fetch_pending, form ) {
-
-					// get latest submission from actual based on form.uuid
-					ActualBeneficiaries
-						.destroy({ report_round: report_round, report_distribution: report_distribution })
-						.exec( function( err, latest ) {
-
-							// return error
-							if ( err ) return res.negotiate( err );
-
-							// cmd
-							var cmd = 'curl -X GET \'https://kc.humanitarianresponse.info/api/v1/data/' +  form.form_id + '?query={ "distribution_information/report_distribution":"' + report_distribution + '" }\' -u ' + kobo_user + ':' + kobo_password + ' -g';
-
-							// run curl command
-							EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
-
-								// if error
-								if ( error ) {
-									// return error
-									res.json( 400, { error: 'Request error! Please try again...' } );
-								} else {
-
-									// success
-									kobo = JSON.parse( stdout );
-
-									// push to kobo_data
-									kobo_data.push( kobo );
-
-									// add deplotmnet complete
-									fetch_complete++;
-
-									// fetch all data
-									if ( fetch_complete === fetch_pending ) {
-										// process ( if ) data
-										if ( _.flatten( kobo_data ).length ) {
-											GfaTaskController.processKoboData( false, _.flatten( kobo_data ), res );
-										} else {
-											// return
-											return res.json( 200, { msg: 'Success!' });
-										}
-									} else {
-										// fetch
-										fetchData( fetch_complete, fetch_pending, forms[ fetch_complete ] );
-									}		
-
-								}
-
+						// actual beneficiaries
+						ActualBeneficiaries
+							.destroy( filter )
+							.exec( function( err, destroy_result ) {
+								// return error
+								if ( err ) return res.negotiate( err );
+								
+								// return success
+								return res.json( 200, { msg: 'Success!' });
 							});
 
-						});
-
-				}
-
+					});
 			});
 
 	},
 
-	// run process to fetch kobo data for updates ( validation_status )
-	getKoboDataUpdates: function( req, res ){
+	// set planned to actual
+	setDailyDistribution: function( req, res ){
 
-		// records to update
-		var update_records = [];
+		// get today's date
+		var today = moment.utc().format( 'YYYY-MM-DD' );
 
-		// forms
-		GfdForms
+		// find from plan
+		PlannedBeneficiaries
 			.find()
-			.where()
-			.exec( function( err, forms ) {
-
+			.where({ distribution_date: today })
+			.exec( function( err, planned_beneficiaries ) {
+				
 				// return error
 				if ( err ) return res.negotiate( err );
 
-				// for each form
-				async.each( forms, function ( form, next ) {
+				// if no records
+				if ( !planned_beneficiaries.length  ) {
+					// return success
+					return res.json( 200, { msg: 'Success!' });					
+				}
 
-					// cmd
-					var cmd = 'curl -X GET \'https://kc.humanitarianresponse.info/api/v1/data/' +  form.form_id + '?query={ "_validation_status.uid": "validation_status_on_hold" }\' -u ' + kobo_user + ':' + kobo_password + ' -g';
+				// if records
+				if ( planned_beneficiaries.length ) {
+					
+					// set to actual
+					ActualBeneficiaries
+						.create( planned_beneficiaries )
+						.exec( function( err, result ) {
+							// return error
+							if ( err ) return res.negotiate( err );
+							// return success
+							return res.json( 200, { msg: 'Success!' });
+						});
 
-					// run curl command
-					EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
-
-						// if error
-						if ( error ) {
-							// next ( any errors to update will simply be updated on next batch script )
-							next();
-						} else {
-
-							// push to update_records
-							var records = JSON.parse( stdout );
-							if ( records.length ) {
-								for ( i=0; i < records.length; i++ ) {
-									update_records.push( records[ i ] );
-								}
-							}
-
-							// next
-							next();
-
-						}
-
-					});
-
-				}, function ( err ) {
-			
-					// if error
-					if ( err ) return cb( err, false );
-
-					// process record
-					if ( update_records.length ) {
-						GfaTaskController.processKoboData( true, update_records, res );
-					} else {
-						// return
-						return res.json( 200, { msg: 'Success!' });
-					}
-
-				});
-
+				}
+				
 			});
 
-	},
-
-	// process actual data
-	processKoboData: function( do_update, kobo_data, res ) {
-
-		// params
-		var counter = 0;
-		var length = kobo_data.length;
-		var actual_beneficiaries = [];
-
-		// for each kobo data
-		async.each( kobo_data, function ( k_data, next ) {
-
-			// empty data
-			var data = {}
-
-			// fcn_id
-			var actual_fcn_id;
-			// from the kobo record
-			var report_round = k_data[ 'distribution_information/report_round' ];
-			var report_distribution = k_data[ 'distribution_information/report_distribution' ]
-
-			// set actual_fcn_id
-			if ( k_data[ 'beneficiary_details/fcn_id' ] ) {
-				actual_fcn_id = k_data[ 'beneficiary_details/fcn_id' ];
-			} else if ( k_data[ 'beneficiary_details/missing_fcn_id' ] ) {
-				actual_fcn_id = k_data[ 'beneficiary_details/missing_fcn_id' ];
-			} else {
-				actual_fcn_id = k_data[ 'beneficiary_details/new_fcn_id' ];
-			}
-
-			// get plan (for each beneficiary)
-			PlannedBeneficiaries
-				.findOne()
-				.where({ report_round: report_round })
-				.where({ report_distribution: report_distribution })
-				.where({ fcn_id: actual_fcn_id })
-				.exec( function( err, planned_beneficiaries ) {
-
-					// return error
-					if ( err ) return res.negotiate( err );
-
-					// get forms
-					GfdForms
-						.findOne()
-						.where({ uuid: k_data[ 'formhub/uuid' ] })
-						.exec( function( err, form ) {
-
-							// return error
-							if ( err ) return res.negotiate( err );
-
-							// set data from planned
-							if ( planned_beneficiaries ) {
-								data = planned_beneficiaries;
-								delete data.id;
-								delete data.report_status;
-								delete data.createdAt;
-								delete data.updatedAt;
-							}
-
-							// else if not in plan, complete basic information
-							if ( !planned_beneficiaries ) {
-								data.admin0pcode = form.admin0pcode;
-								data.admin0name = form.admin0name;
-								data.organization_name = form.organization_name;
-								data.organization_tag = form.organization_tag;
-								data.organization = form.organization;
-								data.organization_id = form.organization_id;
-								data.report_round = k_data[ 'distribution_information/report_round' ];
-								data.report_distribution = k_data[ 'distribution_information/report_distribution' ];
-								data.report_year = moment( k_data[ 'distribution_information/distribution_date' ] ).year();
-								data.report_month_number = moment( k_data[ 'distribution_information/distribution_date' ] ).month();
-								data.report_month_name = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'MMMM' );
-								data.reporting_period = moment( k_data[ 'distribution_information/distribution_date' ] ).startOf( 'month' ).format('YYYY-MM-DDTHH:mm:ssZ');
-								if ( data.report_round === '1' ) {
-									data.reporting_due_date = moment( [ data.report_year, data.report_month_number, 26  ] ).format('YYYY-MM-DDTHH:mm:ssZ');
-								} else {
-									data.reporting_due_date = moment( k_data[ 'distribution_information/distribution_date' ] ).add( 1, 'months' ).day(8).format('YYYY-MM-DDTHH:mm:ssZ');
-								}
-
-								// id's
-								data.fcn_id = actual_fcn_id;
-								// if new add columns
-								if ( k_data[ 'beneficiary_details/new_unhcr_case_id' ] ) {
-									data.unhcr_case_id = k_data[ 'beneficiary_details/new_unhcr_case_id' ];
-								}
-								if ( k_data[ 'beneficiary_details/new_scope_id' ] ) {
-									data.scope_id = k_data[ 'beneficiary_details/new_scope_id' ];
-								}
-								if ( k_data[ 'beneficiary_details/new_gfd_id' ] ) {
-									data.gfd_id = k_data[ 'beneficiary_details/new_gfd_id' ];
-								}
-								if ( k_data[ 'beneficiary_details/new_moha_id' ] ) {
-									data.moha_id = k_data[ 'beneficiary_details/new_moha_id' ];
-								}
-							}
-
-							// planned vs actual
-							data.planned_fcn_id = data.fcn_id === actual_fcn_id ? true : false;
-							data.planned_organization = data.organization_tag === form.organization_tag ? true : false;
-							data.planned_report_round = data.report_round === k_data[ 'distribution_information/report_round' ] ? true : false;
-							data.planned_report_distribution = data.report_distribution === k_data[ 'distribution_information/report_distribution' ] ? true : false;
-							data.planned_site_id = data.site_id === form.site_id ? true : false;
-							data.planned_gfd_family_size = data.gfd_family_size === parseInt( k_data[ 'beneficiary_family_size/family_size' ] ) ? true : false;
-
-							// set actual from inputs / uuid
-							data.actual_fcn_id = actual_fcn_id;
-							data.actual_organization_name = form.organization_name;
-							data.actual_organization_tag = form.organization_tag;
-							data.actual_organization = form.organization;
-							data.actual_report_round = k_data[ 'distribution_information/report_round' ];
-							data.actual_report_distribution = k_data[ 'distribution_information/report_distribution' ];
-							data.actual_distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format('YYYY-MM-DD');
-							data.actual_site_id = form.site_id;
-							data.actual_site_name = form.site_name;
-							data.actual_site_lat = form.site_lat;
-							data.actual_site_lng = form.site_lng;
-							data.beneficiary_type_id = k_data[ 'beneficiary_details/beneficiary_type_id' ];
-							data.beneficiary_type_name = data.beneficiary_type_id === 'planned_beneficiary' ? 'Planned Beneficiary' : 'Unplanned / New Beneficiary';
-							data.actual_gfd_family_size = parseInt( k_data[ 'beneficiary_family_size/family_size' ] );
-
-							// monthly entitlements
-
-							// round 1
-							if ( report_round === '1' ) {
-								if ( data.actual_gfd_family_size <= 10  ) {
-									data.actual_rice = 30 / 1000;
-									data.actual_lentils = 9 / 1000;
-									data.actual_oil = ( 3 * 0.92 ) / 1000;
-									data.actual_entitlements = data.actual_rice + data.actual_lentils + data.actual_oil;
-								} else {
-									data.actual_rice = 60 / 1000;
-									data.actual_lentils = 18 / 1000;
-									data.actual_oil = ( 6 * 0.92 ) / 1000;
-									data.actual_entitlements = data.actual_rice + data.actual_lentils + data.actual_oil;
-								}
-							}
-
-							// round 2
-							if ( report_round === '2' ) {
-								// in the event family size 1-3 are not in round 1
-								if ( data.actual_gfd_family_size >= 1 && data.actual_gfd_family_size <= 3 ) {
-									data.actual_rice = 30 / 1000;
-									data.actual_lentils = 9 / 1000;
-									data.actual_oil = ( 3 * 0.92 ) / 1000;
-									data.actual_entitlements = data.actual_rice + data.actual_lentils + data.actual_oil;
-								}
-								if ( data.actual_gfd_family_size >= 4 && data.actual_gfd_family_size <= 7 ) {
-									data.actual_rice = 30 / 1000;
-									data.actual_lentils = 9 / 1000;
-									data.actual_oil = ( 3 * 0.92 ) / 1000;
-									data.actual_entitlements = data.actual_rice + data.actual_lentils + data.actual_oil;
-								}
-								if ( data.actual_gfd_family_size >= 8 && data.actual_gfd_family_size <= 10 ) {
-									data.actual_rice = 60 / 1000;
-									data.actual_lentils = 18 / 1000;
-									data.actual_oil = ( 6 * 0.92 ) / 1000;
-									data.actual_entitlements = data.actual_rice + data.actual_lentils + data.actual_oil;
-								}
-								if ( data.actual_gfd_family_size >= 11 ) {
-									data.actual_rice = 60 / 1000;
-									data.actual_lentils = 18 / 1000;
-									data.actual_oil = ( 6 * 0.92 ) / 1000;
-									data.actual_entitlements = data.actual_rice + data.actual_lentils + data.actual_oil;
-								}
-							}
-							
-							// remarks
-							data.actual_remarks = k_data[ 'remarks/remarks' ];
-
-							// kobo params
-							data.uuid = k_data[ 'formhub/uuid' ];
-							data.form_id = form.form_id;
-							data._kobo_id = k_data[ '_id' ];
-							data._status = k_data._status;
-							data._submission_time = k_data._submission_time;
-
-							// push record
-							actual_beneficiaries.push( data );
-
-							// next
-							next();
-
-						});
-				
-				});
-
-		}, function ( err ) {
-			
-			// if error
-			if ( err ) return cb( err, false );
-
-			// create, not update_status
-			if ( !do_update ) {
-
-				// create records
-				ActualBeneficiaries
-					.create( actual_beneficiaries )
-					.exec( function( err, form ) {
-						// return error
-						if ( err ) return res.negotiate( err );
-						// return success
-						return res.json( 200, { msg: 'Success!' });
-					});
-
-			}
-
-			// update validation_status
-			if ( do_update ) {
-
-				// ASYNC REQUEST
-				// async loop target_beneficiaries
-				async.each( actual_beneficiaries, function ( d, next ) {
-
-					// update / create
-					ActualBeneficiaries
-						.updateOrCreate( { _kobo_id: d._kobo_id }, d, function( err, result ){
-							
-							// return error
-							if ( err ) return res.negotiate( err );
-
-							// remove validation status
-							var cmd = 'curl -X DELETE -H "Content-Type: application/json" https://kc.humanitarianresponse.info/api/v1/data/' +  d.form_id + '/' +  d._kobo_id + '/validation_status -u ' + kobo_user + ':' + kobo_password + ' -g';
-
-							// run curl command
-							EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
-								// next ( any errors to update will simply be updated on next batch script )
-								next();
-							});
-
-						});
-
-				}, function ( err ) {
-					
-					// return error
-					if ( err ) return res.negotiate( err );
-
-					// return success
-					return res.json( 200, { msg: 'Success!' });
-
-				});
-				
-			}
-
-		});
-	
 	}
 
 }

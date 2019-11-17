@@ -311,15 +311,9 @@ module.exports.routes = {
   // getKoboData
   'GET /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
   'POST /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
-  // getKoboDataRefreshBatch
-  'GET /wfp/gfa/gfd/getKoboDataRefreshBatch': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefreshBatch',
-  'POST /wfp/gfa/gfd/getKoboDataRefreshBatch': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefreshBatch',
-  // getKoboDataRefresh
-  'GET /wfp/gfa/gfd/getKoboDataRefresh': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefresh',
-  'POST /wfp/gfa/gfd/getKoboDataRefresh': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataRefresh',
-  // getKoboDataUpdates
-  'GET /wfp/gfa/gfd/getKoboDataUpdates': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataUpdates',
-  'POST /wfp/gfa/gfd/getKoboDataUpdates': 'Country/Cxb/Gfa/GfaTaskController.getKoboDataUpdates',
+  // set plan to actual
+  'GET /wfp/gfa/gfd/setDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setDailyDistribution',
+  'POST /wfp/gfa/gfd/setDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setDailyDistribution',
 
   // get PlannedBeneficiaries
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
