@@ -756,6 +756,7 @@ var GfaDashboardController = {
 						'admin3name',
 						'admin4name',
 						'admin5name',
+						'distribution_date',
 						'family_1_to_3',
 						'family_4_to_7',
 						'family_8_to_10',
