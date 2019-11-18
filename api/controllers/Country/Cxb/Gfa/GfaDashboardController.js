@@ -771,7 +771,7 @@ var GfaDashboardController = {
 												
 					// food distribution plan
 					var filter = [];
-					planned_beneficiaries.reduce( function( res, value ) {
+					beneficiaries.reduce( function( res, value ) {
 						// group by organization_tag + admin5pcode + distribution_date
 						var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date;
 						if ( !res[ id ] ) {
