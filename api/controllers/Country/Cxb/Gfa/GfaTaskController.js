@@ -904,15 +904,8 @@ var GfaTaskController = {
 				// return error
 				if ( err ) return res.negotiate( err );
 
-				// if no records
-				if ( !planned_beneficiaries.length  ) {
-					// return success
-					return res.json( 200, { msg: 'Success!' });					
-				}
-
 				// if records
 				if ( planned_beneficiaries.length ) {
-					
 					// set to actual
 					ActualBeneficiaries
 						.create( planned_beneficiaries )
@@ -923,6 +916,12 @@ var GfaTaskController = {
 							return res.json( 200, { msg: 'Success!' });
 						});
 
+				}
+
+				// if no records
+				if ( !planned_beneficiaries.length  ) {
+					// return success
+					return res.json( 200, { msg: 'Success!' });					
 				}
 				
 			});
