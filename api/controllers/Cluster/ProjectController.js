@@ -12,6 +12,7 @@ var json2csv = require('json2csv');
 var moment = require('moment');
 var async = require('async');
 var _under = require('underscore');
+var $nin_organizations = [ 'immap', 'arcs' ];
 
 var REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG = sails.config.REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG;
 
@@ -196,53 +197,67 @@ var ProjectController = {
  
   // get projects summary
   getProjects: function(req, res){
- 
-   // req.param('query').project_start_date = '$gte : 2019-01-01';
-    // Guards
-    if (!req.param('id')&&!req.param('query')) {
-      return res.json(401, { err: 'params required!' });
-    }
+
+      // Guards
+      var reqQuery = req.param('query');
+
+      if (!req.param('id') && !reqQuery) {
+        return res.json(401, { err: 'params required!' });
+      }
 
     var allowedParams =
-        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode', 'project_start_date', 'project_end_date','donor_id'];
+          ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode', 'project_start_date', 'project_end_date','donor_id'];
 
-    // if dissallowed parameters sent
-    if ( req.param('query') && _.difference(Object.keys(req.param('query')),allowedParams).length > 0 ) {
-      return res.json(401, { err: 'ivalid query params!' });
-    }
-
-    // build query object
-    // legacy `id` api backward compatibility
-    if (req.param('id')){
-      var query = { project_id : req.param('id') };
-      var queryProject = { id : req.param('id') };
-    } else {
-   
-
-
-      var query, queryProject = req.param('query');
-      if (req.param('query').project_id){
-        queryProject.id = queryProject.project_id;
-        delete queryProject.project_id;
+      // if dissallowed parameters sent
+      if (reqQuery && _.difference(Object.keys(reqQuery), allowedParams).length > 0) {
+        return res.json(401, { err: 'ivalid query params!' });
       }
 
-      if( req.param('query').donor_id){
-         queryProject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('query').donor_id}};
-         delete queryProject.donor_id;
-             
-      }
+      // build query object
+      // legacy `id` api backward compatibility
+      if (req.param('id')) {
+        var query = { project_id: req.param('id') };
+        var queryProject = { id: req.param('id') };
+      } else {
+        var query = Object.assign({}, reqQuery);
 
-     //project_start_date and project_end_date filters
+        if (query.adminRpcode === "hq") delete query.adminRpcode;
+        if (query.adminRpcode) query.adminRpcode = query.adminRpcode.toUpperCase();
+        if (query.admin0pcode) query.admin0pcode = query.admin0pcode.toUpperCase();
 
-      if( req.param('query').project_start_date && req.param('query').project_end_date){
-         queryProject.project_start_date = { $gte: new Date( req.param('query').project_start_date )};
-         queryProject.project_end_date = { $lte: new Date( req.param('query').project_end_date )};
-             
-      }
+        if (reqQuery.donor_id) {
+          query.project_donor = { $elemMatch: { 'project_donor_id': reqQuery.donor_id } };
+          delete query.donor_id;
+        }
+
+        // exclude immap
+        if (!reqQuery.organization_tag && !reqQuery.project_id) {
+          query.organization_tag = { '$nin': $nin_organizations };
+        }
+
+        // project_start_date and project_end_date filters
+        if (reqQuery.project_start_date && reqQuery.project_end_date) {
+          var ped = new Date(reqQuery.project_end_date);
+          var psd = new Date(reqQuery.project_start_date);
+          query.project_start_date = { $lte: ped };
+          query.project_end_date = { $gte: psd };
+        }
+
+        if (reqQuery.cluster_id) {
+          // include multicluster projects
+          query.$or = [{ cluster_id: reqQuery.cluster_id }, { "activity_type.cluster_id": reqQuery.cluster_id }]
+          delete query.cluster_id
+        }
+
+        // if by project id
+        queryProject = Object.assign({}, query);
+        if (reqQuery.project_id) {
+          queryProject.id = queryProject.project_id;
+          delete queryProject.project_id;
+        }
     }
 
     var csv = req.param('csv');
-
 
     // process request pipeline
     var pipe = Promise.resolve()
