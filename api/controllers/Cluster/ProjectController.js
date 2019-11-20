@@ -12,6 +12,7 @@ var json2csv = require('json2csv');
 var moment = require('moment');
 var async = require('async');
 var _under = require('underscore');
+var $nin_organizations = [ 'immap', 'arcs' ];
 
 var REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG = sails.config.REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG;
 
@@ -196,53 +197,67 @@ var ProjectController = {
  
   // get projects summary
   getProjects: function(req, res){
- 
-   // req.param('query').project_start_date = '$gte : 2019-01-01';
-    // Guards
-    if (!req.param('id')&&!req.param('query')) {
-      return res.json(401, { err: 'params required!' });
-    }
+
+      // Guards
+      var reqQuery = req.param('query');
+
+      if (!req.param('id') && !reqQuery) {
+        return res.json(401, { err: 'params required!' });
+      }
 
     var allowedParams =
-        ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode', 'project_start_date', 'project_end_date','donor_id'];
+          ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode', 'project_start_date', 'project_end_date','donor_id'];
 
-    // if dissallowed parameters sent
-    if ( req.param('query') && _.difference(Object.keys(req.param('query')),allowedParams).length > 0 ) {
-      return res.json(401, { err: 'ivalid query params!' });
-    }
-
-    // build query object
-    // legacy `id` api backward compatibility
-    if (req.param('id')){
-      var query = { project_id : req.param('id') };
-      var queryProject = { id : req.param('id') };
-    } else {
-   
-
-
-      var query, queryProject = req.param('query');
-      if (req.param('query').project_id){
-        queryProject.id = queryProject.project_id;
-        delete queryProject.project_id;
+      // if dissallowed parameters sent
+      if (reqQuery && _.difference(Object.keys(reqQuery), allowedParams).length > 0) {
+        return res.json(401, { err: 'ivalid query params!' });
       }
 
-      if( req.param('query').donor_id){
-         queryProject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('query').donor_id}};
-         delete queryProject.donor_id;
-             
-      }
+      // build query object
+      // legacy `id` api backward compatibility
+      if (req.param('id')) {
+        var query = { project_id: req.param('id') };
+        var queryProject = { id: req.param('id') };
+      } else {
+        var query = Object.assign({}, reqQuery);
 
-     //project_start_date and project_end_date filters
+        if (query.adminRpcode === "hq") delete query.adminRpcode;
+        if (query.adminRpcode) query.adminRpcode = query.adminRpcode.toUpperCase();
+        if (query.admin0pcode) query.admin0pcode = query.admin0pcode.toUpperCase();
 
-      if( req.param('query').project_start_date && req.param('query').project_end_date){
-         queryProject.project_start_date = { $gte: new Date( req.param('query').project_start_date )};
-         queryProject.project_end_date = { $lte: new Date( req.param('query').project_end_date )};
-             
-      }
+        if (reqQuery.donor_id) {
+          query.project_donor = { $elemMatch: { 'project_donor_id': reqQuery.donor_id } };
+          delete query.donor_id;
+        }
+
+        // exclude immap
+        if (!reqQuery.organization_tag && !reqQuery.project_id) {
+          query.organization_tag = { '$nin': $nin_organizations };
+        }
+
+        // project_start_date and project_end_date filters
+        if (reqQuery.project_start_date && reqQuery.project_end_date) {
+          var ped = new Date(reqQuery.project_end_date);
+          var psd = new Date(reqQuery.project_start_date);
+          query.project_start_date = { $lte: ped };
+          query.project_end_date = { $gte: psd };
+        }
+
+        if (reqQuery.cluster_id) {
+          // include multicluster projects
+          query.$or = [{ cluster_id: reqQuery.cluster_id }, { "activity_type.cluster_id": reqQuery.cluster_id }]
+          delete query.cluster_id
+        }
+
+        // if by project id
+        queryProject = Object.assign({}, query);
+        if (reqQuery.project_id) {
+          queryProject.id = queryProject.project_id;
+          delete queryProject.project_id;
+        }
     }
 
     var csv = req.param('csv');
-
 
     // process request pipeline
     var pipe = Promise.resolve()
@@ -264,20 +279,55 @@ var ProjectController = {
     },
 
     _getProjectData : function(queryProject, query){
+                  var queryByAdmin = {};
+                  if (query.admin0pcode) { queryByAdmin.admin0pcode = query.admin0pcode; }
+                  if (query.adminRpcode) { queryByAdmin.adminRpcode = query.adminRpcode; }
+
+                  // total beneficiaries by project
+                  var queryBeneficiaries =  new Promise((resolve, reject) => {
+                    Beneficiaries.native((err, collection) => {
+                      if (err) reject(err)
+                      else collection.aggregate([
+                        {
+                          $match: query
+                        },
+                        { $group:
+                            { _id: "$project_id",
+                                total:
+                                  { $sum:
+                                      {
+                                          "$add":  [ { "$ifNull": ["$total_beneficiaries", 0] } ]
+                                      }
+                                  },
+                                totalcluster:
+                                  { $sum:
+                                      {
+                                        $cond: {
+                                          if: reqQuery.cluster_id,
+                                          then: { $cond: { if: { $eq: ["$cluster_id", reqQuery.cluster_id] }, then: { "$ifNull": ["$total_beneficiaries", 0] }, else: 0 } },
+                                          else: { "$ifNull": ["$total_beneficiaries", 0] }
+                                        }
+                                      }
+                                  }
+                            }
+                        }
+                      ]).toArray((err, results) => {
+                        if (err) reject(err);
+                        else resolve(results);
+                      });
+                    })
+                  });
 
 
                   return Promise.props({
                     project: Project.find( queryProject ),
                     budget: BudgetProgress.find( query ),
-                    beneficiaries: TargetBeneficiaries.find( query ),
+                    targetbeneficiaries: TargetBeneficiaries.find( query ),
                     targetlocations: TargetLocation.find( query ),
+                    beneficiaries: queryBeneficiaries,
                     //project documents
-                    documents: Documents.find(query),
-                    organizations: Organizations.find(query),
-                    organizationsOfOrganizationCollection: Organization.find(query),
-                    //Report.find( findProject, updatedRelationsUser ),
-                    //Location.update( findProject, updatedRelationsUser ),
-                    //Beneficiaries.find( findProject, updatedRelationsUser ),
+                    documents: Documents.find(queryByAdmin),
+                    organizations: Organization.find(queryByAdmin),
                   })
 
     },
@@ -292,8 +342,7 @@ var ProjectController = {
 
       var _comparatorBuilder = this._comparatorBuilder
 
-      // populate&sort fields
-                        // TODO maybe realate models via populate
+      // populate & sort fields
       var uppendDataToProject = function(project){
 
                     var projectId = project.id;
@@ -301,21 +350,33 @@ var ProjectController = {
                     // assemble project data
                     $project[i] = project;
                     $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
-                    $project[i].target_beneficiaries = _.filter(data.beneficiaries, { 'project_id' : projectId}) ;
+                    $project[i].target_beneficiaries = _.filter(data.targetbeneficiaries, { 'project_id' : projectId}) ;
                     $project[i].target_locations = _.filter(data.targetlocations,       { 'project_id' : projectId}) ;
                     $project[i].documents = _.filter(data.documents,       { 'project_id' : projectId}) ;
-                   
-                    $project[i].organization_info = _.filter(data.organizationsOfOrganizationCollection, { 'id': project.organization_id });
+                    $project[i].total_beneficiaries_arr = _.filter(data.beneficiaries, { '_id': projectId });
+                    $project[i].total_beneficiaries = $project[i].total_beneficiaries_arr.length ? $project[i].total_beneficiaries_arr[0].total : 0;
+                    $project[i].total_cluster_beneficiaries = $project[i].total_beneficiaries_arr.length ? $project[i].total_beneficiaries_arr[0].totalcluster : 0;
+
+                    $project[i].organization_info = _.filter(data.organizations, { 'id': project.organization_id });
 
                     if($project[i].organization_info.length ){
 
                       $project[i].organization_name = $project[i].organization_info[0].organization_name;
 
-                    }else{
+                    } else {
                       $project[i].organization_name = '';
                     };
 
-
+                    // total of target beneficiaries
+                    $project[i].total_target_beneficiaries = 0;
+                    $project[i].total_cluster_target_beneficiaries = 0;
+                    $project[i].target_beneficiaries.forEach(function (tb) {
+                      var sum = tb.boys + tb.girls + tb.men + tb.women + tb.elderly_men + tb.elderly_women;
+                      $project[i].total_target_beneficiaries += sum;
+                      if(reqQuery.cluster_id && tb.cluster_id === reqQuery.cluster_id) {
+                        $project[i].total_cluster_target_beneficiaries += sum;
+                      }
+                    })
 
                     /// order
                     $project[i].target_beneficiaries
@@ -342,6 +403,10 @@ var ProjectController = {
                     $project[i].project_start_date = moment($project[i].project_start_date).format('YYYY-MM-DD');
                     $project[i].project_end_date   = moment($project[i].project_end_date).format('YYYY-MM-DD');
                     $project[i].createdAt          = moment( $project[i].createdAt ).format('YYYY-MM-DD');
+                    $project[i].updatedAt          = moment( $project[i].updatedAt ).format('YYYY-MM-DD');
+
+                    baseUrl = req.param('url') ? req.param('url') : req.protocol + '://' + req.host + "/desk/#/cluster/projects/details/";
+                    $project[i].url = baseUrl + projectId;
                     // callback if error or post work can be called here `cb()`;
                 };
 
@@ -365,24 +430,27 @@ var ProjectController = {
 
 
         //columns to COL or columns to others countries
-        if(queryProject.admin0pcode === 'col'){
-       
-       
-      // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','componente_humanitario','plan_hrp_plan','componente_construccion_de_paz','componente_desarrollo_sostenible','plan_interagencial','componente_flujos_migratorios','plan_rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+        if (queryProject.admin0pcode === 'col') {
 
-       // fieldNames = [ 'Cluster', 'Organización',  'País', 'Project ID', 'Estado del Proyecto', 'Punto Focal', 'Email', 'Teléfono', 'Código del Proyecto','Título del Proyecto',  'Descripción del Proyecto', 'Fecha Inicio del Proyecto', 'Fecha Finalización del Proyecto', 'Presupuesto del Proyecto', 'Moneda de Presupuesto del Proyecto','Soporte Documentos del Proyecto','Marcador de Género - GAM', 'Donantes del Proyecto'  ,  'Socios Implementadores', 'Componente Humanitario', 'Plan HRP','Componente Construcción de Paz','Componente Desarrollo Sostenible','Plan Interagencial','Componente Flujos Migratorios','Plan RMRP','Strategic Objectives', 'Beneficiary types','Tipos de Actividades','Beneficiarios Objetivo', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Ubicaciones Objetivo','Fecha Creación'];
-         var fields = [ 'cluster', 'organization', 'organization_name', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','plan_component_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
+          // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','componente_humanitario','plan_hrp_plan','componente_construccion_de_paz','componente_desarrollo_sostenible','plan_interagencial','componente_flujos_migratorios','plan_rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
 
-        fieldNames = [ 'Cluster', 'Organization', 'Organization Name', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Organization Code','Project Title',  'Project Description', 'Project Start Date', 'Project End Date', 'Project Budget', 'Project Budget Currency','Project Documents','Gender Marker - GAM', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Componentes de Respuesta','Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Target Locations','Creation Date'];
-        
-      
+          // fieldNames = [ 'Cluster', 'Organización',  'País', 'Project ID', 'Estado del Proyecto', 'Punto Focal', 'Email', 'Teléfono', 'Código del Proyecto','Título del Proyecto',  'Descripción del Proyecto', 'Fecha Inicio del Proyecto', 'Fecha Finalización del Proyecto', 'Presupuesto del Proyecto', 'Moneda de Presupuesto del Proyecto','Soporte Documentos del Proyecto','Marcador de Género - GAM', 'Donantes del Proyecto'  ,  'Socios Implementadores', 'Componente Humanitario', 'Plan HRP','Componente Construcción de Paz','Componente Desarrollo Sostenible','Plan Interagencial','Componente Flujos Migratorios','Plan RMRP','Strategic Objectives', 'Beneficiary types','Tipos de Actividades','Beneficiarios Objetivo', 'Undaf Desarrollo Paz','Acuerdos de Paz','DAC - OECD Development Assistance Committee','ODS - Objetivos de Desarrollo Sostenible','Ubicaciones Objetivo','Fecha Creación'];
+          var fields = ['cluster', 'organization', 'organization_name', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone', 'project_code', 'project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'urls_list', 'project_gender_marker', 'project_donor_list', 'implementing_partners_list', 'strategic_objectives_list', 'beneficiary_type_list', 'activity_type_list', 'target_beneficiaries_list', 'plan_component_list', 'undaf_desarrollo_paz_list', 'acuerdos_de_paz_list', 'dac_oecd_development_assistance_committee_list', 'ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list', 'createdAt'];
 
-        }else{
-          var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list' , 'implementing_partners_list','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list', 'target_locations_list','createdAt']
-
-         fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors'  ,  'Implementing Partners', 'Strategic Objectives', 'Beneficiary types','Activity types','Target Beneficiaries', 'Target locations','Created' ];
+          var fieldNames = ['Cluster', 'Organization', 'Organization Name', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Organization Code', 'Project Title', 'Project Description', 'Project Start Date', 'Project End Date', 'Project Budget', 'Project Budget Currency', 'Project Documents', 'Gender Marker - GAM', 'Project Donors', 'Implementing Partners', 'Strategic Objectives', 'Beneficiary types', 'Activity types', 'Target Beneficiaries', 'Componentes de Respuesta', 'Undaf Desarrollo Paz', 'Acuerdos de Paz', 'DAC - OECD Development Assistance Committee', 'ODS - Objetivos de Desarrollo Sostenible', 'Target Locations', 'Creation Date'];
 
 
+
+        } else {
+          var fields = ['cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone', 'project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list', 'implementing_partners_list', 'strategic_objectives_list', 'beneficiary_type_list', 'activity_type_list', 'target_beneficiaries_list', 'target_locations_list', 'createdAt', 'updatedAt', 'total_target_beneficiaries', 'total_beneficiaries'];
+          var fieldNames = ['Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors', 'Implementing Partners', 'Strategic Objectives', 'Beneficiary types', 'Activity types', 'Target Beneficiaries', 'Target locations', 'Created', 'Last Updated', 'Planned Beneficiaries', 'Services to Beneficiaries'];
+          // add cluster only totals
+          if (reqQuery.cluster_id) {
+            fields.push('total_cluster_target_beneficiaries', 'total_cluster_beneficiaries');
+            fieldNames.push(reqQuery.cluster_id.toUpperCase() + ' Planned Beneficiaries', reqQuery.cluster_id.toUpperCase() + ' Services to Beneficiaries');
+          }
+          fields.push('url');
+          fieldNames.push('URL');
         }
 
         $project = this._projectJson2Csv($project);
@@ -464,7 +532,7 @@ var ProjectController = {
             setKey( project, 'implementing_partners','implementing_partners_list',['organization_name']);
             setKey( project, 'strategic_objectives', 'strategic_objectives_list', ['objective_type_name', 'objective_type_description'] );
             setKey( project, 'beneficiary_type', 'beneficiary_type_list', ['beneficiary_type_name'] );
-            //setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
+            // setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
             setKey( project, 'inter_cluster_activities', 'inter_cluster_activities_list', ['cluster']  );
             setKey( project, 'activity_type', 'activity_type_list', ['cluster', 'activity_type_name']  );
@@ -520,9 +588,9 @@ var ProjectController = {
                  setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
 
             }
-           // setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
-            //'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
-          //setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+            // setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
+            // 'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
+            // setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
 
         };
 
