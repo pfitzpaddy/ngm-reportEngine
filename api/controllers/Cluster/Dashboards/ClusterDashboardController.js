@@ -676,7 +676,7 @@ var ClusterDashboardController = {
 					};
 
 
-					if(req.param('project_type_component') && req.param('project_type_component') !== 'all'){
+					/*if(req.param('project_type_component') && req.param('project_type_component') !== 'all'){
 
 						plan_component = req.param('project_type_component')
 						filters.plan_component = { 'plan_component': {$in: [plan_component]}};
@@ -684,7 +684,50 @@ var ClusterDashboardController = {
 					}else{
 						filters.plan_component = {};
 
-					}
+					}*/
+
+					if( (req.param('project_type_component')&&req.param('project_type_component')!=='all')  &&  ( req.param('hrpplan') !=='all' && req.param('hrpplan') === 'true') ){
+        
+					        //is not possible implement operator $and
+					        plan_component = req.param('project_type_component');
+					        filters.plan_component = {'plan_component': { $in: [plan_component, 'hrp_plan']}};
+					        
+					      }else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
+					        
+					        plan_component = req.param('project_type_component');
+
+					        filters.plan_component = { 'plan_component' : { $in: [plan_component], $nin: ['hrp_plan']}};
+					        // delete filterObject.project_type_component;
+					        // delete filterObject.hrpplan;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
+					        
+					        plan_component = req.param('project_type_component');
+					        filters.plan_component = { 'plan_component' : { $in: [plan_component]}};
+					        // delete queryProject.project_type_component;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
+					        
+					         filters.plan_component = { 'plan_component': { $in: ['hrp_plan']}};
+					       //  delete queryProject.hrpplan;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
+					         filters.plan_component = { 'plan_component': { $nin: ['hrp_plan']}};
+					      //   delete queryProject.hrpplan;
+					      }else{
+
+					      	filters.plan_component = {};
+
+					      }
+
+
+					if(req.param('activity_type_id') && req.param('activity_type_id') !== 'all'){
+							activity_type_id = req.param('activity_type_id');
+							filters.activity_type_id = { 'activity_type_id': activity_type_id} ;
+
+						} 
+
+
 
 		                       
 
@@ -700,6 +743,7 @@ var ClusterDashboardController = {
 					.where( filters.project_donor_id )
 					.where( filters.implementing_partners)
 					.where( filters.plan_component)
+					.where( filters.activity_type_id)
 					.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -839,12 +883,42 @@ var ClusterDashboardController = {
 
 						}
 
-						if(req.param('project_type_component') && req.param('project_type_component') !== 'all'){
-							filterObject.plan_component = {$in: [req.param('project_type_component')]};
 
-						}
+						 if( (req.param('project_type_component')&&req.param('project_type_component')!=='all')  &&  ( req.param('hrpplan') !=='all' && req.param('hrpplan') === 'true') ){
+        
+					        //is not possible implement operator $and
+					        filterObject.plan_component = {$in: [req.param('project_type_component'), 'hrp_plan']};
+					        ///filterObject.plan_component = {$and: [ { plan_component : {$in: [req.param('project_type_component')]} } , {plan_component: {$in:["hrp_plan"]}}]};
+					        
+					             
+					      }else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
+					        
+					        filterObject.plan_component = { $in: [req.param('project_type_component')], $nin: ['hrp_plan']};
+					        // delete filterObject.project_type_component;
+					        // delete filterObject.hrpplan;
 
-						
+					      }else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
+					        
+					        filterObject.plan_component = {$in: [req.param('project_type_component').project_type_component]};
+					        // delete queryProject.project_type_component;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
+					       
+					         filterObject.plan_component = {$in: ['hrp_plan']};
+					       //  delete queryProject.hrpplan;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
+					         filterObject.plan_component = {$nin: ['hrp_plan']};
+					      //   delete queryProject.hrpplan;
+					      }
+
+						  if(req.param('activity_type_id') && req.param('activity_type_id') !== 'all'){
+												//activity_typeid = req.param('activity_type_id');
+							filterObject.activity_type_id = req.param('activity_type_id');
+
+						  }
+
+
 						
 					
 						collection.find(filterObject).toArray(function (err, beneficiaries) {

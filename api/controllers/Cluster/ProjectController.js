@@ -204,7 +204,7 @@ var ProjectController = {
     }
 
     var allowedParams =
-        ['project_id','organization_id','cluster_id','organization_tag','implementer_id','project_type_component','adminRpcode', 'admin0pcode','admin1pcode','admin2pcode', 'project_start_date', 'project_end_date', 'donor_id'];
+        ['project_id','organization_id','cluster_id','organization_tag','implementer_id','project_type_component','activity_type_id','hrpplan','adminRpcode', 'admin0pcode','admin1pcode','admin2pcode', 'project_start_date', 'project_end_date', 'donor_id'];
 
 
     // if dissallowed parameters sent
@@ -241,6 +241,7 @@ var ProjectController = {
 
       delete queryProject.admin2pcode;
 
+    
 
       if( req.param('query').donor_id){
          queryProject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('query').donor_id}};
@@ -254,13 +255,41 @@ var ProjectController = {
              
       }
 
-       if( req.param('query').project_type_component){
-         queryProject.plan_component = {$in: [req.param('query').project_type_component]};
+       if( req.param('query').project_type_component &&  (req.param('query').hrpplan && req.param('query').hrpplan === 'true')){
+        
+         queryProject.plan_component = {$in: [req.param('query').project_type_component, 'hrp_plan']};
          delete queryProject.project_type_component;
+         delete queryProject.hrpplan;
+             
+      }else if(req.param('query').project_type_component && (req.param('query').hrpplan && req.param('query').hrpplan === 'false')){
+        
+        queryProject.plan_component = { $in: [req.param('query').project_type_component], $nin: ['hrp_plan']};
+         delete queryProject.project_type_component;
+         delete queryProject.hrpplan;
+
+      }else if(req.param('query').project_type_component && !req.param('query').hrpplan){
+        
+        queryProject.plan_component = {$in: [req.param('query').project_type_component]};
+         delete queryProject.project_type_component;
+
+      }else if(!req.param('query').project_type_component &&  (req.param('query').hrpplan && req.param('query').hrpplan === 'true')){
+       
+         queryProject.plan_component = {$in: ['hrp_plan']};
+         delete queryProject.hrpplan;
+
+      }else if(!req.param('query').project_type_component &&  (req.param('query').hrpplan && req.param('query').hrpplan === 'false')){
+         queryProject.plan_component = {$nin: ['hrp_plan']};
+         delete queryProject.hrpplan;
+      }
+
+       
+      if( req.param('query').activity_type_id){
+         queryProject.activity_type = { $elemMatch : { 'activity_type_id' : req.param('query').activity_type_id}};
+         delete queryProject.activity_type_id;
              
       }
       
-
+//console.log("QUERYPROJECT FILTERS: ", queryProject);
        
       
      //project_start_date and project_end_date filters
@@ -273,7 +302,6 @@ var ProjectController = {
     }
 
     var csv = req.param('csv');
-
 
     // process request pipeline
     var pipe = Promise.resolve()

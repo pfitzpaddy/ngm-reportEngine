@@ -121,9 +121,11 @@ var Cluster4wplusDashboardController = {
 			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     //? { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}
+			     			     ? {  $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
-			     ? { plan_component: {$in:[params.project_type_component]}}
+			     ? { plan_component: {$in:[params.project_type_component], $nin:["hrp_plan"]}}
 			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
 			     ? { plan_component: {$in : ["hrp_plan"]}}
 			     : { plan_component: { $nin : ["hrp_plan"]}},
@@ -184,9 +186,10 @@ var Cluster4wplusDashboardController = {
 			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     ? {  $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     //? { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
-			     ? { plan_component: {$in:[params.project_type_component]}}
+			     ? { plan_component: {$in:[params.project_type_component], $nin:["hrp_plan"]}}
 			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
 			     ? { plan_component: {$in : ["hrp_plan"]}}
 			     : { plan_component: { $nin : ["hrp_plan"]}},
@@ -307,7 +310,7 @@ var Cluster4wplusDashboardController = {
 
 
            );
-	
+
 
 		// switch on indicator
 		switch( params.indicator ) {
@@ -4154,9 +4157,11 @@ var Cluster4wplusDashboardController = {
 											}
 
 
+												clus.totalBudgetProgress = clus.totalBudgetProgress.toFixed(2);
+
 
 												var newclusterbudgetProgress = {
-													'y':clus.totalBudgetProgress,
+													'y': parseFloat(clus.totalBudgetProgress),
 													'color':'blue',
 													'name': org_name+' ('+clus._id.currency_id+')',
 													'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressExecutorOrg))*100
@@ -4164,6 +4169,346 @@ var Cluster4wplusDashboardController = {
 
 
 												result.data.push(newclusterbudgetProgress);
+											}
+
+
+
+											});
+
+										//	console.log("RESULT DATA: ",result.data);
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							})					
+						
+										
+				break;
+
+
+				/*case 'BarChartFinancingOrgImplementing':
+			// labels
+			//console.log("FILTER BUDGET: ",filterObjectBudget);
+										
+						BudgetProgress.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBudget
+								}
+							]).toArray(function (err, budgetprogressimpl) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!budgetprogressimpl.length) return res.json(200, { 'value': 0 });
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(budgetprogressimpl.length){
+
+								//	console.log("ANTES  BUD: ",budgetprogress);
+
+									
+
+
+									var result = {data:[]};
+
+									//budgetprogressimpl.totalBudgetProgressDonor = 0
+									budgetprogressimpl.totalBudgetProgressOrgImpl = 0;
+
+									budgetprogressimpl.forEach
+
+
+
+									budgetprogressdonor.forEach(function(don,i){
+										//console.log("BUDGETPROGRESS: ", clus);
+
+										if(don._id.currency_id === 'cop'){
+											var dontotalBudgetsCOPtoUSD = don.totalBudgetProgressDonor/params.coptousd;
+
+											don.totalBudgetProgressDonor = dontotalBudgetsCOPtoUSD;
+
+											budgetprogressdonor.totalBudgetProgressDonor = budgetprogressdonor.totalBudgetProgressDonor+don.totalBudgetProgress;
+
+
+										}else if(don._id.currency_id === 'eur'){
+
+
+											var dontotalBudgetsEURtoUSD = don.totalBudgetProgressDonor*params.eurotousd;
+											don.totalBudgetProgressDonor = dontotalBudgetsEURtoUSD;
+
+											budgetprogressdonor.totalBudgetProgressDonor = budgetprogressdonor.totalBudgetProgressDonor+don.totalBudgetProgress;
+											
+										
+
+										}else{
+											budgetprogressdonor.totalBudgetProgressDonor = budgetprogressdonor.totalBudgetProgressDonor+don.totalBudgetProgress;
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									//console.log("BUDGETPROGRESS: ", budgetprogress);
+
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Donor',
+											'label': 0,
+										}]
+									};
+
+									budgetprogressdonor = [{totalBudgetProgressDonor:0}];
+									
+
+								}
+
+							
+							
+								
+								switch (req.param('chart_for')) {
+									case 'financingOrgImplementing':
+
+									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
+										if (!budgetprogressdonor.length) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+											budgetprogressdonor.sort(function(a, b) {
+										  return b.totalBudgetProgressDonor - a.totalBudgetProgressDonor;
+											});
+
+									//	console.log("DESPUES BUD: ",budgetprogress);
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											budgetprogressdonor.forEach(function(donor,i){
+
+											
+									//	console.log("UBICA; ",i);
+											if(i<5){
+											var donor_name;
+											if(donor._id.project_donor_id){
+												donor_name = donor._id.project_donor_name;
+
+											}else{
+												donor._id.project_donor_id;
+
+											}
+
+
+												donor.totalBudgetProgressDonor = donor.totalBudgetProgressDonor.toFixed(2);
+
+
+												var newdonorbudgetProgress = {
+													'y': parseFloat(donor.totalBudgetProgressDonor),
+													'color':'blue',
+													'name': donor_name+' ('+donor._id.currency_id+')',
+													'label': (donor.totalBudgetProgressDonor / (budgetprogressdonor.totalBudgetProgressDonor))*100
+												};
+
+
+												result.data.push(newdonorbudgetProgress);
+											}
+
+
+
+											});
+
+										//	console.log("RESULT DATA: ",result.data);
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							})					
+						
+										
+				break;*/
+
+
+				case 'BarChartFinancingTop5Donors':
+			// labels
+			//console.log("FILTER BUDGET: ",filterObjectBudget);
+										
+						BudgetProgress.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObjectBudget
+								},
+								{
+									$group:{
+										_id: {project_donor_id:'$project_donor_id', project_donor_name:'$project_donor_name',currency_id:'$currency_id'},
+										totalBudgetProgressDonor: {
+											$sum:  "$project_budget_amount_recieved"
+										}
+
+									}
+								}
+							]).toArray(function (err, budgetprogressdonor) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!budgetprogressdonor.length) return res.json(200, { 'value': 0 });
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(budgetprogressdonor.length){
+
+								//	console.log("ANTES  BUD: ",budgetprogress);
+
+									
+
+
+									var result = {data:[]};
+
+									budgetprogressdonor.totalBudgetProgressDonor = 0
+
+									budgetprogressdonor.forEach(function(don,i){
+										//console.log("BUDGETPROGRESS: ", clus);
+
+										if(don._id.currency_id === 'cop'){
+											var dontotalBudgetsCOPtoUSD = don.totalBudgetProgressDonor/params.coptousd;
+
+											don.totalBudgetProgressDonor = dontotalBudgetsCOPtoUSD;
+
+											budgetprogressdonor.totalBudgetProgressDonor = budgetprogressdonor.totalBudgetProgressDonor+don.totalBudgetProgress;
+
+
+										}else if(don._id.currency_id === 'eur'){
+
+
+											var dontotalBudgetsEURtoUSD = don.totalBudgetProgressDonor*params.eurotousd;
+											don.totalBudgetProgressDonor = dontotalBudgetsEURtoUSD;
+
+											budgetprogressdonor.totalBudgetProgressDonor = budgetprogressdonor.totalBudgetProgressDonor+don.totalBudgetProgress;
+											
+										
+
+										}else{
+											budgetprogressdonor.totalBudgetProgressDonor = budgetprogressdonor.totalBudgetProgressDonor+don.totalBudgetProgress;
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									//console.log("BUDGETPROGRESS: ", budgetprogress);
+
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Donor',
+											'label': 0,
+										}]
+									};
+
+									budgetprogressdonor = [{totalBudgetProgressDonor:0}];
+									
+
+								}
+
+							
+							
+								
+								switch (req.param('chart_for')) {
+									case 'FinancingDonors':
+
+									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
+										if (!budgetprogressdonor.length) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+											budgetprogressdonor.sort(function(a, b) {
+										  return b.totalBudgetProgressDonor - a.totalBudgetProgressDonor;
+											});
+
+									//	console.log("DESPUES BUD: ",budgetprogress);
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											budgetprogressdonor.forEach(function(donor,i){
+
+											/*	if(clus._id.currency_id === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = clus.totalBudgetProgress/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSDChart;
+											
+
+										}else if(clus._id.currency_id === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = clus.totalBudgetProgress*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											clus.totalBudgetProgress = clustotalBudgetsEURtoUSDChart;
+										}*/
+									//	console.log("UBICA; ",i);
+											if(i<5){
+											var donor_name;
+											if(donor._id.project_donor_id){
+												donor_name = donor._id.project_donor_name;
+
+											}else{
+												donor._id.project_donor_id;
+
+											}
+
+
+												donor.totalBudgetProgressDonor = donor.totalBudgetProgressDonor.toFixed(2);
+
+
+												var newdonorbudgetProgress = {
+													'y': parseFloat(donor.totalBudgetProgressDonor),
+													'color':'blue',
+													'name': donor_name+' ('+donor._id.currency_id+')',
+													'label': (donor.totalBudgetProgressDonor / (budgetprogressdonor.totalBudgetProgressDonor))*100
+												};
+
+
+												result.data.push(newdonorbudgetProgress);
 											}
 
 
@@ -4298,9 +4643,10 @@ var Cluster4wplusDashboardController = {
 												if(i<5){
 
 
+														budprogadmin1.totalBudgetProgress = budprogadmin1.totalBudgetProgress.toFixed(2);
 
 													var newadmin1financing = {
-														'y':budprogadmin1.totalBudgetProgress,
+														'y':parseFloat(budprogadmin1.totalBudgetProgress),
 														'color':'blue',
 														'name': budprogadmin1._id.admin1name+' ('+budprogadmin1._id.currency_id+')',
 														'label': (budprogadmin1.totalBudgetProgress / (budgetprogress.totalBudgetProgressAdmin1pcode))*100
@@ -4436,6 +4782,7 @@ var Cluster4wplusDashboardController = {
 											var clustotalBudgetsCOPtoUSDChart = clus.totalBudgetProgress/params.coptousd;
 											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
 											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSDChart;
+											clus.totalBudgetProgress = clus.totalBudgetProgress.toFixed(2);
 											
 
 										}else if(clus._id.currency_id === 'eur'){
@@ -4443,12 +4790,14 @@ var Cluster4wplusDashboardController = {
 											var clustotalBudgetsEURtoUSDChart = clus.totalBudgetProgress*params.eurotousd;
 											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
 											clus.totalBudgetProgress = clustotalBudgetsEURtoUSDChart;
+
+											clus.totalBudgetProgress = clus.totalBudgetProgress.toFixed(2);
 										}
 
 
 
 											var newclusterbudgetProgress = {
-												'y':clus.totalBudgetProgress,
+												'y':parseFloat(clus.totalBudgetProgress),
 												'color':'blue',
 												'name': clus._id.cluster+' ('+clus._id.currency_id+')',
 												'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressCluster))*100

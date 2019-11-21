@@ -125,8 +125,10 @@ var Cluster4wprojectplanDashboardController = {
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
 			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			    // ? { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}
+
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
-			     ? { plan_component: {$in:[params.project_type_component]}}
+			     ? { plan_component: {$in:[params.project_type_component], $nin:["hrp_plan"]}}
 			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
 			     ? { plan_component: {$in : ["hrp_plan"]}}
 			     : { plan_component: { $nin : ["hrp_plan"]}},
@@ -162,8 +164,10 @@ var Cluster4wprojectplanDashboardController = {
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
 			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     //? { plan_component : {$in: [params.project_type_component, "hrp_plan"]}}
+
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
-			     ? { plan_component: {$in:[params.project_type_component]}}
+			     ? { plan_component: {$in:[params.project_type_component], $nin:["hrp_plan"]}}
 			     : ( params.project_type_component === 'all' && params.hrpplan === 'true')
 			     ? { plan_component: {$in : ["hrp_plan"]}}
 			     : { plan_component: { $nin : ["hrp_plan"]}},
@@ -221,9 +225,7 @@ var Cluster4wprojectplanDashboardController = {
 										filters.project_endDateNative,
 						
 										 );
-
-
-
+		
 		// switch on indicator
 		switch( params.indicator ) {
 
@@ -4811,6 +4813,600 @@ var Cluster4wprojectplanDashboardController = {
 
 															
 															return res.json(200, result);
+														}
+														break;
+													
+														default:
+															return res.json( 200, { value:0 });
+															break;
+													}
+									         }
+									});
+								});
+
+
+							}else{
+
+								return res.json( 200, { value:0 });
+							}							
+
+
+
+						});
+
+					}				
+							
+											
+				break;
+
+
+
+				case 'BarChartFinancingCluster':
+
+				if(params.admin1pcode === 'all'){
+
+					Project.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObject
+								},
+								{
+									$group:{
+										_id: {cluster_id:'$cluster_id',cluster: '$cluster', project_budget_currency:'$project_budget_currency'},
+										totalBudget: {
+											$sum:  "$project_budget"
+										},
+										
+
+									}
+								}
+							]).toArray(function (err, projectsbudget) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!projectsbudget.length) return res.json(200, { 'value': 0 });
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(projectsbudget.length){
+
+
+									var result = {data:[]};
+
+									projectsbudget.totalBudgetCluster = 0
+
+									projectsbudget.forEach(function(clus,i){
+										//console.log("BUDGETPROGRESS: ", clus);
+
+										if(clus._id.project_budget_currency === 'cop'){
+											var clustotalBudgetsCOPtoUSD = clus.totalBudget/params.coptousd;
+											projectsbudget.totalBudgetCluster = projectsbudget.totalBudgetCluster+clustotalBudgetsCOPtoUSD;
+
+										}else if(clus._id.project_budget_currency === 'eur'){
+
+
+											projectsbudget.totalBudgetCluster = projectsbudget.totalBudgetCluster+(clus.totalBudget*params.eurotousd);
+										
+
+										}else{
+											projectsbudget.totalBudgetCluster = projectsbudget.totalBudgetCluster+clus.totalBudget
+
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									//console.log("BUDGETPROGRESS: ", budgetprogress);
+
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Cluster',
+											'label': 0,
+										}]
+									};
+
+									projectsbudget = [{totalBudget:0}];
+									
+
+								}
+
+								$projectsBudgetOne = projectsbudget[0];
+
+
+							
+								
+								switch (req.param('chart_for')) {
+									case 'financingCluster':
+										if ($projectsBudgetOne.totalBudget < 1 && $projectsBudgetOne.totalBudget < 1) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											projectsbudget.forEach(function(clus,i){
+
+										if(clus._id.project_budget_currency === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = clus.totalBudget/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											clus.totalBudget = clustotalBudgetsCOPtoUSDChart;
+											clus.totalBudget = clus.totalBudget.toFixed(2);
+											
+
+										}else if(clus._id.project_budget_currency === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = clus.totalBudget*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											clus.totalBudget = clustotalBudgetsEURtoUSDChart;
+											clus.totalBudget = clus.totalBudget.toFixed(2);
+										}
+
+
+
+											var newclusterProjectsBudget = {
+												'y':parseFloat(clus.totalBudget),
+												'color':'blue',
+												'name': clus._id.cluster+' ('+clus._id.project_budget_currency+')',
+												'label': (clus.totalBudget / (projectsbudget.totalBudgetCluster))*100
+											};
+
+
+												result.data.push(newclusterProjectsBudget)
+
+											});
+
+											//console.log("RESULT DATA: ",result.data);
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							})	;
+					}else{
+
+						Project
+						.find()
+						.where( filters.default )
+						.where( filters.adminRpcode )
+						.where( filters.admin0pcode )
+						.where( filters.cluster_id )
+						.where( filters.organization_tag )
+						.where(filters.donor_tag)
+						.where( filters.implementer_tag)
+						.where(filters.project_plan_component)
+						.where( filters.activity_type)
+						.where( filters.project_startDateNative )
+						.where( filters.project_endDateNative)
+						.exec( function( err, projectBudgetCluster ){
+
+							if (err) return res.serverError(err);
+
+							if(projectBudgetCluster.length){
+
+								counter = 0;
+								length = projectBudgetCluster.length;
+								listProjectsBudgetCluster = [];
+								
+								var resultCluster = {data:[]};
+
+								projectBudgetCluster.forEach(function(project){
+
+									TargetLocation.find()
+										.where( {project_id: project.id})
+										.where( filters.admin1pcode )
+										.where( filters.admin2pcode ).exec(function(err,targloc){
+
+											if(targloc.length){
+
+												listProjectsBudgetCluster.push(project);
+
+
+											
+											}
+
+											counter++;
+									         if ( counter === length ) {
+
+									         	//console.log("LISTA FINAL",listTargetBeneficiaries);
+
+													
+
+									         	const projectsBudgetgroupsByCluster = [...listProjectsBudgetCluster.reduce((r, o) => {
+														  const key = o.cluster_id + '-' + o.cluster + '-'+ o.project_budget_currency;
+														  
+														  const item = r.get(key) || Object.assign({}, o, {
+														    project_budget: 0,
+														    TOTALBUDGET : 0
+														  });
+														  
+														  item.project_budget += o.project_budget;
+														 
+														  item.TOTALBUDGET = item.project_budget;
+
+														  return r.set(key, item);
+														}, new Map).values()];
+
+									         	//console.log("RESULTADO: ",targetbenefgroups);
+
+									         	totalFinancialFinalCluster = 0;
+
+									         	projectsBudgetgroupsByCluster.forEach(function (groupProjClus){
+
+									         		totalFinancialFinalCluster = totalFinancialFinalCluster + groupProjClus.TOTALBUDGET;
+									         	});
+
+
+									         	switch (req.param('chart_for')) {
+													case 'financingCluster':
+														if (projectsBudgetgroupsByCluster.length < 1 ) {
+															
+															result.data[0].y = 100;
+															result.data[0].label = 0;
+															result.data[0].color = '#c7c7c7';
+															
+															
+															return res.json(200, result);
+														} else {
+
+
+														projectsBudgetgroupsByCluster.forEach(function(clus,i){
+
+
+															if(clus.project_budget_currency === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = clus.TOTALBUDGET/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											clus.TOTALBUDGET = clustotalBudgetsCOPtoUSDChart;
+											clus.TOTALBUDGET = clus.TOTALBUDGET.toFixed(2);
+											
+
+										}else if(clus.project_budget_currency === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = clus.TOTALBUDGET*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											clus.TOTALBUDGET = clustotalBudgetsEURtoUSDChart;
+											clus.TOTALBUDGET = clus.TOTALBUDGET.toFixed(2);
+										}
+
+
+															
+
+														var newclusfinancingCluster = {
+																'y':parseFloat(clus.TOTALBUDGET),
+																'color':'blue',
+																'name': clus.cluster+' ('+clus.project_budget_currency+')',
+																'label': (clus.TOTALBUDGET / (totalFinancialFinalCluster))*100
+															};
+
+
+																resultCluster.data.push(newclusfinancingCluster)
+
+															});
+
+															
+															return res.json(200, resultCluster);
+														}
+														break;
+													
+														default:
+															return res.json( 200, { value:0 });
+															break;
+													}
+									         }
+									});
+								});
+
+
+							}else{
+
+								return res.json( 200, { value:0 });
+							}							
+
+
+
+						});
+
+					}				
+							
+											
+				break;
+
+
+
+				case 'BarChartFinancingExecutorOrg':
+
+				if(params.admin1pcode === 'all'){
+
+					Project.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObject
+								},
+								{
+									$group:{
+										_id: {organization_tag:'$organization_tag',organization: '$organization', project_budget_currency:'$project_budget_currency'},
+										totalBudgetOrgEx: {
+											$sum:  "$project_budget"
+										},
+										
+
+									}
+								}
+							]).toArray(function (err, projectsbudgetorg) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!projectsbudgetorg.length) return res.json(200, { 'value': 0 });
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(projectsbudgetorg.length){
+
+
+									var result = {data:[]};
+
+									projectsbudgetorg.totalBudgetExcOrg = 0
+
+									projectsbudgetorg.forEach(function(orgExec,i){
+										//console.log("BUDGETPROGRESS: ", clus);
+
+										if(orgExec._id.project_budget_currency === 'cop'){
+											var clustotalBudgetsCOPtoUSD = orgExec.totalBudget/params.coptousd;
+											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+clustotalBudgetsCOPtoUSD;
+
+										}else if(orgExec._id.project_budget_currency === 'eur'){
+
+
+											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+(orgExec.totalBudget*params.eurotousd);
+										
+
+										}else{
+											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+orgExec.totalBudget
+
+										}
+
+										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
+
+										
+
+									});
+								}else{
+									//console.log("BUDGETPROGRESS: ", budgetprogress);
+
+									var result = {	
+										data: [{
+											'y': 0,
+											'color': '#f48fb1',
+											'name': 'Organization',
+											'label': 0,
+										}]
+									};
+
+									projectsbudgetorg = [{totalBudgetOrgEx:0}];
+									
+
+								}
+
+								$projectsBudgetOne = projectsbudgetorg[0];
+
+
+							
+								
+								switch (req.param('chart_for')) {
+									case 'financingExecutorOrg':
+										if ($projectsBudgetOne.totalBudgetOrgEx < 1 && $projectsBudgetOne.totalBudgetOrgEx < 1) {
+											
+											result.data[0].y = 100;
+											result.data[0].label = 0;
+											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);
+										} else {
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											projectsbudgetorg.forEach(function(excOrg,i){
+
+
+												if(i<5){
+
+										if(excOrg._id.project_budget_currency === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = excOrg.totalBudgetOrgEx/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											excOrg.totalBudgetOrgEx = clustotalBudgetsCOPtoUSDChart;
+											excOrg.totalBudgetOrgEx = excOrg.totalBudgetOrgEx.toFixed(2);
+											
+
+										}else if(excOrg._id.project_budget_currency === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = excOrg.totalBudgetOrgEx*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											excOrg.totalBudgetOrgEx = clustotalBudgetsEURtoUSDChart;
+											excOrg.totalBudgetOrgEx = excOrg.totalBudgetOrgEx.toFixed(2);
+										}
+
+
+
+											var newExecOrgProjectsBudget = {
+												'y':parseFloat(excOrg.totalBudgetOrgEx),
+												'color':'blue',
+												'name': excOrg._id.organization+' ('+excOrg._id.project_budget_currency+')',
+												'label': (excOrg.totalBudgetOrgEx / (projectsbudgetorg.totalBudgetExcOrg))*100
+											};
+
+
+												result.data.push(newExecOrgProjectsBudget);
+											}
+
+											});
+
+											//console.log("RESULT DATA: ",result.data);
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											break;
+									}
+
+			
+								});
+							})	;
+					}else{
+
+						Project
+						.find()
+						.where( filters.default )
+						.where( filters.adminRpcode )
+						.where( filters.admin0pcode )
+						.where( filters.cluster_id )
+						.where( filters.organization_tag )
+						.where(filters.donor_tag)
+						.where( filters.implementer_tag)
+						.where(filters.project_plan_component)
+						.where( filters.activity_type)
+						.where( filters.project_startDateNative )
+						.where( filters.project_endDateNative)
+						.exec( function( err, projectBudgetOrgEx ){
+
+							if (err) return res.serverError(err);
+
+							if(projectBudgetOrgEx.length){
+
+								counter = 0;
+								length = projectBudgetOrgEx.length;
+								listProjectsBudgetExOrg = [];
+								
+								var resultOrgEx = {data:[]};
+
+								projectBudgetOrgEx.forEach(function(project){
+
+									TargetLocation.find()
+										.where( {project_id: project.id})
+										.where( filters.admin1pcode )
+										.where( filters.admin2pcode ).exec(function(err,targloc){
+
+											if(targloc.length){
+
+												listProjectsBudgetExOrg.push(project);
+
+
+											
+											}
+
+											counter++;
+									         if ( counter === length ) {
+
+									         	//console.log("LISTA FINAL",listTargetBeneficiaries);
+
+													
+
+									         	const projectsBudgetgroupsByCluster = [...listProjectsBudgetExOrg.reduce((r, o) => {
+														  const key = o.organization_tag + '-' + o.organization + '-'+ o.project_budget_currency;
+														  
+														  const item = r.get(key) || Object.assign({}, o, {
+														    project_budget: 0,
+														    TOTALBUDGET : 0
+														  });
+														  
+														  item.project_budget += o.project_budget;
+														 
+														  item.TOTALBUDGET = item.project_budget;
+
+														  return r.set(key, item);
+														}, new Map).values()];
+
+									         	//console.log("RESULTADO: ",targetbenefgroups);
+
+									         	totalFinancialFinalOrgExec = 0;
+
+									         	projectsBudgetgroupsByCluster.forEach(function (groupProjClus){
+
+									         		totalFinancialFinalOrgExec = totalFinancialFinalOrgExec + groupProjClus.TOTALBUDGET;
+									         	});
+
+
+									         	switch (req.param('chart_for')) {
+													case 'financingExecutorOrg':
+														if (projectsBudgetgroupsByCluster.length < 1 ) {
+															
+															result.data[0].y = 100;
+															result.data[0].label = 0;
+															result.data[0].color = '#c7c7c7';
+															
+															
+															return res.json(200, result);
+														} else {
+
+
+														projectsBudgetgroupsByCluster.forEach(function(execOrg,i){
+
+
+															if(execOrg.project_budget_currency === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = execOrg.TOTALBUDGET/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											execOrg.TOTALBUDGET = clustotalBudgetsCOPtoUSDChart;
+											execOrg.TOTALBUDGET = execOrg.TOTALBUDGET.toFixed(2);
+											
+
+										}else if(execOrg.project_budget_currency === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = execOrg.TOTALBUDGET*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											execOrg.TOTALBUDGET = clustotalBudgetsEURtoUSDChart;
+											execOrg.TOTALBUDGET = execOrg.TOTALBUDGET.toFixed(2);
+										}
+
+
+															
+
+														var newExeOrgfinancingCluster = {
+																'y':parseFloat(execOrg.TOTALBUDGET),
+																'color':'blue',
+																'name': execOrg.organization+' ('+execOrg.project_budget_currency+')',
+																'label': (execOrg.TOTALBUDGET / (totalFinancialFinalOrgExec))*100
+															};
+
+
+																resultOrgEx.data.push(newExeOrgfinancingCluster)
+
+															});
+
+															
+															return res.json(200, resultOrgEx);
 														}
 														break;
 													
