@@ -19,7 +19,11 @@ module.exports.http = {
     fn = require('skipper');
     return fn(opts);
 
-  })
+  }),
+
+  customMiddleware: function (app) {
+    app.enable('trust proxy');
+  }
 
   /****************************************************************************
   *                                                                           *
