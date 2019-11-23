@@ -4685,7 +4685,7 @@ var Cluster4wprojectplanDashboardController = {
 												'y':bentype.totalBeneficiaries,
 												'color':'blue',
 												'name': bentype._id.beneficiary_type_name,
-												'label': (bentype.totalBeneficiaries / (beneficiaries.totalBeneficiariesCluster))*100
+												'label': (bentype.totalBeneficiaries / (beneficiaries.totalBeneficiariesType))*100
 											};
 
 
@@ -5179,17 +5179,17 @@ var Cluster4wprojectplanDashboardController = {
 										//console.log("BUDGETPROGRESS: ", clus);
 
 										if(orgExec._id.project_budget_currency === 'cop'){
-											var clustotalBudgetsCOPtoUSD = orgExec.totalBudget/params.coptousd;
+											var clustotalBudgetsCOPtoUSD = orgExec.totalBudgetOrgEx/params.coptousd;
 											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+clustotalBudgetsCOPtoUSD;
 
 										}else if(orgExec._id.project_budget_currency === 'eur'){
 
 
-											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+(orgExec.totalBudget*params.eurotousd);
+											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+(orgExec.totalBudgetOrgEx*params.eurotousd);
 										
 
 										}else{
-											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+orgExec.totalBudget
+											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+orgExec.totalBudgetOrgEx
 
 										}
 
@@ -5198,6 +5198,27 @@ var Cluster4wprojectplanDashboardController = {
 										
 
 									});
+
+									projectsbudgetorg.forEach(function(org,i){
+
+									if(org._id.project_budget_currency === 'cop'){
+											//console.log("Antes2 : ", clus.totalBudgetProgress);
+											var clustotalBudgetsCOPtoUSDChart = org.totalBudgetOrgEx/params.coptousd;
+											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
+											org.totalBudgetOrgEx = clustotalBudgetsCOPtoUSDChart;
+											org.totalBudgetOrgEx = org.totalBudgetOrgEx.toFixed(2);
+											
+
+										}else if(org._id.project_budget_currency === 'eur'){
+
+											var clustotalBudgetsEURtoUSDChart = org.totalBudgetOrgEx*params.eurotousd;
+											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
+											org.totalBudgetOrgEx = clustotalBudgetsEURtoUSDChart;
+											org.totalBudgetOrgEx = org.totalBudgetOrgEx.toFixed(2);
+										}
+									});
+
+
 								}else{
 									//console.log("BUDGETPROGRESS: ", budgetprogress);
 
@@ -5234,12 +5255,16 @@ var Cluster4wprojectplanDashboardController = {
 
 											//console.log("LOS CLUSTERS: ",budgetprogress);
 
+											projectsbudgetorg.sort(function(a, b) {
+										  return b.totalBudgetOrgEx - a.totalBudgetOrgEx;
+											});
+
 											projectsbudgetorg.forEach(function(excOrg,i){
 
 
 												if(i<5){
 
-										if(excOrg._id.project_budget_currency === 'cop'){
+										/*if(excOrg._id.project_budget_currency === 'cop'){
 											//console.log("Antes2 : ", clus.totalBudgetProgress);
 											var clustotalBudgetsCOPtoUSDChart = excOrg.totalBudgetOrgEx/params.coptousd;
 											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
@@ -5253,7 +5278,7 @@ var Cluster4wprojectplanDashboardController = {
 											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
 											excOrg.totalBudgetOrgEx = clustotalBudgetsEURtoUSDChart;
 											excOrg.totalBudgetOrgEx = excOrg.totalBudgetOrgEx.toFixed(2);
-										}
+										}*/
 
 
 
@@ -5352,9 +5377,23 @@ var Cluster4wprojectplanDashboardController = {
 
 									         	totalFinancialFinalOrgExec = 0;
 
-									         	projectsBudgetgroupsByCluster.forEach(function (groupProjClus){
+									         	projectsBudgetgroupsByCluster.forEach(function (groupProjOrgExc){
 
-									         		totalFinancialFinalOrgExec = totalFinancialFinalOrgExec + groupProjClus.TOTALBUDGET;
+									         		if(groupProjOrgExc.project_budget_currency === 'cop'){
+														var orgExctotalBudgetsCOPtoUSD = groupProjOrgExc.TOTALBUDGET/params.coptousd;
+														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+orgExctotalBudgetsCOPtoUSD;
+
+													}else if(groupProjOrgExc.project_budget_currency === 'eur'){
+
+
+														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+(groupProjOrgExc.TOTALBUDGET*params.eurotousd);
+													
+
+													}else{
+														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+groupProjOrgExc.TOTALBUDGET
+
+													}
+
 									         	});
 
 
