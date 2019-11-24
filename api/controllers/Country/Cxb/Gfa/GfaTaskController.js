@@ -886,8 +886,6 @@ var GfaTaskController = {
 						// return error
 						if ( err ) return res.negotiate( err );
 
-						console.log( end_date );
-
 						// find from plan
 						PlannedBeneficiaries
 							.findOne()

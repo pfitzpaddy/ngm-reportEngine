@@ -535,9 +535,20 @@ var GfaDashboardController = {
 			// indicator
 			switch ( params.indicator ) {
 
-				case 'print_distribution_pdf':
+				case 'print_distribution_zip':
 
 
+					// make folder
+
+					// group data
+
+					// make HTML tempaltes
+
+					// send to PDF 
+
+					// add to zip
+
+					// send zip for download
 
 
 					
