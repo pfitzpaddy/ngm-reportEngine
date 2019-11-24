@@ -537,166 +537,226 @@ var GfaDashboardController = {
 
 				case 'print_distribution_pdf':
 
+
+
+
+					
+
+
+
+
+
+					break;
+
+
+
+
+
+
+
+
+				case 'print_distribution_pdf_v1':
+
 					// html
 					var page_html_start,
 							page_html_body,
-							page_html_end,
+							data = [],
 							report = params.organization_tag + '_' + params.site_id + '_' + moment().unix();
 
 					// make template
 					var template = '/home/ubuntu/data/html/template/' + report + '.html';
 
-					// sort
-					distribution_list = _.sortBy( beneficiaries, 'sl_number' );
+					// html content
+					page_html_start = '' +
+						'<!DOCTYPE html>' +
+						'<html lang="en">' +
+							'<head>' +
+								'<title>WFP GFD Distribution List</title>' +
+								'<meta http-equiv="content-type" content="text/html; charset=UTF-8">' +
+								'<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+								'<style type="text/css" media="all">' +
+									'html {' +
+										'margin: 0;' +
+										'zoom: 1;' +
+									'}' +
+								'</style>' +
+							'</head>' +
+							'<style>' +
+									'table {' +
+										'font-family: verdana, arial, sans-serif;' +
+										'color: #333333;' +
+										'border-width: 1px;' +
+										'border-color: #3A3A3A;' +
+										'border-collapse: collapse;' +
+									'}' +
+									'table th {' +
+										'border-width: 1px;' +
+										'font-size: 10px;' +
+										'padding: 4px;' +
+										'border-style: solid;' +
+										'border-color: #517994;' +
+										'background-color: #B2CFD8;' +
+									'}' +
+									'table td {' +
+										'border-width: 1px;' +
+										'font-size: 9px;' +
+										'padding: 4px;' +
+										'border-style: solid;' +
+										'border-color: #517994;' +
+										'background-color: #ffffff;' +
+									'}' +
+							'</style>' +
+							'<body>';
 
 					// get form details
 					GfdForms
-					 .findOne()
-					 .where( filters.site_id )
+					 .find()
+					 .where( filters.organization_tag )
 					 .where({ report_round: params.report_round })
-					 .exec( function( err, form ){
+					 .exec( function( err, forms ){
 
 							// return error
 							if ( err ) return res.negotiate( err );
 
-							// title
-							var header_1 = 'Master Roll - ' + form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + params.report_distribution;
-							var header_2 = 'Distribution Date: ' + moment( params.end_date ).format( 'MMMM Do YYYY' );
-							var footer = 'Funded by the World Food Programme (WFP)';
+							// distribution_list by site_id 
+							var distribution_list = _.groupBy( beneficiaries, 'site_id' );
 
-							// html content
-							page_html_start = '' +
-								'<!DOCTYPE html>' +
-								'<html lang="en">' +
-									'<head>' +
-										'<title>WFP GFD Distribution List</title>' +
-										'<meta http-equiv="content-type" content="text/html; charset=UTF-8">' +
-										'<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-										'<style type="text/css" media="all">' +
-											'html {' +
-												'margin: 0;' +
-												'zoom: 1;' +
-											'}' +
-										'</style>' +
-									'</head>' +
-									'<style>' +
-											'table {' +
-												'font-family: verdana, arial, sans-serif;' +
-												'color: #333333;' +
-												'border-width: 1px;' +
-												'border-color: #3A3A3A;' +
-												'border-collapse: collapse;' +
-											'}' +
-											'table th {' +
-												'border-width: 1px;' +
-												'font-size: 10px;' +
-												'padding: 4px;' +
-												'border-style: solid;' +
-												'border-color: #517994;' +
-												'background-color: #B2CFD8;' +
-											'}' +
-											'table td {' +
-												'border-width: 1px;' +
-												'font-size: 9px;' +
-												'padding: 4px;' +
-												'border-style: solid;' +
-												'border-color: #517994;' +
-												'background-color: #ffffff;' +
-											'}' +
-									'</style>' +
-									'<body>';
+							// get length
+							var forms_count = 0;
+							var forms_length = forms.length;
 
-							// theader
-							page_html_body = '' +
-									'<table style="width:100%">' +
-										'<thead>' +
-											'<tr>' +
-												'<th>SL#</th>' +
-												'<th>FCN</th>' +
-												'<th>Scope</th>' +
-												'<th>HH Name</th>' +
-												'<th>Location</th>' +
-												'<th>Family Size</th>' +
-												'<th>Thumb</th>' +
-											'</tr>' +
-										'</thead>' +
-										'<tbody>';
+							// build template
+							doTemplate( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
 
-							// foreach record
-							for( i=0; i < distribution_list.length; i++ ){
-								
-								// check if /10
-								if ( i !== 0 && i % 10 === 0 ) {
+							// do template
+							function doTemplate( forms_count, forms_length, form, distribution_plan ){
+
+								// group by date
+								var dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date' ), 'distribution_date' );
+
+								// for each date
+								for ( var date_key in dates ) {
+									
+									// title
+									var header_1 = 'Master Roll - ' + form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + params.report_distribution;
+									var header_2 = 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' );
+
+									// header
 									page_html_body += '' +
-									'</tbody>' +
-								'</table>' +
-										'<div style="page-break-before: always;"></div>' +
-										// theader
-											'<table style="width:100%">' +
-												'<thead>' +
+										'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; margin:0px;">' + header_1 + '</h3>' +
+										'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px 0px 10px 0px; color: #616161;">' + header_2 + '</h3>';
+
+									// theader
+									page_html_body += '' +
+										'<table style="width:100%">' +
+											'<thead>' +
+												'<tr>' +
+													'<th>SL#</th>' +
+													'<th>FCN</th>' +
+													'<th>Scope</th>' +
+													'<th>HH Name</th>' +
+													'<th>Location</th>' +
+													'<th>Family Size</th>' +
+													'<th>Thumb</th>' +
+												'</tr>' +
+											'</thead>' +
+											'<tbody>';
+
+									// foreach record
+									for( i=0; i < dates[ date_key ].length; i++ ){
+										
+										// check if /10
+										if ( i !== 0 && i % 10 === 0 ) {
+
+											// html end
+											page_html_body += '' +
+													'</tbody>' +
+												'</table>' +
+												'<div style="page-break-before: always;"></div>';
+
+											// title
+											var header_1 = 'Master Roll - ' + form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + params.report_distribution;
+											var header_2 = 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' );
+
+											// header
+											page_html_body += '' +
+												'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; margin:0px;">' + header_1 + '</h3>' +
+												'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px 0px 10px 0px; color: #616161;">' + header_2 + '</h3>';
+											
+											// new page new header
+											page_html_body += '' +
+												// theader
+												'<table style="width:100%">' +
+													'<thead>' +
+														'<tr>' +
+															'<th>SL#</th>' +
+															'<th>FCN</th>' +
+															'<th>Scope</th>' +
+															'<th>HH Name</th>' +
+															'<th>Location</th>' +
+															'<th>Family Size</th>' +
+															'<th>Thumb</th>' +
+														'</tr>' +
+													'</thead>' +
+													'<tbody>';
+										}
+
+										// content
+										page_html_body += '' +
 													'<tr>' +
-														'<th>SL#</th>' +
-														'<th>FCN</th>' +
-														'<th>Scope</th>' +
-														'<th>HH Name</th>' +
-														'<th>Location</th>' +
-														'<th>Family Size</th>' +
-														'<th>Thumb</th>' +
-													'</tr>' +
-												'</thead>' +
-												'<tbody>';
+														'<td>' + dates[ date_key ][ i ].sl_number  + '</td>' +
+														'<td>' + dates[ date_key ][ i ].fcn_id + '</td>' +
+														'<td>' + dates[ date_key ][ i ].scope_id + '</td>' +
+														'<td>' + dates[ date_key ][ i ].hh_name + '</td>' +
+														'<td>' + dates[ date_key ][ i ].admin4name + '</td>' +
+														'<td align="center">' + dates[ date_key ][ i ].gfd_family_size + '</td>' +
+														'<td width="25%" height="50px;"></td>' +
+													'</tr>';
+									
+									}								
+
 								}
 
-								page_html_body += '' +
-										'<tr>' +
-											'<td>' + distribution_list[ i ].sl_number  + '</td>' +
-											'<td>' + distribution_list[ i ].fcn_id + '</td>' +
-											'<td>' + distribution_list[ i ].scope_id + '</td>' +
-											'<td>' + distribution_list[ i ].hh_name + '</td>' +
-											'<td>' + distribution_list[ i ].admin4name + '</td>' +
-											'<td align="center">' + distribution_list[ i ].gfd_family_size + '</td>' +
-											'<td width="25%" height="55px;"></td>' +
-										'</tr>';
-							}
+								// all sites added?
+								forms_count++;
+								if ( forms_count === forms_length ) {
 
-								// end
-								page_html_body += '' +
-									'</tbody>' +
-								'</table>' +
-							'</body>';
+									// end html
+									page_html_body += '</body></html>';
 
-							// html page end
-							page_html_end = '' +
-							'</html>';
+									// fs write template
+									fs.writeFile( template, page_html_start + page_html_body, function( err ) {
 
-							// fs write template
-							fs.writeFile( template, page_html_start + page_html_body + page_html_end, function( err ) {
+										// err
+										if( err ) return res.json( 400, { error: 'HTML Template error!', details: error  } );
 
-								// err
-								if( err ) {
-									res.json( 400, { error: 'HTML Template error!', details: error  } );
-								}
+										// import updated form
+										var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js ' + template + ' /home/ubuntu/nginx/www/ngm-reportPrint/pdf/' + report + '.pdf';
 
-								// import updated form
-								var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + header_1 + '" "' + header_2 + '" "' + footer + '" ' + template + ' /home/ubuntu/nginx/www/ngm-reportPrint/pdf/' + report + '.pdf';
-
-								// run curl command
-								EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
-									// err
-									if ( error ) {
-										// return error
-										res.json( 400, { error: 'PDF error!', details: error  } );
-									} else {
-										// delete template
-										fs.unlink( template, function ( err ) {
-											if ( err ) throw err;
-											// success
-											return res.json( 200, { report: report + '.pdf' });
+										// run curl command
+										EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
+											// err
+											if ( error ) {
+												// return error
+												res.json( 400, { error: 'PDF error!', details: error  } );
+											} else {
+												// delete template
+												// fs.unlink( template, function ( err ) {
+													// if ( err ) throw err;
+													// success
+													return res.json( 200, { report: report + '.pdf' });
+												// });
+											}
+										
 										});
-									}
-								});
 
-							});
+									});
+
+								} else {
+									doTemplate( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
+								}
+
+							}
 
 					 });
 
@@ -750,13 +810,14 @@ var GfaDashboardController = {
 
 					// fields 
 					var fields = [
+						'distribution_date',
 						'organization',
 						'report_distribution',
 						'site_name',
 						'admin3name',
 						'admin4name',
 						'admin5name',
-						'distribution_date',
+						'majhee_name',
 						'family_1_to_3',
 						'family_4_to_7',
 						'family_8_to_10',
@@ -769,9 +830,32 @@ var GfaDashboardController = {
 						'site_lng',
 						'site_lat',
 					];
+
+					// fieldNames
+					var fieldNames = [
+						'Date (YYYY-MM-DD)',
+						'Implementing Partner',
+						'Distribution',
+						'Distribution Point',
+						'Camp',
+						'Block',
+						'Sub Block',
+						'Majhee Name',
+						'1 to 3',
+						'4 to 7',
+						'8 to 10',
+						'11+',
+						'HH Total',
+						'Rice',
+						'Lentils',
+						'Oil',
+						'Total',
+						'site_lng',
+						'site_lat',
+					];
 												
 					// food distribution plan
-					var filter = [];
+					var data = [];
 					beneficiaries.reduce( function( res, value ) {
 						// group by organization_tag + admin5pcode + distribution_date
 						var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date;
@@ -782,7 +866,7 @@ var GfaDashboardController = {
 							res[ id ][ 'family_8_to_10' ] = 0;
 							res[ id ][ 'family_11+' ] = 0;
 							res[ id ][ 'hh_total' ] = 0;
-							filter.push( res[ id ] );
+							data.push( res[ id ] );
 						} else {
 							// tally (initial values set with res[ id ] = value )
 							res[ id ].rice += value.rice;
@@ -810,8 +894,17 @@ var GfaDashboardController = {
 						return res;
 					}, {});
 
+					// order by least important to most important
+					var filter = _.chain( data )
+						.sortBy( 'admin5name' )
+						.sortBy( 'admin4name' )
+						.sortBy( 'admin3name' )
+						.sortBy( 'distribution_date' )
+						.sortBy( 'organization' )
+						.value();
+
 					// return csv
-					json2csv({ data: filter, fields: fields, fieldNames: fields }, function( err, csv ) {
+					json2csv({ data: filter, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
 
 						// error
 						if ( err ) return res.negotiate( err );

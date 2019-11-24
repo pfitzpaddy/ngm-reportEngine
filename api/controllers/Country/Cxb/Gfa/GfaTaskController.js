@@ -458,9 +458,9 @@ var GfaTaskController = {
 					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ] : d[ 10 ];
 					planned.admin5name = d[ 10 ];
 
-					// majee
-					planned.majee_name = d[ 11 ];
-					planned.majee_phone = d[ 12 ];
+					// majhee
+					planned.majhee_name = d[ 11 ];
+					planned.majhee_phone = d[ 12 ];
 					planned.fh_name = d[ 14 ];
 					planned.hh_name = d[ 13 ];
 					planned.hh_age = d[ 23 ];
@@ -740,7 +740,6 @@ var GfaTaskController = {
 
 				// set process
 				doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-
 				
 				// do deployment
 				function doDeployment( deployments_complete, deployments_pending, form  ) {
@@ -780,6 +779,11 @@ var GfaTaskController = {
 
 									// run curl command
 									EXEC( cmd_3, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
+
+										// log
+										// console.log( error );
+										// console.log( stdout );
+										// console.log( stderr );
 
 										// err
 										if ( error || stderr ) {
@@ -850,40 +854,74 @@ var GfaTaskController = {
 		var k_data = req.body;
 
 		// set actual_fcn_id
-		var actual_fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
-		var actual_scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
+		var uuid = k_data[ 'formhub/uuid' ];
+		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
+		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
+		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
+		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
+		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
 
 		// filter
-		var filter = { fcn_id: actual_fcn_id }
-		if ( actual_scope_id ) {
-			filter.scope_id = actual_scope_id;
+		var filter = { fcn_id: fcn_id }
+		if ( scope_id ) {
+			filter.scope_id = scope_id;
 		}
 
-		// find from plan
-		PlannedBeneficiaries
+		// gfd forms
+		GfdForms
 			.findOne()
-			.where( filter )
-			.exec( function( err, planned ) {
+			.where({ uuid: uuid })
+			.exec( function( err, form ) {
 				// return error
-				if ( err ) return res.negotiate( err );
-		
-				// update absent table
-				AbsentBeneficiaries
-					.updateOrCreate( filter, planned, function ( err, destroy_result ) {
+				if (err) return res.negotiate( err );
+
+				// find from plan
+				PlannedBeneficiaries
+					.findOne()
+					.where({ site_id: form.site_id })
+					.where({ report_distribution: report_distribution })
+					.sort( '-distribution_date' )
+					.limit( 1 )
+					.exec( function( err, end_date ) {
 						// return error
 						if ( err ) return res.negotiate( err );
 
-						// actual beneficiaries
-						ActualBeneficiaries
-							.destroy( filter )
-							.exec( function( err, destroy_result ) {
+						console.log( end_date );
+
+						// find from plan
+						PlannedBeneficiaries
+							.findOne()
+							.where( filter )
+							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );
-								
-								// return success
-								return res.json( 200, { msg: 'Success!' });
-							});
+						
+								// update absent table for beneficiary
+								AbsentBeneficiaries
+									.updateOrCreate( filter, planned, function ( err, destroy_result ) {
+										// return error
+										if ( err ) return res.negotiate( err );
 
+										// set new end date for beneficiary
+										PlannedBeneficiaries
+											.update( filter, { distribution_date: end_date.distribution_date })
+											.exec( function( err, updated_plan ) {
+												// return error
+												if ( err ) return res.negotiate( err );
+
+												// remove beneficiary from actual beneficiaries
+												ActualBeneficiaries
+													.destroy( filter )
+													.exec( function( err, destroy_result ) {
+														// return error
+														if ( err ) return res.negotiate( err );
+														
+														// return success
+														return res.json( 200, { msg: 'Success!' });
+													});
+											});
+									});
+							});
 					});
 			});
 
@@ -898,7 +936,7 @@ var GfaTaskController = {
 		// find from plan
 		PlannedBeneficiaries
 			.find()
-			.where({ distribution_date: today })
+			// .where({ distribution_date: today })
 			.exec( function( err, planned_beneficiaries ) {
 				
 				// return error
