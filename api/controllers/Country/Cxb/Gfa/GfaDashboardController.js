@@ -537,239 +537,112 @@ var GfaDashboardController = {
 
 				case 'print_distribution_zip':
 
-
-					// make folder
-
-					// group data
-
-					// make HTML tempaltes
-
-					// send to PDF 
-
-					// add to zip
-
-					// send zip for download
-
-
+					// folder
+					var dir = '/home/ubuntu/nginx/www/ngm-reportPrint/pdf/';
+					var folder = params.organization_tag + '_round_' + params.report_round + '_distribution_' + params.report_distribution + '_' + moment().unix();
 					
+					// run curl command
+					fs.mkdir( dir + folder, { recursive: true }, function( err ) {
+						// err
+						if (err) throw err;
 
+						// get form details
+						GfdForms
+						 .find()
+						 .where( filters.organization_tag )
+						 .where({ report_round: params.report_round })
+						 .exec( function( err, forms ){
 
+								// return error
+								if ( err ) return res.negotiate( err );
 
+								// distribution_list by site_id 
+								var distribution_list = _.groupBy( beneficiaries, 'site_id' );
 
+								// get length
+								var forms_count = 0;
+								var forms_length = forms.length;
 
-					break;
+								// build template
+								doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
 
+								// do template
+								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
 
+									// group by date
+									var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date' ), 'distribution_date' );
 
+									// distribution_dates
+									var dates_count = 0;
+									var dates_keys = Object.keys( distribution_dates );
+									var dates_length = Object.keys( distribution_dates ).length;
 
+									// run PDF function
+									doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
 
+									// loop each date to allow for PDF generation
+									function doDistributionDate( params, form, date_key, distribution_dates ) {
 
+										// html
+										var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, distribution_dates );
 
-
-				case 'print_distribution_pdf_v1':
-
-					// html
-					var page_html_start,
-							page_html_body,
-							data = [],
-							report = params.organization_tag + '_' + params.site_id + '_' + moment().unix();
-
-					// make template
-					var template = '/home/ubuntu/data/html/template/' + report + '.html';
-
-					// html content
-					page_html_start = '' +
-						'<!DOCTYPE html>' +
-						'<html lang="en">' +
-							'<head>' +
-								'<title>WFP GFD Distribution List</title>' +
-								'<meta http-equiv="content-type" content="text/html; charset=UTF-8">' +
-								'<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-								'<style type="text/css" media="all">' +
-									'html {' +
-										'margin: 0;' +
-										'zoom: 1;' +
-									'}' +
-								'</style>' +
-							'</head>' +
-							'<style>' +
-									'table {' +
-										'font-family: verdana, arial, sans-serif;' +
-										'color: #333333;' +
-										'border-width: 1px;' +
-										'border-color: #3A3A3A;' +
-										'border-collapse: collapse;' +
-									'}' +
-									'table th {' +
-										'border-width: 1px;' +
-										'font-size: 10px;' +
-										'padding: 4px;' +
-										'border-style: solid;' +
-										'border-color: #517994;' +
-										'background-color: #B2CFD8;' +
-									'}' +
-									'table td {' +
-										'border-width: 1px;' +
-										'font-size: 9px;' +
-										'padding: 4px;' +
-										'border-style: solid;' +
-										'border-color: #517994;' +
-										'background-color: #ffffff;' +
-									'}' +
-							'</style>' +
-							'<body>';
-
-					// get form details
-					GfdForms
-					 .find()
-					 .where( filters.organization_tag )
-					 .where({ report_round: params.report_round })
-					 .exec( function( err, forms ){
-
-							// return error
-							if ( err ) return res.negotiate( err );
-
-							// distribution_list by site_id 
-							var distribution_list = _.groupBy( beneficiaries, 'site_id' );
-
-							// get length
-							var forms_count = 0;
-							var forms_length = forms.length;
-
-							// build template
-							doTemplate( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
-
-							// do template
-							function doTemplate( forms_count, forms_length, form, distribution_plan ){
-
-								// group by date
-								var dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date' ), 'distribution_date' );
-
-								// for each date
-								for ( var date_key in dates ) {
-									
-									// title
-									var header_1 = 'Master Roll - ' + form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + params.report_distribution;
-									var header_2 = 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' );
-
-									// header
-									page_html_body += '' +
-										'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; margin:0px;">' + header_1 + '</h3>' +
-										'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px 0px 10px 0px; color: #616161;">' + header_2 + '</h3>';
-
-									// theader
-									page_html_body += '' +
-										'<table style="width:100%">' +
-											'<thead>' +
-												'<tr>' +
-													'<th>SL#</th>' +
-													'<th>FCN</th>' +
-													'<th>Scope</th>' +
-													'<th>HH Name</th>' +
-													'<th>Location</th>' +
-													'<th>Family Size</th>' +
-													'<th>Thumb</th>' +
-												'</tr>' +
-											'</thead>' +
-											'<tbody>';
-
-									// foreach record
-									for( i=0; i < dates[ date_key ].length; i++ ){
-										
-										// check if /10
-										if ( i !== 0 && i % 10 === 0 ) {
-
-											// html end
-											page_html_body += '' +
-													'</tbody>' +
-												'</table>' +
-												'<div style="page-break-before: always;"></div>';
-
-											// title
-											var header_1 = 'Master Roll - ' + form.form_title.replace(', Absent Beneficiaries', '' ) + ', Distribution ' + params.report_distribution;
-											var header_2 = 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' );
-
-											// header
-											page_html_body += '' +
-												'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; margin:0px;">' + header_1 + '</h3>' +
-												'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px 0px 10px 0px; color: #616161;">' + header_2 + '</h3>';
-											
-											// new page new header
-											page_html_body += '' +
-												// theader
-												'<table style="width:100%">' +
-													'<thead>' +
-														'<tr>' +
-															'<th>SL#</th>' +
-															'<th>FCN</th>' +
-															'<th>Scope</th>' +
-															'<th>HH Name</th>' +
-															'<th>Location</th>' +
-															'<th>Family Size</th>' +
-															'<th>Thumb</th>' +
-														'</tr>' +
-													'</thead>' +
-													'<tbody>';
-										}
-
-										// content
-										page_html_body += '' +
-													'<tr>' +
-														'<td>' + dates[ date_key ][ i ].sl_number  + '</td>' +
-														'<td>' + dates[ date_key ][ i ].fcn_id + '</td>' +
-														'<td>' + dates[ date_key ][ i ].scope_id + '</td>' +
-														'<td>' + dates[ date_key ][ i ].hh_name + '</td>' +
-														'<td>' + dates[ date_key ][ i ].admin4name + '</td>' +
-														'<td align="center">' + dates[ date_key ][ i ].gfd_family_size + '</td>' +
-														'<td width="25%" height="50px;"></td>' +
-													'</tr>';
-									
-									}								
-
-								}
-
-								// all sites added?
-								forms_count++;
-								if ( forms_count === forms_length ) {
-
-									// end html
-									page_html_body += '</body></html>';
-
-									// fs write template
-									fs.writeFile( template, page_html_start + page_html_body, function( err ) {
-
-										// err
-										if( err ) return res.json( 400, { error: 'HTML Template error!', details: error  } );
-
-										// import updated form
-										var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js ' + template + ' /home/ubuntu/nginx/www/ngm-reportPrint/pdf/' + report + '.pdf';
-
-										// run curl command
-										EXEC( cmd, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
+										// fs write template
+										fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
 											// err
-											if ( error ) {
-												// return error
-												res.json( 400, { error: 'PDF error!', details: error  } );
-											} else {
-												// delete template
-												// fs.unlink( template, function ( err ) {
-													// if ( err ) throw err;
-													// success
-													return res.json( 200, { report: report + '.pdf' });
-												// });
-											}
-										
+											if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
+											
+											// import updated form
+											var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
+
+											// run curl command
+											EXEC( cmd, function( error, stdout, stderr ) {
+												// err
+												if ( error ) {
+													// return error
+													res.json( 400, { error: 'PDF error!', details: error  } );
+												} else {
+													
+													// delete template
+													fs.unlink( template.dir + template.report + '.html', function ( err ) {
+														// err
+														if ( err ) throw err;
+
+														// generate master list pdf completed
+														dates_count++;
+														if ( dates_count === dates_length ) {
+															forms_count++;
+															if ( forms_count === forms_length ) {
+																// zip
+																var zip_cmd = 'zip -r ' + dir + folder + '.zip ' + dir + folder;
+																// run curl command
+																EXEC( zip_cmd, function( error, stdout, stderr ) {
+																	// err
+																	if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
+																		// success
+																		return res.json( 200, { report: folder + '.zip' });
+																});
+															} else {
+																doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
+															}
+														} else {
+															doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
+														}
+
+													});
+												
+												}
+											
+											});
+
 										});
+									
+									}
 
-									});
-
-								} else {
-									doTemplate( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
 								}
 
-							}
+						});
 
-					 });
+					});
 
 					break;
 
@@ -967,6 +840,182 @@ var GfaDashboardController = {
 			}
 
 		}
+
+	},
+
+	// return html template for distribution master list
+	getDistributionPlanHtmlTemplate: function( params, form, date_key, distribution_dates ) {
+
+		// set object
+		var template = {};
+
+		// html content
+		var page_html_start;
+		var page_html_body;
+
+		// headers
+		page_html_start = '<!DOCTYPE html>' +
+			'<html lang="en">' +
+				'<head>' +
+					'<title>WFP GFD Distribution List</title>' +
+					'<meta http-equiv="content-type" content="text/html; charset=UTF-8">' +
+					'<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+					'<style type="text/css" media="all">' +
+						'html {' +
+							'margin: 0;' +
+							'zoom: 1;' +
+						'}' +
+					'</style>' +
+				'</head>' +
+				'<style>' +
+						'table {' +
+							'font-family: verdana, arial, sans-serif;' +
+							'color: #333333;' +
+							'border-width: 1px;' +
+							'border-color: #3A3A3A;' +
+							'border-collapse: collapse;' +
+						'}' +
+						'table th {' +
+							'border-width: 1px;' +
+							'font-size: 7px;' +
+							'padding: 2px;' +
+							'border-style: solid;' +
+							'border-color: #517994;' +
+							'background-color: #B2CFD8;' +
+						'}' +
+						'table td {' +
+							'border-width: 1px;' +
+							'font-size: 7px;' +
+							'padding: 2px;' +
+							'border-style: solid;' +
+							'border-color: #517994;' +
+							'background-color: #ffffff;' +
+						'}' +
+				'</style>' +
+				'<body>';
+
+		// title
+		template.dir = '/home/ubuntu/data/html/template/';
+		template.report = params.organization_tag + '_' + form.site_id + '_' + params.report_round + '_' + params.report_distribution + '_' + date_key + '_master_list';
+		template.header_1 = 'Master Roll: ' + form.site_name + ', Round ' + form.report_round + ', Distribution ' + params.report_distribution;
+		template.header_2 = 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' );
+		template.footer = 'Funded by the World Food Programme (WFP)';
+
+		// page header
+		page_html_body = '<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px; font-weight: 300;">' + template.header_1 + ': Family Size 1 to 3</h3>' +
+											'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>';
+
+		// theader
+		page_html_body += '<table style="width:100%">' +
+				'<thead>' +
+					'<tr>' +
+						'<th>SL#</th>' +
+						'<th>FCN</th>' +
+						'<th>Scope</th>' +
+						'<th>HH Name</th>' +
+						'<th>Location</th>' +
+						'<th>Family Size</th>' +
+						'<th>Thumb</th>' +
+					'</tr>' +
+				'</thead>' +
+				'<tbody>';	
+
+		// order by least important to most important
+		var distribution = _.chain( distribution_dates[ date_key ] )
+			.sortBy( 'fcn_id' )
+			.sortBy( 'gfd_family_size' )
+			.value();
+
+		// foreach record
+		var sub_header = 'Family Size 1 to 3';
+		var family_4_to_7 = true;
+		var family_8_to_10 = true;
+		var family_11_plus = true;
+		var beneficiary_page_count = 0;
+		var beneficiary_page_length = 15;
+		for( i=0; i < distribution.length; i++ ){
+
+			// ++
+			beneficiary_page_count++;
+			
+			// check if page break required
+			if ( beneficiary_page_count === beneficiary_page_length || 
+						family_4_to_7 && distribution[ i ].gfd_family_size >= 4 || 
+						family_8_to_10 && distribution[ i ].gfd_family_size >= 8 || 
+						family_11_plus && distribution[ i ].gfd_family_size >= 11 ) {
+
+				// page break for family_4_to_7
+				if ( distribution[ i ].gfd_family_size >= 4 ) {
+					family_4_to_7 = false;
+					sub_header = 'Family Size 4 to 7';
+				}
+
+				// page break for family_8_to_10
+				if ( distribution[ i ].gfd_family_size >= 8 ) {
+					family_8_to_10 = false;
+					sub_header = 'Family Size 8 to 10';
+				}
+
+				// page break for family_11_plus
+				if ( distribution[ i ].gfd_family_size >= 11 ) {
+					family_11_plus = false;
+					sub_header = 'Family Size 11+';
+				}
+
+				// reset
+				beneficiary_page_count = 0;
+
+				// end
+				page_html_body += '</tbody>' +
+					'</table>';
+
+				// page break
+				page_html_body += '<div style="page-break-before: always;"></div>';
+
+				// page header
+				page_html_body += '<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px; font-weight: 300;">' + template.header_1 + ': ' + sub_header + '</h3>' +
+													'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>';				
+				
+				// theader
+				page_html_body += '<table style="width:100%">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>SL#</th>' +
+								'<th>FCN</th>' +
+								'<th>Scope</th>' +
+								'<th>HH Name</th>' +
+								'<th>Location</th>' +
+								'<th>Family Size</th>' +
+								'<th>Thumb</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>';
+			}
+
+			// content
+			page_html_body += '<tr>' +
+								'<td>' + distribution[ i ].sl_number  + '</td>' +
+								'<td>' + distribution[ i ].fcn_id + '</td>' +
+								'<td>' + distribution[ i ].scope_id + '</td>' +
+								'<td>' + distribution[ i ].hh_name + '</td>' +
+								'<td>' + distribution[ i ].admin4name + '</td>' +
+								'<td align="center">' + distribution[ i ].gfd_family_size + '</td>' +
+								'<td width="25%" height="42px;"></td>' +
+							'</tr>';
+
+		}
+
+		// end
+		page_html_body += '</tbody>' +
+				'</table>' +
+			'</body>' +
+			'</html>';
+
+		// set html
+		template.html = page_html_start + page_html_body; 
+
+		// return
+		return template;
 
 	}
 
