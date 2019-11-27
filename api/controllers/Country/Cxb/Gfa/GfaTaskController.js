@@ -233,7 +233,7 @@ var GfaTaskController = {
 		// variables
 		var round = req.param( 'round' );
 		var day = moment().date();
-		var round_1 = 27;
+		var round_1 = 26;
 		var round_2 = 8;
 
 		// check req
@@ -260,7 +260,7 @@ var GfaTaskController = {
 			report.report_month_name = moment().add( 1, 'M' ).format( 'MMMM' );
 			report.report_year = moment().add( 1, 'M' ).year();
 			report.reporting_period = moment().add( 1, 'M' ).set( 'date', 1 ).startOf( 'day' ).format();
-			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_1-1 ) ).startOf( 'day' ).format();		
+			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_1 ) ).startOf( 'day' ).format();		
 
 			// set filter
 			var filter = { report_round: report.report_round, report_year: moment().year(), report_month_number: moment().month() };
