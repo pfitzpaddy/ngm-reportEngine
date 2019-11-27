@@ -613,7 +613,7 @@ var GfaDashboardController = {
 															forms_count++;
 															if ( forms_count === forms_length ) {
 																// zip
-																var zip_cmd = 'zip -r ' + dir + folder + '.zip ' + dir + folder;
+																var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
 																// run curl command
 																EXEC( zip_cmd, function( error, stdout, stderr ) {
 																	// err
@@ -900,13 +900,6 @@ var GfaDashboardController = {
 				'</style>' +
 				'<body>';
 
-		// page header
-		// page_html_body = '<div>' +
-		// 									// '<span style="float:left"><img src="../logo/wfp-logo-standard-blue-en-sm.png" width="10%" /></span>' +
-		// 										'<img style="margin-top:-10px;" src="https://cdn.wfp.org/guides/ui/v1.0.95/assets/logos/standard/en/wfp-logo-standard-blue-en.png" width="10%" />' +
-		// 										'<h3 style="padding-left:60px; font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px; font-weight: 300;">' + template.header_1 + ': ' + sub_header + '</h3>' +
-		// 										'<h3 style="padding-left:60px; font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
-		// 								'<div>';
 
 		// order by least important to most important
 		var distribution = _.chain( distribution_dates[ date_key ] )
@@ -929,8 +922,7 @@ var GfaDashboardController = {
 			beneficiary_page_count++;
 
 			// true / false
-			var page_break = i !== 0 ||
-						beneficiary_page_count === beneficiary_page_length || 
+			var page_break = beneficiary_page_count === beneficiary_page_length || 
 						family_4_to_7 && distribution[ i ].gfd_family_size >= 4 || 
 						family_8_to_10 && distribution[ i ].gfd_family_size >= 8 || 
 						family_11_plus && distribution[ i ].gfd_family_size >= 11;
@@ -960,7 +952,7 @@ var GfaDashboardController = {
 				}
 
 				// reset / page break
-				if ( page_break ) {
+				if (  i !== 0 && page_break ) {
 					// set 
 					beneficiary_page_count = 0;
 					// end
@@ -971,14 +963,14 @@ var GfaDashboardController = {
 				page_html_body += '' +
 					'<table style="border-width: 0px;">' +
 						'<td width="20%" style="border-width: 0px; margin-top:-10px;">' +
-							'<img src="https://reporthub.immap.org/desk/images/logo/wfp-logo-standard-blue-en.png" width="90%"/>' +
+							'<img src="https://reporthub.immap.org/desk/images/logo/wfp-logo-standard-blue-en.png" width="90%" />' +
 						'</td>' +
 						'<td style="border-width: 0px;">' +
 							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:12px; margin:0px; font-weight: 300;">' + template.header_1 + ': ' + sub_header + '</h3>' +
 							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
 						'</td>' +
-						'<td style="border-width: 0px;">' +
-							'<img src="https://reporthub.immap.org/desk/images/logo/' + params.organization_tag + '-logo.png" />' +
+						'<td align="right" style="border-width: 0px;">' +
+							'<img src="https://reporthub.immap.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="50%" />' +
 						'</td>' +
 					'</table>';	
 				
