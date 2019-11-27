@@ -970,7 +970,7 @@ var GfaDashboardController = {
 							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
 						'</td>' +
 						'<td align="right" style="border-width: 0px;">' +
-							'<img src="https://reporthub.immap.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="45%" />' +
+							'<img src="https://reporthub.immap.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="40%" />' +
 						'</td>' +
 					'</table>';	
 				
