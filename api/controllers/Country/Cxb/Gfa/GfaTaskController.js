@@ -231,18 +231,18 @@ var GfaTaskController = {
 	setDistributionRound: function( req, res ){
 
 		// variables
-		var round = req.param('round');
+		var round = req.param( 'round' );
 		var day = moment().date();
-		var round_1 = 26;
+		var round_1 = 27;
 		var round_2 = 8;
 
 		// check req
-		if ( !req.param('round') ) {
-			return res.json( 401, { err: 'round as integer required!' });
+		if ( !req.param( 'round' ) ) {
+			return res.json( 401, { err: 'round required!' });
 		}
 
 		// open round?
-		if ( day !== 26 || day !== 8 ) {
+		if ( day !== round_1 && day !== round_2 ) {
 			return res.json( 401, { err: 'round not open!' });
 		}
 
@@ -257,10 +257,10 @@ var GfaTaskController = {
 
 			// set report variables
 			report.report_month_number = moment().add( 1, 'M' ).month();
-			report.report_month_name = moment().add( 1, 'M' ).format('MMMM');
+			report.report_month_name = moment().add( 1, 'M' ).format( 'MMMM' );
 			report.report_year = moment().add( 1, 'M' ).year();
-			report.reporting_period = moment().add( 1, 'M' ).set('date', 1).startOf('day').format();
-			report.reporting_due_date = moment().add( 1, 'M' ).set('date', round_1 ).startOf('day').format();		
+			report.reporting_period = moment().add( 1, 'M' ).set( 'date', 1 ).startOf( 'day' ).format();
+			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_1-1 ) ).startOf( 'day' ).format();		
 
 			// set filter
 			var filter = { report_round: report.report_round, report_year: moment().year(), report_month_number: moment().month() };
@@ -269,10 +269,10 @@ var GfaTaskController = {
 
 			// 
 			report.report_month_number = moment().month();
-			report.report_month_name = moment().format('MMMM');
+			report.report_month_name = moment().format( 'MMMM' );
 			report.report_year = moment().year();
-			report.reporting_period = moment().set('date', 1).startOf('day').format();
-			report.reporting_due_date = moment().add( 1, 'M' ).set('date', round_2 ).startOf('day').format();
+			report.reporting_period = moment().set( 'date', 1 ).startOf( 'day' ).format();
+			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_2 ) ).startOf( 'day' ).format();
 
 			// set filter
 			var filter = { report_round: report.report_round, report_year: moment().subtract( 1, 'M' ).year(), report_month_number: moment().subtract( 1, 'M' ).month() }

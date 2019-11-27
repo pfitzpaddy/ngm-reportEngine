@@ -846,12 +846,18 @@ var GfaDashboardController = {
 	// return html template for distribution master list
 	getDistributionPlanHtmlTemplate: function( params, form, date_key, distribution_dates ) {
 
-		// set object
-		var template = {};
-
 		// html content
-		var page_html_start;
-		var page_html_body;
+		var page_html_start = '';
+		var page_html_body = '';
+
+		// template object
+		var template = {
+			dir: '/home/ubuntu/data/html/template/',
+			report: params.organization_tag + '_' + form.site_id + '_' + params.report_round + '_' + params.report_distribution + '_' + date_key + '_master_list',
+			header_1: 'Master Roll: ' + form.site_name + ', Round ' + form.report_round + ', Distribution ' + params.report_distribution,
+			header_2: 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' ),
+			footer: 'Funded by the World Food Programme (WFP)'
+		}
 
 		// headers
 		page_html_start = '<!DOCTYPE html>' +
@@ -894,37 +900,19 @@ var GfaDashboardController = {
 				'</style>' +
 				'<body>';
 
-		// title
-		template.dir = '/home/ubuntu/data/html/template/';
-		template.report = params.organization_tag + '_' + form.site_id + '_' + params.report_round + '_' + params.report_distribution + '_' + date_key + '_master_list';
-		template.header_1 = 'Master Roll: ' + form.site_name + ', Round ' + form.report_round + ', Distribution ' + params.report_distribution;
-		template.header_2 = 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' );
-		template.footer = 'Funded by the World Food Programme (WFP)';
-
 		// page header
-		page_html_body = '<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px; font-weight: 300;">' + template.header_1 + ': Family Size 1 to 3</h3>' +
-											'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>';
-
-		// theader
-		page_html_body += '<table style="width:100%">' +
-				'<thead>' +
-					'<tr>' +
-						'<th>SL#</th>' +
-						'<th>FCN</th>' +
-						'<th>Scope</th>' +
-						'<th>HH Name</th>' +
-						'<th>Location</th>' +
-						'<th>Family Size</th>' +
-						'<th>Thumb</th>' +
-					'</tr>' +
-				'</thead>' +
-				'<tbody>';	
+		// page_html_body = '<div>' +
+		// 									// '<span style="float:left"><img src="../logo/wfp-logo-standard-blue-en-sm.png" width="10%" /></span>' +
+		// 										'<img style="margin-top:-10px;" src="https://cdn.wfp.org/guides/ui/v1.0.95/assets/logos/standard/en/wfp-logo-standard-blue-en.png" width="10%" />' +
+		// 										'<h3 style="padding-left:60px; font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px; font-weight: 300;">' + template.header_1 + ': ' + sub_header + '</h3>' +
+		// 										'<h3 style="padding-left:60px; font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
+		// 								'<div>';
 
 		// order by least important to most important
 		var distribution = _.chain( distribution_dates[ date_key ] )
-			.sortBy( 'fcn_id' )
-			.sortBy( 'gfd_family_size' )
-			.value();
+												.sortBy( 'fcn_id' )
+												.sortBy( 'gfd_family_size' )
+												.value();
 
 		// foreach record
 		var sub_header = 'Family Size 1 to 3';
@@ -933,83 +921,99 @@ var GfaDashboardController = {
 		var family_11_plus = true;
 		var beneficiary_page_count = 0;
 		var beneficiary_page_length = 15;
+
+		// for each record
 		for( i=0; i < distribution.length; i++ ){
 
 			// ++
 			beneficiary_page_count++;
-			
-			// check if page break required
-			if ( beneficiary_page_count === beneficiary_page_length || 
+
+			// true / false
+			var page_break = beneficiary_page_count === beneficiary_page_length || 
 						family_4_to_7 && distribution[ i ].gfd_family_size >= 4 || 
 						family_8_to_10 && distribution[ i ].gfd_family_size >= 8 || 
-						family_11_plus && distribution[ i ].gfd_family_size >= 11 ) {
+						family_11_plus && distribution[ i ].gfd_family_size >= 11;
+			
+			// check if first page / page break required
+			if ( i === 0 || page_break ) {
 
 				// page break for family_4_to_7
 				if ( distribution[ i ].gfd_family_size >= 4 ) {
 					family_4_to_7 = false;
 					sub_header = 'Family Size 4 to 7';
+				
 				}
 
 				// page break for family_8_to_10
 				if ( distribution[ i ].gfd_family_size >= 8 ) {
 					family_8_to_10 = false;
 					sub_header = 'Family Size 8 to 10';
+				
 				}
 
 				// page break for family_11_plus
 				if ( distribution[ i ].gfd_family_size >= 11 ) {
 					family_11_plus = false;
 					sub_header = 'Family Size 11+';
+				
 				}
 
-				// reset
-				beneficiary_page_count = 0;
-
-				// end
-				page_html_body += '</tbody>' +
-					'</table>';
-
-				// page break
-				page_html_body += '<div style="page-break-before: always;"></div>';
+				// reset / page break
+				if ( page_break ) {
+					// set 
+					beneficiary_page_count = 0;
+					// end
+					page_html_body += '</tbody></table><div style="page-break-before: always;"></div>';
+				}
 
 				// page header
-				page_html_body += '<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; margin:0px; font-weight: 300;">' + template.header_1 + ': ' + sub_header + '</h3>' +
-													'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>';				
+				page_html_body += '' +
+					'<table style="border-width: 0px;">' +
+						'<td width="20%" style="border-width: 0px; margin-top:-10px;">' +
+							'<img src="https://reporthub.immap.org/images/logo/wfp-logo-standard-blue-en.png" width="90%"/>' +
+						'</td>' +
+						'<td style="border-width: 0px;">' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:12px; margin:0px; font-weight: 300;">' + template.header_1 + ': ' + sub_header + '</h3>' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
+						'</td>' +
+						'<td style="border-width: 0px;">' +
+							'<img src="https://reporthub.immap.org/images/logo/ric-logo.png" />' +
+						'</td>' +
+					'</table>';	
 				
 				// theader
-				page_html_body += '<table style="width:100%">' +
-						'<thead>' +
-							'<tr>' +
-								'<th>SL#</th>' +
-								'<th>FCN</th>' +
-								'<th>Scope</th>' +
-								'<th>HH Name</th>' +
-								'<th>Location</th>' +
-								'<th>Family Size</th>' +
-								'<th>Thumb</th>' +
-							'</tr>' +
-						'</thead>' +
-						'<tbody>';
+				page_html_body += '' +
+					'<table style="width:100%">' +
+					'<thead>' +
+						'<tr>' +
+							'<th>SL#</th>' +
+							'<th>FCN</th>' +
+							'<th>Scope</th>' +
+							'<th>HH Name</th>' +
+							'<th>Location</th>' +
+							'<th>Family Size</th>' +
+							'<th>Thumb</th>' +
+						'</tr>' +
+					'</thead>' +
+					'<tbody>';
 			}
 
 			// content
-			page_html_body += '<tr>' +
-								'<td>' + distribution[ i ].sl_number  + '</td>' +
-								'<td>' + distribution[ i ].fcn_id + '</td>' +
-								'<td>' + distribution[ i ].scope_id + '</td>' +
-								'<td>' + distribution[ i ].hh_name + '</td>' +
-								'<td>' + distribution[ i ].admin4name + '</td>' +
-								'<td align="center">' + distribution[ i ].gfd_family_size + '</td>' +
-								'<td width="25%" height="42px;"></td>' +
-							'</tr>';
+			page_html_body += '' +
+				'<tr>' +
+					'<td>' + distribution[ i ].sl_number  + '</td>' +
+					'<td>' + distribution[ i ].fcn_id + '</td>' +
+					'<td>' + distribution[ i ].scope_id + '</td>' +
+					'<td>' + distribution[ i ].hh_name + '</td>' +
+					'<td>' + distribution[ i ].admin4name + '</td>' +
+					'<td align="center">' + distribution[ i ].gfd_family_size + '</td>' +
+					'<td width="25%" height="42px;"></td>' +
+				'</tr>';
 
 		}
 
 		// end
-		page_html_body += '</tbody>' +
-				'</table>' +
-			'</body>' +
-			'</html>';
+		page_html_body += '</tbody></table></body></html>';
 
 		// set html
 		template.html = page_html_start + page_html_body; 
