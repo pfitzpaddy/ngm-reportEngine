@@ -829,7 +829,7 @@ var GfaTaskController = {
 									var version_id = kobo.version_id;
 
 									// import updated form
-									var cmd_3 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form version_id=' + version_id + ' | python -m json.tool';
+									var cmd_3 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form "active=true" --form "version_id=' + version_id + '" | python -m json.tool';
 
 									// run curl command
 									EXEC( cmd_3, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
