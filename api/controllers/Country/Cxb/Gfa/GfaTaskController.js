@@ -746,7 +746,7 @@ var GfaTaskController = {
 				function doDeployment( deployments_complete, deployments_pending, form ) {
 
 					// import updated form
-					var cmd_1 = 'curl --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X POST https://kobo.humanitarianresponse.info/imports/ --form destination=https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ --form file=@' + XLSX_PATH + '/forms/' + form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx';
+					var cmd_1 = 'curl --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X POST https://kobo.humanitarianresponse.info/imports/ --form destination=https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ --form file=@' + XLSX_PATH + '/forms/' + form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx | python -m json.tool';
 
 					// run curl command
 					EXEC( cmd_1, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
@@ -788,7 +788,7 @@ var GfaTaskController = {
 						} else {
 
 							// import updated form
-							var cmd_2 = 'curl --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/';
+							var cmd_2 = 'curl --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ | python -m json.tool';
 
 							// run curl command
 							EXEC( cmd_2, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
