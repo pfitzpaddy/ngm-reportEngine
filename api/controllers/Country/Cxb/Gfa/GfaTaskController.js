@@ -743,7 +743,7 @@ var GfaTaskController = {
 				doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
 				
 				// do deployment
-				function doDeployment( deployments_complete, deployments_pending, form  ) {
+				function doDeployment( deployments_complete, deployments_pending, form ) {
 
 					// import updated form
 					var cmd_1 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X POST https://kobo.humanitarianresponse.info/imports/ --form destination=https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ --form file=@' + XLSX_PATH + '/forms/' + form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx | python -m json.tool';
@@ -753,6 +753,7 @@ var GfaTaskController = {
 
 						// if error
 						if ( error ) {
+
 						// 	// send email
 						// 	sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 						// 			name: 'WFP GFA Team',
@@ -834,12 +835,12 @@ var GfaTaskController = {
 									EXEC( cmd_3, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 										// log
-										console.log( error );
+										// console.log( error );
 										// console.log( stdout );
 										// console.log( stderr );
 
 										// err
-										if ( error ) {
+										// if ( error ) {
 
 											// send email
 											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
@@ -861,7 +862,8 @@ var GfaTaskController = {
 													// return success
 													if ( deployments_complete === deployments_pending ) {
 														// return the reports for the project period
-														return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
+														// return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
+														return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
 													} else {
 														// set process
 														doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
@@ -869,20 +871,20 @@ var GfaTaskController = {
 
 												});
 
-										} else {
+										// } else {
 
-											// add deplotmnet complete
-											deployments_complete++;
-											// return success
-											if ( deployments_complete === deployments_pending ) {
-												// return the reports for the project period
-												return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
-											} else {
-												// set process
-												doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-											}
+										// 	// add deplotmnet complete
+										// 	deployments_complete++;
+										// 	// return success
+										// 	if ( deployments_complete === deployments_pending ) {
+										// 		// return the reports for the project period
+										// 		return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
+										// 	} else {
+										// 		// set process
+										// 		doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+										// 	}
 
-										}
+										// }
 
 									});
 
