@@ -782,7 +782,7 @@ var GfaTaskController = {
 									EXEC( cmd_3, function( error, stdout, stderr ) {
 
 										// log
-										// console.log( error );
+										console.log( error );
 										// console.log( stdout );
 										// console.log( stderr );
 
@@ -792,12 +792,12 @@ var GfaTaskController = {
 											// send email
 											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 													name: 'WFP GFA Team',
-													form: form.title,
+													form: form.form_title,
 													cmd: cmd_3,
 													sendername: 'ReportHub'
 												}, {
 													to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
-													subject: 'Form Deployment Issue - ' + form.title + '!'
+													subject: 'Form Deployment Issue - ' + form.form_title + '!'
 												}, function(err) {
 
 													// return error
