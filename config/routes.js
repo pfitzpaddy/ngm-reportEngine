@@ -312,8 +312,11 @@ module.exports.routes = {
   'GET /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
   'POST /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
   // set plan to actual
-  'GET /wfp/gfa/gfd/setDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setDailyDistribution',
-  'POST /wfp/gfa/gfd/setDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setDailyDistribution',
+  'GET /wfp/gfa/gfd/setActualDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDailyDistribution',
+  'POST /wfp/gfa/gfd/setActualDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDailyDistribution',
+  // set plan to actual for distribution
+  'GET /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
+  'POST /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
 
   // get PlannedBeneficiaries
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',

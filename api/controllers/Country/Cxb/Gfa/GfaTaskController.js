@@ -859,7 +859,6 @@ var GfaTaskController = {
 		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
 		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
 		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
-		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
 		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
 
 		// filter
@@ -869,6 +868,11 @@ var GfaTaskController = {
 		}
 
 		console.log( filter );
+		console.log( uuid );
+		console.log( fcn_id );
+		console.log( scope_id );
+		console.log( report_distribution );
+		console.log( distribution_date );
 
 		// gfd forms
 		GfdForms
@@ -929,7 +933,7 @@ var GfaTaskController = {
 	},
 
 	// set planned to actual
-	setDailyDistribution: function( req, res ){
+	setActualDailyDistribution: function( req, res ){
 
 		// get today's date
 		var today = moment.utc().format( 'YYYY-MM-DD' );
@@ -960,12 +964,64 @@ var GfaTaskController = {
 				// if no records
 				if ( !planned_beneficiaries.length  ) {
 					// return success
-					return res.json( 200, { msg: 'Success!' });					
+					return res.json( 200, { msg: 'Success! No plan found...' });					
 				}
 				
 			});
 
-	}
+	},
+
+	// set planned to actual
+	setActualDistribution: function( req, res ){
+
+		// check req
+		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
+			return res.json( 401, { err: 'admin0pcode, organization_tag, report_round, report_distribution required!' });
+		}
+
+		var admin0pcode = req.param('admin0pcode');
+		var organization_tag = req.param('organization_tag');
+		var report_round = req.param('report_round');
+		var report_distribution = req.param('report_distribution');
+
+		// filter
+		var organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
+
+		// find from plan
+		PlannedBeneficiaries
+			.find()
+			.where({ admin0pcode: admin0pcode })
+			.where( organization_tag_filter )
+			.where({ report_round: report_round })
+			.where({ report_distribution: report_distribution })
+			.exec( function( err, planned_beneficiaries ) {
+				
+				// return error
+				if ( err ) return res.negotiate( err );
+
+				// if records
+				if ( planned_beneficiaries.length ) {
+					// set to actual
+					ActualBeneficiaries
+						.create( planned_beneficiaries )
+						.exec( function( err, result ) {
+							// return error
+							if ( err ) return res.negotiate( err );
+							// return success
+							return res.json( 200, { msg: 'Success!' });
+						});
+
+				}
+
+				// if no records
+				if ( !planned_beneficiaries.length  ) {
+					// return success
+					return res.json( 200, { msg: 'Success! No plan found...' });					
+				}
+				
+			});
+
+	}	
 
 }
 
