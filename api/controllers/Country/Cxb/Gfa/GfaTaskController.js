@@ -754,10 +754,6 @@ var GfaTaskController = {
 						// if error
 						if ( error ) {
 
-							console.log( 'cmd_1' );
-							console.log( cmd_1 );
-							console.log( error );
-
 						// 	// send email
 						// 	sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 						// 			name: 'WFP GFA Team',
@@ -795,10 +791,6 @@ var GfaTaskController = {
 
 								// err
 								if ( error ) {
-
-									console.log( 'cmd_2' );
-									console.log( cmd_2 );
-									console.log( error );
 
 									// send email
 									// sails.hooks.email.send( 'bgd-gfa-form-deployment', {
@@ -842,55 +834,128 @@ var GfaTaskController = {
 									// run curl command
 									EXEC( cmd_3, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
-										// log
-										// console.log( error );
-										// console.log( stdout );
-										// console.log( stderr );
-
 										// err
 										if ( error ) {
 
-											// send email
-											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
-													name: 'WFP GFA Team',
-													form: form.form_title,
-													issue: 'deploy',
-													cmd: cmd_3,
-													sendername: 'ReportHub'
-												}, {
-													// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
-													to: 'pfitzgerald@immap.org',
-													subject: 'Form Deployment Issue - ' + form.form_title + '!'
-												}, function(err) {
+											// // send email
+											// sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+											// 		name: 'WFP GFA Team',
+											// 		form: form.form_title,
+											// 		issue: 'deploy',
+											// 		cmd: cmd_3,
+											// 		sendername: 'ReportHub'
+											// 	}, {
+											// 		// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+											// 		to: 'pfitzgerald@immap.org',
+											// 		subject: 'Form Deployment Issue - ' + form.form_title + '!'
+											// 	}, function(err) {
 
-													// return error
-													if (err) return res.negotiate( err );
+											// 		// return error
+											// 		if (err) return res.negotiate( err );
 
-													// add deplotmnet complete
+											// 		// add deplotmnet complete
 													deployments_complete++;
 													// return success
 													if ( deployments_complete === deployments_pending ) {
 														// return the reports for the project period
-														return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
+														// return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
+														return res.json( 200, { msg: 'Form deployment complete' });
 													} else {
 														// set process
 														doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
 													}
 
-												});
+											// 	});
 
 										} else {
 
-											// add deplotmnet complete
-											deployments_complete++;
-											// return success
-											if ( deployments_complete === deployments_pending ) {
-												// return the reports for the project period
-												return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
-											} else {
-												// set process
-												doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-											}
+											// run curl command
+											EXEC( cmd_2, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+
+												// err
+												if ( error ) {
+														
+														// add deplotmnet complete
+														deployments_complete++;
+														// return success
+														if ( deployments_complete === deployments_pending ) {
+															// return the reports for the project period
+															// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
+															return res.json( 200, { msg: 'Form deployment complete' });
+														} else {
+															// set process
+															doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+														}
+
+												} else {
+
+													// success
+													kobo = JSON.parse( stdout );
+
+													// get staged version
+													if ( kobo.version_id !== kobo.deployed_version_id ) {
+
+														// send email
+														sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+																name: 'WFP GFA Team',
+																form: form.form_title,
+																issue: 'deploy',
+																assetUid: form.assetUid,
+																cmd: cmd_3,
+																sendername: 'ReportHub'
+															}, {
+																// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+																to: 'pfitzgerald@immap.org',
+																subject: 'Form Deployment Issue - ' + form.form_title + '!'
+															}, function(err) {
+
+																// return error
+																if (err) return res.negotiate( err );
+
+																// add deplotmnet complete
+																deployments_complete++;
+																// return success
+																if ( deployments_complete === deployments_pending ) {
+																	// return the reports for the project period
+																	// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
+																	return res.json( 200, { msg: 'Form deployment complete' });
+																} else {
+																	// set process
+																	doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+																}
+
+															});
+
+													} else {
+														// add deplotmnet complete
+														deployments_complete++;
+														// return success
+														if ( deployments_complete === deployments_pending ) {
+															// return the reports for the project period
+															// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
+															return res.json( 200, { msg: 'Form deployment complete' });
+														} else {
+															// set process
+															doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+														}
+
+													}
+
+												}
+
+
+												// add deplotmnet complete
+												// deployments_complete++;
+												// // return success
+												// if ( deployments_complete === deployments_pending ) {
+												// 	// return the reports for the project period
+												// 	return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
+												// } else {
+												// 	// set process
+												// 	doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+												// }
+
+											});
 
 										}
 
