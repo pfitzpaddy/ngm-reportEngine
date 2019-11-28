@@ -452,7 +452,8 @@ var GfaTaskController = {
 					}
 
 					// add to planned
-					planned = Object.assign( { sl_number: d[ 0 ], distribution_date: d[ 1 ] }, organization, distribution, distribution_site, camp_block );
+					// planned = Object.assign( { sl_number: d[ 0 ], distribution_date: d[ 1 ] }, organization, distribution, distribution_site, camp_block );
+					planned = Object.assign( { sl_number: d[ 0 ], distribution_date: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
 
 					// variables
 					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ] : d[ 10 ];
@@ -934,7 +935,7 @@ var GfaTaskController = {
 		// find from plan
 		PlannedBeneficiaries
 			.find()
-			// .where({ distribution_date: today })
+			.where({ distribution_date: today })
 			.exec( function( err, planned_beneficiaries ) {
 				
 				// return error
