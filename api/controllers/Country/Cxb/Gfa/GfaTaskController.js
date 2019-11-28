@@ -754,6 +754,9 @@ var GfaTaskController = {
 						// if error
 						if ( error ) {
 
+							console.log( cmd_1 );
+							console.log( error );
+
 						// 	// send email
 						// 	sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 						// 			name: 'WFP GFA Team',
@@ -791,6 +794,9 @@ var GfaTaskController = {
 
 								// err
 								if ( error ) {
+
+									console.log( cmd_2 );
+									console.log( error );
 
 									// send email
 									// sails.hooks.email.send( 'bgd-gfa-form-deployment', {
