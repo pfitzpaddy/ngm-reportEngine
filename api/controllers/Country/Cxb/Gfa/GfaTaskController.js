@@ -906,7 +906,7 @@ var GfaTaskController = {
 															}, {
 																// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
 																to: 'pfitzgerald@immap.org',
-																subject: 'Form Deployment Issue - ' + form.form_title + '! - ' + moment().format( 'LLL' )
+																subject: 'Form Deployment Issue - ' + form.form_title + '! - ' + moment().format( 'MMM Do YY hh:mm a' )
 															}, function(err) {
 
 																// return error
