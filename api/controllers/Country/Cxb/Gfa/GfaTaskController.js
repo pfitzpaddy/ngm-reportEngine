@@ -753,8 +753,32 @@ var GfaTaskController = {
 
 						// if error
 						if ( error ) {
-							// return error
-							res.json( 400, { error: 'Form import error! Please try again...', details: error } );
+							// send email
+							sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+									name: 'WFP GFA Team',
+									form: form.form_title,
+									cmd: cmd_3,
+									sendername: 'ReportHub'
+								}, {
+									to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+									subject: 'Form Import Error - ' + form.form_title + '!'
+								}, function(err) {
+
+									// return error
+									if (err) return res.negotiate( err );
+
+									// add deplotmnet complete
+									deployments_complete++;
+									// return success
+									if ( deployments_complete === deployments_pending ) {
+										// return the reports for the project period
+										return res.json( 200, { msg: 'Form import error! Please try again...' });
+									} else {
+										// set process
+										doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+									}
+
+								});
 						} else {
 
 							// import updated form
