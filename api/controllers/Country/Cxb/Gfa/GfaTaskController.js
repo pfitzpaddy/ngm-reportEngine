@@ -837,7 +837,7 @@ var GfaTaskController = {
 									var version_id = kobo.version_id;
 
 									// import updated form
-									var cmd_3 = 'curl --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form version_id=' + version_id;
+									var cmd_3 = 'curl --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form version_id=' + version_id + '| python -m json.tool';
 
 									// run curl command
 									EXEC( cmd_3, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
@@ -930,13 +930,6 @@ var GfaTaskController = {
 			filter.scope_id = scope_id;
 		}
 
-		console.log( filter );
-		console.log( uuid );
-		console.log( fcn_id );
-		console.log( scope_id );
-		console.log( report_distribution );
-		console.log( distribution_date );
-
 		// gfd forms
 		GfdForms
 			.findOne()
@@ -960,6 +953,7 @@ var GfaTaskController = {
 						PlannedBeneficiaries
 							.findOne()
 							.where( filter )
+							.where({ report_distribution: report_distribution })
 							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );

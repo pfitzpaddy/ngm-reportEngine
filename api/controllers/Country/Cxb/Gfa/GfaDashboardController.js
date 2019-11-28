@@ -218,7 +218,7 @@ var GfaDashboardController = {
 			admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
 			admin5pcode: params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
 		}
-
+		
 		// distribution
 		AbsentBeneficiaries
 			.find()
@@ -235,6 +235,8 @@ var GfaDashboardController = {
 
 				// return error
 				if (err) return res.negotiate( err );
+
+				console.log( absent_beneficiaries )
 
 				// calculate indicators
 				GfaDashboardController.setIndicator( params, filters, absent_beneficiaries, res );
