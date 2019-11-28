@@ -1000,7 +1000,7 @@ var GfaDashboardController = {
 					'<td>' + distribution[ i ].hh_name + '</td>' +
 					'<td>' + distribution[ i ].admin4name + '</td>' +
 					'<td align="center">' + distribution[ i ].gfd_family_size + '</td>' +
-					'<td width="25%" height="42px;"></td>' +
+					'<td width="25%" height="40px;"></td>' +
 				'</tr>';
 
 		}
