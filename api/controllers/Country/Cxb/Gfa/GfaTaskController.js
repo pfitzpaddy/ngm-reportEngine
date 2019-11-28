@@ -757,7 +757,8 @@ var GfaTaskController = {
 							sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 									name: 'WFP GFA Team',
 									form: form.form_title,
-									cmd: cmd_3,
+									issue: 'import',
+									cmd: cmd_1,
 									sendername: 'ReportHub'
 								}, {
 									to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
@@ -794,7 +795,8 @@ var GfaTaskController = {
 									sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 											name: 'WFP GFA Team',
 											form: form.form_title,
-											cmd: cmd_3,
+											issue: 'update',
+											cmd: cmd_2,
 											sendername: 'ReportHub'
 										}, {
 											to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
@@ -843,6 +845,7 @@ var GfaTaskController = {
 											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 													name: 'WFP GFA Team',
 													form: form.form_title,
+													issue: 'deploy',
 													cmd: cmd_3,
 													sendername: 'ReportHub'
 												}, {
