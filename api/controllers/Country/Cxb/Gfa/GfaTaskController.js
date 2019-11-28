@@ -1054,14 +1054,24 @@ var GfaTaskController = {
 
 				// if records
 				if ( planned_beneficiaries.length ) {
-					// set to actual
-					ActualBeneficiaries
-						.create( planned_beneficiaries )
-						.exec( function( err, result ) {
+
+					// set to planned_beneficiaries
+					async.each( planned_beneficiaries, function ( data, next ) {
+
+						// set to actual
+						ActualBeneficiaries
+							.updateOrCreate( { id: data.id }, data, function ( err, result ) {
+								// return error
+								if ( err ) return res.negotiate( err );
+								// next
+								next();
+							});
+
+						}, function ( err ) {
 							// return error
 							if ( err ) return res.negotiate( err );
 							// return success
-							return res.json( 200, { msg: 'Success!' });
+							return res.json( 200, { msg: 'Success!' });							
 						});
 
 				}
