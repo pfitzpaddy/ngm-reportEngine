@@ -754,6 +754,7 @@ var GfaTaskController = {
 						// if error
 						if ( error ) {
 
+							console.log( 'cmd_1' );
 							console.log( cmd_1 );
 							console.log( error );
 
@@ -790,11 +791,12 @@ var GfaTaskController = {
 							var cmd_2 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ | python -m json.tool';
 
 							// run curl command
-							EXEC( cmd_2, function( error, stdout, stderr ) {
+							EXEC( cmd_2, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 								// err
 								if ( error ) {
 
+									console.log( 'cmd_2' );
 									console.log( cmd_2 );
 									console.log( error );
 
@@ -838,7 +840,7 @@ var GfaTaskController = {
 									var cmd_3 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form version_id=' + version_id;
 
 									// run curl command
-									EXEC( cmd_3, function( error, stdout, stderr ) {
+									EXEC( cmd_3, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 										// log
 										// console.log( error );
@@ -846,7 +848,7 @@ var GfaTaskController = {
 										// console.log( stderr );
 
 										// err
-										// if ( error ) {
+										if ( error ) {
 
 											// send email
 											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
@@ -868,8 +870,7 @@ var GfaTaskController = {
 													// return success
 													if ( deployments_complete === deployments_pending ) {
 														// return the reports for the project period
-														// return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
-														return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
+														return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
 													} else {
 														// set process
 														doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
@@ -877,20 +878,20 @@ var GfaTaskController = {
 
 												});
 
-										// } else {
+										} else {
 
-										// 	// add deplotmnet complete
-										// 	deployments_complete++;
-										// 	// return success
-										// 	if ( deployments_complete === deployments_pending ) {
-										// 		// return the reports for the project period
-										// 		return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
-										// 	} else {
-										// 		// set process
-										// 		doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-										// 	}
+											// add deplotmnet complete
+											deployments_complete++;
+											// return success
+											if ( deployments_complete === deployments_pending ) {
+												// return the reports for the project period
+												return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
+											} else {
+												// set process
+												doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+											}
 
-										// }
+										}
 
 									});
 
