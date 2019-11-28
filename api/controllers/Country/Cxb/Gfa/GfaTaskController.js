@@ -925,7 +925,7 @@ var GfaTaskController = {
 		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
 
 		// filter
-		var filter = { fcn_id: fcn_id }
+		var filter = { fcn_id: fcn_id, report_distribution: report_distribution }
 		if ( scope_id ) {
 			filter.scope_id = scope_id;
 		}
@@ -953,7 +953,6 @@ var GfaTaskController = {
 						PlannedBeneficiaries
 							.findOne()
 							.where( filter )
-							.where({ report_distribution: report_distribution })
 							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );
