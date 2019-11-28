@@ -749,7 +749,7 @@ var GfaTaskController = {
 					var cmd_1 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X POST https://kobo.humanitarianresponse.info/imports/ --form destination=https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ --form file=@' + XLSX_PATH + '/forms/' + form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx | python -m json.tool';
 
 					// run curl command
-					EXEC( cmd_1, function( error, stdout, stderr ) {
+					EXEC( cmd_1, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
 
 						// if error
 						if ( error ) {
@@ -786,7 +786,7 @@ var GfaTaskController = {
 							var cmd_2 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ | python -m json.tool';
 
 							// run curl command
-							EXEC( cmd_2, function( error, stdout, stderr ) {
+							EXEC( cmd_2, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 								// err
 								if ( error ) {
@@ -831,7 +831,7 @@ var GfaTaskController = {
 									var cmd_3 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form version_id=' + version_id;
 
 									// run curl command
-									EXEC( cmd_3, function( error, stdout, stderr ) {
+									EXEC( cmd_3, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 										// log
 										console.log( error );

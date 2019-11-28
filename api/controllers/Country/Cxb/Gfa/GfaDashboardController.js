@@ -595,7 +595,7 @@ var GfaDashboardController = {
 											var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
 
 											// run curl command
-											EXEC( cmd, function( error, stdout, stderr ) {
+											EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
 												// err
 												if ( error ) {
 													// return error
@@ -615,7 +615,7 @@ var GfaDashboardController = {
 																// zip
 																var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
 																// run curl command
-																EXEC( zip_cmd, function( error, stdout, stderr ) {
+																EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
 																	// err
 																	if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
 																		// success
