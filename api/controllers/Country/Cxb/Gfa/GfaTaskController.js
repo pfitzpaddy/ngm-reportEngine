@@ -536,6 +536,12 @@ var GfaTaskController = {
 
 					// round 2
 					if ( report_round === '2' ) {
+						if ( planned.gfd_family_size >= 1 && planned.gfd_family_size <= 3 ) {
+							planned.rice = 30 / 1000;
+							planned.lentils = 9 / 1000;
+							planned.oil = ( 3 * 0.92 ) / 1000;
+							planned.entitlements = planned.rice + planned.lentils + planned.oil;
+						}
 						if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
 							planned.rice = 30 / 1000;
 							planned.lentils = 9 / 1000;
@@ -754,33 +760,37 @@ var GfaTaskController = {
 						// if error
 						if ( error ) {
 
-						// 	// send email
-						// 	sails.hooks.email.send( 'bgd-gfa-form-deployment', {
-						// 			name: 'WFP GFA Team',
-						// 			form: form.form_title,
-						// 			issue: 'import',
-						// 			cmd: cmd_1,
-						// 			sendername: 'ReportHub'
-						// 		}, {
-						// 			to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
-						// 			subject: 'Form Import Error - ' + form.form_title + '!'
-						// 		}, function(err) {
+							// send email
+							sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+									name: 'WFP GFA Team',
+									form: form.form_title,
+									issue: 'import',
+									cmd: cmd_1,
+									show_cmd: false,
+									xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+									sendername: 'ReportHub'
+								}, {
+									// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+									to: 'pfitzgerald@immap.org',
+									subject: 'Form Import Error - ' + form.form_title + '!'
+								}, function(err) {
 
-									// return error
-									// if (err) return res.negotiate( err );
+									return error
+									if (err) return res.negotiate( err );
 
 									// add deplotmnet complete
-									// deployments_complete++;
+									deployments_complete++;
 									// return success
-									// if ( deployments_complete === deployments_pending ) {
+									if ( deployments_complete === deployments_pending ) {
 										// return the reports for the project period
-										// return res.json( 200, { msg: 'Form import error! Please try again...' });
-									// } else {
+										return res.json( 200, { msg: 'Form Deployment Complete' });
+									} else {
 										// set process
 										doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-									// }
+									}
 
-								// });
+								});
+
 						} else {
 
 							// import updated form
@@ -793,32 +803,35 @@ var GfaTaskController = {
 								if ( error ) {
 
 									// send email
-									// sails.hooks.email.send( 'bgd-gfa-form-deployment', {
-									// 		name: 'WFP GFA Team',
-									// 		form: form.form_title,
-									// 		issue: 'update',
-									// 		cmd: cmd_2,
-									// 		sendername: 'ReportHub'
-									// 	}, {
-									// 		to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
-									// 		subject: 'Form Version Error - ' + form.form_title + '!'
-									// 	}, function(err) {
+									sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+											name: 'WFP GFA Team',
+											form: form.form_title,
+											issue: 'update',
+											cmd: cmd_1,
+											show_cmd: false,
+											xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+											sendername: 'ReportHub'
+										}, {
+											// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+											to: 'pfitzgerald@immap.org',
+											subject: 'Form Update Error - ' + form.form_title + '!'
+										}, function(err) {
 
-									// 		// return error
-									// 		if (err) return res.negotiate( err );
+											return error
+											if (err) return res.negotiate( err );
 
 											// add deplotmnet complete
-											// deployments_complete++;
+											deployments_complete++;
 											// return success
-											// if ( deployments_complete === deployments_pending ) {
+											if ( deployments_complete === deployments_pending ) {
 												// return the reports for the project period
-												// return res.json( 200, { msg: 'Form version error! Please try again...' });
-											// } else {
+												return res.json( 200, { msg: 'Form Deployment Complete' });
+											} else {
 												// set process
 												doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-											// }
+											}
 
-										// });
+										});
 
 								} else {
 
@@ -837,35 +850,37 @@ var GfaTaskController = {
 										// err
 										if ( error ) {
 
-											// // send email
-											// sails.hooks.email.send( 'bgd-gfa-form-deployment', {
-											// 		name: 'WFP GFA Team',
-											// 		form: form.form_title,
-											// 		issue: 'deploy',
-											// 		cmd: cmd_3,
-											// 		sendername: 'ReportHub'
-											// 	}, {
-											// 		// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
-											// 		to: 'pfitzgerald@immap.org',
-											// 		subject: 'Form Deployment Issue - ' + form.form_title + '!'
-											// 	}, function(err) {
+											// send email
+											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+													name: 'WFP GFA Team',
+													form: form.form_title,
+													issue: 'deploy',
+													assetUid: form.assetUid,
+													cmd: cmd_3,
+													show_cmd: true,
+													xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+													sendername: 'ReportHub'
+												}, {
+													// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+													to: 'pfitzgerald@immap.org',
+													subject: 'Form Deployment Error - ' + form.form_title + '! - ' + moment().add( 6, 'h' ).format( 'MMM Do YY hh:mm a' )
+												}, function(err) {
 
-											// 		// return error
-											// 		if (err) return res.negotiate( err );
+													// return error
+													if (err) return res.negotiate( err );
 
-											// 		// add deplotmnet complete
+													// add deplotmnet complete
 													deployments_complete++;
 													// return success
 													if ( deployments_complete === deployments_pending ) {
 														// return the reports for the project period
-														// return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
-														return res.json( 200, { msg: 'Form deployment complete' });
+														return res.json( 200, { msg: 'Form Deployment Complete' });
 													} else {
 														// set process
 														doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
 													}
 
-											// 	});
+												});
 
 										} else {
 
@@ -875,17 +890,37 @@ var GfaTaskController = {
 												// err
 												if ( error ) {
 														
-														// add deplotmnet complete
-														deployments_complete++;
-														// return success
-														if ( deployments_complete === deployments_pending ) {
-															// return the reports for the project period
-															// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
-															return res.json( 200, { msg: 'Form deployment complete' });
-														} else {
-															// set process
-															doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-														}
+													// send email
+													sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+															name: 'WFP GFA Team',
+															form: form.form_title,
+															issue: 'deploy',
+															assetUid: form.assetUid,
+															cmd: cmd_3,
+															show_cmd: true,
+															xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+															sendername: 'ReportHub'
+														}, {
+															// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+															to: 'pfitzgerald@immap.org',
+															subject: 'Form Deployment Verification Error - ' + form.form_title + '! - ' + moment().add( 6, 'h' ).format( 'MMM Do YY hh:mm a' )
+														}, function(err) {
+
+															// return error
+															if (err) return res.negotiate( err );
+
+															// add deplotmnet complete
+															deployments_complete++;
+															// return success
+															if ( deployments_complete === deployments_pending ) {
+																// return the reports for the project period
+																return res.json( 200, { msg: 'Form Deployment Complete' });
+															} else {
+																// set process
+																doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+															}
+
+														});
 
 												} else {
 
@@ -902,6 +937,7 @@ var GfaTaskController = {
 																issue: 'deploy',
 																assetUid: form.assetUid,
 																cmd: cmd_3,
+																xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
 																sendername: 'ReportHub'
 															}, {
 																// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
@@ -918,7 +954,7 @@ var GfaTaskController = {
 																if ( deployments_complete === deployments_pending ) {
 																	// return the reports for the project period
 																	// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
-																	return res.json( 200, { msg: 'Form deployment complete' });
+																	return res.json( 200, { msg: 'Form Deployment Complete' });
 																} else {
 																	// set process
 																	doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
@@ -933,7 +969,7 @@ var GfaTaskController = {
 														if ( deployments_complete === deployments_pending ) {
 															// return the reports for the project period
 															// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
-															return res.json( 200, { msg: 'Form deployment success' });
+															return res.json( 200, { msg: 'Form Deployment Success!' });
 														} else {
 															// set process
 															doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
@@ -942,18 +978,6 @@ var GfaTaskController = {
 													}
 
 												}
-
-
-												// add deplotmnet complete
-												// deployments_complete++;
-												// // return success
-												// if ( deployments_complete === deployments_pending ) {
-												// 	// return the reports for the project period
-												// 	return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
-												// } else {
-												// 	// set process
-												// 	doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-												// }
 
 											});
 

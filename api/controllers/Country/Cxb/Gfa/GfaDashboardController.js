@@ -698,6 +698,8 @@ var GfaDashboardController = {
 						'organization',
 						'report_distribution',
 						'site_name',
+						'admin1name',
+						'admin2name',
 						'admin3name',
 						'admin4name',
 						'admin5name',
@@ -721,6 +723,8 @@ var GfaDashboardController = {
 						'Implementing Partner',
 						'Distribution',
 						'Distribution Point',
+						'Upazilla',
+						'Union',
 						'Camp',
 						'Block',
 						'Sub Block',
@@ -854,7 +858,7 @@ var GfaDashboardController = {
 		var template = {
 			dir: '/home/ubuntu/data/html/template/',
 			report: params.organization_tag + '_' + form.site_id + '_' + params.report_round + '_' + params.report_distribution + '_' + date_key + '_master_list',
-			header_1: 'Master Roll: ' + form.site_name + ', Round ' + form.report_round + ', Distribution ' + params.report_distribution,
+			header_1: 'Master Roll for GFD Point: ' + form.site_name + ', Round ' + form.report_round + ', Distribution ' + params.report_distribution,
 			header_2: 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' ),
 			footer: 'Funded by the World Food Programme (WFP)'
 		}
@@ -912,20 +916,51 @@ var GfaDashboardController = {
 		var family_4_to_7 = true;
 		var family_8_to_10 = true;
 		var family_11_plus = true;
-		var beneficiary_page_count = 0;
+		var beneficiary_page_count = 1;
 		var beneficiary_page_length = 15;
 
 		// for each record
 		for( i=0; i < distribution.length; i++ ){
 
-			// ++
-			beneficiary_page_count++;
+			// gfd entitlement
+			var gfd_entitlement;
 
 			// true / false
-			var page_break = beneficiary_page_count === beneficiary_page_length || 
+			var page_break = ( beneficiary_page_count > beneficiary_page_length ) || 
 						family_4_to_7 && distribution[ i ].gfd_family_size >= 4 || 
 						family_8_to_10 && distribution[ i ].gfd_family_size >= 8 || 
 						family_11_plus && distribution[ i ].gfd_family_size >= 11;
+
+			// round 1
+			if ( distribution[ i ].report_round === '1' ) {
+				if ( distribution[ i ].gfd_family_size <= 10  ) {
+					// gfd_entitlement
+					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+				} else {
+					// gfd_entitlement
+					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
+				}
+			}
+
+			// round 2
+			if ( distribution[ i ].report_round === '2' ) {
+				if ( distribution[ i ].gfd_family_size >= 1 && distribution[ i ].gfd_family_size <= 3 ) {
+					// gfd_entitlement
+					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+				}
+				if ( distribution[ i ].gfd_family_size >= 4 && distribution[ i ].gfd_family_size <= 7 ) {
+					// gfd_entitlement
+					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+				}
+				if ( distribution[ i ].gfd_family_size >= 8 && distribution[ i ].gfd_family_size <= 10 ) {
+					// gfd_entitlement
+					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
+				}
+				if ( distribution[ i ].gfd_family_size >= 11 ) {
+					// gfd_entitlement
+					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
+				}
+			}
 			
 			// check if first page / page break required
 			if ( i === 0 || page_break ) {
@@ -954,7 +989,7 @@ var GfaDashboardController = {
 				// reset / page break
 				if (  i !== 0 && page_break ) {
 					// set 
-					beneficiary_page_count = 0;
+					beneficiary_page_count = 1;
 					// end
 					page_html_body += '</tbody></table><div style="page-break-before: always;"></div>';
 				}
@@ -965,9 +1000,10 @@ var GfaDashboardController = {
 						'<td width="20%" style="border-width: 0px; margin-top:-10px;">' +
 							'<img src="https://reporthub.immap.org/desk/images/logo/wfp-logo-standard-blue-en.png" width="90%" />' +
 						'</td>' +
-						'<td style="border-width: 0px;">' +
-							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:12px; margin:0px; font-weight: 300;">' + template.header_1 + ': ' + sub_header + '</h3>' +
-							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
+						'<td align="center" style="border-width: 0px;">' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:12px; margin:0px; font-weight: 300;">' + template.header_1 + '</h3>' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:6px; margin:0px; font-weight: 300;">' + sub_header + '</h3>' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; padding-top:6px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
 						'</td>' +
 						'<td align="right" style="border-width: 0px;">' +
 							'<img src="https://reporthub.immap.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="40%" />' +
@@ -980,11 +1016,12 @@ var GfaDashboardController = {
 					'<thead>' +
 						'<tr>' +
 							'<th>SL#</th>' +
+							'<th>HH Number</th>' +
 							'<th>FCN</th>' +
 							'<th>Scope</th>' +
 							'<th>HH Name</th>' +
-							'<th>Location</th>' +
 							'<th>Family Size</th>' +
+							'<th>GFD</th>' +
 							'<th>Thumb</th>' +
 						'</tr>' +
 					'</thead>' +
@@ -995,13 +1032,18 @@ var GfaDashboardController = {
 			page_html_body += '' +
 				'<tr>' +
 					'<td>' + distribution[ i ].sl_number  + '</td>' +
+					'<td>' + distribution[ i ].gfd_id + '</td>' +
 					'<td>' + distribution[ i ].fcn_id + '</td>' +
 					'<td>' + distribution[ i ].scope_id + '</td>' +
 					'<td>' + distribution[ i ].hh_name + '</td>' +
-					'<td>' + distribution[ i ].admin4name + '</td>' +
 					'<td align="center">' + distribution[ i ].gfd_family_size + '</td>' +
+					'<td>' + gfd_entitlement + '</td>' +
 					'<td width="25%" height="40px;"></td>' +
 				'</tr>';
+
+			
+			// ++
+			beneficiary_page_count++;				
 
 		}
 

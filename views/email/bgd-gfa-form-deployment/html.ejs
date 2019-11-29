@@ -11,16 +11,31 @@
 			The form for <%= form %> failed to <%= issue %>.
 		</p>
 		<p>
-			Go To Kobo Page for <a title="Go To Form <%= form %>" href="https://kobo.humanitarianresponse.info/#/forms/<%= assetUid %>/landing"><%= form %></a>.
+			To manually upload the form, follow the steps below;
+			<ol>
+				<li>
+					Download the <a title="the XLS form for <%= form %>" href="https://reporthub.immap.org/forms/<%= xlsform %>/landing">XLS form </a>.
+				</li>
+				<li>
+					Open the <a title="Go to form <%= form %>" href="https://kobo.humanitarianresponse.info/#/forms/<%= assetUid %>/landing"><%= form %></a> landing page in Kobo.
+				</li>
+				<li>
+					Follow the prompts to upload the XLS form and deploy in Kobo.
+				</li>			
+			</ol>
 		</p>
+		<% if ( show_cmd ) { %>
+			<div>
+				<p>
+					Alternatively, to fix the issue, please run the following command from the terminal;
+				</p>
+				<p style="color:#616161; background-color:#f5f5f5;">
+					<i><%= cmd %></i>
+				</p>
+			</div>
+		<% } %>
 		<p>
-			To fix the issue, please run the following command from the terminal;
-		</p>
-		<p style="color:#616161; background-color:#f5f5f5;">
-			<i><%= cmd %></i>
-		</p>
-		<p>
-			Once complete, please reply to this email with all team members in cc to close this issue.
+			Once resolved, please reply to this email with all team members in cc to close this issue.
 		</p>
 
 		<p><br/><%= sendername %></p>
