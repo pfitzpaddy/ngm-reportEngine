@@ -324,7 +324,7 @@ var Cluster4wprojectplanDashboardController = {
 
 					}else{
 
-						return res.json( 200,  totalprojectsupdated );
+						return res.json( 200,  totalprojectsupdated.length );
 
 					}		
 
@@ -335,1701 +335,7 @@ var Cluster4wprojectplanDashboardController = {
 
 				break;
 
-			/*	
-
-			case 'contacts':
-
-				// require
-				var users = [],
-						fields = [
-							'admin0name',
-							'cluster',
-							'organization',
-							'name',
-							'position',
-							'username',
-							'phone',
-							'email',
-							'createdAt'
-						],
-						fieldNames = [
-							'Country',
-							'Cluster',
-							'Organization',
-							'Name',
-							'Position',
-							'Username',
-							'Phone',
-							'Email',
-							'Joined ReportHub'
-						];
-
-
-				// get organizations by project
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					//.where( filters.activity_type_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					//.where( filters.beneficiaries )
-					.where( filters.date )
-					.exec( function( err, beneficiaries ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// orgs
-						var users = [];
-
-						// projects
-						beneficiaries.forEach(function( d, i ){
-
-							// if not existing
-							users.push( d.username );
-
-						});
-
-						// users
-						User
-							.find()
-							.where( { username: users } )
-							.exec( function( err, users ){
-
-								// return error
-								if (err) return res.negotiate( err );
-
-								// return csv
-								json2csv({ data: users, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-
-									// error
-									if ( err ) return res.negotiate( err );
-
-									// success
-									if ( params.ocha ) {
-										res.set('Content-Type', 'text/csv');
-										return res.send( 200, csv );
-									} else {
-										return res.json( 200, { data: csv } );
-									}
-
-								});
-
-							});
-
-						});
-
-				break;
-
-
-			case 'ocha_report':
-
-				// require
-				var data = {},
-						hxl_codes = {
-							cluster: '#sector+name',
-							admin1pcode: '#adm1+code',
-							admin1name: '#adm1+name',
-							organization: '#org+prog',
-							implementing_partners: '#org+impl',
-							category_type_name: '',
-							beneficiary_type_name: '',
-							boys: '#reached+m+children',
-							girls: '#reached+f+children',
-							men: '#reached+m+adult',
-							women: '#reached+f+adult',
-							elderly_men: '',
-							elderly_men: '',
-							total: '#reached'
-						},
-						fields = [
-							'cluster',
-							'admin1pcode',
-							'admin1name',
-							'organization',
-							'implementing_partners',
-							'category_type_name',
-							'beneficiary_type_name',
-							'boys',
-							'girls',
-							'men',
-							'women',
-							'elderly_men',
-							'elderly_women',
-							'total'
-						],
-						fieldNames = [
-							'Cluster',
-							'Admin1 Pcode',
-							'Admin1 Name',
-							'Organizations',
-							'Implementing Partners',
-							'Category',
-							'Beneficiary',
-							'Boys',
-							'Girls',
-							'Men',
-							'Women',
-							'Elderly Men',
-							'Elderly Women',
-							'Total'
-						];
-
-				// get organizations by project
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					//.where( filters.activity_type_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					//.where( filters.beneficiaries )
-					.where( filters.date )
-					.exec( function( err, beneficiaries ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// beneficiaries
-						beneficiaries.forEach(function( d, i ){
-							if ( !data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] ) {
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ] = {};
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster = [];
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization = [];
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].implementing_partners = [];
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys = 0;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls = 0;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men = 0;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women = 0;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men = 0;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women = 0;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total = 0;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lat = d.admin1lat;
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].lng = d.admin1lng;
-							}
-
-							// cluster
-							if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster.indexOf( d.cluster ) === -1 ){
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].cluster.push( d.cluster );
-							}
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1pcode = d.admin1pcode;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].admin1name = d.admin1name;
-
-							// organization
-							if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.indexOf( d.organization ) === -1 ){
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].organization.push( d.organization );
-							}
-
-							// implementing partners
-							if ( data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].implementing_partners.indexOf( d.implementing_partners ) === -1 ){
-								data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].implementing_partners.push( d.implementing_partners );
-							}
-
-							// data
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].category_type_name = d.category_type_name;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].beneficiary_type_name = d.beneficiary_type_name;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].boys += d.boys;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].girls += d.girls;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].men += d.men;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].women += d.women;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_men += d.elderly_men;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].elderly_women += d.elderly_women;
-							data[ d.admin1pcode + d.category_type_id + d.beneficiary_type_id ].total += d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
-						});
-
-						// flatten
-						var report = Cluster4wprojectplanDashboardController.flatten( data );
-
-						// array to string
-						report.forEach( function( d, i ) {
-							report[i].cluster = report[i].cluster.join(', ');
-							report[i].organization = report[i].organization.join(', ');
-							report[i].implementing_partners = report[i].implementing_partners.join(', ');
-						});
-
-						// sort
-						report.sort(function(a, b) {
-							return a.admin1name.localeCompare(b.admin1name) ||
-											(a.category_type_name && b.category_type_name && a.category_type_name.localeCompare(b.category_type_name)) ||
-											a.beneficiary_type_name.localeCompare(b.beneficiary_type_name)
-						});
-
-						// hxl_codes
-						report.unshift( hxl_codes );
-
-						// return csv
-						json2csv({ data: report, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-
-					});
-
-				break;
-
-
-			// raw data export
-			case 'financial_report':
-
-				// fields
-				var fields = [ 
-							'cluster',
-							'organization',
-							'admin0name',
-							'project_title',
-							'project_description',
-							'project_hrp_code',
-							'project_budget',
-							'project_budget_currency',
-							'project_donor_name',
-							'grant_id',
-							'currency_id',
-							'project_budget_amount_recieved',
-							'contribution_status',
-							'project_budget_date_recieved',
-							'budget_funds_name',
-							'financial_programming_name',
-							'multi_year_funding_name',
-							'funding_2017',
-							'reported_on_fts_name',
-							'fts_record_id',
-							'email',
-							'createdAt',
-							'comments'
-						],
-						fieldNames = [
-							'Cluster',
-							'Organization',
-							'Country',
-							'Project Title',
-							'Project Description',
-							'HRP Project Code',
-							'Project Budget',
-							'Project Budget Currency',
-							'Project Donor',
-							'Donor Grant ID',
-							'Currency Recieved',
-							'Ammount Received',
-							'Contribution Status',
-							'Date of Payment',
-							'Incoming Funds',
-							'Financial Programming',
-							'Multi-Year Funding',
-							'2017 Funding',
-							'Reported on FTS',
-							'FTS ID',
-							'Email',
-							'createdAt',
-							'Comments'
-						];
-
-				// get beneficiaries by project
-				BudgetProgress
-					.find()
-					.where( { project_id: { '!': null } } )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
-					.exec( function( err, budget ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// return csv
-						json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-			case 'households_population':
-				
-				// total sum
-				Beneficiaries.native(function(err, collection) {
-					if (err) return res.serverError(err);
-				
-					collection.aggregate(
-						[
-							{ 
-								$match : filterObject 
-							},
-							{
-								$group:
-								{
-									_id: null,
-									total:  { $sum: { $add: [ "$households" ] } } ,
-								}
-							}
-						]
-					).toArray(function (err, beneficiaries) {
-						if (err) return res.serverError(err);
-
-						var total = beneficiaries[0]?beneficiaries[0].total:0;
-
-						return res.json( 200, { 'value': total } );
-					});
-				});
-				
-				break;
-
 			
-			case 'beneficiaries_population':
-
-				// total sum
-				Beneficiaries.native(function(err, collection) {
-					if (err) return res.serverError(err);
-				
-					collection.aggregate(
-						[
-							{ 
-								$match : filterObject 
-							},
-							{
-								$group:
-								{
-									_id: null,
-									total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
-								}
-							}
-						]
-					).toArray(function (err, beneficiaries) {
-						if (err) return res.serverError(err);
-
-						var total = beneficiaries[0]?beneficiaries[0].total:0;
-
-						return res.json( 200, { 'value': total } );
-					});
-				});
-				
-				break;
-				
-
-
-			// raw data export
-			case 'beneficiaries':
-				if ( !params.csv ) {
-					// total sum
-					Beneficiaries.native(function(err, collection) {
-						if (err) return res.serverError(err);
-					
-						collection.aggregate(
-							[
-								{ 
-									$match : filterObject 
-								},
-								{
-									$group:
-									{
-										_id: null,
-										total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } } ,
-									}
-								}
-							]
-						).toArray(function (err, beneficiaries) {
-							if (err) return res.serverError(err);
-							
-							TrainingParticipants.native(function(err, collection) {
-								if (err) return res.serverError(err);
-							
-								collection.aggregate(
-									[
-										{ 
-											$match : filterObject 
-										},
-										{
-											$group:
-											{
-												_id: null,
-												total:  { $sum: { $add: [ "$trainee_men", "$trainee_women" ] } } ,
-											}
-										}
-									]
-								).toArray(function (err, training_participants) {
-									if (err) return res.serverError(err);
-									
-									var total = beneficiaries[0]?beneficiaries[0].total:0 + training_participants[0]?training_participants[0].total:0  
-				
-									return res.json( 200, { 'value': total } );
-								});
-							});
-						});
-					});
-				}	else	{
-					// get beneficiaries export
-					Beneficiaries.native(function(err, collection) {
-						if (err) return res.serverError(err);
-					
-						collection.find(filterObject).toArray(function (err, beneficiaries) {
-							if (err) return res.serverError(err);
-							
-							var fields = [
-								'project_id',
-								'report_id',
-								'cluster_id',
-								'cluster',
-								'mpc_purpose_cluster_id',
-								'mpc_purpose_type_name',
-								'organization',
-								'implementing_partners',
-								'project_hrp_code',
-								'project_code',
-								'project_title',
-								'project_start_date',
-								'project_end_date',
-								'donor',
-								'report_month_number',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'admin0pcode',
-								'admin0name',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'conflict',
-								'site_id',
-								'site_class',
-								'site_status',
-								'site_hub_id',
-								'site_hub_name',
-								'site_implementation_name',
-								'site_type_name',
-								'site_name',
-								'category_type_id',
-								'category_type_name',
-								'beneficiary_type_id',
-								'beneficiary_type_name',
-								'beneficiary_category_name',
-								'strategic_objective_id',
-								'strategic_objective_name',
-								'strategic_objective_description',
-								'sector_objective_id',
-								'sector_objective_name',
-								'sector_objective_description',
-								//'activity_type_id',
-								'activity_type_name',
-								'activity_description_id',
-								'activity_description_name',
-								'activity_detail_id',
-								'activity_detail_name',
-								'indicator_id',
-								'indicator_name',
-								'activity_status_id',
-								'activity_status_name',
-								'delivery_type_id',
-								'delivery_type_name',
-								'distribution_status',
-								'distribution_start_date',
-								'distribution_end_date',
-								'partial_kits',
-								'kit_details',
-								'units',
-								'unit_type_id',
-								'unit_type_name',
-								'transfer_type_value',
-								'mpc_delivery_type_id',
-								'mpc_delivery_type_name',
-								'mpc_mechanism_type_id',
-								'mpc_mechanism_type_name',
-								'package_type_id',
-								'households',
-								'families',
-								'boys',
-								'girls',
-								'men',
-								'women',
-								'elderly_men',
-								'elderly_women',
-								'total',
-								'admin1lng',
-								'admin1lat',
-								'admin2lng',
-								'admin2lat',
-								'admin3lng',
-								'admin3lat',
-								'admin4lng',
-								'admin4lat',
-								'admin5lng',
-								'admin5lat',
-								'site_lng',
-								'site_lat',
-								'updatedAt',
-								'createdAt',
-							],
-
-						fieldNames = [
-								'project_id',
-								'report_id',
-								'cluster_id',
-								'cluster',
-								'mpc_purpose_cluster_id',
-								'mpc_purpose_type_name',
-								'organization',
-								'implementing_partners',
-								'project_hrp_code',
-								'project_code',
-								'project_title',
-								'project_start_date',
-								'project_end_date',
-								'donor',
-								'report_month_number',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'admin0pcode',
-								'admin0name',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'conflict',
-								'site_id',
-								'site_class',
-								'site_status',
-								'site_hub_id',
-								'site_hub_name',
-								'site_implementation_name',
-								'site_type_name',
-								'site_name',
-								'category_type_id',
-								'category_type_name',
-								'beneficiary_type_id',
-								'beneficiary_type_name',
-								'beneficiary_category_name',
-								'strategic_objective_id',
-								'strategic_objective_name',
-								'strategic_objective_description',
-								'sector_objective_id',
-								'sector_objective_name',
-								'sector_objective_description',
-								//'activity_type_id',
-								'activity_type_name',
-								'activity_description_id',
-								'activity_description_name',
-								'activity_detail_id',
-								'activity_detail_name',
-								'indicator_id',
-								'indicator_name',
-								'activity_status_id',
-								'activity_status_name',
-								'delivery_type_id',
-								'delivery_type_name',
-								'distribution_status',
-								'distribution_start_date',
-								'distribution_end_date',
-								'partial_kits',
-								'kit_details',
-								'units',
-								'unit_type_id',
-								'unit_type_name',
-								'transfer_type_value',
-								'mpc_delivery_type_id',
-								'mpc_delivery_type_name',
-								'mpc_mechanism_type_id',
-								'mpc_mechanism_type_name',
-								'package_type_id',
-								'households',
-								'families',
-								'boys',
-								'girls',
-								'men',
-								'women',
-								'elderly_men',
-								'elderly_women',
-								'total',
-								'admin1lng',
-								'admin1lat',
-								'admin2lng',
-								'admin2lat',
-								'admin3lng',
-								'admin3lat',
-								'admin4lng',
-								'admin4lat',
-								'admin5lng',
-								'admin5lat',
-								'site_lng',
-								'site_lat',
-								'updatedAt',
-								'createdAt'
-							];
-
-							var total = 0;
-							
-							// format beneficiaries
-							async.eachLimit(beneficiaries, 200, function (d, next) {
-								// hrp code
-								if (!d.project_hrp_code) {
-									d.project_hrp_code = '-';
-								}
-								// project code
-								if (!d.project_code) {
-									d.project_code = '-';
-								}
-								// project donor
-								if (d.project_donor) {
-									var da = [];
-									d.project_donor.forEach(function (d, i) {
-										if (d) da.push(d.project_donor_name);
-									});
-									da.sort();
-									d.donor = da.join(', ');
-								}
-
-								//implementing_partner
-								if (Array.isArray(d.implementing_partners)) {
-									var im = [];
-									d.implementing_partners.forEach(function (impl, i) {
-										if (impl) im.push(impl.organization_name);
-									});
-									im.sort();
-									d.implementing_partners = im.join(', ');
-								}
-
-								// sum
-								var sum = d.boys + d.girls + d.men + d.women + d.elderly_men + d.elderly_women;
-								// beneficiaries
-								d.total = sum;
-								d.report_month_number = d.report_month + 1;
-								d.report_month = moment(d.reporting_period).format('MMMM');
-								d.reporting_period = moment(d.reporting_period).format('YYYY-MM-DD');
-								d.updatedAt = moment(d.updatedAt).format('YYYY-MM-DD HH:mm:ss');
-								d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
-								// grand total
-								total += sum;
-								next();
-
-							}, function (err) {
-								if (err) return res.negotiate(err);
-								// return csv
-								json2csv({ data: beneficiaries, fields: fields, fieldNames: fieldNames }, function (err, csv) {
-
-									// error
-									if (err) return res.negotiate(err);
-
-									// success
-									if (params.ocha) {
-										res.set('Content-Type', 'text/csv');
-										filename = req.param('reportname') ? req.param('reportname') : 'beneficiaries'
-										res.setHeader('Content-disposition', 'attachment; filename=' + filename + '.csv');
-										res.send(200, csv);
-										MetricsController.setApiMetrics({
-											dashboard: 'cluster_dashboard',
-											theme: params.indicator,
-											url: req.url,
-										}, function (err) { return })									
-									} else {
-										return res.json(200, { data: csv });
-									}
-								});
-							});
-						})
-					});
-				}
-				
-				break;
-
-
-			// raw data export
-			case 'stocks':
-
-				// get beneficiaries by project
-				Stock
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.organization_tag )
-					.where( filters.date )
-					.exec( function( err, stocks ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// format stocks
-						stocks.forEach(function( d, i ){
-							stocks[ i ].report_month_number = d.report_month+1;
-							stocks[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							stocks[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-						});
-
-						var fields = [
-								'report_id',
-								'location_id',
-								'cluster',
-								'stock_warehouse_id',
-								'stock_item_type',
-								'stock_item_name',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'adminRpcode',
-								'adminRname',
-								'admin0pcode',
-								'admin0name',
-								'organization',
-								'username',
-								'email',
-								'createdAt',
-								'updatedAt',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'site_lng',
-								'site_lat',
-								'site_name',
-								'conflict',
-								'number_in_stock',
-								'number_in_pipeline',
-								'beneficiaries_covered',
-							],
-
-						fieldNames = [
-								'report_id',
-								'location_id',
-								'cluster',
-								'stock_warehouse_id',
-								'stock_item_type',
-								'stock_item_name',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'adminRpcode',
-								'adminRname',
-								'admin0pcode',
-								'admin0name',
-								'organization',
-								'username',
-								'email',
-								'createdAt',
-								'updatedAt',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'warehouse_lng',
-								'warehouse_lat',
-								'warehouse_name',
-								'conflict',
-								'number_in_stock',
-								'number_in_pipeline',
-								'beneficiaries_covered',
-							];
-
-						// return csv
-						json2csv({ data: stocks, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-
-			// raw data export
-			case 'training_participants':
-
-				// trainings
-				TrainingParticipants
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					//.where( filters.beneficiaries )
-					.where( filters.date )
-					.exec( function( err, training_participants ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						var fields = [
-							'project_id',
-							'project_title',
-							'project_description',
-							'project_start_date',
-							'project_end_date',
-							'project_hrp_code',
-							'project_code',
-							'report_id',
-							'report_month',
-							'report_year',
-							'reporting_period',
-							'report_submitted',
-							'admin0pcode',
-							'admin0name',
-							'cluster_id',
-							'cluster',
-							'organization',
-							'organization_tag',
-							'training_id',
-							'training_title',
-							'training_topics',
-							'training_start_date',
-							'training_end_date',
-							'training_days_number',
-							'training_conducted_by',
-							'training_supported_by',
-							'trainee_affiliation_id',
-							'trainee_affiliation_name',
-							'trainee_health_worker_id',
-							'trainee_health_worker_name',
-							'trainee_men',
-							'trainee_women',
-							'site_id',
-							'site_class',
-							'site_status',
-							'site_name',
-							'site_implementation_id',
-							'site_implementation_name',
-							'site_type_id',
-							'site_type_name',
-							'conflict',
-							'admin1lng',
-							'admin1lat',
-							'admin2lng',
-							'admin2lat',
-							'admin3lat',
-							'admin3lng',
-							'admin4lat',
-							'admin4lng',
-							'admin5lat',
-							'admin5lng',
-							'site_lng',
-							'site_lat',
-							'createdAt',
-							'updatedAt'
-						],
-
-					fieldNames = [
-							'project_id',
-							'project_title',
-							'project_description',
-							'project_start_date',
-							'project_end_date',
-							'project_hrp_code',
-							'project_code',
-							'report_id',
-							'report_month',
-							'report_year',
-							'reporting_period',
-							'report_submitted',
-							'admin0pcode',
-							'admin0name',
-							'cluster_id',
-							'cluster',
-							'organization',
-							'organization_tag',
-							'training_id',
-							'training_title',
-							'training_topics',
-							'training_start_date',
-							'training_end_date',
-							'training_days_number',
-							'training_conducted_by',
-							'training_supported_by',
-							'trainee_affiliation_id',
-							'trainee_affiliation_name',
-							'trainee_health_worker_id',
-							'trainee_health_worker_name',
-							'trainee_men',
-							'trainee_women',
-							'site_id',
-							'site_class',
-							'site_status',
-							'site_name',
-							'site_implementation_id',
-							'site_implementation_name',
-							'site_type_id',
-							'site_type_name',
-							'conflict',
-							'admin1lng',
-							'admin1lat',
-							'admin2lng',
-							'admin2lat',
-							'admin3lat',
-							'admin3lng',
-							'admin4lat',
-							'admin4lng',
-							'admin5lat',
-							'admin5lng',
-							'site_lng',
-							'site_lat',
-							'createdAt',
-							'updatedAt'
-						];
-						// return csv
-
-						training_participants.forEach(function( d, i ){
-							training_participants[ i ].report_month_number = d.report_month+1;
-							training_participants[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							training_participants[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-						});
-
-						json2csv({ data: training_participants, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-			
-			// NG WASH
-			// accountability
-			case 'accountability':
-
-				var data = [];
-
-				// trainings
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.date )
-					.populate( params.indicator )
-					.exec( function( err, result ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// format month
-						result.forEach( function( d, i ){
-							result[ i ].report_month_number = d.report_month+1;
-							result[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							result[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-							result[ i ][ params.indicator ].forEach( function( a, j ){
-								var obj = _.extend( result[ i ],  a );
-								delete obj.accountability;
-								delete obj.boreholes;
-								delete obj.cash;
-								delete obj.hygiene;
-								delete obj.sanitation;
-								delete obj.water;
-								delete obj.beneficiary_id;
-								delete obj.activity_type;
-								delete obj.inter_cluster_activities;
-								delete obj.strategic_objectives;
-								delete obj.activity_type;
-								delete obj.delivery_type_id;
-								delete obj.delivery_type_name;
-								data.push( obj );
-							});
-						});
-
-						json2csv({ data: data }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-			
-			// boreholes
-			case 'boreholes':
-
-				var data = [];
-
-				// trainings
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.date )
-					.populate( params.indicator )
-					.exec( function( err, result ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// format month
-						result.forEach( function( d, i ){
-							result[ i ].report_month_number = d.report_month+1;
-							result[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							result[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-							result[ i ][ params.indicator ].forEach( function( a, j ){
-								var obj = _.extend( result[ i ],  a );
-								delete obj.accountability;
-								delete obj.boreholes;
-								delete obj.cash;
-								delete obj.hygiene;
-								delete obj.sanitation;
-								delete obj.water;
-								delete obj.beneficiary_id;
-								delete obj.activity_type;
-								delete obj.inter_cluster_activities;
-								delete obj.strategic_objectives;
-								delete obj.activity_type;
-								delete obj.delivery_type_id;
-								delete obj.delivery_type_name;
-								data.push( obj );
-							});
-						});
-
-						json2csv({ data: data }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-			// cash
-			case 'cash':
-
-				var data = [];
-
-				// trainings
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.date )
-					.populate( params.indicator )
-					.exec( function( err, result ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// format month
-						result.forEach( function( d, i ){
-							result[ i ].report_month_number = d.report_month+1;
-							result[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							result[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-							result[ i ][ params.indicator ].forEach( function( a, j ){
-								var obj = _.extend( result[ i ],  a );
-								delete obj.accountability;
-								delete obj.boreholes;
-								delete obj.cash;
-								delete obj.hygiene;
-								delete obj.sanitation;
-								delete obj.water;
-								delete obj.beneficiary_id;
-								delete obj.activity_type;
-								delete obj.inter_cluster_activities;
-								delete obj.strategic_objectives;
-								delete obj.activity_type;
-								delete obj.delivery_type_id;
-								delete obj.delivery_type_name;
-								data.push( obj );
-							});
-						});
-
-						json2csv({ data: data }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-
-			// hygiene
-			case 'hygiene':
-
-				var data = [];
-
-				// trainings
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.date )
-					.populate( params.indicator )
-					.exec( function( err, result ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// format month
-						result.forEach( function( d, i ){
-							result[ i ].report_month_number = d.report_month+1;
-							result[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							result[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-							result[ i ][ params.indicator ].forEach( function( a, j ){
-								var obj = _.extend( result[ i ],  a );
-								delete obj.accountability;
-								delete obj.boreholes;
-								delete obj.cash;
-								delete obj.hygiene;
-								delete obj.sanitation;
-								delete obj.water;
-								delete obj.beneficiary_id;
-								delete obj.activity_type;
-								delete obj.inter_cluster_activities;
-								delete obj.strategic_objectives;
-								delete obj.activity_type;
-								delete obj.delivery_type_id;
-								delete obj.delivery_type_name;
-								data.push( obj );
-							});
-						});
-
-						json2csv({ data: data }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-
-			// sanitation
-			case 'sanitation':
-
-				var data = [];
-
-				// trainings
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.date )
-					.populate( params.indicator )
-					.exec( function( err, result ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// format month
-						result.forEach( function( d, i ){
-							result[ i ].report_month_number = d.report_month+1;
-							result[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							result[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-							result[ i ][ params.indicator ].forEach( function( a, j ){
-								var obj = _.extend( result[ i ],  a );
-								delete obj.accountability;
-								delete obj.boreholes;
-								delete obj.cash;
-								delete obj.hygiene;
-								delete obj.sanitation;
-								delete obj.water;
-								delete obj.beneficiary_id;
-								delete obj.activity_type;
-								delete obj.inter_cluster_activities;
-								delete obj.strategic_objectives;
-								delete obj.activity_type;
-								delete obj.delivery_type_id;
-								delete obj.delivery_type_name;
-								data.push( obj );
-							});
-						});
-
-						json2csv({ data: data }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-
-			// water
-			case 'water':
-
-				var data = [];
-
-				// trainings
-				Beneficiaries
-					.find()
-					.where( filters.default )
-					.where( filters.adminRpcode )
-					.where( filters.admin0pcode )
-					.where( filters.admin1pcode )
-					.where( filters.admin2pcode )
-					.where( filters.cluster_id )
-					.where( filters.acbar_partners )
-					.where( filters.organization_tag )
-					.where( filters.beneficiaries )
-					.where( filters.date )
-					.populate( params.indicator )
-					.exec( function( err, result ){
-
-						// return error
-						if (err) return res.negotiate( err );
-
-						// format month
-						result.forEach( function( d, i ){
-							result[ i ].report_month_number = d.report_month+1;
-							result[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							result[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
-							result[ i ][ params.indicator ].forEach( function( a, j ){
-								var obj = _.extend( result[ i ],  a );
-								delete obj.accountability;
-								delete obj.boreholes;
-								delete obj.cash;
-								delete obj.hygiene;
-								delete obj.sanitation;
-								delete obj.water;
-								delete obj.beneficiary_id;
-								delete obj.activity_type;
-								delete obj.inter_cluster_activities;
-								delete obj.strategic_objectives;
-								delete obj.activity_type;
-								delete obj.delivery_type_id;
-								delete obj.delivery_type_name;
-								data.push( obj );
-							});
-						});
-
-						json2csv({ data: data }, function( err, csv ) {
-
-							// error
-							if ( err ) return res.negotiate( err );
-
-							// success
-							if ( params.ocha ) {
-								res.set('Content-Type', 'text/csv');
-								return res.send( 200, csv );
-							} else {
-								return res.json( 200, { data: csv } );
-							}
-
-						});
-
-					});
-
-				break;
-
-				
-
-			
-			
-			case 'pieChart':
-			// labels
-				var result = {
-					label: {
-						left: {
-							label: {
-								prefix: 'M',
-								label: 0,
-								postfix: '%'
-							},
-							subLabel: {
-											label: 0
-										}
-									},
-									center: {
-										label: {
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									},
-									right: {
-										label: {
-											prefix: 'F',
-											label: 0,
-											postfix: '%'
-										},
-										subLabel: {
-											label: 0
-										}
-									}
-								},
-								data: [{
-									'y': 0,
-									'color': '#f48fb1',
-									'name': 'Female',
-									'label': 0,
-								},{
-									'y': 0,
-									'color': '#90caf9',
-									'name': 'Male',
-									'label': 0,
-								}]
-							};
-						// beneficiaries
-						
-										
-						Beneficiaries.native(function (err, results) {
-							if(err) return res.serverError(err);
-			
-							results.aggregate([
-								{
-									$match : filterObject
-								},
-								{
-									$group: {
-										_id: null,
-										men: { $sum: "$men" },
-										women: { $sum: "$women" },
-										elderly_men: { $sum: "$elderly_men" },
-										elderly_women: { $sum: "$elderly_women" },
-										boys: { $sum: "$boys" },
-										girls: { $sum: "$girls" },
-										childTotal: { $sum: { $add: ["$boys", "$girls"] } },
-										adultTotal: { $sum: { $add: ["$men", "$women"] } },
-										elderTotal: { $sum: { $add: ["$elderly_men", "$elderly_women"] } }
-									}
-								}
-							]).toArray(function (err, beneficiaries) {
-								if (err) return res.serverError(err);								
-
-								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
-
-
-								$beneficiaries = beneficiaries[0];
-
-
-								switch (req.param('chart_for')) {
-									case 'children':
-										if ($beneficiaries.boys < 1 && $beneficiaries.girls < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var boysPerCent = ($beneficiaries.boys / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var girlsPerCent = ($beneficiaries.girls / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
-											var totalPerCent = ($beneficiaries.childTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-
-											// assign data left
-											result.label.left.label.label = boysPerCent;
-											result.label.left.subLabel.label = $beneficiaries.boys;
-											// assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.childTotal;
-											// assign data right
-											result.label.right.label.label = girlsPerCent;
-											result.label.right.subLabel.label = $beneficiaries.girls;
-
-											// highcharts girls
-											result.data[0].y = girlsPerCent;
-											result.data[0].label = $beneficiaries.childTotal;
-											// highcharts boys
-											result.data[1].y = boysPerCent;
-											result.data[1].label = $beneficiaries.childTotal;
-											
-											return res.json(200, result);
-										}
-
-										break;
-
-									case 'adult':
-										if ($beneficiaries.men < 1 && $beneficiaries.women < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-
-											var mensPerCent = ($beneficiaries.men / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
-											var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-										
-											// // assign data left
-											result.label.left.label.label = mensPerCent;
-											result.label.left.subLabel.label = $beneficiaries.men;
-											// // assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.adultTotal;
-											// // assign data right
-											result.label.right.label.label = womensPerCent;
-											result.label.right.subLabel.label = $beneficiaries.women;
-
-											// // highcharts women
-											result.data[0].y = womensPerCent;
-											result.data[0].label = $beneficiaries.adultTotal;
-											// // highcharts men
-											result.data[1].y = mensPerCent;
-											result.data[1].label = $beneficiaries.adultTotal;
-											
-											return res.json(200, result);
-
-										}
-
-										break;
-
-									case 'elderly':
-										if ($beneficiaries.elderly_men < 1 && $beneficiaries.elderly_women < 1) {
-
-											// // assign data left
-											result.label.left.label.label = 0;
-											result.label.left.subLabel.label = 0;
-											// // assign data center
-											result.label.center.label.label = 0;
-											result.label.center.subLabel.label = 0;
-											// // assign data right
-											result.label.right.label.label = 0;
-											result.label.right.subLabel.label = 0;
-
-											// // highcharts elderly_women
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
-											// // highcharts elderly_men
-											result.data[1].y = 0;
-											result.data[1].label = 0;
-											
-											return res.json(200, result);
-
-										} else {
-											// calc
-											var elmensPerCent = ($beneficiaries.elderly_men / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var elwomensPerCent = ($beneficiaries.elderly_women / ($beneficiaries.elderly_men + $beneficiaries.elderly_women)) * 100;
-											var totalPerCent = ($beneficiaries.elderTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
-											
-											// // assign data left
-											result.label.left.label.label = elmensPerCent;
-											result.label.left.subLabel.label = $beneficiaries.elderly_men;
-											// // assign data center
-											result.label.center.label.label = totalPerCent;
-											result.label.center.subLabel.label = $beneficiaries.elderTotal;
-											// // assign data right
-											result.label.right.label.label = elwomensPerCent;
-											result.label.right.subLabel.label = $beneficiaries.elderly_women;
-
-											// // highcharts elderWomen
-											result.data[0].y = elwomensPerCent;
-											result.data[0].label = $beneficiaries.elderTotal;
-											// // highcharts elderMen
-											result.data[1].y = elmensPerCent;
-											result.data[1].label = $beneficiaries.elderTotal;
-											
-											return res.json(200, result);
-
-										}
-										break;
-
-										default:
-											return res.json( 200, { value:0 });
-											break;
-									}
-
-			
-								})
-							})					
-						
-										
-				break;*/
 
 				//4wDASHBOARDprojectplan
 
@@ -2212,7 +518,6 @@ var Cluster4wprojectplanDashboardController = {
 				if(params.admin1pcode === 'all'){
 
 
-
 				// total sum
 				totalBeneficiariesAll = 0;
 
@@ -2237,12 +542,23 @@ var Cluster4wprojectplanDashboardController = {
 
 							counter = 0;
 
-						    length = results.length;
+						    length = results.length; 
 
 
 							results.forEach(function(benefrecordAll,i){
 
-								totalBeneficiariesAll = totalBeneficiariesAll + benefrecordAll.total_male + benefrecordAll.total_female;
+						
+
+
+							if(benefrecordAll.total_male){
+								totalBeneficiariesAll = totalBeneficiariesAll + benefrecordAll.total_male;
+							}	
+							if(benefrecordAll.total_female){
+								totalBeneficiariesAll = totalBeneficiariesAll + benefrecordAll.total_female;
+							}	
+							//totalBeneficiariesAll = totalBeneficiariesAll + benefrecordAll.total_male + benefrecordAll.total_female;
+									
+
 
 								counter++;
 			                    if ( counter === length ) {
@@ -2250,17 +566,15 @@ var Cluster4wprojectplanDashboardController = {
 									return res.json( 200, {'value': totalBeneficiariesAll} );
 			                    }
 
-
 							});
 						}else{
 
-
 							return res.json( 200, {'value': results.length} );
-
 						}
 					});
-				
 
+			             
+					
 			}else{
 
 				totalBeneficiaries = 0;
@@ -2284,10 +598,7 @@ var Cluster4wprojectplanDashboardController = {
 						// return error
 						if (err) return res.negotiate( err );
 
-
 						if(results.length){
-
-					
 
 						counter = 0;
 
@@ -2305,7 +616,10 @@ var Cluster4wprojectplanDashboardController = {
 
 
 								if(targloc.length){
+
+									
 									totalBeneficiaries = totalBeneficiaries + benefrecord.total_male + benefrecord.total_female;
+									
 									
 								}
 
@@ -2314,28 +628,24 @@ var Cluster4wprojectplanDashboardController = {
 			                      // table
 									return res.json( 200, {'value': totalBeneficiaries} );
 			                    }
+								});
+
 							});
 
-						});
+						}else{
 
-					}else{
+							return res.json( 200, {'value': results.length} );
 
-						return res.json( 200, {'value': results.length} );
-
-					}
+						}
 
 					});
 
 			}
 				
-		
+		break;
 
 
-				break;
-
-
-					case 'total_financing_4wdashboard_projectplan':
-
+		case 'total_financing_4wdashboard_projectplan':
 
 				// total sum
 				if(params.admin1pcode === 'all'){
@@ -2355,19 +665,16 @@ var Cluster4wprojectplanDashboardController = {
 					.where( filters.project_endDateNative)
 					.exec( function( err, results ){
 
-					
                        var totalfinancing = 0;
+
 
 						results.forEach(function(pro,i){
 
-							
 							//console.log("VALOR ENTRA: ",pro.project_budget);
 
 							if(typeof pro.project_budget === 'string'){
 
-
 								var stringtonum = parseFloat(pro.project_budget);
-
 
 								if(stringtonum){
 									if(pro.project_budget_currency !=='eur' && pro.project_budget_currency !== 'cop'){
@@ -2379,27 +686,19 @@ var Cluster4wprojectplanDashboardController = {
 										var budeurtodollar = stringtonum*params.eurotousd;
  										
  										//console.log("FINAL BUDG EUR STRING: ",budeurtodollar);
-
 									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
-										
 										var  financing = budeurtodollar;
-
 
 									}else if(pro.project_budget_currency ==='cop'){
 
 
 									/*	var copchange = stringtonum.replace(".",'');
-
 										console.log("DESPUES DE REEMPLAZAR: ",copchange);*/
-
-
 										var budcoptodollar = stringtonum/params.coptousd;
 
 										//console.log("FINAL BUDG COP STRING: ",budcoptodollar);
-
 										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
 										var financing = budcoptodollar;
-
 
 									}
 
@@ -2421,42 +720,29 @@ var Cluster4wprojectplanDashboardController = {
 										var budeurtodollar2 = pro.project_budget*params.eurotousd;
  										
  										//console.log("FINAL BUDG EUR NO STRING: ",budeurtodollar2);
-
 									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
-										
 										var financing = budeurtodollar2;
 
 
 									}else if(pro.project_budget_currency ==='cop'){
 
-
 										var budcoptodollar2 = pro.project_budget/params.coptousd;
 
 										//console.log("FINAL BUDG COP NO STRING: ",budcoptodollar2);
-
 										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
 										var financing = budcoptodollar2;
-
-
 									}
-
-
 
 								} else{	
 								//	console.log("NO ES VALIDO: ", valnum);
 									var financing =0;
 								}
 
-							
-
 							//console.log("VALOR A GUARDAR:", financing);
-
 						totalfinancing = totalfinancing+financing;
-					
 							
                        });
 						//console.log("FINANCING: ", totalfinancing);
-
 						return res.json( 200, { 'value': totalfinancing } );
 						//if (err) return res.serverError(err);
 						//var total = projectbudget[0]?projectbudget[0].total:0;
@@ -2521,9 +807,7 @@ var Cluster4wprojectplanDashboardController = {
 										var budeurtodollar = stringtonum*params.eurotousd;
  										
  										//console.log("FINAL BUDG EUR STRING: ",budeurtodollar);
-
 									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
-										
 										var  financing = budeurtodollar;
 
 
@@ -2532,10 +816,8 @@ var Cluster4wprojectplanDashboardController = {
 										var budcoptodollar = stringtonum/params.coptousd;
 
 										//console.log("FINAL BUDG COP STRING: ",budcoptodollar);
-
 										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
 										var financing = budcoptodollar;
-
 
 									}
 
@@ -2557,9 +839,7 @@ var Cluster4wprojectplanDashboardController = {
 										var budeurtodollar2 = project.project_budget*params.eurotousd;
  										
  										//console.log("FINAL BUDG EUR NO STRING: ",budeurtodollar2);
-
 									//	console.log("EURO A DOLAR STRING: ",budeurtodollar);
-										
 										var financing = budeurtodollar2;
 
 
@@ -2569,10 +849,8 @@ var Cluster4wprojectplanDashboardController = {
 										var budcoptodollar2 = project.project_budget/params.coptousd;
 
 										//console.log("FINAL BUDG COP NO STRING: ",budcoptodollar2);
-
 										//console.log("PESO COL A USD SSTRING: ",budcoptodollar);
 										var financing = budcoptodollar2;
-
 
 									}
 
@@ -2607,15 +885,11 @@ var Cluster4wprojectplanDashboardController = {
 
 
 				}
-				
-		
-
-
-				break;
+		break;
 
 
 
-				case 'organizations_4wdashboard_projectplan':
+		case 'organizations_4wdashboard_projectplan':
 				
 				if ( params.list ) {
 
@@ -3002,7 +1276,7 @@ var Cluster4wprojectplanDashboardController = {
 
 												if(targloc.length){
 
-											projrecord.project_donor.forEach(function (projdonor, j){
+													projrecord.project_donor.forEach(function (projdonor, j){
 
 													if(projdonor.project_donor_id){
 
@@ -3049,149 +1323,6 @@ var Cluster4wprojectplanDashboardController = {
 
 
 				break;
-
-
-				/*case 'total_donors_4wdashboard_projectplan':
-
-				//console.log("FILTROS: ", filters);
-
-				if(params.admin1pcode === 'all'){
-
-
-				var donorslist = [];
-
-
-				Project.find()
-				.where(filters.default)
-				.where( filters.adminRpcode )
-				.where( filters.admin0pcode )
-				.where( filters.organization_tag )
-				.where( filters.cluster_id)
-				.where( filters.donor_tag)
-				.where (filters.implementer_tag)
-				.where(filters.project_plan_component)
-				.where( filters.activity_type)
-				.where( filters.project_startDateNative )
-				.where( filters.project_endDateNative)
-				.exec(function (err, results){
-
-					if (err) return res.serverError(err);
-
-						
-
-
-					if(results.length){
-
-
-						results.forEach( function( d, i ) {
-
-
-							if(d.project_donor.length > 0){
-
-								 d.project_donor.forEach(function (projdonor, j){
-
-
-	                             const resultado = donorslist.find( donor => donor.project_donor_id === projdonor.project_donor_id );
-
-	                             if(!resultado){
-	                             	donorslist.push(projdonor);
-	                             	//console.log("METI EL DONANTE: ", projdonor);
-
-	                             }
-	                            
-
-								});
-
-							};
-
-						});
-
-					  }
-
-					return res.json(200, {'value':donorslist.length});
-
-					
-
-				});
-			}else{
-
-				var donorslist = [];
-
-				Project.find()
-				.where(filters.default)
-				.where( filters.adminRpcode )
-				.where( filters.admin0pcode )
-				.where( filters.organization_tag )
-				.where( filters.cluster_id)
-				.where( filters.donor_tag)
-				.where (filters.implementer_tag)
-				.where(filters.project_plan_component)
-				.where( filters.activity_type)
-				.where( filters.project_startDateNative )
-				.where( filters.project_endDateNative)
-				.exec(function (err, results){
-
-					if (err) return res.serverError(err);
-
-								if(results.length){
-
-								counter = 0;
-
-
-								length = results.length;
-
-								results.forEach(function(projrecord,i){
-
-
-
-										if(projrecord.project_donor.length > 0){
-
-
-
-											TargetLocation.find()
-											.where( {project_id: projrecord.id})
-											.where( filters.admin1pcode )
-											.where( filters.admin2pcode ).exec(function(err,targloc){
-
-
-												if(targloc.length){
-
-											projrecord.project_donor.forEach(function (projdonor, j){
-
-
-					                                  const resultado = donorslist.find( donor => donor.project_donor_id === projdonor.project_donor_id );
-
-							                             if(!resultado){
-							                             	donorslist.push(projdonor);
-
-							                             }
-					                            
-
-														});
-
-													
-												}
-
-												counter++;
-							                    if ( counter === length ) {
-							                      // table
-													return res.json( 200, {'value': donorslist.length} );
-							                    }
-											});
-
-										}else{
-											counter ++;
-										}
-				              });
-							}
-						});
-
-			}
-
-
-
-				break;
-				*/
 				
 
 
@@ -3220,8 +1351,6 @@ var Cluster4wprojectplanDashboardController = {
 
 						var imppartners = [];
 
-					  
-
 					if(results.length){
 
 						results.forEach( function( d, i ) {
@@ -3244,10 +1373,6 @@ var Cluster4wprojectplanDashboardController = {
 								});
 
 							}
-
-						
-                         
-
 
 						});
 					}
@@ -3278,7 +1403,7 @@ var Cluster4wprojectplanDashboardController = {
 
 					if (err) return res.serverError(err);
 
-								if(results.length){
+							if(results.length){
 
 
 								counter = 0;
@@ -3341,7 +1466,6 @@ var Cluster4wprojectplanDashboardController = {
 				              });
 							}else{
 
-								
 								return res.json( 200, {'value': implementpartnerstotal.length} );
 							}
 						});
@@ -3361,79 +1485,79 @@ var Cluster4wprojectplanDashboardController = {
 						var imppartners = [];
 
 
-					Project
-					.find()
-					.where(filters.default)
-				.where( filters.adminRpcode )
-				.where( filters.admin0pcode )
-				.where( filters.organization_tag )
-				.where( filters.cluster_id)
-				.where( filters.donor_tag)
-				.where (filters.implementer_tag)
-				.where(filters.project_plan_component)
-				.where( filters.activity_type)
-				.where( filters.project_startDateNative )
-				.where( filters.project_endDateNative)
+						Project
+						.find()
+						.where(filters.default)
+						.where( filters.adminRpcode )
+						.where( filters.admin0pcode )
+						.where( filters.organization_tag )
+						.where( filters.cluster_id)
+						.where( filters.donor_tag)
+						.where (filters.implementer_tag)
+						.where(filters.project_plan_component)
+						.where( filters.activity_type)
+						.where( filters.project_startDateNative )
+						.where( filters.project_endDateNative)
 
-					.exec( function( err, results ) {
-						if (err) return res.serverError(err);
+						.exec( function( err, results ) {
+							if (err) return res.serverError(err);
 
 
 					  
 
-					if(results.length){
+								if(results.length){
 
-						results.forEach( function( d, i ) {
+									results.forEach( function( d, i ) {
 
-							if(d.implementing_partners){
+										if(d.implementing_partners){
 
-								 d.implementing_partners.forEach(function (implpartner, j){
+											 d.implementing_partners.forEach(function (implpartner, j){
 
-								 	if(implpartner.organization_tag){
+											 	if(implpartner.organization_tag){
 
 
 
-			                             const resultado = imppartners.find( implementer => implementer.organization_tag === implpartner.organization_tag );
+						                             const resultado = imppartners.find( implementer => implementer.organization_tag === implpartner.organization_tag );
 
-			                             if(!resultado){
-			                             	imppartners.push(implpartner);
-			                             }
+						                             if(!resultado){
+						                             	imppartners.push(implpartner);
+						                             }
 
-	                         		}
-	                            
+				                         		}
+				                            
 
-								});
+											});
 
-							}
+										}
+
+									});
+
+								}
+								return res.json( 200, { 'data': imppartners } );
+
+
 
 						});
 
-					}
-					return res.json( 200, { 'data': imppartners } );
+					}else{
+
+						var implementpartnerslist = [];
 
 
-
-				});
-
-			}else{
-
-				var implementpartnerslist = [];
-
-
-				Project
-					.find()
-					.where(filters.default)
-				.where( filters.adminRpcode )
-				.where( filters.admin0pcode )
-				.where( filters.organization_tag )
-				.where( filters.cluster_id)
-				.where( filters.donor_tag)
-				.where (filters.implementer_tag)
-				.where(filters.project_plan_component)
-				.where( filters.activity_type)
-				.where( filters.project_startDateNative )
-				.where( filters.project_endDateNative)
-					.exec( function( err, results ) {
+						Project
+							.find()
+							.where(filters.default)
+						.where( filters.adminRpcode )
+						.where( filters.admin0pcode )
+						.where( filters.organization_tag )
+						.where( filters.cluster_id)
+						.where( filters.donor_tag)
+						.where (filters.implementer_tag)
+						.where(filters.project_plan_component)
+						.where( filters.activity_type)
+						.where( filters.project_startDateNative )
+						.where( filters.project_endDateNative)
+							.exec( function( err, results ) {
 
 
 						if (err) return res.serverError(err);
@@ -3746,15 +1870,27 @@ var Cluster4wprojectplanDashboardController = {
 								if (err) return res.serverError(err);								
 
 								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								//if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								if (!beneficiaries.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
 
 
-								$beneficiaries = beneficiaries[0];
+							$beneficiaries = beneficiaries[0];
 
 
 
 								switch (req.param('chart_for')) {
 									case 'children':
+
+
 										if ($beneficiaries.femaleTotal < 1 && $beneficiaries.maleTotal < 1) {
 
 											// // assign data left
@@ -3814,12 +1950,14 @@ var Cluster4wprojectplanDashboardController = {
 
 
 										default:
+										//var result = {data: []};
 											return res.json( 200, { value:0 });
+											//return res.json( 200, result);
 											break;
 									}
 
 			
-								})
+								});
 							})	
 					}else{
 
@@ -3838,35 +1976,7 @@ var Cluster4wprojectplanDashboardController = {
 						.where( filters.project_endDateNative)
 						.exec( function( err, beneficiaries ){
 
-							/*TargetBeneficiaries.native(function (err, results) {
-							if(err) return res.serverError(err);
-			
-							results.aggregate([
-								{
-									//$match : filterObject
-									$match: filterObject
-								},
-								{
-									$group: {
-										_id: null,
-										men: { $sum: "$men" },
-										women: { $sum: "$women" },
-										elderly_men: { $sum: "$elderly_men" },
-										elderly_women: { $sum: "$elderly_women" },
-										boys: { $sum: "$boys" },
-										girls: { $sum: "$girls" },
-										childTotal: { $sum: { $add: ["$boys", "$girls"] } },
-										adultTotal: { $sum: { $add: ["$men", "$women"] } },
-										elderTotal: { $sum: { $add: ["$elderly_men", "$elderly_women"] } },
-										maleTotal: { $sum: "$total_male"},
-										femaleTotal: { $sum: "$total_female"},
-										sexTotal: { $sum: { $add: ["$total_male","$total_female"]}},
-										age_0_5: { $sum: {$add: ["$boys_0_5","$girls_0_5"]}},
-										age_6_11: { $sum: {$add: ["$boys_6_11","$girls_6_11"]}},
-										age_12_17: { $sum: {$add: ["$boys_12_17","$girls_12_17"]}}
-									}
-								}
-							]).toArray(function (err, beneficiaries) {*/
+							
 								if (err) return res.serverError(err);								
 
 								// if no length
@@ -3881,6 +1991,7 @@ var Cluster4wprojectplanDashboardController = {
 									totalMale = 0;
 									totalFemale = 0;
 									totalSex = 0;
+
 
 										beneficiaries.forEach(function(targben){
 
@@ -3960,6 +2071,7 @@ var Cluster4wprojectplanDashboardController = {
 
 														default:
 															return res.json( 200, { value:0 });
+															
 															break;
 													}
 									                      // table
@@ -3973,6 +2085,7 @@ var Cluster4wprojectplanDashboardController = {
 									
 								}else{
 									return res.json(200, { 'value': 0 });
+							
 									}
 
 			
@@ -4059,7 +2172,17 @@ var Cluster4wprojectplanDashboardController = {
 								if (err) return res.serverError(err);								
 
 								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								//if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								if (!beneficiaries.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
 
 
 								$beneficiaries = beneficiaries[0];
@@ -4069,8 +2192,10 @@ var Cluster4wprojectplanDashboardController = {
 
 								switch (req.param('chart_for')) {
 								
+								case 'ages':
 
-									case 'ages':
+								
+
 										if ($beneficiaries.age_0_5 < 1 && $beneficiaries.age_6_11 < 1 && $beneficiaries.age_12_17 < 1  && $beneficiaries.age_18_59 < 1  && $beneficiaries.age_60_more < 1) {
 
 											
@@ -4106,7 +2231,8 @@ var Cluster4wprojectplanDashboardController = {
 											var womensPerCent = ($beneficiaries.women / ($beneficiaries.men + $beneficiaries.women)) * 100;
 											var totalPerCent = ($beneficiaries.adultTotal / ($beneficiaries.elderTotal + $beneficiaries.adultTotal + $beneficiaries.childTotal)) * 100;
 										
-											
+
+											var total = $beneficiaries.sexTotal;
 
 											var TotalAge_0_5 = $beneficiaries.age_0_5;
 											var TotalAge_6_11 = $beneficiaries.age_6_11;
@@ -4117,11 +2243,11 @@ var Cluster4wprojectplanDashboardController = {
 
 											var TotalAges = TotalAge_6_11 + TotalAge_0_5 +TotalAge_12_17 +  TotalAge_18_59 + TotalAge_60_more;
 
-											var age_0_5PerCent = ($beneficiaries.age_0_5 / (TotalAges))*100;
-											var age_6_11PerCent = ($beneficiaries.age_6_11 / (TotalAges))*100;
-											var age_12_17PerCent = ($beneficiaries.age_12_17 / (TotalAges))*100;
-											var age_18_59PerCent = ($beneficiaries.age_18_59 / (TotalAges))*100;
-											var age_60_morePerCent = ($beneficiaries.age_60_more / (TotalAges))*100;
+											var age_0_5PerCent = ($beneficiaries.age_0_5 / (total))*100;
+											var age_6_11PerCent = ($beneficiaries.age_6_11 / (total))*100;
+											var age_12_17PerCent = ($beneficiaries.age_12_17 / (total))*100;
+											var age_18_59PerCent = ($beneficiaries.age_18_59 / (total))*100;
+											var age_60_morePerCent = ($beneficiaries.age_60_more / (total))*100;
 
 
 											// // highcharts women
@@ -4155,13 +2281,16 @@ var Cluster4wprojectplanDashboardController = {
 										break;
 
 									default:
-											return res.json( 200, { value:0 });
+										return res.json( 200, { value:0 });
+											
 											break; 
 									}
 								});
 							});		
 
 						}else{
+
+							
 
 							TargetBeneficiaries
 						.find()
@@ -4178,35 +2307,7 @@ var Cluster4wprojectplanDashboardController = {
 						.where( filters.project_endDateNative)
 						.exec( function( err, beneficiaries ){
 
-							/*TargetBeneficiaries.native(function (err, results) {
-							if(err) return res.serverError(err);
-			
-							results.aggregate([
-								{
-									//$match : filterObject
-									$match: filterObject
-								},
-								{
-									$group: {
-										_id: null,
-										men: { $sum: "$men" },
-										women: { $sum: "$women" },
-										elderly_men: { $sum: "$elderly_men" },
-										elderly_women: { $sum: "$elderly_women" },
-										boys: { $sum: "$boys" },
-										girls: { $sum: "$girls" },
-										childTotal: { $sum: { $add: ["$boys", "$girls"] } },
-										adultTotal: { $sum: { $add: ["$men", "$women"] } },
-										elderTotal: { $sum: { $add: ["$elderly_men", "$elderly_women"] } },
-										maleTotal: { $sum: "$total_male"},
-										femaleTotal: { $sum: "$total_female"},
-										sexTotal: { $sum: { $add: ["$total_male","$total_female"]}},
-										age_0_5: { $sum: {$add: ["$boys_0_5","$girls_0_5"]}},
-										age_6_11: { $sum: {$add: ["$boys_6_11","$girls_6_11"]}},
-										age_12_17: { $sum: {$add: ["$boys_12_17","$girls_12_17"]}}
-									}
-								}
-							]).toArray(function (err, beneficiaries) {*/
+						
 								if (err) return res.serverError(err);								
 
 								// if no length
@@ -4224,6 +2325,8 @@ var Cluster4wprojectplanDashboardController = {
 									var TotalAge_18_59 = 0;
 									var TotalAge_60_more = 0;
 
+									var TotalAges = 0;
+
 									beneficiaries.forEach(function(targben){
 
 											TargetLocation.find()
@@ -4240,6 +2343,8 @@ var Cluster4wprojectplanDashboardController = {
 															TotalAge_12_17 = TotalAge_12_17 + targben.boys_12_17 + targben.girls_12_17;
 															TotalAge_18_59 = TotalAge_18_59 + targben.men + targben.women;
 															TotalAge_60_more = TotalAge_60_more + targben.elderly_men + targben.elderly_women;
+
+															TotalAges = TotalAges + targben.total_female + targben.total_male;
 														}
 
 														counter++;
@@ -4281,13 +2386,14 @@ var Cluster4wprojectplanDashboardController = {
 
 
 
-															var TotalAges = TotalAge_6_11 + TotalAge_0_5 +TotalAge_12_17 +  TotalAge_18_59 + TotalAge_60_more;
+															//var TotalAges = TotalAge_6_11 + TotalAge_0_5 +TotalAge_12_17 +  TotalAge_18_59 + TotalAge_60_more;
+															var Total = TotalAges;
 
-															var age_0_5PerCent = (TotalAge_0_5 / (TotalAges))*100;
-															var age_6_11PerCent = (TotalAge_6_11 / (TotalAges))*100;
-															var age_12_17PerCent = (TotalAge_12_17 / (TotalAges))*100;
-															var age_18_59PerCent = (TotalAge_18_59 / (TotalAges))*100;
-															var age_60_morePerCent = (TotalAge_60_more / (TotalAges))*100;
+															var age_0_5PerCent = (TotalAge_0_5 / (Total))*100;
+															var age_6_11PerCent = (TotalAge_6_11 / (Total))*100;
+															var age_12_17PerCent = (TotalAge_12_17 / (Total))*100;
+															var age_18_59PerCent = (TotalAge_18_59 / (Total))*100;
+															var age_60_morePerCent = (TotalAge_60_more / (Total))*100;
 
 
 															// // highcharts women
@@ -4322,11 +2428,10 @@ var Cluster4wprojectplanDashboardController = {
 
 														default:
 															return res.json( 200, { value:0 });
+															
 															break;
 													}
-									                      // table
-									                    //   console.log("TOTAL PROYECTOS: ",totalprojects.length);
-
+									   
 									                    }
 													});
 											});
@@ -4334,7 +2439,9 @@ var Cluster4wprojectplanDashboardController = {
 
 									
 								}else{
-									return res.json(200, { 'value': 0 });
+									return res.json(200, { value: 0 });
+									
+									
 									}
 
 			
@@ -4375,28 +2482,31 @@ var Cluster4wprojectplanDashboardController = {
 
 								
 								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								//if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								if (!beneficiaries.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
 
 
 								if(beneficiaries.length){
 
 
-									var result = {data:[]};
 
 									beneficiaries.totalBeneficiariesCluster= 0
 
 									beneficiaries.forEach(function(clus,i){
-
-										beneficiaries.totalBeneficiariesCluster = beneficiaries.totalBeneficiariesCluster+clus.totalBeneficiaries 
-
-										/*var newclusterbeneficiary = {
-											'y':clus.totalBeneficiaries,
-											'color':'blue',
-											'name': clus._id.cluster,
-											'label':0
-										};
-
-										result.data.push(newclusterbeneficiary)*/
+										
+										
+											beneficiaries.totalBeneficiariesCluster = beneficiaries.totalBeneficiariesCluster+clus.totalBeneficiaries 
+									
+										
 
 									});
 								}else{
@@ -4421,15 +2531,21 @@ var Cluster4wprojectplanDashboardController = {
 								
 								switch (req.param('chart_for')) {
 									case 'beneficiaryCluster':
-										if ($beneficiariesOne.totalBeneficiaries < 1 && $beneficiariesOne.totalBeneficiaries < 1) {
+										if (beneficiaries.length < 1) {
 											
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+													data: [{
+														'y': 0,
+														'color': '#f48fb1',
+														'label': 0,
+													}]
+													};
+											
 											
 											
 											return res.json(200, result);
 										} else {
+											var result = {data: []};
 
 											beneficiaries.forEach(function(bencluster,i){
 
@@ -4452,6 +2568,7 @@ var Cluster4wprojectplanDashboardController = {
 									
 										default:
 											return res.json( 200, { value:0 });
+											
 											break;
 									}
 
@@ -4482,7 +2599,7 @@ var Cluster4wprojectplanDashboardController = {
 								counter = 0;
 								length = beneficiariesCluster.length;
 								listTargetBeneficiariesCluster = [];
-								var resultCluster = {data:[]};
+								
 
 								beneficiariesCluster.forEach(function(targben){
 
@@ -4491,21 +2608,18 @@ var Cluster4wprojectplanDashboardController = {
 										.where( filters.admin1pcode )
 										.where( filters.admin2pcode ).exec(function(err,targloc){
 
-											if(targloc.length){
+												if(targloc.length){
 
-												listTargetBeneficiariesCluster.push(targben);
+													listTargetBeneficiariesCluster.push(targben);
+		
+												}
 
-
-											
-											}
+										
 
 											counter++;
 									         if ( counter === length ) {
 
-									         	//console.log("LISTA FINAL",listTargetBeneficiaries);
-
-													
-
+									         
 									         	const targetbenefgroupsCluster = [...listTargetBeneficiariesCluster.reduce((r, o) => {
 														  const key = o.cluster_id + '-' + o.cluster;
 														  
@@ -4537,14 +2651,22 @@ var Cluster4wprojectplanDashboardController = {
 									         	switch (req.param('chart_for')) {
 													case 'beneficiaryCluster':
 														if (targetbenefgroupsCluster.length < 1 ) {
-															
-															result.data[0].y = 100;
-															result.data[0].label = 0;
-															result.data[0].color = '#c7c7c7';
+
+
+															var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Cluster',
+																		'label': 0,
+																	}]
+																};
 															
 															
 															return res.json(200, result);
 														} else {
+
+															var result = {data: []};
 
 
 															targetbenefgroupsCluster.forEach(function(clus,i){
@@ -4560,27 +2682,30 @@ var Cluster4wprojectplanDashboardController = {
 															};
 
 
-																resultCluster.data.push(newclusbeneficiaryCluster)
+																result.data.push(newclusbeneficiaryCluster)
 
 															});
 
 															
-															return res.json(200, resultCluster);
+															return res.json(200, result);
 														}
 														break;
 													
 														default:
 															return res.json( 200, { value:0 });
+															
 															break;
 													}
 									         }
-									});
+									   });
+									
 								});
 
 
 							}else{
-
+								
 								return res.json( 200, { value:0 });
+						
 							}							
 
 
@@ -4623,7 +2748,20 @@ var Cluster4wprojectplanDashboardController = {
 
 								
 								// if no length
-								if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								//if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								
+
+								if (!beneficiaries.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+								
 
 
 								if(beneficiaries.length){
@@ -4637,14 +2775,6 @@ var Cluster4wprojectplanDashboardController = {
 
 										beneficiaries.totalBeneficiariesType = beneficiaries.totalBeneficiariesType+ben.totalBeneficiaries 
 
-										/*var newclusterbeneficiary = {
-											'y':clus.totalBeneficiaries,
-											'color':'blue',
-											'name': clus._id.cluster,
-											'label':0
-										};
-
-										result.data.push(newclusterbeneficiary)*/
 
 									});
 								}else{
@@ -4669,16 +2799,21 @@ var Cluster4wprojectplanDashboardController = {
 								
 								switch (req.param('chart_for')) {
 									case 'beneficiaryType':
-										if ($beneficiariesOne.totalBeneficiaries < 1 && $beneficiariesOne.totalBeneficiaries < 1) {
+										if (beneficiaries.length<1) {
 											
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Type',
+																		'label': 0,
+																	}]
+																};
 											
 											
 											return res.json(200, result);
 										} else {
-
+											var result = {data: []};
 											beneficiaries.forEach(function(bentype,i){
 
 											var newclusterbeneficiary = {
@@ -4764,6 +2899,7 @@ var Cluster4wprojectplanDashboardController = {
 														  });
 														  
 														  item.total_beneficiaries += o.total_beneficiaries;
+														 
 														  item.total_male += o.total_male ;
 														  item.total_female  += o.total_female;
 														  item.TOTALBEN = item.total_male + item.total_female;
@@ -4781,17 +2917,26 @@ var Cluster4wprojectplanDashboardController = {
 									         	});
 
 
+
+
 									         	switch (req.param('chart_for')) {
 													case 'beneficiaryType':
 														if (targetbenefgroups.length < 1 ) {
 															
-															result.data[0].y = 100;
-															result.data[0].label = 0;
-															result.data[0].color = '#c7c7c7';
+															var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Type',
+																		'label': 0,
+																	}]
+																};
 															
 															
 															return res.json(200, result);
 														} else {
+
+															var result = {data: []};
 
 
 															targetbenefgroups.forEach(function(ben,i){
@@ -4818,6 +2963,7 @@ var Cluster4wprojectplanDashboardController = {
 													
 														default:
 															return res.json( 200, { value:0 });
+															
 															break;
 													}
 									         }
@@ -4826,8 +2972,9 @@ var Cluster4wprojectplanDashboardController = {
 
 
 							}else{
-
+								
 								return res.json( 200, { value:0 });
+								
 							}							
 
 
@@ -4839,6 +2986,7 @@ var Cluster4wprojectplanDashboardController = {
 											
 				break;
 
+				//FINANCING CHARTS
 
 
 				case 'BarChartFinancingCluster':
@@ -4868,7 +3016,17 @@ var Cluster4wprojectplanDashboardController = {
 
 								
 								// if no length
-								if (!projectsbudget.length) return res.json(200, { 'value': 0 });
+								//if (!beneficiaries.length) return res.json(200, { 'value': 0 });
+								if (!projectsbudget.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
 
 								//console.log("TAMAÑO: ",budgetprogress.lenth);
 
@@ -4876,7 +3034,7 @@ var Cluster4wprojectplanDashboardController = {
 								if(projectsbudget.length){
 
 
-									var result = {data:[]};
+									
 
 									projectsbudget.totalBudgetCluster = 0
 
@@ -4927,16 +3085,20 @@ var Cluster4wprojectplanDashboardController = {
 								
 								switch (req.param('chart_for')) {
 									case 'financingCluster':
-										if ($projectsBudgetOne.totalBudget < 1 && $projectsBudgetOne.totalBudget < 1) {
+										if (projectsbudget.length < 1) {
 											
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
 											
 											
 											return res.json(200, result);
 										} else {
-
+												var result = {data:[]};
 											//console.log("LOS CLUSTERS: ",budgetprogress);
 
 											projectsbudget.forEach(function(clus,i){
@@ -4979,6 +3141,7 @@ var Cluster4wprojectplanDashboardController = {
 									
 										default:
 											return res.json( 200, { value:0 });
+											
 											break;
 									}
 
@@ -5053,25 +3216,45 @@ var Cluster4wprojectplanDashboardController = {
 
 									         	totalFinancialFinalCluster = 0;
 
-									         	projectsBudgetgroupsByCluster.forEach(function (groupProjClus){
+									         	listProjectsBudgetCluster.forEach(function (project){
 
-									         		totalFinancialFinalCluster = totalFinancialFinalCluster + groupProjClus.TOTALBUDGET;
+									         		if(project.project_budget_currency === 'cop'){
+														var clustotalBudgetsCOPtoUSD = project.project_budget/params.coptousd;
+														totalFinancialFinalCluster = totalFinancialFinalCluster+clustotalBudgetsCOPtoUSD;
+
+													}else if(project.project_budget_currency === 'eur'){
+
+
+														totalFinancialFinalCluster = totalFinancialFinalCluster+(project.project_budget*params.eurotousd);
+													
+
+													}else{
+														totalFinancialFinalCluster = totalFinancialFinalCluster+project.project_budget
+
+													}
 									         	});
+
+									         	
 
 
 									         	switch (req.param('chart_for')) {
 													case 'financingCluster':
 														if (projectsBudgetgroupsByCluster.length < 1 ) {
 															
-															result.data[0].y = 100;
-															result.data[0].label = 0;
-															result.data[0].color = '#c7c7c7';
+															var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Cluster',
+																		'label': 0,
+																	}]
+																};
 															
 															
 															return res.json(200, result);
 														} else {
 
-
+															var result = {data:[]};
 														projectsBudgetgroupsByCluster.forEach(function(clus,i){
 
 
@@ -5112,7 +3295,8 @@ var Cluster4wprojectplanDashboardController = {
 														break;
 													
 														default:
-															return res.json( 200, { value:0 });
+														return res.json( 200, { value:0 });
+														
 															break;
 													}
 									         }
@@ -5123,8 +3307,8 @@ var Cluster4wprojectplanDashboardController = {
 							}else{
 
 								return res.json( 200, { value:0 });
+								
 							}							
-
 
 
 						});
@@ -5163,7 +3347,18 @@ var Cluster4wprojectplanDashboardController = {
 
 								
 								// if no length
-								if (!projectsbudgetorg.length) return res.json(200, { 'value': 0 });
+								
+							if (!projectsbudgetorg.length) {
+								
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
 
 								//console.log("TAMAÑO: ",budgetprogress.lenth);
 
@@ -5171,7 +3366,7 @@ var Cluster4wprojectplanDashboardController = {
 								if(projectsbudgetorg.length){
 
 
-									var result = {data:[]};
+									
 
 									projectsbudgetorg.totalBudgetExcOrg = 0
 
@@ -5180,42 +3375,27 @@ var Cluster4wprojectplanDashboardController = {
 
 										if(orgExec._id.project_budget_currency === 'cop'){
 											var clustotalBudgetsCOPtoUSD = orgExec.totalBudgetOrgEx/params.coptousd;
+											
 											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+clustotalBudgetsCOPtoUSD;
+
+											orgExec.totalBudgetOrgEx=clustotalBudgetsCOPtoUSD;
+											orgExec.totalBudgetOrgEx = orgExec.totalBudgetOrgEx.toFixed(2);
 
 										}else if(orgExec._id.project_budget_currency === 'eur'){
 
+											var clustotalBudgetsEURtoUSDChart = orgExec.totalBudgetOrgEx*params.eurotousd;
 
 											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+(orgExec.totalBudgetOrgEx*params.eurotousd);
-										
+											
+											orgExec.totalBudgetOrgEx=clustotalBudgetsEURtoUSDChart;
+											orgExec.totalBudgetOrgEx = orgExec.totalBudgetOrgEx.toFixed(2);
 
 										}else{
 											projectsbudgetorg.totalBudgetExcOrg = projectsbudgetorg.totalBudgetExcOrg+orgExec.totalBudgetOrgEx
 
 										}
 
-										//beneficiaries.totalBudgetProgressCluster = beneficiaries.totalBudgetProgressCluster+clus.totalBeneficiaries 
 
-										
-
-									});
-
-									projectsbudgetorg.forEach(function(org,i){
-
-									if(org._id.project_budget_currency === 'cop'){
-											//console.log("Antes2 : ", clus.totalBudgetProgress);
-											var clustotalBudgetsCOPtoUSDChart = org.totalBudgetOrgEx/params.coptousd;
-											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
-											org.totalBudgetOrgEx = clustotalBudgetsCOPtoUSDChart;
-											org.totalBudgetOrgEx = org.totalBudgetOrgEx.toFixed(2);
-											
-
-										}else if(org._id.project_budget_currency === 'eur'){
-
-											var clustotalBudgetsEURtoUSDChart = org.totalBudgetOrgEx*params.eurotousd;
-											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
-											org.totalBudgetOrgEx = clustotalBudgetsEURtoUSDChart;
-											org.totalBudgetOrgEx = org.totalBudgetOrgEx.toFixed(2);
-										}
 									});
 
 
@@ -5243,17 +3423,24 @@ var Cluster4wprojectplanDashboardController = {
 								
 								switch (req.param('chart_for')) {
 									case 'financingExecutorOrg':
-										if ($projectsBudgetOne.totalBudgetOrgEx < 1 && $projectsBudgetOne.totalBudgetOrgEx < 1) {
+									//console.log("BUDG: ",projectsbudgetorg.length);
+									//console.log("BUDG- new: ",projectsbudgetorg);
+										if (projectsbudgetorg.length < 1) {
 											
-											result.data[0].y = 100;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
 											
 											
 											return res.json(200, result);
 										} else {
 
 											//console.log("LOS CLUSTERS: ",budgetprogress);
+											var result = {	data: []};
 
 											projectsbudgetorg.sort(function(a, b) {
 										  return b.totalBudgetOrgEx - a.totalBudgetOrgEx;
@@ -5263,23 +3450,6 @@ var Cluster4wprojectplanDashboardController = {
 
 
 												if(i<5){
-
-										/*if(excOrg._id.project_budget_currency === 'cop'){
-											//console.log("Antes2 : ", clus.totalBudgetProgress);
-											var clustotalBudgetsCOPtoUSDChart = excOrg.totalBudgetOrgEx/params.coptousd;
-											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
-											excOrg.totalBudgetOrgEx = clustotalBudgetsCOPtoUSDChart;
-											excOrg.totalBudgetOrgEx = excOrg.totalBudgetOrgEx.toFixed(2);
-											
-
-										}else if(excOrg._id.project_budget_currency === 'eur'){
-
-											var clustotalBudgetsEURtoUSDChart = excOrg.totalBudgetOrgEx*params.eurotousd;
-											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
-											excOrg.totalBudgetOrgEx = clustotalBudgetsEURtoUSDChart;
-											excOrg.totalBudgetOrgEx = excOrg.totalBudgetOrgEx.toFixed(2);
-										}*/
-
 
 
 											var newExecOrgProjectsBudget = {
@@ -5303,6 +3473,7 @@ var Cluster4wprojectplanDashboardController = {
 									
 										default:
 											return res.json( 200, { value:0 });
+											
 											break;
 									}
 
@@ -5328,6 +3499,18 @@ var Cluster4wprojectplanDashboardController = {
 
 							if (err) return res.serverError(err);
 
+							if (!projectBudgetOrgEx.length) {
+								
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
 							if(projectBudgetOrgEx.length){
 
 								counter = 0;
@@ -5347,8 +3530,7 @@ var Cluster4wprojectplanDashboardController = {
 
 												listProjectsBudgetExOrg.push(project);
 
-
-											
+											   
 											}
 
 											counter++;
@@ -5377,20 +3559,20 @@ var Cluster4wprojectplanDashboardController = {
 
 									         	totalFinancialFinalOrgExec = 0;
 
-									         	projectsBudgetgroupsByCluster.forEach(function (groupProjOrgExc){
+									         	listProjectsBudgetExOrg.forEach(function (projectbud){
 
-									         		if(groupProjOrgExc.project_budget_currency === 'cop'){
-														var orgExctotalBudgetsCOPtoUSD = groupProjOrgExc.TOTALBUDGET/params.coptousd;
-														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+orgExctotalBudgetsCOPtoUSD;
+									         		if(projectbud.project_budget_currency === 'cop'){
+														var projectBudgetsCOPtoUSD = projectbud.project_budget/params.coptousd;
+														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+projectBudgetsCOPtoUSD;
 
-													}else if(groupProjOrgExc.project_budget_currency === 'eur'){
+													}else if(projectbud.project_budget_currency === 'eur'){
 
 
-														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+(groupProjOrgExc.TOTALBUDGET*params.eurotousd);
+														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+(projectbud.project_budget*params.eurotousd);
 													
 
 													}else{
-														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+groupProjOrgExc.TOTALBUDGET
+														totalFinancialFinalOrgExec = totalFinancialFinalOrgExec+projectbud.project_budget
 
 													}
 
@@ -5401,14 +3583,20 @@ var Cluster4wprojectplanDashboardController = {
 													case 'financingExecutorOrg':
 														if (projectsBudgetgroupsByCluster.length < 1 ) {
 															
-															result.data[0].y = 100;
-															result.data[0].label = 0;
-															result.data[0].color = '#c7c7c7';
 															
+															var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Organization',
+																		'label': 0,
+																	}]
+																};
 															
 															return res.json(200, result);
 														} else {
 
+															var result = {	data: []};
 
 														projectsBudgetgroupsByCluster.forEach(function(execOrg,i){
 
@@ -5451,6 +3639,7 @@ var Cluster4wprojectplanDashboardController = {
 													
 														default:
 															return res.json( 200, { value:0 });
+															
 															break;
 													}
 									         }
@@ -5461,6 +3650,7 @@ var Cluster4wprojectplanDashboardController = {
 							}else{
 
 								return res.json( 200, { value:0 });
+								
 							}							
 
 
@@ -5470,13 +3660,988 @@ var Cluster4wprojectplanDashboardController = {
 					}				
 							
 											
+				break; 
+
+
+				case 'BarChartFinancingOrgImplementing':
+
+
+				if(params.admin1pcode === 'all'){
+
+
+
+						Project.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObject
+								}
+							]).toArray(function (err, budgetsprogress) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+							if (!budgetsprogress.length) {
+								var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(budgetsprogress.length){
+
+
+
+									counter = 0;
+
+									length = budgetsprogress.length;
+
+									//budgetprogressimpl.totalBudgetProgressDonor = 0
+									budgetsprogress.totalBudgetProgressOrgImpl = 0;
+
+									implementorgbudgetprogress = [];
+
+									totalFinancialFinalOrgImple = 0;
+
+									budgetsprogress.forEach(function(budgprog){
+
+
+
+									         	if(budgprog.project_budget_currency === 'cop'){
+
+
+														totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (budgprog.project_budget/params.coptousd);
+
+
+													}else if(budgprog.project_budget_currency === 'eur'){
+
+
+														totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (budgprog.project_budget*params.eurotousd);
+														
+													
+
+													}else{
+
+
+														totalFinancialFinalOrgImple = totalFinancialFinalOrgImple+budgprog.project_budget;
+													}
+									   
+
+
+
+
+										if(budgprog.implementing_partners){
+
+											//console.log("IMPLE: ",budgprog.implementing_partners);
+
+											budgprog.implementing_partners.forEach(function (imp, i){
+
+												
+
+
+												if(imp.organization_tag){
+
+
+
+
+						                           /*  const exist = implementorgbudgetprogress.find( implementer => implementer.organization_tag === imp.organization_tag );
+
+						                             if(!exist){*/
+
+						                             	newimplementorg = {
+						                             		'organization_name':imp.organization_name,
+						                             		'organization_tag':imp.organization_tag,
+						                             		'organization':imp.organization,
+						                             		'project_budget':budgprog.project_budget,
+						                             		'project_budget_currency':budgprog.project_budget_currency
+						                             	}
+						                             	implementorgbudgetprogress.push(newimplementorg);
+
+						                             	//console.log("HICE PUSH: ",newimplementorg);
+
+														
+						                             //}
+
+						                         }
+				                            
+
+											});
+
+										}
+
+										counter++;
+
+									    if ( counter === length ) {
+
+
+
+									       const budgetprogressByImpleOrg = [...implementorgbudgetprogress.reduce((r, o) => {
+														  const key = o.organization_tag + '-' + o.organization + '-'+ o.project_budget_currency;
+														  
+														  const item = r.get(key) || Object.assign({}, o, {
+														    project_budget: 0,
+														    TOTALBUDGET : 0
+														  });
+														  
+														  item.project_budget += o.project_budget;
+														 
+														  item.TOTALBUDGET = item.project_budget;
+
+														  return r.set(key, item);
+														}, new Map).values()];  
+
+
+
+									       	budgetprogressByImpleOrg.forEach(function(orgim,i){
+
+									       		if(orgim.project_budget_currency === 'cop'){
+														newTotalBudImpl  = orgim.TOTALBUDGET /params.coptousd;
+														//console.log("tota cop: ", newTotalBudImpl);
+														orgim.TOTALBUDGET = newTotalBudImpl.toFixed(2);
+														//console.log("TOT cop: ",orgimplementer.TOTALBUDGET);
+
+													}else if(orgim.project_budget_currency === 'eur'){
+
+														newTotalBudImpl = orgim.TOTALBUDGET *params.eurotousd;
+														//console.log("tota eur: ", newTotalBudImpl);
+
+														orgim.TOTALBUDGET = newTotalBudImpl.toFixed(2);
+														//console.log("TOT euro: ",orgimplementer.TOTALBUDGET);
+
+													}
+
+											});
+
+									        // console.log("TOTAL: ",totalFinancialFinalOrgImple);
+
+								switch (req.param('chart_for')) {
+									case 'financingOrgImplementing':
+
+											//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
+										if (!budgetprogressByImpleOrg.length) {
+													
+													var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Org Impl',
+																		'label': 0,
+																	}]
+																};
+													
+													
+													return res.json(200, result);
+										} else {
+
+											var result = {data:[]};
+
+
+											budgetprogressByImpleOrg.sort(function(a, b) {
+											  return b.TOTALBUDGET - a.TOTALBUDGET;
+												});
+
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											budgetprogressByImpleOrg.forEach(function(orgimplementer,i){
+
+											
+											if(i<5){
+
+												//console.log("CADA GRUPO: ", orgimplementer);
+
+											var orgimplementer_name;
+											if(orgimplementer.organization_name){
+												orgimplementer_name = orgimplementer.organization_name;
+
+											}else{
+												orgimplementer.organization_tag;
+
+											}
+												var neworgimplefinancial = {
+													'y': parseFloat(orgimplementer.TOTALBUDGET),
+													'color':'blue',
+													'name': orgimplementer_name+' ('+orgimplementer.project_budget_currency+')',
+													'label': (orgimplementer.TOTALBUDGET / (totalFinancialFinalOrgImple))*100
+												};
+
+												//console.log("AGREGADO A RESULT: ", neworgimplefinancial);
+
+
+
+												result.data.push(neworgimplefinancial);
+											}
+											});
+
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											
+											break;
+										}
+
+
+
+
+
+									}	
+
+							});
+
+
+
+									
+						}else{
+									return res.json(200, { value: 0 });
+
+									
+									
+
+						}
+					});
+				});					
+
+			}else{
+				//console.log("ENTRA AQUI", filterObject);
+
+				Project
+						.find()
+						.where( filters.default )
+						.where( filters.adminRpcode )
+						.where( filters.admin0pcode )
+						.where( filters.cluster_id )
+						.where( filters.organization_tag )
+						.where(filters.donor_tag)
+						.where( filters.implementer_tag)
+						.where(filters.project_plan_component)
+						.where( filters.activity_type)
+						.where( filters.project_startDateNative )
+						.where( filters.project_endDateNative)
+						.exec( function( err, projects ){
+
+								if (err) return res.serverError(err);	
+
+								//console.log("PROJECTS: ",projects);
+								// if no length
+								if (!projects.length) {
+								var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
+
+								if(projects.length){
+
+
+									counter = 0;
+
+									length = projects.length;
+
+
+
+									implementorgfinancial = [];
+
+									totalFinancialFinalOrgImple = 0;
+																	
+
+									projects.forEach(function(project){
+
+										TargetLocation.find()
+										.where( {project_id: project.id})
+										.where( filters.admin1pcode )
+										.where( filters.admin2pcode ).exec(function(err,targloc){
+
+											if(targloc.length){
+
+
+												if(project.project_budget_currency === 'cop'){
+
+
+														totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (project.project_budget/params.coptousd);
+
+
+													}else if(project.project_budget_currency === 'eur'){
+
+
+														totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (project.project_budget*params.eurotousd);
+														
+													
+
+													}else{
+
+
+														totalFinancialFinalOrgImple = totalFinancialFinalOrgImple+project.project_budget;
+													}
+									   
+
+
+
+
+												if(project.implementing_partners){
+
+													//console.log("IMPLE: ",budgprog.implementing_partners);
+
+													project.implementing_partners.forEach(function (imp, i){
+
+														
+
+
+														if(imp.organization_tag){
+
+
+
+
+								                           /*  const exist = implementorgbudgetprogress.find( implementer => implementer.organization_tag === imp.organization_tag );
+
+								                             if(!exist){*/
+
+								                             	newimplementorg = {
+								                             		'organization_name':imp.organization_name,
+								                             		'organization_tag':imp.organization_tag,
+								                             		'organization':imp.organization,
+								                             		'project_budget':project.project_budget,
+								                             		'project_budget_currency':project.project_budget_currency
+								                             	}
+								                             	implementorgfinancial.push(newimplementorg);
+
+								                             	//console.log("HICE PUSH: ",newimplementorg);
+
+																
+								                             //}
+
+								                         }
+						                            
+
+													});
+
+												}
+											}
+
+												counter++;
+												//console.log("counter length: ", counter + ' -  ' +length);
+												//console.log("FINANCIAL: ", implementorgfinancial);
+
+
+												if(counter === length){
+																														
+
+
+
+															 const budgetprogressByImpleOrg = [...implementorgfinancial.reduce((r, o) => {
+																  const key = o.organization_tag + '-' + o.organization_name + '-'+ o.project_budget_currency;
+																  
+																  const item = r.get(key) || Object.assign({}, o, {
+																    project_budget: 0,
+																    TOTALBUDGET : 0
+																  });
+																  
+																  item.project_budget += o.project_budget;
+																 
+																  item.TOTALBUDGET = item.project_budget;
+
+																  return r.set(key, item);
+																}, new Map).values()];  
+
+												
+
+														       	budgetprogressByImpleOrg.forEach(function(orgim,i){
+
+														       		if(orgim.project_budget_currency === 'cop'){
+																			newTotalBudImpl  = orgim.TOTALBUDGET /params.coptousd;
+																			//console.log("tota cop: ", newTotalBudImpl);
+																			orgim.TOTALBUDGET = newTotalBudImpl.toFixed(2);
+																			//console.log("TOT cop: ",orgimplementer.TOTALBUDGET);
+
+																		}else if(orgim.project_budget_currency === 'eur'){
+
+																			newTotalBudImpl = orgim.TOTALBUDGET *params.eurotousd;
+																			//console.log("tota eur: ", newTotalBudImpl);
+
+																			orgim.TOTALBUDGET = newTotalBudImpl.toFixed(2);
+																			//console.log("TOT euro: ",orgimplementer.TOTALBUDGET);
+
+																		}
+
+																});
+
+
+																switch (req.param('chart_for')) {
+																	case 'financingOrgImplementing':
+
+																		if (!budgetprogressByImpleOrg.length) {
+																			
+																			var result = {	
+																				data: [{
+																					'y': 0,
+																					'color': '#f48fb1',
+																					'name': 'Org Impl',
+																					'label': 0,
+																				}]
+																			};
+																			
+																			
+																			return res.json(200, result);
+																		} else {
+
+																			var result = {data:[]};
+
+																			budgetprogressByImpleOrg.sort(function(a, b) {
+																			  return b.TOTALBUDGET - a.TOTALBUDGET;
+																				});
+
+																			budgetprogressByImpleOrg.forEach(function(orgimplement,i){
+
+																				if(i<5){
+																					var orgimplementer_name;
+																					if(orgimplement.organization_name){
+																						orgimplementer_name = orgimplement.organization_name;
+
+																					}else{
+																						orgimplement.organization_tag;
+
+																					}
+																						var neworgimplefinancial = {
+																							'y': parseFloat(orgimplement.TOTALBUDGET),
+																							'color':'blue',
+																							'name': orgimplementer_name+' ('+orgimplement.project_budget_currency+')',
+																							'label': (orgimplement.TOTALBUDGET / (totalFinancialFinalOrgImple))*100
+																						};
+
+																						
+																						result.data.push(neworgimplefinancial);
+																				}
+
+																			});
+
+																			return res.json(200, result);
+
+
+																		}
+
+																		break;
+
+																		default:
+																		return res.json( 200, { value:0 });
+																		
+																		break;
+														}
+
+											}
+
+
+										});//Termino verificación de TargetLocation
+
+									});
+
+								}else{
+									return res.json(200, { value: 0 });
+
+								}//cierro verificación de cantidad de proyectos 
+
+							});
+
+						
+				}
+
+
+
+
+
 				break;
 
 
 
-				
+				case 'BarChartFinancingDonor':
+
+
+				if(params.admin1pcode === 'all'){
+
+
+
+						Project.native(function (err, results) {
+							if(err) return res.serverError(err);
+			
+							results.aggregate([
+								{
+									//$match : filterObject
+									$match: filterObject
+								}
+							]).toArray(function (err, financingdonor) {
+								if (err) return res.serverError(err);	
+
+								
+								// if no length
+								if (!financingdonor.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
+								//console.log("TAMAÑO: ",budgetprogress.lenth);
+
+
+								if(financingdonor.length){
+
+
+
+									counter = 0;
+
+									length = financingdonor.length;
+
+									//budgetprogressimpl.totalBudgetProgressDonor = 0
+									
+
+									donorsFinancing = [];
+
+									totalFinancialFinalDonor = 0;
+
+									financingdonor.forEach(function(projfinancial){
+
+
+
+									         	if(projfinancial.project_budget_currency === 'cop'){
+
+
+														totalFinancialFinalDonor = totalFinancialFinalDonor + (projfinancial.project_budget/params.coptousd);
+
+
+													}else if(projfinancial.project_budget_currency === 'eur'){
+
+
+														totalFinancialFinalDonor = totalFinancialFinalDonor + (projfinancial.project_budget*params.eurotousd);
+														
+													
+
+													}else{
+
+
+														totalFinancialFinalDonor = totalFinancialFinalDonor+projfinancial.project_budget;
+													}
+									   
+
+
+
+
+										if(projfinancial.project_donor){
+
+											//console.log("IMPLE: ",budgprog.implementing_partners);
+
+											projfinancial.project_donor.forEach(function (don, i){
+
+												
+
+
+												if(don.project_donor_id){
+
+
+
+
+															 if(don.project_donor_budget){
+															 	donor_budg =  don.project_donor_budget;
+
+															 }	else{
+															 	donor_budg = 0;
+															 }
+
+						                             	newdonor = {
+						                             		'donor_name':don.project_donor_name,
+						                             		'donor_id':don.project_donor_id,
+						                             		'donor_budget':donor_budg,
+						                             		'project_budget_currency':projfinancial.project_budget_currency
+						                             	}
+						                             	donorsFinancing.push(newdonor);
+
+						                             	//console.log("HICE PUSH: ",newimplementorg);
+
+														
+						                             //}
+
+						                         }
+				                            
+
+											});
+
+										}
+
+										counter++;
+
+									    if ( counter === length ) {
+
+
+									       const financingGroupByDonors = [...donorsFinancing.reduce((r, o) => {
+														  const key = o.donor_id + '-' + o.donor_name + '-'+ o.project_budget_currency;
+														  
+														  const item = r.get(key) || Object.assign({}, o, {
+														    donor_budget: 0,
+														    TOTALBUDGET : 0
+														  });
+														  
+														  item.donor_budget += o.donor_budget;
+														 
+														  item.TOTALBUDGET = item.donor_budget;
+
+														  return r.set(key, item);
+														}, new Map).values()];  
+
+
+
+									       	financingGroupByDonors.forEach(function(orgdonor,i){
+
+									       		if(orgdonor.project_budget_currency === 'cop'){
+														newTotalBudDon  = orgdonor.TOTALBUDGET /params.coptousd;
+														//console.log("tota cop: ", newTotalBudImpl);
+														orgdonor.TOTALBUDGET = newTotalBudDon.toFixed(2);
+														//console.log("TOT cop: ",orgimplementer.TOTALBUDGET);
+
+													}else if(orgdonor.project_budget_currency === 'eur'){
+
+														newTotalBudDon = orgdonor.TOTALBUDGET *params.eurotousd;
+														//console.log("tota eur: ", newTotalBudImpl);
+
+														orgdonor.TOTALBUDGET = newTotalBudDon.toFixed(2);
+														//console.log("TOT euro: ",orgimplementer.TOTALBUDGET);
+
+													}
+
+											});
+
+									        // console.log("TOTAL: ",totalFinancialFinalOrgImple);
+
+									    switch (req.param('chart_for')) {
+											case 'financingDonor':
+
+											//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
+												if (!financingGroupByDonors.length) {
+													
+													var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Donor',
+																		'label': 0,
+																	}]
+																};
+													
+													
+													return res.json(200, result);
+												} else {
+
+												var result = {data:[]};
+
+											financingGroupByDonors.sort(function(a, b) {
+											  return b.TOTALBUDGET - a.TOTALBUDGET;
+												});
+
+
+											//console.log("LOS CLUSTERS: ",budgetprogress);
+
+											financingGroupByDonors.forEach(function(orgdon,i){
+
+											
+											if(i<5){
+
+												//console.log("CADA GRUPO: ", orgimplementer);
+
+											var donor_name;
+											if(orgdon.donor_name){
+												donor_name = orgdon.donor_name;
+
+											}else{
+												orgdon.donor_id;
+
+											}
+												var neworgdonorfinancial = {
+													'y': parseFloat(orgdon.TOTALBUDGET),
+													'color':'blue',
+													'name': donor_name+' ('+orgdon.project_budget_currency+')',
+													'label': (orgdon.TOTALBUDGET / (totalFinancialFinalDonor))*100
+												};
+
+												//console.log("AGREGADO A RESULT: ", neworgimplefinancial);
+
+
+
+												result.data.push(neworgdonorfinancial);
+											}
+											});
+
+											
+											return res.json(200, result);
+										}
+										break;
+									
+										default:
+											return res.json( 200, { value:0 });
+											
+											break;
+										}
+
+									}	
+
+							});
+
+
+
+									
+						}else{
+									return res.json(200, { value: 0 });
+
+						}
+					});
+				});					
+
+			}else{
+
+				Project
+						.find()
+						.where( filters.default )
+						.where( filters.adminRpcode )
+						.where( filters.admin0pcode )
+						.where( filters.cluster_id )
+						.where( filters.organization_tag )
+						.where(filters.donor_tag)
+						.where( filters.implementer_tag)
+						.where(filters.project_plan_component)
+						.where( filters.activity_type)
+						.where( filters.project_startDateNative )
+						.where( filters.project_endDateNative)
+						.exec( function( err, projects ){
+
+								if (err) return res.serverError(err);	
+
+								if (!projects.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
+								if(projects.length){
+
+
+									counter = 0;
+
+									length = projects.length;
+
+									donorfinancial = [];
+
+									totalFinancialFinalDonors = 0;
+
+									projects.forEach(function(project){
+
+										TargetLocation.find()
+										.where( {project_id: project.id})
+										.where( filters.admin1pcode )
+										.where( filters.admin2pcode ).exec(function(err,targloc){
+
+											if(targloc.length){
+
+
+												if(project.project_budget_currency === 'cop'){
+
+
+														totalFinancialFinalDonors = totalFinancialFinalDonors + (project.project_budget/params.coptousd);
+
+
+													}else if(project.project_budget_currency === 'eur'){
+
+
+														totalFinancialFinalDonors = totalFinancialFinalDonors + (project.project_budget*params.eurotousd);
+														
+													
+
+													}else{
+
+
+														totalFinancialFinalDonors = totalFinancialFinalDonors+project.project_budget;
+													}
+									   
+													if(project.project_donor){
+
+														//console.log("ENTRa: ",project.project_donor);
+
+														project.project_donor.forEach(function (donor, i){
+
+															
+
+															if(donor.project_donor_id){
+
+															 if(donor.project_donor_budget){
+															 	donor_budg =  donor.project_donor_budget;
+
+															 }	else{
+															 	donor_budg = 0;
+															 }
+
+									                             	newdonororg = {
+									                             		'donor_name':donor.project_donor_name,
+									                             		'donor_id':donor.project_donor_id,
+									                             		'donor_budget':donor_budg,
+									                             		'project_budget_currency':project.project_budget_currency
+									                             	}
+									                             	donorfinancial.push(newdonororg);
+
+									                         }
+							                            
+
+														});
+
+													}
+												}
+											
+
+											counter++;
+												
+												if(counter === length){
+
+													
+
+													
+
+
+															 const financialgroupByDonors = [...donorfinancial.reduce((r, o) => {
+																  const key = o.donor_id + '-' + o.donor_name + '-'+ o.project_budget_currency;
+																  
+																  const item = r.get(key) || Object.assign({}, o, {
+																    donor_budget: 0,
+																    TOTALBUDGET : 0
+																  });
+																  
+																  item.donor_budget += o.donor_budget;
+																 
+																  item.TOTALBUDGET = item.donor_budget;
+
+																  return r.set(key, item);
+																}, new Map).values()];  
+
+												
+
+														       	financialgroupByDonors.forEach(function(orgdon,i){
+
+														       		if(orgdon.project_budget_currency === 'cop'){
+																			newTotalBudDonor  = orgdon.TOTALBUDGET /params.coptousd;
+																			//console.log("tota cop: ", newTotalBudImpl);
+																			orgdon.TOTALBUDGET = newTotalBudDonor.toFixed(2);
+																			//console.log("TOT cop: ",orgimplementer.TOTALBUDGET);
+
+																		}else if(orgdon.project_budget_currency === 'eur'){
+
+																			newTotalBudDonor = orgdon.TOTALBUDGET *params.eurotousd;
+																			//console.log("tota eur: ", newTotalBudImpl);
+
+																			orgdon.TOTALBUDGET = newTotalBudDonor.toFixed(2);
+																			//console.log("TOT euro: ",orgimplementer.TOTALBUDGET);
+
+																		}
+
+																});
+
+
+																switch (req.param('chart_for')) {
+																	case 'financingDonor':
+																	//console.log("DONORS FINANCING: ",financialgroupByDonors);
+																		if (!financialgroupByDonors.length) {
+																			
+																			var result = {	
+																				data: [{
+																					'y': 0,
+																					'color': '#f48fb1',
+																					'name': 'Donor',
+																					'label': 0,
+																				}]
+																			};
+																			
+																			
+																			return res.json(200, result);
+																		} else {
+
+																			var result = {data:[]};
+
+																			financialgroupByDonors.sort(function(a, b) {
+																			  return b.TOTALBUDGET - a.TOTALBUDGET;
+																				});
+
+																			financialgroupByDonors.forEach(function(orgdonor,i){
+
+																				if(i<5){
+																					var orgdonor_name;
+																					if(orgdonor.donor_name){
+																						orgdonor_name = orgdonor.donor_name;
+
+																					}else{
+																						orgdonor.donor_name;
+
+																					}
+																						var newdonorfinancial = {
+																							'y': parseFloat(orgdonor.TOTALBUDGET),
+																							'color':'blue',
+																							'name': orgdonor_name+' ('+orgdonor.project_budget_currency+')',
+																							'label': (orgdonor.TOTALBUDGET / (totalFinancialFinalDonors))*100
+																						};
+
+																						result.data.push(newdonorfinancial);
+																				}
+
+																			});
+
+																			return res.json(200, result);
+
+
+																		}
+
+																		break;
+
+																		default:
+																		return res.json( 200, { value:0 });
+																		
+																		break;
+																	}
+																}
+													});
+											});
+
+								}else{
+									return res.json(200, { value: 0 });
+
+								}
+
+							});
+									
+			}
+
+				break;
+
 				default: 
+				
 					return res.json( 200, { value:0 });
+					
 					break;
 
 		}
