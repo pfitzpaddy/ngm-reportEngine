@@ -744,28 +744,20 @@ var GfaTaskController = {
 				// send email
 				sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 						name: 'WFP GFA Team',
-						organization: form[ 0 ].organization,
+						organization: forms[ 0 ].organization,
 						forms: forms,
 						sendername: 'ReportHub'
 					}, {
 						// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
 						to: 'pfitzgerald@immap.org',
-						subject: form[ 0 ].organization + ' Form Deployment R' + report_round + ' D' + report_distribution + ' - Ticket - ' + moment().unix()
+						subject: forms[ 0 ].organization + ' Form Deployment R' + report_round + ' D' + report_distribution + ' - Ticket - ' + moment().unix()
 					}, function(err) {
 
-						return error
+						// return error
 						if (err) return res.negotiate( err );
-
-						// add deplotmnet complete
-						deployments_complete++;
-						// return success
-						if ( deployments_complete === deployments_pending ) {
-							// return the reports for the project period
-							return res.json( 200, { msg: 'Form Processing Complete' });
-						} else {
-							// set process
-							doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-						}
+						
+						// return the reports for the project period
+						return res.json( 200, { msg: 'Form Processing Complete' });
 
 					});
 
