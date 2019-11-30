@@ -293,6 +293,9 @@ module.exports.routes = {
   
   // -------- CXB GFA ------------
   // setDistributionRound
+  'GET /wfp/gfa/gfd/getForms': 'Country/Cxb/Gfa/GfaTaskController.getForms',
+  'POST /wfp/gfa/gfd/getForms': 'Country/Cxb/Gfa/GfaTaskController.getForms',
+  // setDistributionRound
   'GET /wfp/gfa/gfd/getDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.getDistributionRound',
   'POST /wfp/gfa/gfd/getDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.getDistributionRound',
   // setDistributionRound
