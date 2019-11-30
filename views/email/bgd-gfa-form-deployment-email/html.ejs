@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- Default home page -->
+<html>
+	<head>
+		<style>
+		</style>
+	</head>
+	<body>
+		<p>Hi <%= name %>,</p>
+		<p>
+			The plan for <%= organization %> has been updated.
+		</p>
+		<p>
+			
+			To deploy the form updates, please follow the steps below;
+
+			<!-- loop for each form -->
+			<% for(var i=0; i < forms.length; i++) { %>
+				<!-- title -->
+				<%= forms[ i ].form_title =>
+				<!-- loop -->
+				<ol>
+					<li>
+						Download the <a title="the XLS form for <%= forms[ i ].form_title %>" href="https://reporthub.immap.org/forms/<%= forms[ i ].organization_tag %>/<%= form[ i ].form_template %>_current.xlsx">XLS form</a>.
+					</li>
+					<li>
+						Open the <a title="Go to form <%= forms[ i ].form_title %>" href="https://kobo.humanitarianresponse.info/#/forms/<%= forms[ i ].assetUid %>/landing"><%= form %></a> landing page in Kobo.
+					</li>
+					<li>
+						Click on the blue <b>REDEPLOY</b> button and follow the prompts to manually upload the the XLS form to deploy in Kobo.
+					</li>			
+				</ol>
+
+			<% } %>
+
+		</p>
+
+		<br/>
+		<p>
+			Once all forms are deployed, please reply to this email with team members in cc to close this ticket.
+		</p>
+
+		<p><br/><%= sendername %></p>
+
+	</body>
+</html>
