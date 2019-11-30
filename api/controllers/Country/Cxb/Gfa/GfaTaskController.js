@@ -718,7 +718,7 @@ var GfaTaskController = {
 	},
 
 	// send email to kobo admin to update xlsform
-	sendDeployEmail: function( req, res ){
+	sendKoboManualDeployEmail: function( req, res ){
 
 		// check req
 		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {

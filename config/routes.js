@@ -307,6 +307,10 @@ module.exports.routes = {
   // deployKoboXlsxForm
   'GET /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
   'POST /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
+  // sendKoboManualDeployEmail
+  'GET /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
+  'POST /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
+  
   
   // getKoboData
   'GET /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
