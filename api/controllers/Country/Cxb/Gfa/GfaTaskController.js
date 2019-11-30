@@ -783,7 +783,7 @@ var GfaTaskController = {
 						sendername: 'ReportHub'
 					}, {
 						to: forms[ 0 ].email,
-						// to: 'pfitzgerald@immap.org',
+						cc: 'pfitzgerald@immap.org',
 						subject: forms[ 0 ].organization + ' Form Deployment R' + report_round + ' D' + report_distribution + ' - Ticket: ' + moment().unix()
 					}, function(err) {
 
