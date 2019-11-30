@@ -742,7 +742,7 @@ var GfaTaskController = {
 				if (err) return res.negotiate( err );
 
 				// send email
-				sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+				sails.hooks.email.send( 'bgd-gfa-form-deployment-email', {
 						name: 'WFP GFA Team',
 						organization: forms[ 0 ].organization,
 						forms: forms,
