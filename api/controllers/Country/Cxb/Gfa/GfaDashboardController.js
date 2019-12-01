@@ -311,28 +311,28 @@ var GfaDashboardController = {
 
 				case 'family_size_1_3':
 					filter = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 0 && b.total_beneficiaries <= 3;
+						return b.gfd_family_size >= 0 && b.gfd_family_size <= 3;
 					});
 					value = { 'value': filter.length };
 					break;
 
 				case 'family_size_4_7':
 					filter = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 4 && b.total_beneficiaries <= 7;
+						return b.gfd_family_size >= 4 && b.gfd_family_size <= 7;
 					});
 					value = { 'value': filter.length };
 					break;
 
 				case 'family_size_8_10':
 					filter = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 8 && b.total_beneficiaries <= 10;
+						return b.gfd_family_size >= 8 && b.gfd_family_size <= 10;
 					});
 					value = { 'value': filter.length };
 					break;
 
 				case 'family_size_11+':
 					filter = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 11;
+						return b.gfd_family_size >= 11;
 					});
 					value = { 'value': filter.length };
 					break;
@@ -498,16 +498,16 @@ var GfaDashboardController = {
 				case 'family_size_chart':
 					
 					var family_size_1_3 = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 0 && b.total_beneficiaries <= 3;
+						return b.gfd_family_size >= 0 && b.gfd_family_size <= 3;
 					});
 					var family_size_4_7 = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 4 && b.total_beneficiaries <= 7;
+						return b.gfd_family_size >= 4 && b.gfd_family_size <= 7;
 					});
 					var family_size_8_10 = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 8 && b.total_beneficiaries <= 10;
+						return b.gfd_family_size >= 8 && b.gfd_family_size <= 10;
 					});
 					var family_size_11 = _.filter( beneficiaries, function ( b ) {
-						return b.total_beneficiaries >= 11;
+						return b.gfd_family_size >= 11;
 					});
 					value = { 
 						data: [

@@ -583,7 +583,7 @@ var GfaTaskController = {
 							planned.lentils = 18 / 1000;
 							planned.oil = ( 6 * 0.92 ) / 1000;
 							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						} else {
+						} else if ( planned.gfd_family_size >= 11 ) {
 							planned.rice = 60 / 1000;
 							planned.lentils = 18 / 1000;
 							planned.oil = ( 6 * 0.92 ) / 1000;
