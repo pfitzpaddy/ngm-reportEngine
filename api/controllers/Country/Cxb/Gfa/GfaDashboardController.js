@@ -311,7 +311,7 @@ var GfaDashboardController = {
 
 				case 'family_size_1_3':
 					filter = _.filter( beneficiaries, function ( b ) {
-						return b.gfd_family_size >= 0 && b.gfd_family_size <= 3;
+						return b.gfd_family_size >= 1 && b.gfd_family_size <= 3;
 					});
 					value = { 'value': filter.length };
 					break;
