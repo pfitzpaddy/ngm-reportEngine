@@ -573,20 +573,17 @@ var GfaTaskController = {
 							planned.lentils = 9 / 1000;
 							planned.oil = ( 3 * 0.92 ) / 1000;
 							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						}
-						if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
+						} else if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
 							planned.rice = 30 / 1000;
 							planned.lentils = 9 / 1000;
 							planned.oil = ( 3 * 0.92 ) / 1000;
 							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						}
-						if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
+						} else if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
 							planned.rice = 60 / 1000;
 							planned.lentils = 18 / 1000;
 							planned.oil = ( 6 * 0.92 ) / 1000;
 							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						}
-						if ( planned.gfd_family_size >= 11 ) {
+						} else {
 							planned.rice = 60 / 1000;
 							planned.lentils = 18 / 1000;
 							planned.oil = ( 6 * 0.92 ) / 1000;
