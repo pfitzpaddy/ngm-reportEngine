@@ -717,7 +717,7 @@ var GfaTaskController = {
 
 							// choices per form
 							var choices = choices_list[ forms[ xls_complete ][ 'site_id' ] ];
-							if ( !choices.length ) {
+							if ( !choices && !choices.length ) {
 								choices = [];
 								choices.push( [ 'list_name', 'name', 'label' ] );
 								// choices.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary' ] );
