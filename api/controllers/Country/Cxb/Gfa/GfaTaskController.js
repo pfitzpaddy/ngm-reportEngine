@@ -496,8 +496,8 @@ var GfaTaskController = {
 					planned.majhee_phone = d[ 12 ];
 					planned.fh_name = d[ 14 ];
 					planned.hh_name = d[ 13 ];
-					planned.hh_age = d[ 23 ];
-					planned.hh_gender = d[ 22 ] === 'M' || d[ 22 ] === 'Male' ? 'Male' : 'Female';
+					planned.hh_age = d[ 24 ];
+					planned.hh_gender = d[ 23 ] === 'M' || d[ 23 ] === 'Male' ? 'Male' : 'Female';
 					
 					// ids
 					planned.scope_id = d[ 15 ].toString();
@@ -505,45 +505,46 @@ var GfaTaskController = {
 					planned.fcn_id = d[ 18 ].toString();
 					planned.govt_id = d[ 19 ].toString();
 					planned.unhcr_case_id = d[ 20 ].toString();
-					planned.progres_id = d[ 21 ].toString();
+					planned.unhcr_case_camp = d[ 21 ].toString();
+					planned.progres_id = d[ 22 ].toString();
 					planned.gfd_modality = d[ 16 ];
 
 					// demographics
-					planned.gfd_family_size = d[ 34 ] ? parseInt( d[ 34 ] ) : 0;
-					planned.boys_0_5 = d[ 27 ] ? parseInt( d[ 27 ] ) : 0;
-					planned.girls_0_5 = d[ 26 ] ? parseInt( d[ 26 ] ) : 0;
-					planned.boys_5_17 = d[ 29 ] ? parseInt( d[ 29 ] ) :0;
-					planned.girls_5_17 = d[ 28 ] ? parseInt( d[ 28 ] ) : 0;
+					planned.gfd_family_size = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
+					planned.boys_0_5 = d[ 28 ] ? parseInt( d[ 28 ] ) : 0;
+					planned.girls_0_5 = d[ 27 ] ? parseInt( d[ 27 ] ) : 0;
+					planned.boys_5_17 = d[ 30 ] ? parseInt( d[ 30 ] ) :0;
+					planned.girls_5_17 = d[ 29 ] ? parseInt( d[ 29 ] ) : 0;
 					planned.boys = parseInt( planned.boys_0_5 ) + parseInt( planned.boys_5_17 );
 					planned.girls = parseInt( planned.girls_0_5 ) + parseInt( planned.girls_5_17 );
-					planned.men = d[ 31 ] ? parseInt( d[ 31 ] ) : 0;
-					planned.women = d[ 30 ] ? parseInt( d[ 30 ] ) : 0;
-					planned.elderly_men = d[ 33 ] ? parseInt( d[ 33 ] ) : 0;
-					planned.elderly_women = d[ 32 ] ? parseInt( d[ 32 ] ) : 0;
+					planned.men = d[ 32 ] ? parseInt( d[ 32 ] ) : 0;
+					planned.women = d[ 31 ] ? parseInt( d[ 31 ] ) : 0;
+					planned.elderly_men = d[ 34 ] ? parseInt( d[ 34 ] ) : 0;
+					planned.elderly_women = d[ 33 ] ? parseInt( d[ 33 ] ) : 0;
 					planned.total_male = parseInt( planned.boys ) + parseInt( planned.men ) + parseInt( planned.elderly_men );
 					planned.total_female = parseInt( planned.girls ) + parseInt( planned.women ) + parseInt( planned.elderly_women );
 					planned.total_beneficiaries = parseInt( planned.total_male ) + parseInt( planned.total_female );
 
 					// special needs
-					planned.pregnant_hh = d[ 35 ] ? true : false;
-					planned.lactating_hh = d[ 36 ] ? true : false;
-					planned.disabled_hh = d[ 45 ] ? true : false;
+					planned.pregnant_hh = d[ 36 ] ? true : false;
+					planned.lactating_hh = d[ 37 ] ? true : false;
+					planned.disabled_hh = d[ 46 ] ? true : false;
 
 					// special needs demographics
-					planned.pregnant_women = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
-					planned.lactating_women = d[ 36 ] ? parseInt( d[ 36 ] ) : 0;
+					planned.pregnant_women = d[ 36 ] ? parseInt( d[ 36 ] ) : 0;
+					planned.lactating_women = d[ 37 ] ? parseInt( d[ 37 ] ) : 0;
 
 					// disabled
-					planned.boys_0_5_disabled = d[ 38 ] ? parseInt( d[ 38 ] ) : 0;
-					planned.girls_0_5_disabled = d[ 37 ] ? parseInt( d[ 37 ] ) : 0;
-					planned.boys_5_17_disabled = d[ 40 ] ? parseInt( d[ 40 ] ) : 0;
-					planned.girls_5_17_disabled = d[ 39 ] ? parseInt( d[ 39 ] ) : 0;
+					planned.boys_0_5_disabled = d[ 39 ] ? parseInt( d[ 39 ] ) : 0;
+					planned.girls_0_5_disabled = d[ 38 ] ? parseInt( d[ 38 ] ) : 0;
+					planned.boys_5_17_disabled = d[ 41 ] ? parseInt( d[ 41 ] ) : 0;
+					planned.girls_5_17_disabled = d[ 40 ] ? parseInt( d[ 40 ] ) : 0;
 					planned.boys_disabled = parseInt( planned.boys_0_5_disabled ) + parseInt( planned.boys_5_17_disabled );
 					planned.girls_disabled = parseInt( planned.girls_0_5_disabled ) + parseInt( planned.girls_5_17_disabled );
-					planned.men_disabled = d[ 42 ] ? parseInt( d[ 42 ] ) : 0;
-					planned.women_disabled = d[ 41 ] ? parseInt( d[ 41 ] ) : 0;
-					planned.elderly_men_disabled = d[ 44 ] ? parseInt( d[ 44 ] ) : 0;
-					planned.elderly_women_disabled = d[ 43 ] ? parseInt( d[ 43 ] ) : 0;
+					planned.men_disabled = d[ 43 ] ? parseInt( d[ 43 ] ) : 0;
+					planned.women_disabled = d[ 42 ] ? parseInt( d[ 42 ] ) : 0;
+					planned.elderly_men_disabled = d[ 45 ] ? parseInt( d[ 45 ] ) : 0;
+					planned.elderly_women_disabled = d[ 44 ] ? parseInt( d[ 44 ] ) : 0;
 					planned.total_male_disabled = parseInt( planned.boys_disabled ) + parseInt( planned.men_disabled ) + parseInt( planned.elderly_men_disabled );
 					planned.total_women_disabled = parseInt( planned.girls_disabled ) + parseInt( planned.women_disabled ) + parseInt( planned.elderly_women_disabled );
 					planned.total_beneficiaries_disabled = parseInt( planned.total_male_disabled ) + parseInt( planned.total_women_disabled );
