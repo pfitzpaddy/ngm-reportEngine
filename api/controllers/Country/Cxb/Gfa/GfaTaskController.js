@@ -716,8 +716,8 @@ var GfaTaskController = {
 							survey_sheet[ 'B2' ].v = forms[ xls_complete ].form_template;
 
 							// choices per form
-							var choices = choices_list[ forms[ xls_complete ][ 'site_id' ] ];
-							if ( !choices && !choices.length ) {
+							var choices = choices = choices_list[ forms[ xls_complete ][ 'site_id' ] ] ? choices_list[ forms[ xls_complete ][ 'site_id' ] ] : [];
+							if ( !choices.length ) {
 								choices = [];
 								choices.push( [ 'list_name', 'name', 'label' ] );
 								// choices.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary' ] );
