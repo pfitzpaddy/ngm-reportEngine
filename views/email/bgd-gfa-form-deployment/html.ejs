@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- Default home page -->
+<html>
+	<head>
+		<style>
+		</style>
+	</head>
+	<body>
+		<p>Hi <%= name %>,</p>
+		<p>
+			The form for <%= form %> failed to <%= issue %>.
+		</p>
+		<p>
+			To <b>fix</b>, follow the steps below;
+			<ol>
+				<li>
+					Download the <a title="the XLS form for <%= form %>" href="https://reporthub.immap.org/forms/<%= xlsform %>">XLS form</a>
+				</li>
+				<li>
+					Open the <a title="Go to form <%= form %>" href="https://kobo.humanitarianresponse.info/#/forms/<%= assetUid %>/landing"><%= form %></a> landing page in Kobo
+				</li>
+				<li>
+					Follow the prompts to manually upload the the XLS form to deploy in Kobo
+				</li>			
+			</ol>
+		</p>
+		<% if ( show_cmd ) { %>
+			<div>
+				<p>
+					Alternatively, run the following command from the terminal;
+				</p>
+				<blockquote style="color:#616161; background-color:#f5f5f5;">
+					<i><%= cmd %></i>
+				</blockquote>
+			</div>
+		<% } %>
+		<br/>
+		<p>
+			Once resolved, please reply to this email with all team members in cc to close this issue.
+		</p>
+
+		<p><br/><%= sendername %></p>
+
+	</body>
+</html>

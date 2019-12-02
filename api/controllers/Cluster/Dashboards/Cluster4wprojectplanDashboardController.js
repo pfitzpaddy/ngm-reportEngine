@@ -115,8 +115,8 @@ var Cluster4wprojectplanDashboardController = {
 			cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
 								: ( params.cluster_id !== 'cvwg' )
-			                    ?{or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}}]}
-			                    : {inter_cluster_activities:{$elemMatch:{cluster_id:params.cluster_id}}},
+			                    ?{or:[{cluster_id:params.cluster_id},{activity_type:{$elemMatch:{cluster_id:params.cluster_id}}}]}
+			                    : {activity_type:{$elemMatch:{cluster_id:params.cluster_id}}},
 			 activity_type: params.activity_type === 'all' ? {} : {activity_type:{$elemMatch:{activity_type_id:params.activity_type}}},
 			
 			project_plan_component: (params.project_type_component === 'all' && params.hrpplan === 'all')
@@ -124,7 +124,7 @@ var Cluster4wprojectplanDashboardController = {
 			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     ? {  plan_component : {$in: [params.project_type_component, "hrp_plan"]}} 
 			    // ? { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}
 
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
@@ -142,8 +142,8 @@ var Cluster4wprojectplanDashboardController = {
 	                            : {implementing_partners: { $elemMatch:{'organization_tag':params.implementer_tag} } },
 			
 			
-			project_startDate: { project_start_date: {'>=': new Date(params.start_date)}},
-			project_endDate: { project_end_date: {'<=': new Date(params.end_date)}},
+			project_endDate: { project_end_date: {'>=': new Date(params.start_date)}},
+			project_startDate: { project_start_date: {'<=': new Date(params.end_date)}},
 
 			adminRpcode_Native: params.adminRpcode === 'hq'  ? {} : { adminRpcode: params.adminRpcode.toUpperCase() },
 			admin0pcode_Native: params.admin0pcode === 'all' ? {} : { admin0pcode: params.admin0pcode.toUpperCase() },
@@ -163,7 +163,7 @@ var Cluster4wprojectplanDashboardController = {
 			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     ? { $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     ? { $and: [ { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}]}
 			     //? { plan_component : {$in: [params.project_type_component, "hrp_plan"]}}
 
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
@@ -176,8 +176,8 @@ var Cluster4wprojectplanDashboardController = {
 			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') ) 
 								? {} 
 								: ( params.cluster_ids.includes('cvwg') )
-			                     ?{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
-			                    :{inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
+			                     ?{$or:[{cluster_id:params.cluster_id},{activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}}]}
+			                    :{activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			                 
 			is_cluster_ids_array: params.cluster_ids ? true : false,
 			organization_tag_Native: params.organization_tag === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: params.organization_tag },
@@ -189,8 +189,8 @@ var Cluster4wprojectplanDashboardController = {
 	                     
 	                           : { implementing_partners: { $elemMatch: { 'organization_tag' : params.implementer_tag} }},
 			
-			project_startDateNative: { project_start_date: { $gte: new Date(params.start_date) }},
-			project_endDateNative: { project_end_date: { $lte: new Date(params.end_date) }},
+			project_endDateNative: { project_end_date: { $gte: new Date(params.start_date) }},
+			project_startDateNative: { project_start_date: { $lte: new Date(params.end_date) }},
 
 
 
@@ -324,7 +324,7 @@ var Cluster4wprojectplanDashboardController = {
 
 					}else{
 
-						return res.json( 200,  totalprojectsupdated.length );
+						return res.json( 200,  totalprojectsupdated);
 
 					}		
 
@@ -1837,6 +1837,8 @@ var Cluster4wprojectplanDashboardController = {
 							};
 						// beneficiaries
 				if(params.admin1pcode === 'all'){
+
+					
 										
 						TargetBeneficiaries.native(function (err, results) {
 							if(err) return res.serverError(err);
@@ -1872,13 +1874,9 @@ var Cluster4wprojectplanDashboardController = {
 								// if no length
 								//if (!beneficiaries.length) return res.json(200, { 'value': 0 });
 								if (!beneficiaries.length) {
-									var result = {	
-												data: [{
-												'y': 0,
-												'color': '#f48fb1',
-												'label': 0,
-												}]
-												};
+									result.data[0].y = 100;
+									result.data[0].label = 0;
+									result.data[0].color = '#c7c7c7';
 									return res.json(200, result);
 								}
 
@@ -1889,7 +1887,7 @@ var Cluster4wprojectplanDashboardController = {
 
 								switch (req.param('chart_for')) {
 									case 'children':
-
+									
 
 										if ($beneficiaries.femaleTotal < 1 && $beneficiaries.maleTotal < 1) {
 
@@ -1915,6 +1913,7 @@ var Cluster4wprojectplanDashboardController = {
 
 										} else {
 											// calc
+											
 
 											var boysPerCent = ($beneficiaries.boys / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
 											var girlsPerCent = ($beneficiaries.girls / ($beneficiaries.boys + $beneficiaries.girls)) * 100;
@@ -1980,6 +1979,13 @@ var Cluster4wprojectplanDashboardController = {
 								if (err) return res.serverError(err);								
 
 								// if no length
+
+									if (!beneficiaries.length) {
+									result.data[0].y = 100;
+									result.data[0].label = 0;
+									result.data[0].color = '#c7c7c7';
+									return res.json(200, result);
+								}
 								
 
 								if(beneficiaries.length){
@@ -2083,10 +2089,10 @@ var Cluster4wprojectplanDashboardController = {
 
 
 									
-								}else{
+								}/*else{
 									return res.json(200, { 'value': 0 });
 							
-									}
+									}*/
 
 			
 								});
@@ -2173,14 +2179,10 @@ var Cluster4wprojectplanDashboardController = {
 
 								// if no length
 								//if (!beneficiaries.length) return res.json(200, { 'value': 0 });
-								if (!beneficiaries.length) {
-									var result = {	
-												data: [{
-												'y': 0,
-												'color': '#f48fb1',
-												'label': 0,
-												}]
-												};
+									if (!beneficiaries.length) {
+									result.data[0].y = 0;
+									result.data[0].label = 0;
+									result.data[0].color = '#c7c7c7';
 									return res.json(200, result);
 								}
 
@@ -2311,7 +2313,12 @@ var Cluster4wprojectplanDashboardController = {
 								if (err) return res.serverError(err);								
 
 								// if no length
-								
+								if (!beneficiaries.length) {
+									result.data[0].y = 0;
+									result.data[0].label = 0;
+									result.data[0].color = '#c7c7c7';
+									return res.json(200, result);
+								}
 
 								if(beneficiaries.length){
 
@@ -2438,11 +2445,11 @@ var Cluster4wprojectplanDashboardController = {
 
 
 									
-								}else{
+								}/*else{
 									return res.json(200, { value: 0 });
 									
 									
-									}
+									}*/
 
 			
 								});
@@ -2594,6 +2601,17 @@ var Cluster4wprojectplanDashboardController = {
 
 							if (err) return res.serverError(err);
 
+							if (!beneficiariesCluster.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
 							if(beneficiariesCluster.length){
 
 								counter = 0;
@@ -2702,11 +2720,11 @@ var Cluster4wprojectplanDashboardController = {
 								});
 
 
-							}else{
+							}/*else{
 								
 								return res.json( 200, { value:0 });
 						
-							}							
+							}		*/					
 
 
 
@@ -2859,6 +2877,19 @@ var Cluster4wprojectplanDashboardController = {
 
 							if (err) return res.serverError(err);
 
+							if (!beneficiaries.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
+
+
 							if(beneficiaries.length){
 
 								counter = 0;
@@ -2971,11 +3002,11 @@ var Cluster4wprojectplanDashboardController = {
 								});
 
 
-							}else{
+							}/*else{
 								
 								return res.json( 200, { value:0 });
 								
-							}							
+							}*/							
 
 
 
@@ -3167,6 +3198,17 @@ var Cluster4wprojectplanDashboardController = {
 
 							if (err) return res.serverError(err);
 
+							if (!projectBudgetCluster.length) {
+									var result = {	
+												data: [{
+												'y': 0,
+												'color': '#f48fb1',
+												'label': 0,
+												}]
+												};
+									return res.json(200, result);
+								}
+
 							if(projectBudgetCluster.length){
 
 								counter = 0;
@@ -3304,11 +3346,11 @@ var Cluster4wprojectplanDashboardController = {
 								});
 
 
-							}else{
+							}/*else{
 
 								return res.json( 200, { value:0 });
 								
-							}							
+							}	*/						
 
 
 						});
@@ -3647,11 +3689,11 @@ var Cluster4wprojectplanDashboardController = {
 								});
 
 
-							}else{
+							}/*else{
 
 								return res.json( 200, { value:0 });
 								
-							}							
+							}	*/						
 
 
 
@@ -4151,10 +4193,10 @@ var Cluster4wprojectplanDashboardController = {
 
 									});
 
-								}else{
+								}/*else{
 									return res.json(200, { value: 0 });
 
-								}//cierro verificación de cantidad de proyectos 
+								}*///cierro verificación de cantidad de proyectos 
 
 							});
 

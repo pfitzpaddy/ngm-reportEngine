@@ -199,6 +199,9 @@ module.exports = {
 		inter_cluster_activities: {
 			type: 'array'
 		},
+		activity_type:{
+			type: 'array'
+		},
 		project_donor: {
 			type: 'array'
 		},

@@ -107,7 +107,7 @@ var Cluster4wplusDashboardController = {
 	getFilters: function( params ){
 
 	
-		return {
+		return { 
 			//new default
 			//default: {  project_status: {$in:['active','complete'] }},
 
@@ -121,8 +121,8 @@ var Cluster4wplusDashboardController = {
 			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     //? { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}
-			     			     ? {  $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     ? { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}
+			     //? {  $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
 
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
 			     ? { plan_component: {$in:[params.project_type_component], $nin:["hrp_plan"]}}
@@ -134,7 +134,7 @@ var Cluster4wplusDashboardController = {
 								? {} 
 								: ( params.cluster_id !== 'cvwg' )
 									 ?{cluster_id:params.cluster_id}
-			                     : {inter_cluster_activities:{$elemMatch:{'cluster_id':params.cluster_id}}},
+			                     : {activity_type:{$elemMatch:{'cluster_id':params.cluster_id}}},
 			
 			implementer_tag: (params.implementer === 'all')
 	                            ? {}
@@ -178,7 +178,7 @@ var Cluster4wplusDashboardController = {
 								: { cluster_id: params.cluster_id } ,
 			cluster_id_Native2:( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' ) 
 								? {} 
-								: { inter_cluster_activities: { $elemMatch:{cluster_id:params.cluster_id}}} ,
+								: { activity_type: { $elemMatch:{cluster_id:params.cluster_id}}} ,
 
 								 //: { $in:[{ cluster_id: params.cluster_id }, { inter_cluster_activities: { $elemMatch:{cluster_id:params.cluster_id} }} ]} ,
 			project_plan_componentNative: (params.project_type_component === 'all' && params.hrpplan === 'all')
@@ -186,7 +186,7 @@ var Cluster4wplusDashboardController = {
 			     : (params.project_type_component !== 'all' && params.hrpplan === 'all')
 			     ? { plan_component: {$in: [params.project_type_component]}}
 			     : (params.project_type_component != 'all' && params.hrpplan === 'true')
-			     ? {  $and: [ { plan_component : {$in: [params.project_type_component]} } , {plan_component: {$in:["hrp_plan"]}}]}
+			     ? {  plan_component : {$in: [params.project_type_component, "hrp_plan"]}} 
 			     //? { plan_component : {$in: [params.project_type_component,"hrp_plan"]}}
 			     : ( params.project_type_component != 'all' && params.hrpplan === 'false')
 			     ? { plan_component: {$in:[params.project_type_component], $nin:["hrp_plan"]}}
@@ -214,8 +214,8 @@ var Cluster4wplusDashboardController = {
 								? {} 
 								: ( params.cluster_ids.includes('cvwg') )
 								
-			                     ?{$or:[{cluster_id:params.cluster_id},{inter_cluster_activities:{ $elemMatch:{'cluster_id':params.cluster_id}}}]}
-			                    :{inter_cluster_activities:{ $elemMatch:{'cluster_id':params.cluster_id}}},
+			                     ?{$or:[{cluster_id:params.cluster_id},{activity_type:{ $elemMatch:{'cluster_id':params.cluster_id}}}]}
+			                    :{activity_type:{ $elemMatch:{'cluster_id':params.cluster_id}}},
 			                 
 			is_cluster_ids_array: params.cluster_ids ? true : false,
 

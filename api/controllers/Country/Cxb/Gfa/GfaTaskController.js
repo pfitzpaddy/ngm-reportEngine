@@ -227,22 +227,54 @@ var GfaTaskController = {
 
 	},
 
+	// get forms
+	getForms: function( req, res ){
+
+		// check req
+		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
+			return res.json( 401, { err: 'admin0pcode, organization_tag, report_round, report_distribution required!' });
+		}
+
+		// set params
+		var admin0pcode = req.param('admin0pcode');
+		var organization_tag = req.param('organization_tag');
+		var report_round = req.param('report_round');
+		var report_distribution = req.param('report_distribution');
+
+		// gfd forms
+		GfdForms
+			.find()
+			.where({ organization_tag: organization_tag })
+			.where({ report_round: report_round })
+			.exec( function( err, forms ) {
+
+				// return error
+				if (err) return res.negotiate( err );
+
+				// return
+				return res.json( 200, { list: forms });
+
+			});
+
+
+	},
+
 	// set distribution round
 	setDistributionRound: function( req, res ){
 
 		// variables
-		var round = req.param('round');
+		var round = req.param( 'round' );
 		var day = moment().date();
 		var round_1 = 26;
 		var round_2 = 8;
 
 		// check req
-		if ( !req.param('round') ) {
-			return res.json( 401, { err: 'round as integer required!' });
+		if ( !req.param( 'round' ) ) {
+			return res.json( 401, { err: 'round required!' });
 		}
 
 		// open round?
-		if ( day !== 26 || day !== 8 ) {
+		if ( day !== round_1 && day !== round_2 ) {
 			return res.json( 401, { err: 'round not open!' });
 		}
 
@@ -257,10 +289,10 @@ var GfaTaskController = {
 
 			// set report variables
 			report.report_month_number = moment().add( 1, 'M' ).month();
-			report.report_month_name = moment().add( 1, 'M' ).format('MMMM');
+			report.report_month_name = moment().add( 1, 'M' ).format( 'MMMM' );
 			report.report_year = moment().add( 1, 'M' ).year();
-			report.reporting_period = moment().add( 1, 'M' ).set('date', 1).startOf('day').format();
-			report.reporting_due_date = moment().add( 1, 'M' ).set('date', round_1 ).startOf('day').format();		
+			report.reporting_period = moment().add( 1, 'M' ).set( 'date', 1 ).startOf( 'day' ).format();
+			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_1 ) ).startOf( 'day' ).format();		
 
 			// set filter
 			var filter = { report_round: report.report_round, report_year: moment().year(), report_month_number: moment().month() };
@@ -269,10 +301,10 @@ var GfaTaskController = {
 
 			// 
 			report.report_month_number = moment().month();
-			report.report_month_name = moment().format('MMMM');
+			report.report_month_name = moment().format( 'MMMM' );
 			report.report_year = moment().year();
-			report.reporting_period = moment().set('date', 1).startOf('day').format();
-			report.reporting_due_date = moment().add( 1, 'M' ).set('date', round_2 ).startOf('day').format();
+			report.reporting_period = moment().set( 'date', 1 ).startOf( 'day' ).format();
+			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_2 ) ).startOf( 'day' ).format();
 
 			// set filter
 			var filter = { report_round: report.report_round, report_year: moment().subtract( 1, 'M' ).year(), report_month_number: moment().subtract( 1, 'M' ).month() }
@@ -452,19 +484,20 @@ var GfaTaskController = {
 					}
 
 					// add to planned
-					planned = Object.assign( { sl_number: d[ 0 ], distribution_date: moment( d[ 1 ] ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
+					// planned = Object.assign( { sl_number: d[ 0 ], distribution_date: d[ 1 ] }, organization, distribution, distribution_site, camp_block );
+					planned = Object.assign( { sl_number: d[ 0 ], distribution_date: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
 
 					// variables
 					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ] : d[ 10 ];
 					planned.admin5name = d[ 10 ];
 
-					// majee
-					planned.majee_name = d[ 11 ];
-					planned.majee_phone = d[ 12 ];
+					// majhee
+					planned.majhee_name = d[ 11 ];
+					planned.majhee_phone = d[ 12 ];
 					planned.fh_name = d[ 14 ];
 					planned.hh_name = d[ 13 ];
-					planned.hh_age = d[ 23 ];
-					planned.hh_gender = d[ 22 ] === 'M' || d[ 22 ] === 'Male' ? 'Male' : 'Female';
+					planned.hh_age = d[ 24 ];
+					planned.hh_gender = d[ 23 ] === 'M' || d[ 23 ] === 'Male' ? 'Male' : 'Female';
 					
 					// ids
 					planned.scope_id = d[ 15 ].toString();
@@ -472,45 +505,46 @@ var GfaTaskController = {
 					planned.fcn_id = d[ 18 ].toString();
 					planned.govt_id = d[ 19 ].toString();
 					planned.unhcr_case_id = d[ 20 ].toString();
-					planned.progres_id = d[ 21 ].toString();
+					planned.unhcr_case_camp = d[ 21 ].toString();
+					planned.progres_id = d[ 22 ].toString();
 					planned.gfd_modality = d[ 16 ];
 
 					// demographics
-					planned.gfd_family_size = d[ 34 ] ? parseInt( d[ 34 ] ) : 0;
-					planned.boys_0_5 = d[ 27 ] ? parseInt( d[ 27 ] ) : 0;
-					planned.girls_0_5 = d[ 26 ] ? parseInt( d[ 26 ] ) : 0;
-					planned.boys_5_17 = d[ 29 ] ? parseInt( d[ 29 ] ) :0;
-					planned.girls_5_17 = d[ 28 ] ? parseInt( d[ 28 ] ) : 0;
+					planned.gfd_family_size = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
+					planned.boys_0_5 = d[ 28 ] ? parseInt( d[ 28 ] ) : 0;
+					planned.girls_0_5 = d[ 27 ] ? parseInt( d[ 27 ] ) : 0;
+					planned.boys_5_17 = d[ 30 ] ? parseInt( d[ 30 ] ) :0;
+					planned.girls_5_17 = d[ 29 ] ? parseInt( d[ 29 ] ) : 0;
 					planned.boys = parseInt( planned.boys_0_5 ) + parseInt( planned.boys_5_17 );
 					planned.girls = parseInt( planned.girls_0_5 ) + parseInt( planned.girls_5_17 );
-					planned.men = d[ 31 ] ? parseInt( d[ 31 ] ) : 0;
-					planned.women = d[ 30 ] ? parseInt( d[ 30 ] ) : 0;
-					planned.elderly_men = d[ 33 ] ? parseInt( d[ 33 ] ) : 0;
-					planned.elderly_women = d[ 32 ] ? parseInt( d[ 32 ] ) : 0;
+					planned.men = d[ 32 ] ? parseInt( d[ 32 ] ) : 0;
+					planned.women = d[ 31 ] ? parseInt( d[ 31 ] ) : 0;
+					planned.elderly_men = d[ 34 ] ? parseInt( d[ 34 ] ) : 0;
+					planned.elderly_women = d[ 33 ] ? parseInt( d[ 33 ] ) : 0;
 					planned.total_male = parseInt( planned.boys ) + parseInt( planned.men ) + parseInt( planned.elderly_men );
 					planned.total_female = parseInt( planned.girls ) + parseInt( planned.women ) + parseInt( planned.elderly_women );
 					planned.total_beneficiaries = parseInt( planned.total_male ) + parseInt( planned.total_female );
 
 					// special needs
-					planned.pregnant_hh = d[ 35 ] ? true : false;
-					planned.lactating_hh = d[ 36 ] ? true : false;
-					planned.disabled_hh = d[ 45 ] ? true : false;
+					planned.pregnant_hh = d[ 36 ] ? true : false;
+					planned.lactating_hh = d[ 37 ] ? true : false;
+					planned.disabled_hh = d[ 46 ] ? true : false;
 
 					// special needs demographics
-					planned.pregnant_women = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
-					planned.lactating_women = d[ 36 ] ? parseInt( d[ 36 ] ) : 0;
+					planned.pregnant_women = d[ 36 ] ? parseInt( d[ 36 ] ) : 0;
+					planned.lactating_women = d[ 37 ] ? parseInt( d[ 37 ] ) : 0;
 
 					// disabled
-					planned.boys_0_5_disabled = d[ 38 ] ? parseInt( d[ 38 ] ) : 0;
-					planned.girls_0_5_disabled = d[ 37 ] ? parseInt( d[ 37 ] ) : 0;
-					planned.boys_5_17_disabled = d[ 40 ] ? parseInt( d[ 40 ] ) : 0;
-					planned.girls_5_17_disabled = d[ 39 ] ? parseInt( d[ 39 ] ) : 0;
+					planned.boys_0_5_disabled = d[ 39 ] ? parseInt( d[ 39 ] ) : 0;
+					planned.girls_0_5_disabled = d[ 38 ] ? parseInt( d[ 38 ] ) : 0;
+					planned.boys_5_17_disabled = d[ 41 ] ? parseInt( d[ 41 ] ) : 0;
+					planned.girls_5_17_disabled = d[ 40 ] ? parseInt( d[ 40 ] ) : 0;
 					planned.boys_disabled = parseInt( planned.boys_0_5_disabled ) + parseInt( planned.boys_5_17_disabled );
 					planned.girls_disabled = parseInt( planned.girls_0_5_disabled ) + parseInt( planned.girls_5_17_disabled );
-					planned.men_disabled = d[ 42 ] ? parseInt( d[ 42 ] ) : 0;
-					planned.women_disabled = d[ 41 ] ? parseInt( d[ 41 ] ) : 0;
-					planned.elderly_men_disabled = d[ 44 ] ? parseInt( d[ 44 ] ) : 0;
-					planned.elderly_women_disabled = d[ 43 ] ? parseInt( d[ 43 ] ) : 0;
+					planned.men_disabled = d[ 43 ] ? parseInt( d[ 43 ] ) : 0;
+					planned.women_disabled = d[ 42 ] ? parseInt( d[ 42 ] ) : 0;
+					planned.elderly_men_disabled = d[ 45 ] ? parseInt( d[ 45 ] ) : 0;
+					planned.elderly_women_disabled = d[ 44 ] ? parseInt( d[ 44 ] ) : 0;
 					planned.total_male_disabled = parseInt( planned.boys_disabled ) + parseInt( planned.men_disabled ) + parseInt( planned.elderly_men_disabled );
 					planned.total_women_disabled = parseInt( planned.girls_disabled ) + parseInt( planned.women_disabled ) + parseInt( planned.elderly_women_disabled );
 					planned.total_beneficiaries_disabled = parseInt( planned.total_male_disabled ) + parseInt( planned.total_women_disabled );
@@ -535,19 +569,22 @@ var GfaTaskController = {
 
 					// round 2
 					if ( report_round === '2' ) {
-						if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
+						if ( planned.gfd_family_size >= 1 && planned.gfd_family_size <= 3 ) {
 							planned.rice = 30 / 1000;
 							planned.lentils = 9 / 1000;
 							planned.oil = ( 3 * 0.92 ) / 1000;
 							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						}
-						if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
+						} else if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
+							planned.rice = 30 / 1000;
+							planned.lentils = 9 / 1000;
+							planned.oil = ( 3 * 0.92 ) / 1000;
+							planned.entitlements = planned.rice + planned.lentils + planned.oil;
+						} else if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
 							planned.rice = 60 / 1000;
 							planned.lentils = 18 / 1000;
 							planned.oil = ( 6 * 0.92 ) / 1000;
 							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						}
-						if ( planned.gfd_family_size >= 11 ) {
+						} else if ( planned.gfd_family_size >= 11 ) {
 							planned.rice = 60 / 1000;
 							planned.lentils = 18 / 1000;
 							planned.oil = ( 6 * 0.92 ) / 1000;
@@ -679,7 +716,7 @@ var GfaTaskController = {
 							survey_sheet[ 'B2' ].v = forms[ xls_complete ].form_template;
 
 							// choices per form
-							var choices = choices_list[ forms[ xls_complete ][ 'site_id' ] ];
+							var choices = choices = choices_list[ forms[ xls_complete ][ 'site_id' ] ] ? choices_list[ forms[ xls_complete ][ 'site_id' ] ] : [];
 							if ( !choices.length ) {
 								choices = [];
 								choices.push( [ 'list_name', 'name', 'label' ] );
@@ -703,6 +740,56 @@ var GfaTaskController = {
 							}
 						
 						}
+
+					});
+
+			});
+
+	},
+
+	// send email to kobo admin to update xlsform
+	sendKoboManualDeployEmail: function( req, res ){
+
+		// check req
+		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
+			return res.json( 401, { err: 'admin0pcode, organization_tag, report_round, report_distribution required!' });
+		}
+
+		// set params
+		var admin0pcode = req.param('admin0pcode');
+		var organization_tag = req.param('organization_tag');
+		var report_round = req.param('report_round');
+		var report_distribution = req.param('report_distribution');
+
+		// gfd forms
+		GfdForms
+			.find()
+			.where({ organization_tag: organization_tag })
+			.where({ report_round: report_round })
+			.exec( function( err, forms ) {
+
+				// return error
+				if (err) return res.negotiate( err );
+
+				// send email
+				sails.hooks.email.send( 'bgd-gfa-form-deployment-email', {
+						name: forms[ 0 ].organization + ' GFA Team',
+						organization: forms[ 0 ].organization,
+						report_round: report_round,
+						report_distribution: report_distribution,
+						forms: forms,
+						sendername: 'ReportHub'
+					}, {
+						to: forms[ 0 ].email,
+						cc: 'pfitzgerald@immap.org',
+						subject: forms[ 0 ].organization + ' Form Deployment R' + report_round + ' D' + report_distribution + ' - Ticket: ' + moment().unix()
+					}, function(err) {
+
+						// return error
+						if (err) return res.negotiate( err );
+						
+						// return the reports for the project period
+						return res.json( 200, { msg: 'Form Processing Complete' });
 
 					});
 
@@ -740,33 +827,92 @@ var GfaTaskController = {
 
 				// set process
 				doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-
 				
 				// do deployment
-				function doDeployment( deployments_complete, deployments_pending, form  ) {
+				function doDeployment( deployments_complete, deployments_pending, form ) {
 
 					// import updated form
 					var cmd_1 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X POST https://kobo.humanitarianresponse.info/imports/ --form destination=https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ --form file=@' + XLSX_PATH + '/forms/' + form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx | python -m json.tool';
 
 					// run curl command
-					EXEC( cmd_1, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
+					EXEC( cmd_1, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 						// if error
 						if ( error ) {
-							// return error
-							res.json( 400, { error: 'Form import error! Please try again...', details: error } );
+
+							// send email
+							sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+									name: 'WFP GFA Team',
+									form: form.form_title,
+									issue: 'import',
+									cmd: cmd_1,
+									show_cmd: false,
+									xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+									sendername: 'ReportHub'
+								}, {
+									// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+									to: 'pfitzgerald@immap.org',
+									subject: 'Form Import Error - ' + form.form_title + '!'
+								}, function(err) {
+
+									return error
+									if (err) return res.negotiate( err );
+
+									// add deplotmnet complete
+									deployments_complete++;
+									// return success
+									if ( deployments_complete === deployments_pending ) {
+										// return the reports for the project period
+										return res.json( 200, { msg: 'Form Deployment Complete' });
+									} else {
+										// set process
+										doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+									}
+
+								});
+
 						} else {
 
 							// import updated form
 							var cmd_2 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/ | python -m json.tool';
 
 							// run curl command
-							EXEC( cmd_2, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
+							EXEC( cmd_2, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 								// err
 								if ( error ) {
-									// return error
-									res.json( 400, { error: 'Form version error! Please try again...', details: error  } );
+
+									// send email
+									sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+											name: 'WFP GFA Team',
+											form: form.form_title,
+											issue: 'update',
+											cmd: cmd_1,
+											show_cmd: false,
+											xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+											sendername: 'ReportHub'
+										}, {
+											// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+											to: 'pfitzgerald@immap.org',
+											subject: 'Form Update Error - ' + form.form_title + '!'
+										}, function(err) {
+
+											return error
+											if (err) return res.negotiate( err );
+
+											// add deplotmnet complete
+											deployments_complete++;
+											// return success
+											if ( deployments_complete === deployments_pending ) {
+												// return the reports for the project period
+												return res.json( 200, { msg: 'Form Deployment Complete' });
+											} else {
+												// set process
+												doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+											}
+
+										});
+
 								} else {
 
 									// success
@@ -776,23 +922,28 @@ var GfaTaskController = {
 									var version_id = kobo.version_id;
 
 									// import updated form
-									var cmd_3 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form version_id=' + version_id;
+									var cmd_3 = 'curl --silent --user ' + kobo_user + ':' + kobo_password + ' --header "Accept: application/json" -X PATCH https://kobo.humanitarianresponse.info/assets/' + form[ 'assetUid' ] + '/deployment/ --form "active=true" --form "version_id=' + version_id + '" | python -m json.tool';
 
 									// run curl command
-									EXEC( cmd_3, { maxBuffer: 1024 * 16384 }, function( error, stdout, stderr ) {
+									EXEC( cmd_3, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
 
 										// err
-										if ( error || stderr ) {
+										if ( error ) {
 
 											// send email
 											sails.hooks.email.send( 'bgd-gfa-form-deployment', {
 													name: 'WFP GFA Team',
-													form: form.title,
+													form: form.form_title,
+													issue: 'deploy',
+													assetUid: form.assetUid,
 													cmd: cmd_3,
+													show_cmd: true,
+													xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
 													sendername: 'ReportHub'
 												}, {
-													to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
-													subject: 'Form Deployment Issue - ' + form.title + '!'
+													// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+													to: 'pfitzgerald@immap.org',
+													subject: 'Form Deployment Error - ' + form.form_title + '! - ' + moment().add( 6, 'h' ).format( 'MMM Do YY hh:mm a' )
 												}, function(err) {
 
 													// return error
@@ -803,7 +954,7 @@ var GfaTaskController = {
 													// return success
 													if ( deployments_complete === deployments_pending ) {
 														// return the reports for the project period
-														return res.json( 200, { msg: 'Form deployment error, instructions provided to WFP GFA Team via email' });
+														return res.json( 200, { msg: 'Form Deployment Complete' });
 													} else {
 														// set process
 														doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
@@ -813,16 +964,102 @@ var GfaTaskController = {
 
 										} else {
 
-											// add deplotmnet complete
-											deployments_complete++;
-											// return success
-											if ( deployments_complete === deployments_pending ) {
-												// return the reports for the project period
-												return res.json( 200, { msg: 'Kobo Daily Reporting Forms Successfully Deployed!' });
-											} else {
-												// set process
-												doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
-											}
+											// run curl command
+											EXEC( cmd_2, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+
+												// err
+												if ( error ) {
+														
+													// send email
+													sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+															name: 'WFP GFA Team',
+															form: form.form_title,
+															issue: 'deploy',
+															assetUid: form.assetUid,
+															cmd: cmd_3,
+															show_cmd: true,
+															xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+															sendername: 'ReportHub'
+														}, {
+															// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+															to: 'pfitzgerald@immap.org',
+															subject: 'Form Deployment Verification Error - ' + form.form_title + '! - ' + moment().add( 6, 'h' ).format( 'MMM Do YY hh:mm a' )
+														}, function(err) {
+
+															// return error
+															if (err) return res.negotiate( err );
+
+															// add deplotmnet complete
+															deployments_complete++;
+															// return success
+															if ( deployments_complete === deployments_pending ) {
+																// return the reports for the project period
+																return res.json( 200, { msg: 'Form Deployment Complete' });
+															} else {
+																// set process
+																doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+															}
+
+														});
+
+												} else {
+
+													// success
+													kobo = JSON.parse( stdout );
+
+													// get staged version
+													if ( kobo.version_id !== kobo.deployed_version_id ) {
+
+														// send email
+														sails.hooks.email.send( 'bgd-gfa-form-deployment', {
+																name: 'WFP GFA Team',
+																form: form.form_title,
+																issue: 'deploy',
+																assetUid: form.assetUid,
+																cmd: cmd_3,
+																xlsform: form[ 'organization_tag' ] + '/' + form[ 'form_template' ] + '_current.xlsx',
+																sendername: 'ReportHub'
+															}, {
+																// to: 'pfitzgerald@immap.org, ngmreporthub@gmail.com',
+																to: 'pfitzgerald@immap.org',
+																subject: 'Form Deployment Issue - ' + form.form_title + '! - ' + moment().add( 6, 'h' ).format( 'MMM Do YY hh:mm a' )
+															}, function(err) {
+
+																// return error
+																if (err) return res.negotiate( err );
+
+																// add deplotmnet complete
+																deployments_complete++;
+																// return success
+																if ( deployments_complete === deployments_pending ) {
+																	// return the reports for the project period
+																	// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
+																	return res.json( 200, { msg: 'Form Deployment Complete' });
+																} else {
+																	// set process
+																	doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+																}
+
+															});
+
+													} else {
+														// add deplotmnet complete
+														deployments_complete++;
+														// return success
+														if ( deployments_complete === deployments_pending ) {
+															// return the reports for the project period
+															// return res.json( 200, { msg: 'Form deployment issue, instructions provided to WFP GFA Team via email' });
+															return res.json( 200, { msg: 'Form Deployment Success!' });
+														} else {
+															// set process
+															doDeployment( deployments_complete, deployments_pending, forms[ deployments_complete ] );
+														}
+
+													}
+
+												}
+
+											});
 
 										}
 
@@ -850,47 +1087,78 @@ var GfaTaskController = {
 		var k_data = req.body;
 
 		// set actual_fcn_id
-		var actual_fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
-		var actual_scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
+		var uuid = k_data[ 'formhub/uuid' ];
+		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
+		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
+		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
+		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
 
 		// filter
-		var filter = { fcn_id: actual_fcn_id }
-		if ( actual_scope_id ) {
-			filter.scope_id = actual_scope_id;
+		var filter = { fcn_id: fcn_id, report_distribution: report_distribution }
+		if ( scope_id ) {
+			filter.scope_id = scope_id;
 		}
 
-		// find from plan
-		PlannedBeneficiaries
+		// gfd forms
+		GfdForms
 			.findOne()
-			.where( filter )
-			.exec( function( err, planned ) {
+			.where({ uuid: uuid })
+			.exec( function( err, form ) {
 				// return error
-				if ( err ) return res.negotiate( err );
-		
-				// update absent table
-				AbsentBeneficiaries
-					.updateOrCreate( filter, planned, function ( err, destroy_result ) {
+				if (err) return res.negotiate( err );
+
+				// find from plan
+				PlannedBeneficiaries
+					.findOne()
+					.where({ site_id: form.site_id })
+					.where({ report_distribution: report_distribution })
+					.sort( '-distribution_date' )
+					.limit( 1 )
+					.exec( function( err, end_date ) {
 						// return error
 						if ( err ) return res.negotiate( err );
 
-						// actual beneficiaries
-						ActualBeneficiaries
-							.destroy( filter )
-							.exec( function( err, destroy_result ) {
+						// find from plan
+						PlannedBeneficiaries
+							.findOne()
+							.where( filter )
+							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );
-								
-								// return success
-								return res.json( 200, { msg: 'Success!' });
-							});
+						
+								// update absent table for beneficiary
+								AbsentBeneficiaries
+									.updateOrCreate( filter, planned, function ( err, destroy_result ) {
+										// return error
+										if ( err ) return res.negotiate( err );
 
+										// set new end date for beneficiary
+										PlannedBeneficiaries
+											.update( filter, { distribution_date: end_date.distribution_date })
+											.exec( function( err, updated_plan ) {
+												// return error
+												if ( err ) return res.negotiate( err );
+
+												// remove beneficiary from actual beneficiaries
+												ActualBeneficiaries
+													.destroy( filter )
+													.exec( function( err, destroy_result ) {
+														// return error
+														if ( err ) return res.negotiate( err );
+														
+														// return success
+														return res.json( 200, { msg: 'Success!' });
+													});
+											});
+									});
+							});
 					});
 			});
 
 	},
 
 	// set planned to actual
-	setDailyDistribution: function( req, res ){
+	setActualDailyDistribution: function( req, res ){
 
 		// get today's date
 		var today = moment.utc().format( 'YYYY-MM-DD' );
@@ -904,15 +1172,8 @@ var GfaTaskController = {
 				// return error
 				if ( err ) return res.negotiate( err );
 
-				// if no records
-				if ( !planned_beneficiaries.length  ) {
-					// return success
-					return res.json( 200, { msg: 'Success!' });					
-				}
-
 				// if records
 				if ( planned_beneficiaries.length ) {
-					
 					// set to actual
 					ActualBeneficiaries
 						.create( planned_beneficiaries )
@@ -924,10 +1185,78 @@ var GfaTaskController = {
 						});
 
 				}
+
+				// if no records
+				if ( !planned_beneficiaries.length  ) {
+					// return success
+					return res.json( 200, { msg: 'Success! No plan found...' });					
+				}
 				
 			});
 
-	}
+	},
+
+	// set planned to actual
+	setActualDistribution: function( req, res ){
+
+		// check req
+		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
+			return res.json( 401, { err: 'admin0pcode, organization_tag, report_round, report_distribution required!' });
+		}
+
+		var admin0pcode = req.param('admin0pcode');
+		var organization_tag = req.param('organization_tag');
+		var report_round = req.param('report_round');
+		var report_distribution = req.param('report_distribution');
+
+		// filter
+		var organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
+
+		// find from plan
+		PlannedBeneficiaries
+			.find()
+			.where({ admin0pcode: admin0pcode })
+			.where( organization_tag_filter )
+			.where({ report_round: report_round })
+			.where({ report_distribution: report_distribution })
+			.exec( function( err, planned_beneficiaries ) {
+				
+				// return error
+				if ( err ) return res.negotiate( err );
+
+				// if records
+				if ( planned_beneficiaries.length ) {
+
+					// set to planned_beneficiaries
+					async.each( planned_beneficiaries, function ( data, next ) {
+
+						// set to actual
+						ActualBeneficiaries
+							.updateOrCreate( { id: data.id }, data, function ( err, result ) {
+								// return error
+								if ( err ) return res.negotiate( err );
+								// next
+								next();
+							});
+
+						}, function ( err ) {
+							// return error
+							if ( err ) return res.negotiate( err );
+							// return success
+							return res.json( 200, { msg: 'Success!' });							
+						});
+
+				}
+
+				// if no records
+				if ( !planned_beneficiaries.length  ) {
+					// return success
+					return res.json( 200, { msg: 'Success! No plan found...' });					
+				}
+				
+			});
+
+	}	
 
 }
 

@@ -293,6 +293,9 @@ module.exports.routes = {
   
   // -------- CXB GFA ------------
   // setDistributionRound
+  'GET /wfp/gfa/gfd/getForms': 'Country/Cxb/Gfa/GfaTaskController.getForms',
+  'POST /wfp/gfa/gfd/getForms': 'Country/Cxb/Gfa/GfaTaskController.getForms',
+  // setDistributionRound
   'GET /wfp/gfa/gfd/getDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.getDistributionRound',
   'POST /wfp/gfa/gfd/getDistributionRound': 'Country/Cxb/Gfa/GfaTaskController.getDistributionRound',
   // setDistributionRound
@@ -307,13 +310,20 @@ module.exports.routes = {
   // deployKoboXlsxForm
   'GET /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
   'POST /wfp/gfa/gfd/deployKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.deployKoboXlsxForm',
+  // sendKoboManualDeployEmail
+  'GET /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
+  'POST /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
+  
   
   // getKoboData
   'GET /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
   'POST /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
   // set plan to actual
-  'GET /wfp/gfa/gfd/setDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setDailyDistribution',
-  'POST /wfp/gfa/gfd/setDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setDailyDistribution',
+  'GET /wfp/gfa/gfd/setActualDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDailyDistribution',
+  'POST /wfp/gfa/gfd/setActualDailyDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDailyDistribution',
+  // set plan to actual for distribution
+  'GET /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
+  'POST /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
 
   // get PlannedBeneficiaries
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
@@ -324,6 +334,9 @@ module.exports.routes = {
   // get ActualBeneficiaries Indicator
   'GET /wfp/gfa/gfd/getActualBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getActualBeneficiariesIndicator',
   'POST /wfp/gfa/gfd/getActualBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getActualBeneficiariesIndicator',
+  // get AbsentBeneficiaries Indicator
+  'GET /wfp/gfa/gfd/getAbsentBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getAbsentBeneficiariesIndicator',
+  'POST /wfp/gfa/gfd/getAbsentBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getAbsentBeneficiariesIndicator',  
 
   /***************************************************************************
   *                                                                          *
