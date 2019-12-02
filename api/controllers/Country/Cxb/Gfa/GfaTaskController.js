@@ -685,7 +685,7 @@ var GfaTaskController = {
 								// choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)'] );
 							}
 							// each beneficiary
-							choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'fcn_id', planned_beneficiaries[ i ].fcn_id + '_' + planned_beneficiaries[ i ].scope_id, planned_beneficiaries[ i ].fcn_id + ' / ' + planned_beneficiaries[ i ].scope_id ] );
+							choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'fcn_id', planned_beneficiaries[ i ].gfd_id + '_' + planned_beneficiaries[ i ].fcn_id + '_' + planned_beneficiaries[ i ].scope_id, planned_beneficiaries[ i ].gfd_id + ' / ' + planned_beneficiaries[ i ].fcn_id + ' / ' + planned_beneficiaries[ i ].scope_id ] );
 						}
 						
 						// deployments
@@ -1088,16 +1088,32 @@ var GfaTaskController = {
 
 		// set actual_fcn_id
 		var uuid = k_data[ 'formhub/uuid' ];
-		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
-		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
+		
+		var gfd_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
+		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
+		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 2 ];
+
+		// 
 		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
 		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
 
+
+
+
+
+
+
 		// filter
-		var filter = { fcn_id: fcn_id, report_distribution: report_distribution }
+		var filter = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution }
 		if ( scope_id ) {
 			filter.scope_id = scope_id;
 		}
+
+
+
+
+
+
 
 		// gfd forms
 		GfdForms
