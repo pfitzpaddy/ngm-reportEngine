@@ -10,6 +10,15 @@ module.exports = {
 	// connection
 	connection: 'ngmWfpGfaServer',
 
+	// attributes
+	attributes: {
+		// distribution_status
+		distribution_status: {
+			type: 'string',
+			defaultsTo: 'absent'
+		}
+	},
+
 	// updateOrCreate
 		// http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
 	updateOrCreate: function( criteria, values, cb ){

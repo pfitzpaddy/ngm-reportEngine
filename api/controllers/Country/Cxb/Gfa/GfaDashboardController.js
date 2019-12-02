@@ -807,7 +807,25 @@ var GfaDashboardController = {
 
 					break;
 
-				case 'downloads_planned_beneficiaries':
+				case 'downloads_absent_beneficiaries':
+
+					// return csv
+					json2csv({ data: beneficiaries }, function( err, csv ) {
+
+						// error
+						if ( err ) return res.negotiate( err );
+
+						// success
+						value = { data: csv };
+
+						// return
+						return res.json( 200, value );
+
+					});
+
+					break;
+
+				case 'downloads_beneficiaries':
 
 					// return csv
 					json2csv({ data: beneficiaries }, function( err, csv ) {

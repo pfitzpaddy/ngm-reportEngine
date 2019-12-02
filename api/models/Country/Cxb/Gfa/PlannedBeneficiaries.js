@@ -8,6 +8,15 @@
 module.exports = {
 
 	// connection
-	connection: 'ngmWfpGfaServer'
+	connection: 'ngmWfpGfaServer',
+
+	// attributes
+	attributes: {
+		// distribution_status
+		distribution_status: {
+			type: 'string',
+			defaultsTo: 'plan'
+		}
+	}
 
 }
