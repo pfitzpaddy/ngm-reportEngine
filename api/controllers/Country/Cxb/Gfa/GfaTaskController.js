@@ -1113,7 +1113,7 @@ var GfaTaskController = {
 					.findOne()
 					.where({ site_id: form.site_id })
 					.where({ report_distribution: report_distribution })
-					.sort( '-distribution_date' )
+					.sort({ distribution_date: 'DESC' })
 					.limit( 1 )
 					.exec( function( err, end_date ) {
 						// return error
