@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl 'https://reporthub.immap.org/api/wfp/gfa/gfd/setDistributionRound?round=2'
+curl 'https://reporthub.org/api/wfp/gfa/gfd/setDistributionRound?round=2'

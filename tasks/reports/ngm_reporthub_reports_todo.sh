@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl https://reporthub.immap.org/api/cluster/report/setReportsToDo
+curl https://reporthub.org/api/cluster/report/setReportsToDo

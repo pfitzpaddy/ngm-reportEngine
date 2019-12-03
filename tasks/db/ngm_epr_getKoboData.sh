@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl https://reporthub.immap.org/api/epr/getKoboData
+curl https://reporthub.org/api/epr/getKoboData
