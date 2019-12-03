@@ -318,7 +318,7 @@ module.exports = {
 	            position: user.position,
 	            phone: user.phone,
 	            email: user.email,
-	            url: 'https://reporthub.immap.org/desk/#/profile/' + user.username,
+	            url: 'https://reporthub.org/desk/#/profile/' + user.username,
 	            sendername: 'ReportHub'
 	          }, {
 	            to: org_emails,

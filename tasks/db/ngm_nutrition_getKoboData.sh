@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl https://reporthub.immap.org/api/nutrition/afghanistan/getKoboData
+curl https://reporthub.org/api/nutrition/afghanistan/getKoboData

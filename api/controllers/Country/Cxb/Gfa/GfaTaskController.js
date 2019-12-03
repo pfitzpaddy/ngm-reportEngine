@@ -1088,32 +1088,17 @@ var GfaTaskController = {
 
 		// set actual_fcn_id
 		var uuid = k_data[ 'formhub/uuid' ];
-		
 		var gfd_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
 		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
 		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 2 ];
-
-		// 
 		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
 		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
-
-
-
-
-
-
 
 		// filter
 		var filter = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution }
 		if ( scope_id ) {
 			filter.scope_id = scope_id;
 		}
-
-
-
-
-
-
 
 		// gfd forms
 		GfdForms
@@ -1128,7 +1113,7 @@ var GfaTaskController = {
 					.findOne()
 					.where({ site_id: form.site_id })
 					.where({ report_distribution: report_distribution })
-					.sort( '-distribution_date' )
+					.sort({ distribution_date: 'DESC' })
 					.limit( 1 )
 					.exec( function( err, end_date ) {
 						// return error
