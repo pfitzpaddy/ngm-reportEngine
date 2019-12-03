@@ -14,7 +14,7 @@ var async = require('async');
 var Cluster4wplusDashboardController = {
 
 	// flatten json
-	flatten: function( json ) {
+	flatten: function( json ) { 
 		var array = [];
 		for( var i in json ) {
 			if ( json.hasOwnProperty( i ) && json[ i ] instanceof Object ){
@@ -2089,9 +2089,14 @@ var Cluster4wplusDashboardController = {
 									case 'beneficiaryAdmin1pcode':
 										if ($beneficiariesOne.totalBeneficiaries < 1 && $beneficiariesOne.totalBeneficiaries < 1) {
 											
-											result.data[0].y = 0;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Province',
+																		'label': 0,
+																	}]
+																};
 											
 											
 											return res.json(200, result);
@@ -2213,9 +2218,14 @@ var Cluster4wplusDashboardController = {
 									case 'beneficiaryType':
 										if ($beneficiariesOne.totalBeneficiaries < 1 && $beneficiariesOne.totalBeneficiaries < 1) {
 											
-											result.data[0].y = 0;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Type',
+																		'label': 0,
+																	}]
+																};
 											
 											
 											return res.json(200, result);
@@ -2317,9 +2327,14 @@ var Cluster4wplusDashboardController = {
 									case 'beneficiaryCluster':
 										if ($beneficiariesOne.totalBeneficiaries < 1 ) {
 											
-											result.data[0].y = 0;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Cluster',
+																		'label': 0,
+																	}]
+																};
 											
 											
 											return res.json(200, result);
@@ -2452,9 +2467,20 @@ var Cluster4wplusDashboardController = {
 									
 										if ($beneficiariesOne.totalBudgetProgress < 1) {
 											
-											result.data[0].y = 0;
+											/*result.data[0].y = 0;
 											result.data[0].label = 0;
 											result.data[0].color = '#c7c7c7';
+											
+											
+											return res.json(200, result);*/
+											var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Organization',
+																		'label': 0,
+																	}]
+																};
 											
 											
 											return res.json(200, result);
@@ -2855,9 +2881,14 @@ var Cluster4wplusDashboardController = {
 									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
 										if (!budgetprogressdonor.length) {
 											
-											result.data[0].y = 0;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Donor',
+																		'label': 0,
+																	}]
+																};
 											
 											
 											return res.json(200, result);
@@ -3029,9 +3060,14 @@ var Cluster4wplusDashboardController = {
 									case 'financingAdmin1pcode':
 										if ($financingOne.totalBudgetProgress < 1 && $financingOne.totalBudgetProgress < 1) {
 											
-											result.data[0].y = 0;
-											result.data[0].label = 0;
-											result.data[0].color = '#c7c7c7';
+											var result = {	
+																	data: [{
+																		'y': 0,
+																		'color': '#f48fb1',
+																		'name': 'Province',
+																		'label': 0,
+																	}]
+																};
 											
 											
 											return res.json(200, result);

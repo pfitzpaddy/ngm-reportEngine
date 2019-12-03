@@ -536,7 +536,7 @@ var ProjectController = {
 
 
         //columns to COL or columns to others countries
-        if (queryProject.admin0pcode === 'col') {
+        if (queryProject.admin0pcode === 'COL') {
 
           // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','componente_humanitario','plan_hrp_plan','componente_construccion_de_paz','componente_desarrollo_sostenible','plan_interagencial','componente_flujos_migratorios','plan_rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
 
@@ -645,7 +645,7 @@ var ProjectController = {
 
             //values in columns to COL or values to others countries
 
-            if(queryProject.admin0pcode == 'col'){
+            if(queryProject.admin0pcode == 'COL'){
 
               project.urls_list = seturls(project.documents);
 
