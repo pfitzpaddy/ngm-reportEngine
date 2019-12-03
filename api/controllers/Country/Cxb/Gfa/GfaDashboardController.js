@@ -925,7 +925,7 @@ var GfaDashboardController = {
 
 		// order by least important to most important
 		var distribution = _.chain( distribution_dates[ date_key ] )
-												.sortBy( 'fcn_id' )
+												.sortBy( 'gfd_id' )
 												.sortBy( 'gfd_family_size' )
 												.value();
 
