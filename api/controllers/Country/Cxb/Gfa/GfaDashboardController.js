@@ -46,7 +46,7 @@ var GfaDashboardController = {
 		var report_distribution = req.param('report_distribution');
 
 		// if wfp, select all
-		organization_tag_filter = organization_tag === 'wfp' ? {} : { organization_tag: organization_tag };
+		organization_tag_filter = organization_tag === 'wfp' ? { organization_tag: { $exists: true } } : { organization_tag: organization_tag };
 
 		// distribution
 		PlannedBeneficiaries
@@ -93,13 +93,20 @@ var GfaDashboardController = {
 		}
 
 		// filters
+		// var filters = {
+		// 	organization_tag: params.organization_tag === 'wfp' ? {} : { organization_tag: params.organization_tag },
+		// 	site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
+		// 	admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
+		// 	admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
+		// 	admin5pcode: params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
+		// }
 		var filters = {
-			organization_tag: params.organization_tag === 'wfp' ? {} : { organization_tag: params.organization_tag },
-			site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
-			admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
-			admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
-			admin5pcode: params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
-		}
+			organization_tag: params.organization_tag === 'wfp' ? { organization_tag: { $exists: true } } : { organization_tag: params.organization_tag },
+			site_id: params.site_id === 'all' ? { site_id: { $exists: true } } : { site_id: params.site_id },
+			admin3pcode: params.admin3pcode === 'all' ? { admin3pcode: { $exists: true } } : { admin3pcode: params.admin3pcode },
+			admin4pcode: params.admin4pcode === 'all' ? { admin4pcode: { $exists: true } } : { admin4pcode: params.admin4pcode },
+			admin5pcode: params.admin5pcode === 'all' ? { admin5pcode: { $exists: true } } : { admin5pcode: params.admin5pcode }
+		}		
 
 		// distribution
 		PlannedBeneficiaries
