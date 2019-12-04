@@ -897,6 +897,7 @@ var GfaDashboardController = {
 				'</head>' +
 				'<style>' +
 						'table {' +
+							'width: 100%' +
 							'font-family: verdana, arial, sans-serif;' +
 							'color: #333333;' +
 							'border-width: 1px;' +
@@ -941,7 +942,7 @@ var GfaDashboardController = {
 		for( i=0; i < distribution.length; i++ ){
 
 			// gfd entitlement
-			var gfd_entitlement;
+			var gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 
 			// true / false
 			var page_break = ( beneficiary_page_count > beneficiary_page_length ) || 
@@ -1008,8 +1009,26 @@ var GfaDashboardController = {
 				if (  i !== 0 && page_break ) {
 					// set 
 					beneficiary_page_count = 1;
+					
 					// end
-					page_html_body += '</tbody></table><div style="page-break-before: always;"></div>';
+					page_html_body += '</tbody></table>';
+					
+					// approval content
+					page_html_body += '' +
+						'<table style="width: 100%; border-width: 0px; font-family: verdana, arial, sans-serif; font-size: 8px; color: #333333; margin: 10px 0px 0px 0px;">' +
+							'<td style="width: 25%; border-width: 0px;" align="left">' +
+								'Prepared by:' +
+							"</td>" +
+							'<td style="width: 25%; border-width: 0px;" align="left">' +
+								'Checked by:' +
+							"</td>" +
+							'<td style="width: 25%; border-width: 0px;" align="left">' +
+								'Approved by:' +
+							"</td>" +
+						'</table>';
+
+					// page break
+					page_html_body += '<div style="page-break-before: always;"></div>';
 				}
 
 				// page header
@@ -1058,12 +1077,28 @@ var GfaDashboardController = {
 					'<td>' + gfd_entitlement + '</td>' +
 					'<td width="25%" height="40px;"></td>' +
 				'</tr>';
-
 			
 			// ++
-			beneficiary_page_count++;				
+			beneficiary_page_count++;
 
 		}
+
+		// end
+		page_html_body += '</tbody></table>';
+		
+		// approval content
+		page_html_body += '' +
+			'<table style="width: 100%; border-width: 0px; font-family: verdana, arial, sans-serif; font-size: 8px; color: #333333; margin: 10px 0px 0px 0px;">' +
+				'<td style="width: 25%; border-width: 0px;" align="left">' +
+					'Prepared by:' +
+				"</td>" +
+				'<td style="width: 25%; border-width: 0px;" align="left">' +
+					'Checked by:' +
+				"</td>" +
+				'<td style="width: 25%; border-width: 0px;" align="left">' +
+					'Approved by:' +
+				"</td>" +
+			'</table>';
 
 		// end
 		page_html_body += '</tbody></table></body></html>';
