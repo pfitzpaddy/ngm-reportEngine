@@ -1088,6 +1088,7 @@ var GfaTaskController = {
 
 		// set actual_fcn_id
 		var uuid = k_data[ 'formhub/uuid' ];
+		var kobo_id = k_data[ '_id' ]
 		var gfd_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
 		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
 		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 2 ];
@@ -1130,6 +1131,7 @@ var GfaTaskController = {
 								// add kobo form ids
 								planned.uuid = form.uuid;
 								planned.form_id = form.form_id;
+								planned.kobo_id = kobo_id;
 						
 								// update absent table for beneficiary
 								AbsentBeneficiaries
@@ -1166,67 +1168,81 @@ var GfaTaskController = {
 	removeAbsentBeneficiary: function( req, res ){
 
 		// check req
-		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
-			return res.json( 401, { err: 'fcn_id, report_distribution, distribution_date!' });
+		if ( !req.param('fcn_id') && !req.param('site_id') && !req.param('report_round') && !req.param('report_distribution') && !req.param('distribution_date') ) {
+			return res.json( 401, { err: 'fcn_id, site_id, report_round, report_distribution, distribution_date!' });
 		}
 		
 		// set actual_fcn_id
 		var fcn_id = req.param( 'fcn_id' );
+		var site_id = req.param( 'site_id' );
+		var report_round = req.param( 'report_round' );
 		var report_distribution = req.param( 'report_distribution' );
 		var distribution_date = req.param( 'distribution_date' );
 
-		// find from plan
-		PlannedBeneficiaries
-			.update({ fcn_id: fcn_id, report_distribution: report_distribution }, { distribution_date: distribution_date })
-			.exec( function( err, update ){
+		// gfd forms
+		GfdForms
+			.findOne()
+			.where({ site_id: site_id })
+			.where({ report_round: report_round })
+			.exec( function( err, form ) {
 				// return error
-				if ( err ) return res.negotiate( err );
+				if (err) return res.negotiate( err );
 
-				if ( moment().isAfter( moment( distribution_date ) ) ) {
-					
-					console.log('after')
-					
-					update[ 0 ].distribution_status = 'actual';
+					// find from plan
+					PlannedBeneficiaries
+						.update({ fcn_id: fcn_id, report_distribution: report_distribution }, { distribution_date: distribution_date })
+						.exec( function( err, update ){
+							// return error
+							if ( err ) return res.negotiate( err );
 
-					// remove beneficiary from actual beneficiaries
-					// ActualBeneficiaries
-					// 	.create( update )
-					// 	.exec( function( err, actual ) {
-					// 		// return error
-					// 		if ( err ) return res.negotiate( err );
-								// AbsentBeneficiaries
-								// 	.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
-								// 	.exec( function( err, destroy ) {
-								// 		// return error
-								// 		if ( err ) return res.negotiate( err );
-								// 		// return success
-								// 		return res.json( 200, { msg: 'Success!' });
-								// 	});	
-					// 	});
+							// if in past, place back to plan / actual
+							if ( moment().isAfter( moment( distribution_date ) ) ) {
+								
+								// set to actual
+								update[ 0 ].distribution_status = 'actual';
 
+								// remove beneficiary from actual beneficiaries
+								Promise.all([
+									ActualBeneficiaries.create( update ),
+									AbsentBeneficiaries.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
+								])
+								.catch( function( err ) {
+									return res.negotiate( err );
+								})
+								.then( function( result ) {
+									// 
+									var actual = result[ 0 ];
+									var destroy = result[ 1 ];
 
-					// curl -X GET https://kc.humanitarianresponse.info/api/v1/data/457157?format=json -u ric_bgd_cxb:ricBgdCxb2020
+									// import updated form
+									var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
 
-				} else {
-					console.log('before');
-					// AbsentBeneficiaries
-					// 	.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
-					// 	.exec( function( err, destroy ) {
-					// 		// return error
-					// 		if ( err ) return res.negotiate( err );
-					// 		// return success
-					// 		return res.json( 200, { msg: 'Success!' });
-					// 	});					
-				}
+									// run curl command
+									EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+										if ( error ) {
+											return res.json( 200, { msg: 'Success, please delete from Kobo Admin!' });
+										} else {
+											return res.json( 200, { msg: 'Success!' });
+										}
+									});
 
-				return res.json( 200, { msg: 'Success!' });
+								});
 
+							} else {
+								// remove
+								AbsentBeneficiaries
+									.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
+									.exec( function( err, destroy ) {
+										// return error
+										if ( err ) return res.negotiate( err );
+										// return success
+										return res.json( 200, { msg: 'Success!' });
+									});
+							}
 
+						});
 
 			});
-
-
-
 	}, 
 
 	// set planned to actual
