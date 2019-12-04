@@ -1126,6 +1126,10 @@ var GfaTaskController = {
 							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );
+
+								// add kobo form ids
+								planned.uuid = form.uuid;
+								planned.form_id = form.form_id;
 						
 								// update absent table for beneficiary
 								AbsentBeneficiaries
@@ -1157,6 +1161,73 @@ var GfaTaskController = {
 			});
 
 	},
+
+	// remove beneficiary 
+	removeAbsentBeneficiary: function( req, res ){
+
+		// check req
+		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
+			return res.json( 401, { err: 'fcn_id, report_distribution, distribution_date!' });
+		}
+		
+		// set actual_fcn_id
+		var fcn_id = req.param( 'fcn_id' );
+		var report_distribution = req.param( 'report_distribution' );
+		var distribution_date = req.param( 'distribution_date' );
+
+		// find from plan
+		PlannedBeneficiaries
+			.update({ fcn_id: fcn_id, report_distribution: report_distribution }, { distribution_date: distribution_date })
+			.exec( function( err, update ){
+				// return error
+				if ( err ) return res.negotiate( err );
+
+				if ( moment().isAfter( moment( distribution_date ) ) ) {
+					
+					console.log('after')
+					
+					update[ 0 ].distribution_status = 'actual';
+
+					// remove beneficiary from actual beneficiaries
+					// ActualBeneficiaries
+					// 	.create( update )
+					// 	.exec( function( err, actual ) {
+					// 		// return error
+					// 		if ( err ) return res.negotiate( err );
+								// AbsentBeneficiaries
+								// 	.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
+								// 	.exec( function( err, destroy ) {
+								// 		// return error
+								// 		if ( err ) return res.negotiate( err );
+								// 		// return success
+								// 		return res.json( 200, { msg: 'Success!' });
+								// 	});	
+					// 	});
+
+
+					// curl -X GET https://kc.humanitarianresponse.info/api/v1/data/457157?format=json -u ric_bgd_cxb:ricBgdCxb2020
+
+				} else {
+					console.log('before');
+					// AbsentBeneficiaries
+					// 	.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
+					// 	.exec( function( err, destroy ) {
+					// 		// return error
+					// 		if ( err ) return res.negotiate( err );
+					// 		// return success
+					// 		return res.json( 200, { msg: 'Success!' });
+					// 	});					
+				}
+
+				return res.json( 200, { msg: 'Success!' });
+
+
+
+			});
+
+
+
+	}, 
 
 	// set planned to actual
 	setActualDailyDistribution: function( req, res ){

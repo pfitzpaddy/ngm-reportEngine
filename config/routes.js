@@ -324,6 +324,11 @@ module.exports.routes = {
   // set plan to actual for distribution
   'GET /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
   'POST /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
+  // remove absent beneficiary
+  'GET /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',
+  'POST /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',  
+
+  
 
   // get PlannedBeneficiaries
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
