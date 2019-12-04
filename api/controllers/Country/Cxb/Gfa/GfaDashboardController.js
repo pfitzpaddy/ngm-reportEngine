@@ -283,9 +283,11 @@ var GfaDashboardController = {
 				case 'rice':
 					// food distribution plan
 					planned = 0;
+					console.log( 'planned_beneficiaries' );
 					for( i=0; i<beneficiaries.length; i++ ){
 						planned += beneficiaries[ i ].rice;
 					}
+					console.log( 'loop' );
 					value = { 'value': planned };
 					break;
 
