@@ -1131,6 +1131,7 @@ var GfaTaskController = {
 								// add kobo form ids
 								planned.uuid = form.uuid;
 								planned.form_id = form.form_id;
+								planned.form_url = form.form_url;
 								planned.kobo_id = kobo_id;
 						
 								// update absent table for beneficiary
