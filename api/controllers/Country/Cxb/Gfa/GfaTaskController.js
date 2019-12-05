@@ -1086,6 +1086,8 @@ var GfaTaskController = {
 		// kobo data
 		var k_data = req.body;
 
+		console.log( k_data );
+
 		// set actual_fcn_id
 		var uuid = k_data[ 'formhub/uuid' ];
 		var kobo_id = k_data[ '_id' ]
@@ -1127,6 +1129,8 @@ var GfaTaskController = {
 							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );
+
+								console.log( form );
 
 								// add kobo form ids
 								planned.uuid = form.uuid;
@@ -1200,11 +1204,12 @@ var GfaTaskController = {
 							if ( moment().isAfter( moment( distribution_date ) ) ) {
 								
 								// set to actual
-								update[ 0 ].distribution_status = 'actual';
+								var absent = update[ 0 ];
+								absent.distribution_status = 'actual';
 
 								// remove beneficiary from actual beneficiaries
 								Promise.all([
-									ActualBeneficiaries.create( update ),
+									ActualBeneficiaries.create( absent ),
 									AbsentBeneficiaries.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
 								])
 								.catch( function( err ) {
