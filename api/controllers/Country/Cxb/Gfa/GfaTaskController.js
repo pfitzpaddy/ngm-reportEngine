@@ -1086,8 +1086,6 @@ var GfaTaskController = {
 		// kobo data
 		var k_data = req.body;
 
-		console.log( k_data );
-
 		// set actual_fcn_id
 		var uuid = k_data[ 'formhub/uuid' ];
 		var kobo_id = k_data[ '_id' ]
@@ -1129,9 +1127,7 @@ var GfaTaskController = {
 							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );
-
-								console.log( form );
-
+								
 								// add kobo form ids
 								planned.uuid = form.uuid;
 								planned.form_id = form.form_id;
