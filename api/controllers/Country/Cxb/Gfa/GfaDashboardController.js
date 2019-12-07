@@ -953,7 +953,8 @@ var GfaDashboardController = {
 
 		// order by least important to most important
 		var distribution = _.chain( master_roll[ sub_block_key ] )
-												.sortBy( 'gfd_id' )
+												.sortBy( 'sl_number' )
+												// .sortBy( 'gfd_id' )
 												.sortBy( 'gfd_family_size' )
 												.value();
 
