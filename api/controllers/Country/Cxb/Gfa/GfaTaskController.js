@@ -1226,16 +1226,19 @@ var GfaTaskController = {
 									var destroy = result[ 1 ];
 
 									// import updated form
-									var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
+									// var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
 
-									// run curl command
-									EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
-										if ( error ) {
-											return res.json( 200, { msg: 'Success, please delete from Kobo Admin!' });
-										} else {
-											return res.json( 200, { msg: 'Success!' });
-										}
-									});
+									// // run curl command
+									// EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+									// 	if ( error ) {
+									// 		return res.json( 200, { msg: 'Success, please delete from Kobo Admin!' });
+									// 	} else {
+									// 		return res.json( 200, { msg: 'Success!' });
+									// 	}
+									// });
+
+									// 
+									return res.json( 200, { msg: 'Success!' });
 
 								});
 
