@@ -1101,6 +1101,8 @@ var GfaTaskController = {
 			filter.scope_id = scope_id;
 		}
 
+		console.log( filter );
+
 		// gfd forms
 		GfdForms
 			.findOne()
@@ -1261,7 +1263,7 @@ var GfaTaskController = {
 		// get today's date
 		// var today = moment.utc().format( 'YYYY-MM-DD' );
 		var today = '2019-12-08';
-		var today = '2019-12-07';
+		// var today = '2019-12-07';
 
 		// find from plan
 		PlannedBeneficiaries
