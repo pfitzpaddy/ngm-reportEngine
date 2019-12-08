@@ -680,8 +680,6 @@ var GfaTaskController = {
 								choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ] = [];
 								// choices beneficiary_type
 								choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'list_name', 'name', 'label'] );
-								// choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary'] );
-								// choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)'] );
 							}
 							// each beneficiary
 							choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'fcn_id', planned_beneficiaries[ i ].gfd_id + '_' + planned_beneficiaries[ i ].fcn_id + '_' + planned_beneficiaries[ i ].scope_id, planned_beneficiaries[ i ].gfd_id + ' / ' + planned_beneficiaries[ i ].fcn_id + ' / ' + planned_beneficiaries[ i ].scope_id ] );
@@ -719,8 +717,6 @@ var GfaTaskController = {
 							if ( !choices.length ) {
 								choices = [];
 								choices.push( [ 'list_name', 'name', 'label' ] );
-								// choices.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary' ] );
-								// choices.push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)' ] );
 							}
 							XLSX_UTILS.book_append_sheet( workbook, XLSX_UTILS.aoa_to_sheet( choices ), 'choices' );
 
@@ -1101,13 +1097,10 @@ var GfaTaskController = {
 			filter.scope_id = scope_id;
 		}
 
-		console.log( filter );
-
 		// gfd forms
 		GfdForms
 			.findOne()
-			// .where({ uuid: uuid })
-			.where({ uuid: '493277e83b85413183e4d5c79eb31c35' })
+			.where({ uuid: uuid })
 			.exec( function( err, form ) {
 				// return error
 				if (err) return res.negotiate( err );
@@ -1226,19 +1219,16 @@ var GfaTaskController = {
 									var destroy = result[ 1 ];
 
 									// import updated form
-									// var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
+									var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
 
-									// // run curl command
-									// EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
-									// 	if ( error ) {
-									// 		return res.json( 200, { msg: 'Success, please delete from Kobo Admin!' });
-									// 	} else {
-									// 		return res.json( 200, { msg: 'Success!' });
-									// 	}
-									// });
-
-									// 
-									return res.json( 200, { msg: 'Success!' });
+									// run curl command
+									EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+										if ( error ) {
+											return res.json( 200, { msg: 'Success, please delete from Kobo Admin!' });
+										} else {
+											return res.json( 200, { msg: 'Success!' });
+										}
+									});
 
 								});
 
