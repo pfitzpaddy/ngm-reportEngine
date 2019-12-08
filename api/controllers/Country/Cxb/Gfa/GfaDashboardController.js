@@ -899,6 +899,10 @@ var GfaDashboardController = {
 		var page_html_start = '';
 		var page_html_body = '';
 
+		// list and object
+		var distribution_list = [];
+		var distribution_groups = {};
+
 		// template object
 		var template = {
 			dir: '/home/ubuntu/data/html/template/',
@@ -952,164 +956,199 @@ var GfaDashboardController = {
 
 
 		// order by least important to most important
-		var distribution = _.chain( master_roll[ sub_block_key ] )
+		distribution_list = _.chain( master_roll[ sub_block_key ] )
 												.sortBy( 'sl_number' )
-												// .sortBy( 'gfd_id' )
-												.sortBy( 'gfd_family_size' )
 												.value();
 
-		// foreach record
-		var sub_header = 'Family Size 1 to 3, Sub Block ' + sub_block_key;
-		var family_4_to_7 = true;
-		var family_8_to_10 = true;
-		var family_11_plus = true;
-		var beneficiary_page_count = 1;
-		var beneficiary_page_length = 15;
+		// distribution_list_length
+		var distribution_list_counter = 0;
+		var distribution_list_length = distribution_list.length;
 
-		// for each record
-		for( i=0; i < distribution.length; i++ ){
+		// by entitlement size
+		distribution_groups[ 'family_size_1_3' ] = _.filter( distribution_list, function ( b ) {
+			return b.gfd_family_size >= 0 && b.gfd_family_size <= 3;
+		});
+		distribution_groups[ 'family_size_4_7' ] = _.filter( distribution_list, function ( b ) {
+			return b.gfd_family_size >= 4 && b.gfd_family_size <= 7;
+		});
+		distribution_groups[ 'family_size_8_10' ] = _.filter( distribution_list, function ( b ) {
+			return b.gfd_family_size >= 8 && b.gfd_family_size <= 10;
+		});
+		distribution_groups[ 'family_size_11' ] = _.filter( distribution_list, function ( b ) {
+			return b.gfd_family_size >= 11;
+		});
 
-			// gfd entitlement
-			var gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+		// for each family grouping
+		for ( var family_size in distribution_groups ) {
 
-			// true / false
-			var page_break = ( beneficiary_page_count > beneficiary_page_length ) || 
-						family_4_to_7 && distribution[ i ].gfd_family_size >= 4 || 
-						family_8_to_10 && distribution[ i ].gfd_family_size >= 8 || 
-						family_11_plus && distribution[ i ].gfd_family_size >= 11;
+			// foreach record
+			var sub_header;
+			var gfd_entitlement;
+			var new_family_size = true;
+
+			// beneficiary counter
+			var beneficiary_page_count = 1;
+			var beneficiary_page_length = 15;
 
 			// round 1
-			if ( distribution[ i ].report_round === '1' ) {
-				if ( distribution[ i ].gfd_family_size <= 10  ) {
+			if ( params.report_round === '1' ) {
+				if ( family_size === 'family_size_1_3' ) {
 					// gfd_entitlement
+					sub_header = 'Family Size 1 to 3, Sub Block ' + sub_block_key;
 					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
-				} else {
+				}
+				if ( family_size === 'family_size_4_7' ) {
 					// gfd_entitlement
+					sub_header = 'Family Size 4 to 7, Sub Block ' + sub_block_key;
+					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+				}
+				if ( family_size === 'family_size_8_10' ) {
+					// gfd_entitlement
+					sub_header = 'Family Size 8 to 10, Sub Block ' + sub_block_key;
+					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+				}
+				if ( family_size === 'family_size_11' ) {
+					// gfd_entitlement
+					sub_header = 'Family Size 11+, Sub Block ' + sub_block_key;
 					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
 				}
+			
 			}
 
 			// round 2
-			if ( distribution[ i ].report_round === '2' ) {
-				if ( distribution[ i ].gfd_family_size >= 1 && distribution[ i ].gfd_family_size <= 3 ) {
+			if ( params.report_round === '2' ) {
+				if ( family_size === 'family_size_1_3' ) {
 					// gfd_entitlement
+					sub_header = 'Family Size 1 to 3, Sub Block ' + sub_block_key;
 					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 				}
-				if ( distribution[ i ].gfd_family_size >= 4 && distribution[ i ].gfd_family_size <= 7 ) {
+				if ( family_size === 'family_size_4_7' ) {
 					// gfd_entitlement
-					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
-				}
-				if ( distribution[ i ].gfd_family_size >= 8 && distribution[ i ].gfd_family_size <= 10 ) {
-					// gfd_entitlement
-					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
-				}
-				if ( distribution[ i ].gfd_family_size >= 11 ) {
-					// gfd_entitlement
-					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
-				}
-			}
-			
-			// check if first page / page break required
-			if ( i === 0 || page_break ) {
-
-				// page break for family_4_to_7
-				if ( distribution[ i ].gfd_family_size >= 4 ) {
-					family_4_to_7 = false;
 					sub_header = 'Family Size 4 to 7, Sub Block ' + sub_block_key;
-				
+					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 				}
-
-				// page break for family_8_to_10
-				if ( distribution[ i ].gfd_family_size >= 8 ) {
-					family_8_to_10 = false;
+				if ( family_size === 'family_size_8_10' ) {
+					// gfd_entitlement
 					sub_header = 'Family Size 8 to 10, Sub Block ' + sub_block_key;
-				
+					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
 				}
-
-				// page break for family_11_plus
-				if ( distribution[ i ].gfd_family_size >= 11 ) {
-					family_11_plus = false;
+				if ( family_size === 'family_size_11' ) {
+					// gfd_entitlement
 					sub_header = 'Family Size 11+, Sub Block ' + sub_block_key;
-				
+					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
 				}
-
-				// reset / page break
-				if (  i !== 0 && page_break ) {
-					// set 
-					beneficiary_page_count = 1;
-					
-					// end
-					page_html_body += '</tbody></table>';
-					
-					// approval content
-					page_html_body += '' +
-						'<table style="width: 100%; border-width: 0px; font-family: verdana, arial, sans-serif; font-size: 8px; color: #333333; margin: 10px 0px 0px 0px;">' +
-							'<td style="width: 25%; border-width: 0px;" align="left">' +
-								'Prepared by:' +
-							"</td>" +
-							'<td style="width: 25%; border-width: 0px;" align="left">' +
-								'Checked by:' +
-							"</td>" +
-							'<td style="width: 25%; border-width: 0px;" align="left">' +
-								'Approved by:' +
-							"</td>" +
-						'</table>';
-
-					// page break
-					page_html_body += '<div style="page-break-before: always;"></div>';
-				}
-
-				// page header
-				page_html_body += '' +
-					'<table style="border-width: 0px;">' +
-						'<td width="20%" style="border-width: 0px; margin-top:-10px;">' +
-							'<img src="https://reporthub.org/desk/images/logo/wfp-logo-standard-blue-en.png" width="90%" />' +
-						'</td>' +
-						'<td align="center" style="border-width: 0px;">' +
-							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:12px; margin:0px; font-weight: 300;">' + template.header_1 + '</h3>' +
-							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:6px; margin:0px; font-weight: 300;">' + sub_header + '</h3>' +
-							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; padding-top:6px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
-						'</td>' +
-						'<td align="right" style="border-width: 0px;">' +
-							'<img src="https://reporthub.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="40%" />' +
-						'</td>' +
-					'</table>';	
-				
-				// theader
-				page_html_body += '' +
-					'<table style="width:100%">' +
-					'<thead>' +
-						'<tr>' +
-							'<th>SL#</th>' +
-							'<th>HH Number</th>' +
-							'<th>FCN</th>' +
-							'<th>Scope</th>' +
-							'<th>HH Name</th>' +
-							'<th>Sub Block</th>' +
-							'<th>Family Size</th>' +
-							'<th>GFD</th>' +
-							'<th>Thumb</th>' +
-						'</tr>' +
-					'</thead>' +
-					'<tbody>';
+			
 			}
 
-			// content
-			page_html_body += '' +
-				'<tr>' +
-					'<td>' + distribution[ i ].sl_number  + '</td>' +
-					'<td>' + distribution[ i ].gfd_id + '</td>' +
-					'<td>' + distribution[ i ].fcn_id + '</td>' +
-					'<td>' + distribution[ i ].scope_id + '</td>' +
-					'<td>' + distribution[ i ].hh_name + '</td>' +
-					'<td align="center">' + distribution[ i ].admin5name + '</td>' +
-					'<td align="center">' + distribution[ i ].gfd_family_size + '</td>' +
-					'<td>' + gfd_entitlement + '</td>' +
-					'<td width="25%" height="40px;"></td>' +
-				'</tr>';
-			
-			// ++
-			beneficiary_page_count++;
+			// for each record
+			for( i=0; i < distribution_groups[ family_size ].length; i++ ){
+
+				// distribution list
+				distribution_list_counter++;
+
+				// set beneficiary
+				var b = distribution_groups[ family_size ][ i ];
+
+				// gfd entitlement
+				var gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+
+				// new page?
+				var page_break = new_family_size || ( beneficiary_page_count > beneficiary_page_length );
+
+				// page_break
+				if ( page_break ) {
+					
+					// set
+					beneficiary_page_count = 1;					
+
+					// page header
+					page_html_body += '' +
+						'<table style="border-width: 0px;">' +
+							'<td width="20%" style="border-width: 0px; margin-top:-10px;">' +
+								'<img src="https://reporthub.org/desk/images/logo/wfp-logo-standard-blue-en.png" width="90%" />' +
+							'</td>' +
+							'<td align="center" style="border-width: 0px;">' +
+								'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:12px; margin:0px; font-weight: 300;">' + template.header_1 + '</h3>' +
+								'<h3 style="font-family: verdana, arial, sans-serif; font-size: 9px; padding-top:6px; margin:0px; font-weight: 300;">' + sub_header + '</h3>' +
+								'<h3 style="font-family: verdana, arial, sans-serif; font-size: 8px; padding-top:6px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">' + template.header_2 + '</h3>' +
+							'</td>' +
+							'<td align="right" style="border-width: 0px;">' +
+								'<img src="https://reporthub.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="40%" />' +
+							'</td>' +
+						'</table>';	
+					
+					// theader
+					page_html_body += '' +
+						'<table style="width:100%">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>SL#</th>' +
+								'<th>HH Number</th>' +
+								'<th>FCN</th>' +
+								'<th>Scope</th>' +
+								'<th>HH Name</th>' +
+								'<th>Gender</th>' +
+								'<th>Sub Block</th>' +
+								'<th>Family Size</th>' +
+								'<th>GFD</th>' +
+								'<th>Thumb</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>';
+
+				}
+
+				// content
+				page_html_body += '' +
+					'<tr>' +
+						'<td align="center" style="font-size:8px">' + b.sl_number  + '</td>' +
+						'<td width="14%" style="font-size:8px">' + b.gfd_id + '</td>' +
+						'<td style="font-size:8px">' + b.fcn_id + '</td>' +
+						'<td style="font-size:8px">' + b.scope_id + '</td>' +
+						'<td width="12%">' + b.hh_name + '</td>' +
+						'<td align="center">' + b.hh_gender + '</td>' +
+						'<td align="center">' + b.admin5name + '</td>' +
+						'<td align="center">' + b.gfd_family_size + '</td>' +
+						'<td>' + gfd_entitlement + '</td>' +
+						'<td width="20%" height="40px;"></td>' +
+					'</tr>';
+
+				// end table
+				if ( i === distribution_groups[ family_size ].length -1 || beneficiary_page_count === beneficiary_page_length ) {
+					
+					// page break
+					if ( distribution_list_counter !== distribution_list_length ) {
+
+						// end
+						page_html_body += '</tbody></table>';
+
+						// approval content
+						page_html_body += '' +
+							'<table style="width: 100%; border-width: 0px; font-family: verdana, arial, sans-serif; font-size: 8px; color: #333333; margin: 10px 0px 0px 0px;">' +
+								'<td style="width: 25%; border-width: 0px;" align="left">' +
+									'Prepared by:' +
+								"</td>" +
+								'<td style="width: 25%; border-width: 0px;" align="left">' +
+									'Checked by:' +
+								"</td>" +
+								'<td style="width: 25%; border-width: 0px;" align="left">' +
+									'Approved by:' +
+								"</td>" +
+							'</table>';
+
+						// page break
+						page_html_body += '<div style="page-break-before: always;"></div>';
+
+					}
+				
+				}
+				
+				// ++
+				// new family activated
+				new_family_size = false;		
+				beneficiary_page_count++;
+
+			}
 
 		}
 
