@@ -387,8 +387,7 @@ var GfaDashboardController = {
 					var admin4 = _.sortBy( _.unique( beneficiaries, 'admin4pcode' ), 'admin4name' ); 
 					var admin5 = _.sortBy( _.unique( beneficiaries, 'admin5pcode' ), 'admin5name' );
 					var site_id = _.sortBy( _.unique( beneficiaries, 'site_id' ), 'site_name' );
-					var dates_plan = _.sortBy( _.unique( beneficiaries, 'distribution_date_plan' ), 'distribution_date_plan' );
-					var dates_actual = _.sortBy( _.unique( beneficiaries, 'distribution_date_actual' ), 'distribution_date_actual' );
+					var dates = _.sortBy( _.unique( beneficiaries, 'distribution_date_plan' ), 'distribution_date_plan' );
 					
 					// set
 					value = {
@@ -396,8 +395,7 @@ var GfaDashboardController = {
 						admin4: admin4,
 						admin5: admin5,
 						site_id: site_id,
-						dates_plan: dates_plan,
-						dates_actual: dates_actual
+						dates: dates
 					}
 
 					break;
