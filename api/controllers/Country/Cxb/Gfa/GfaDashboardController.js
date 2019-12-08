@@ -112,9 +112,12 @@ var GfaDashboardController = {
 			.where( filters.admin3pcode )
 			.where( filters.admin4pcode )
 			.where( filters.admin5pcode )
-			.where( { or :[{ distribution_date_plan: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } },
-										{ distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } }] })
-			// .where( { distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { or: [{ 
+									distribution_date_plan: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } 
+								},{ 
+									distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } 
+								}] 
+							})
 			.exec( function( err, planned_beneficiaries ){
 
 				// return error
@@ -232,8 +235,12 @@ var GfaDashboardController = {
 			.where( filters.admin3pcode )
 			.where( filters.admin4pcode )
 			.where( filters.admin5pcode )
-			.where( { distribution_date_plan: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
-			.where( { distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { or: [{ 
+									distribution_date_plan: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } 
+								},{ 
+									distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } 
+								}] 
+							})
 			.exec( function( err, absent_beneficiaries ){
 
 				// return error
