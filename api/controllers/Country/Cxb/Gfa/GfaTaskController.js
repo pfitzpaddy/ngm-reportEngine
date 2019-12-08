@@ -1205,7 +1205,7 @@ var GfaTaskController = {
 									if ( err ) return res.negotiate( err );
 
 									// if in past, place back to plan / actual
-									if ( moment().isAfter( moment( distribution_date_actual ) ) ) {
+									if ( moment().isAfter( moment( absent_beneficiary.distribution_date_actual ) ) ) {
 										
 										// set to actual
 										var actual = update[ 0 ];
