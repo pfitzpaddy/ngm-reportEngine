@@ -484,8 +484,7 @@ var GfaTaskController = {
 					}
 
 					// add to planned
-					// planned = Object.assign( { sl_number: d[ 0 ], distribution_date: d[ 1 ] }, organization, distribution, distribution_site, camp_block );
-					planned = Object.assign( { sl_number: d[ 0 ], distribution_date: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
+					planned = Object.assign( { sl_number: d[ 0 ], distribution_date_plan: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ), distribution_date_actual: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
 
 					// variables
 					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ] : d[ 10 ];
@@ -1095,7 +1094,6 @@ var GfaTaskController = {
 		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 2 ];
 		// report details
 		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
-		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
 
 		// filter
 		var filter = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution }
@@ -1116,7 +1114,7 @@ var GfaTaskController = {
 					.findOne()
 					.where({ site_id: form.site_id })
 					.where({ report_distribution: report_distribution })
-					.sort({ distribution_date: 'DESC' })
+					.sort({ distribution_date_plan: 'DESC' })
 					.limit( 1 )
 					.exec( function( err, end_date ) {
 						// return error
@@ -1131,20 +1129,22 @@ var GfaTaskController = {
 								if ( err ) return res.negotiate( err );
 								
 								// add kobo form ids
-								planned.uuid = form.uuid;
-								planned.form_id = form.form_id;
-								planned.form_url = form.form_url;
-								planned.kobo_id = kobo_id;
+								var absent = planned;
+										absent.uuid = form.uuid;
+										absent.form_id = form.form_id;
+										absent.form_url = form.form_url;
+										absent.kobo_id = kobo_id;
+										absent.distribution_status = 'absent';
 						
 								// update absent table for beneficiary
 								AbsentBeneficiaries
-									.updateOrCreate( filter, planned, function ( err, destroy_result ) {
+									.updateOrCreate( filter, absent, function ( err, destroy_result ) {
 										// return error
 										if ( err ) return res.negotiate( err );
 
 										// set new end date for beneficiary
 										PlannedBeneficiaries
-											.update( filter, { distribution_date: end_date.distribution_date })
+											.update( filter, { distribution_date_actual: end_date.distribution_date_plan })
 											.exec( function( err, updated_plan ) {
 												// return error
 												if ( err ) return res.negotiate( err );
@@ -1171,16 +1171,20 @@ var GfaTaskController = {
 	removeAbsentBeneficiary: function( req, res ){
 
 		// check req
-		if ( !req.param('fcn_id') && !req.param('site_id') && !req.param('report_round') && !req.param('report_distribution') && !req.param('distribution_date') ) {
+		if ( !req.param('gfd_id') && !req.param('fcn_id') && !req.param('site_id') && !req.param('report_round') && !req.param('report_distribution') && !req.param('distribution_date') ) {
 			return res.json( 401, { err: 'fcn_id, site_id, report_round, report_distribution, distribution_date!' });
 		}
 		
 		// set actual_fcn_id
+		var gfd_id = req.param( 'gfd_id' );
 		var fcn_id = req.param( 'fcn_id' );
 		var site_id = req.param( 'site_id' );
 		var report_round = req.param( 'report_round' );
 		var report_distribution = req.param( 'report_distribution' );
-		var distribution_date = req.param( 'distribution_date' );
+		var distribution_date_actual = req.param( 'distribution_date' );
+
+		// filter
+		var filter = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution }
 
 		// gfd forms
 		GfdForms
@@ -1193,22 +1197,22 @@ var GfaTaskController = {
 
 					// find from plan
 					PlannedBeneficiaries
-						.update({ fcn_id: fcn_id, report_distribution: report_distribution }, { distribution_date: distribution_date })
+						.update( filter, { distribution_date_actual: distribution_date_actual })
 						.exec( function( err, update ){
 							// return error
 							if ( err ) return res.negotiate( err );
 
 							// if in past, place back to plan / actual
-							if ( moment().isAfter( moment( distribution_date ) ) ) {
+							if ( moment().isAfter( moment( distribution_date_actual ) ) ) {
 								
 								// set to actual
-								var absent = update[ 0 ];
-								absent.distribution_status = 'actual';
+								var actual = update[ 0 ];
+								actual.distribution_status = 'actual';
 
 								// remove beneficiary from actual beneficiaries
 								Promise.all([
-									ActualBeneficiaries.create( absent ),
-									AbsentBeneficiaries.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
+									ActualBeneficiaries.create( actual ),
+									AbsentBeneficiaries.destroy( filter )
 								])
 								.catch( function( err ) {
 									return res.negotiate( err );
@@ -1235,7 +1239,7 @@ var GfaTaskController = {
 							} else {
 								// remove
 								AbsentBeneficiaries
-									.destroy({ fcn_id: fcn_id, report_distribution: report_distribution  })
+									.destroy( filter )
 									.exec( function( err, destroy ) {
 										// return error
 										if ( err ) return res.negotiate( err );
@@ -1247,6 +1251,7 @@ var GfaTaskController = {
 						});
 
 			});
+	
 	}, 
 
 	// set planned to actual
@@ -1258,7 +1263,7 @@ var GfaTaskController = {
 		// find from plan
 		PlannedBeneficiaries
 			.find()
-			.where({ distribution_date: today })
+			.where({ distribution_date_actual: today })
 			.exec( function( err, planned_beneficiaries ) {
 				
 				// return error
@@ -1266,14 +1271,26 @@ var GfaTaskController = {
 
 				// if records
 				if ( planned_beneficiaries.length ) {
-					// set to actual
-					ActualBeneficiaries
-						.create( planned_beneficiaries )
-						.exec( function( err, result ) {
+					// set to planned_beneficiaries
+					async.each( planned_beneficiaries, function ( data, next ) {
+
+						// status to actual
+						data.distribution_status = 'actual'
+
+						// set to actual
+						ActualBeneficiaries
+							.updateOrCreate( { id: data.id }, data, function ( err, result ) {
+								// return error
+								if ( err ) return res.negotiate( err );
+								// next
+								next();
+							});
+
+						}, function ( err ) {
 							// return error
 							if ( err ) return res.negotiate( err );
 							// return success
-							return res.json( 200, { msg: 'Success!' });
+							return res.json( 200, { msg: 'Success!' });							
 						});
 
 				}
@@ -1321,6 +1338,9 @@ var GfaTaskController = {
 
 					// set to planned_beneficiaries
 					async.each( planned_beneficiaries, function ( data, next ) {
+
+						// status to actual
+						data.distribution_status = 'actual'
 
 						// set to actual
 						ActualBeneficiaries

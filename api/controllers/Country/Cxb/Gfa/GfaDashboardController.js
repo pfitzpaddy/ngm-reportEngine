@@ -93,20 +93,13 @@ var GfaDashboardController = {
 		}
 
 		// filters
-		// var filters = {
-		// 	organization_tag: params.organization_tag === 'wfp' ? {} : { organization_tag: params.organization_tag },
-		// 	site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
-		// 	admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
-		// 	admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
-		// 	admin5pcode: params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
-		// }
 		var filters = {
-			organization_tag: params.organization_tag === 'wfp' ? { organization_tag: { $exists: true } } : { organization_tag: params.organization_tag },
-			site_id: params.site_id === 'all' ? { site_id: { $exists: true } } : { site_id: params.site_id },
-			admin3pcode: params.admin3pcode === 'all' ? { admin3pcode: { $exists: true } } : { admin3pcode: params.admin3pcode },
-			admin4pcode: params.admin4pcode === 'all' ? { admin4pcode: { $exists: true } } : { admin4pcode: params.admin4pcode },
-			admin5pcode: params.admin5pcode === 'all' ? { admin5pcode: { $exists: true } } : { admin5pcode: params.admin5pcode }
-		}		
+			organization_tag: params.organization_tag === 'wfp' ? {} : { organization_tag: params.organization_tag },
+			site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
+			admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
+			admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
+			admin5pcode: params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
+		}
 
 		// distribution
 		PlannedBeneficiaries
@@ -119,7 +112,8 @@ var GfaDashboardController = {
 			.where( filters.admin3pcode )
 			.where( filters.admin4pcode )
 			.where( filters.admin5pcode )
-			.where( { distribution_date: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { distribution_date_plan: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
 			.exec( function( err, planned_beneficiaries ){
 
 				// return error
@@ -178,7 +172,7 @@ var GfaDashboardController = {
 			.where( filters.admin3pcode )
 			.where( filters.admin4pcode )
 			.where( filters.admin5pcode )
-			.where( { distribution_date: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
 			.exec( function( err, actual_beneficiaries ){
 
 				// return error
@@ -237,7 +231,8 @@ var GfaDashboardController = {
 			.where( filters.admin3pcode )
 			.where( filters.admin4pcode )
 			.where( filters.admin5pcode )
-			.where( { distribution_date: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { distribution_date_plan: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
+			.where( { distribution_date_actual: { '>=': moment( params.start_date ).format( 'YYYY-MM-DD' ), '<=': moment( params.end_date ).format( 'YYYY-MM-DD' ) } } )
 			.exec( function( err, absent_beneficiaries ){
 
 				// return error
@@ -392,7 +387,8 @@ var GfaDashboardController = {
 					var admin4 = _.sortBy( _.unique( beneficiaries, 'admin4pcode' ), 'admin4name' ); 
 					var admin5 = _.sortBy( _.unique( beneficiaries, 'admin5pcode' ), 'admin5name' );
 					var site_id = _.sortBy( _.unique( beneficiaries, 'site_id' ), 'site_name' );
-					var dates = _.sortBy( _.unique( beneficiaries, 'distribution_date' ), 'distribution_date' );
+					var dates_plan = _.sortBy( _.unique( beneficiaries, 'distribution_date_plan' ), 'distribution_date_plan' );
+					var dates_actual = _.sortBy( _.unique( beneficiaries, 'distribution_date_actual' ), 'distribution_date_actual' );
 					
 					// set
 					value = {
@@ -400,7 +396,8 @@ var GfaDashboardController = {
 						admin4: admin4,
 						admin5: admin5,
 						site_id: site_id,
-						dates: dates,
+						dates_plan: dates_plan,
+						dates_actual: dates_actual
 					}
 
 					break;
@@ -577,7 +574,7 @@ var GfaDashboardController = {
 								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
 
 									// group by date
-									var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date' ), 'distribution_date' );
+									var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date_actual' ), 'distribution_date_actual' );
 
 									// distribution_dates
 									var dates_count = 0;
@@ -717,11 +714,11 @@ var GfaDashboardController = {
 
 					break;
 
-				case 'downloads_food_distribution':
+				case 'downloads_food_distribution_plan':
 
 					// fields 
 					var fields = [
-						'distribution_date',
+						'distribution_date_plan',
 						'organization',
 						'report_distribution',
 						'site_name',
@@ -772,8 +769,8 @@ var GfaDashboardController = {
 					// food distribution plan
 					var data = [];
 					beneficiaries.reduce( function( res, value ) {
-						// group by organization_tag + admin5pcode + distribution_date
-						var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date;
+						// group by organization_tag + admin5pcode + distribution_date_plan
+						var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date_plan;
 						if ( !res[ id ] ) {
 							res[ id ] = value;
 							res[ id ][ 'family_1_to_3' ] = 0;
@@ -811,12 +808,129 @@ var GfaDashboardController = {
 
 					// order by least important to most important
 					var filter = _.chain( data )
-						.sortBy( 'admin5name' )
-						.sortBy( 'admin4name' )
-						.sortBy( 'admin3name' )
-						.sortBy( 'distribution_date' )
-						.sortBy( 'organization' )
-						.value();
+												.sortBy( 'admin5name' )
+												.sortBy( 'admin4name' )
+												.sortBy( 'admin3name' )
+												.sortBy( 'distribution_date_plan' )
+												.sortBy( 'organization' )
+												.value();
+
+					// return csv
+					json2csv({ data: filter, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+
+						// error
+						if ( err ) return res.negotiate( err );
+
+						// success
+						value = { data: csv };
+
+						// return
+						return res.json( 200, value );
+
+					});
+
+					break;
+
+				case 'downloads_food_distribution_actual':
+
+					// fields 
+					var fields = [
+						'distribution_date_actual',
+						'organization',
+						'report_distribution',
+						'site_name',
+						'admin1name',
+						'admin2name',
+						'admin3name',
+						'admin4name',
+						'admin5name',
+						'majhee_name',
+						'family_1_to_3',
+						'family_4_to_7',
+						'family_8_to_10',
+						'family_11+',
+						'hh_total',
+						'rice',
+						'lentils',
+						'oil',
+						'entitlements',
+						'site_lng',
+						'site_lat',
+					];
+
+					// fieldNames
+					var fieldNames = [
+						'Date (YYYY-MM-DD)',
+						'Implementing Partner',
+						'Distribution',
+						'Distribution Point',
+						'Upazilla',
+						'Union',
+						'Camp',
+						'Block',
+						'Sub Block',
+						'Majhee Name',
+						'1 to 3',
+						'4 to 7',
+						'8 to 10',
+						'11+',
+						'HH Total',
+						'Rice',
+						'Lentils',
+						'Oil',
+						'Total',
+						'site_lng',
+						'site_lat',
+					];
+												
+					// food distribution plan
+					var data = [];
+					beneficiaries.reduce( function( res, value ) {
+						// group by organization_tag + admin5pcode + distribution_date_actual
+						var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date_actual;
+						if ( !res[ id ] ) {
+							res[ id ] = value;
+							res[ id ][ 'family_1_to_3' ] = 0;
+							res[ id ][ 'family_4_to_7' ] = 0;
+							res[ id ][ 'family_8_to_10' ] = 0;
+							res[ id ][ 'family_11+' ] = 0;
+							res[ id ][ 'hh_total' ] = 0;
+							data.push( res[ id ] );
+						} else {
+							// tally (initial values set with res[ id ] = value )
+							res[ id ].rice += value.rice;
+							res[ id ].lentils += value.lentils;
+							res[ id ].oil += value.oil;
+							res[ id ].entitlements += value.entitlements;
+						}
+
+						// family size
+						if ( value.gfd_family_size >= 0 && value.gfd_family_size <= 3 ) {
+							res[ id ][ 'family_1_to_3' ]++;
+						}
+						if ( value.gfd_family_size >= 4 && value.gfd_family_size <= 7 ) {
+							res[ id ][ 'family_4_to_7' ]++;
+						}
+						if ( value.gfd_family_size >= 8 && value.gfd_family_size <= 10 ) {
+							res[ id ][ 'family_8_to_10' ]++;
+						}
+						if ( value.gfd_family_size >= 11 ) {
+							res[ id ][ 'family_11+' ]++;
+						}
+						// count hh's
+						res[ id ][ 'hh_total' ]++;
+
+						return res;
+					}, {});
+
+					// order by least important to most important
+					var filter = _.chain( data )
+												.sortBy( 'admin5name' )
+												.sortBy( 'admin4name' )
+												.sortBy( 'admin3name' )
+												.sortBy( 'distribution_date_actual' )
+												.sortBy( 'organization' )
+												.value();
 
 					// return csv
 					json2csv({ data: filter, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
