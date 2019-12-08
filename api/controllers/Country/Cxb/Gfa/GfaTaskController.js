@@ -1100,8 +1100,8 @@ var GfaTaskController = {
 		// gfd forms
 		GfdForms
 			.findOne()
-			// .where({ uuid: uuid })
-			.where({ uuid: '493277e83b85413183e4d5c79eb31c35' })
+			.where({ uuid: uuid })
+			// .where({ uuid: '493277e83b85413183e4d5c79eb31c35' })
 			.exec( function( err, form ) {
 				// return error
 				if (err) return res.negotiate( err );
@@ -1116,8 +1116,6 @@ var GfaTaskController = {
 					.exec( function( err, end_date ) {
 						// return error
 						if ( err ) return res.negotiate( err );
-
-						console.log( end_date.distribution_date_plan );
 
 						// find from plan
 						PlannedBeneficiaries
