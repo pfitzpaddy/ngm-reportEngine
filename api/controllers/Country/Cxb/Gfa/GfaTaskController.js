@@ -702,10 +702,10 @@ var GfaTaskController = {
 
 							// update distribution_round
 							var survey_sheet = workbook.Sheets[ workbook.SheetNames[ 0 ] ];
+							survey_sheet[ 'E5' ].t = 's';
+							survey_sheet[ 'E5' ].v = report_round;
 							survey_sheet[ 'E6' ].t = 's';
-							survey_sheet[ 'E6' ].v = report_round;
-							survey_sheet[ 'E7' ].t = 's';
-							survey_sheet[ 'E7' ].v = report_distribution;
+							survey_sheet[ 'E6' ].v = report_distribution;
 
 							// settings
 							var survey_sheet = workbook.Sheets[ workbook.SheetNames[ 1 ] ];
@@ -1258,7 +1258,9 @@ var GfaTaskController = {
 	setActualDailyDistribution: function( req, res ){
 
 		// get today's date
-		var today = moment.utc().format( 'YYYY-MM-DD' );
+		// var today = moment.utc().format( 'YYYY-MM-DD' );
+		var today = '2019-12-08';
+		var today = '2019-12-07';
 
 		// find from plan
 		PlannedBeneficiaries
