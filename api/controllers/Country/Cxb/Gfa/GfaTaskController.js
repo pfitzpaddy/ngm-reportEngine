@@ -1104,7 +1104,8 @@ var GfaTaskController = {
 		// gfd forms
 		GfdForms
 			.findOne()
-			.where({ uuid: uuid })
+			// .where({ uuid: uuid })
+			.where({ uuid: '84a3bc9c8b9243ff85aeda3d0b71f286' })
 			.exec( function( err, form ) {
 				// return error
 				if (err) return res.negotiate( err );
@@ -1112,8 +1113,7 @@ var GfaTaskController = {
 				// find from plan
 				PlannedBeneficiaries
 					.findOne()
-					// .where({ site_id: form.site_id })
-					.where({ site_id: 'jamtoli' })
+					.where({ site_id: form.site_id })
 					.where({ report_distribution: report_distribution })
 					.sort({ distribution_date_plan: 'DESC' })
 					.limit( 1 )
