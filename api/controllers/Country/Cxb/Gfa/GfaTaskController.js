@@ -1261,9 +1261,7 @@ var GfaTaskController = {
 	setActualDailyDistribution: function( req, res ){
 
 		// get today's date
-		// var today = moment.utc().format( 'YYYY-MM-DD' );
-		var today = '2019-12-08';
-		// var today = '2019-12-07';
+		var today = moment.utc().format( 'YYYY-MM-DD' );
 
 		// find from plan
 		PlannedBeneficiaries
