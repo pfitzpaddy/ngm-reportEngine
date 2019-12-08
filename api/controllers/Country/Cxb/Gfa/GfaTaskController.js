@@ -1112,7 +1112,8 @@ var GfaTaskController = {
 				// find from plan
 				PlannedBeneficiaries
 					.findOne()
-					.where({ site_id: form.site_id })
+					// .where({ site_id: form.site_id })
+					.where({ site_id: 'jamtoli' })
 					.where({ report_distribution: report_distribution })
 					.sort({ distribution_date_plan: 'DESC' })
 					.limit( 1 )
