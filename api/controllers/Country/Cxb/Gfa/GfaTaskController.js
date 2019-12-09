@@ -1093,9 +1093,9 @@ var GfaTaskController = {
 
 		// filter
 		var filter = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution }
-		if ( scope_id ) {
-			filter.scope_id = scope_id;
-		}
+		// if ( scope_id ) {
+		// 	filter.scope_id = scope_id;
+		// }
 
 		// gfd forms
 		GfdForms
