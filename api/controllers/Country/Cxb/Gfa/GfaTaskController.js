@@ -273,7 +273,7 @@ var GfaTaskController = {
 			return res.json( 401, { err: 'round required!' });
 		}
 
-		// // open round?
+		// open round?
 		// if ( day !== round_1 && day !== round_2 ) {
 		// 	return res.json( 401, { err: 'round not open!' });
 		// }
@@ -294,9 +294,6 @@ var GfaTaskController = {
 			report.reporting_period = moment().add( 1, 'M' ).set( 'date', 1 ).startOf( 'day' ).format();
 			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_1 ) ).startOf( 'day' ).format();		
 
-			// set filter
-			var filter = { report_round: report.report_round, report_year: moment().year(), report_month_number: moment().month() };
-
 		} else {
 
 			// 
@@ -306,33 +303,40 @@ var GfaTaskController = {
 			report.reporting_period = moment().set( 'date', 1 ).startOf( 'day' ).format();
 			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_2 ) ).startOf( 'day' ).format();
 
-			// set filter
-			var filter = { report_round: report.report_round, report_year: moment().subtract( 1, 'M' ).year(), report_month_number: moment().subtract( 1, 'M' ).month() }
-
 		}
-
+		
 		// distribution
 		Distribution
-			.update( filter, { report_status: 'complete' } )
-			.exec( function( err, distribution ){
-
+			.findOne()
+			.where({ report_round: report.report_round })
+			.sort({ reporting_due_date: 'DESC' })
+			.exec( function( err, current_distribution ){
 				// return error
 				if (err) return res.negotiate( err );
 
-				// set report_distribution
-				report.report_distribution = parseInt( distribution[0].report_distribution ) + 2;
-				report.report_distribution = report.report_distribution.toString();
-
-				// find or create
+				// distribution
 				Distribution
-					.updateOrCreate( { report_round: report.report_round, report_month_number: report.report_month_number, report_year: report.report_year }, report, 
-					function( err, distribution ){
-
+					.update( { id: current_distribution.id }, { report_status: 'complete' } )
+					.exec( function( err, new_distribution ){
 						// return error
 						if (err) return res.negotiate( err );
 
-						// return
-						return res.json( 200, { msg: 'Success!' });
+						// set report_distribution
+						report.report_distribution = parseInt( new_distribution[0].report_distribution ) + 2;
+						report.report_distribution = report.report_distribution.toString();
+
+						// find or create
+						Distribution
+							.updateOrCreate( { report_round: report.report_round, report_month_number: report.report_month_number, report_year: report.report_year }, report, 
+							function( err, distribution ){
+
+								// return error
+								if (err) return res.negotiate( err );
+
+								// return
+								return res.json( 200, { msg: 'Success!' });
+
+							});
 
 					});
 
