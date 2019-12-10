@@ -141,10 +141,15 @@ module.exports.policies = {
   },
 
 
-  // Gfa (public)
+  // Gfa
   'Country/Cxb/Gfa/GfaTaskController': {
     '*': true
   }, 
+
+  // Gfa Controller
+  'Country/Cxb/Gfa/GfaDashboardController': {
+    '*': true
+  },
 
   /***************************************************************************
   *                                                                          *

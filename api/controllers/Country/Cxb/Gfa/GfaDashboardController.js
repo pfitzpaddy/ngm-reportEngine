@@ -72,8 +72,8 @@ var GfaDashboardController = {
 	getPlannedBeneficiariesIndicator: function( req, res ){
 
 		// check req
-		if ( !req.param('indicator') && !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('site_id') && !req.param('admin3pcode') && !req.param('admin4pcode') && !req.param('admin5pcode') && !req.param('start_date') && !req.param('end_date') ) {
-			return res.json( 401, { err: 'indicator, admin0pcode, organization_tag, report_round, site_id, admin3pcode, admin4pcode, admin5pcode, start_date, end_date required!' });
+		if ( !req.param('indicator') && !req.param('start_date') && !req.param('end_date') ) {
+			return res.json( 401, { err: 'indicator, start_date, end_date required!' });
 		}
 
 		// set params
@@ -94,19 +94,22 @@ var GfaDashboardController = {
 
 		// filters
 		var filters = {
-			organization_tag: params.organization_tag === 'wfp' ? {} : { organization_tag: params.organization_tag },
-			site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
-			admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
-			admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
-			admin5pcode: params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
+			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
+			report_round: !params.report_round ? {} : { report_round: params.report_round },
+			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
+			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
+			site_id: !params.site_id || params.site_id === 'all' ? {} : { site_id: params.site_id },
+			admin3pcode: !params.admin3pcode || params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
+			admin4pcode: !params.admin4pcode || params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
+			admin5pcode: !params.admin5pcode || params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
 		}
 
 		// distribution
 		PlannedBeneficiaries
 			.find()
-			.where( { admin0pcode: params.admin0pcode } )
-			.where( { report_round: params.report_round } )
-			.where( { report_distribution: params.report_distribution } )
+			.where( filters.admin0pcode )
+			.where( filters.report_round )
+			.where( filters.report_distribution )
 			.where( filters.organization_tag )
 			.where( filters.site_id )
 			.where( filters.admin3pcode )
@@ -134,8 +137,8 @@ var GfaDashboardController = {
 	getActualBeneficiariesIndicator: function( req, res ){
 
 		// check req
-		if ( !req.param('indicator') && !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('site_id') && !req.param('admin3pcode') && !req.param('admin4pcode') && !req.param('admin5pcode') && !req.param('start_date') && !req.param('end_date') ) {
-			return res.json( 401, { err: 'indicator, admin0pcode, organization_tag, report_round, site_id, admin3pcode, admin4pcode, admin5pcode, start_date, end_date required!' });
+		if ( !req.param('indicator') && !req.param('start_date') && !req.param('end_date') ) {
+			return res.json( 401, { err: 'indicator, start_date, end_date required!' });
 		}
 
 		// set params
@@ -145,7 +148,7 @@ var GfaDashboardController = {
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
 			report_round: req.param('report_round'),
-			report_distribution: req.param('report_distribution') ? req.param('report_distribution') : false,
+			report_distribution: req.param('report_distribution'),
 			site_id: req.param('site_id'),
 			admin3pcode: req.param('admin3pcode'),
 			admin4pcode: req.param('admin4pcode'),
@@ -156,9 +159,10 @@ var GfaDashboardController = {
 
 		// filters
 		var filters = {
-			organization_tag: params.organization_tag === 'wfp' ? {} : { organization_tag: params.organization_tag },
-			report_round: params.report_round === 'all' ? {} : { report_round: params.report_round },
+			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
+			report_round: !params.report_round ? {} : { report_round: params.report_round },
 			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
+			organization_tag: params.organization_tag === 'wfp' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
 			site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
 			admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
 			admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
@@ -168,10 +172,10 @@ var GfaDashboardController = {
 		// distribution
 		ActualBeneficiaries
 			.find()
-			.where( { admin0pcode: params.admin0pcode } )
-			.where( filters.organization_tag )
+			.where( filters.admin0pcode )
 			.where( filters.report_round )
 			.where( filters.report_distribution )
+			.where( filters.organization_tag )
 			.where( filters.site_id )
 			.where( filters.admin3pcode )
 			.where( filters.admin4pcode )
@@ -193,8 +197,8 @@ var GfaDashboardController = {
 	getAbsentBeneficiariesIndicator: function( req, res ){
 
 		// check req
-		if ( !req.param('indicator') && !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('site_id') && !req.param('admin3pcode') && !req.param('admin4pcode') && !req.param('admin5pcode') && !req.param('start_date') && !req.param('end_date') ) {
-			return res.json( 401, { err: 'indicator, admin0pcode, organization_tag, report_round, site_id, admin3pcode, admin4pcode, admin5pcode, start_date, end_date required!' });
+		if ( !req.param('indicator') && !req.param('start_date') && !req.param('end_date') ) {
+			return res.json( 401, { err: 'indicator, start_date, end_date required!' });
 		}
 
 		// set params
@@ -204,7 +208,7 @@ var GfaDashboardController = {
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
 			report_round: req.param('report_round'),
-			report_distribution: req.param('report_distribution') ? req.param('report_distribution') : false,
+			report_distribution: req.param('report_distribution'),
 			site_id: req.param('site_id'),
 			admin3pcode: req.param('admin3pcode'),
 			admin4pcode: req.param('admin4pcode'),
@@ -215,9 +219,10 @@ var GfaDashboardController = {
 
 		// filters
 		var filters = {
-			organization_tag: params.organization_tag === 'wfp' ? {} : { organization_tag: params.organization_tag },
-			report_round: params.report_round === 'all' ? {} : { report_round: params.report_round },
+			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
+			report_round: !params.report_round ? {} : { report_round: params.report_round },
 			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
+			organization_tag: params.organization_tag === 'wfp' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
 			site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
 			admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
 			admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
@@ -227,10 +232,10 @@ var GfaDashboardController = {
 		// distribution
 		AbsentBeneficiaries
 			.find()
-			.where( { admin0pcode: params.admin0pcode } )
-			.where( filters.organization_tag )
+			.where( filters.admin0pcode )
 			.where( filters.report_round )
 			.where( filters.report_distribution )
+			.where( filters.organization_tag )
 			.where( filters.site_id )
 			.where( filters.admin3pcode )
 			.where( filters.admin4pcode )
