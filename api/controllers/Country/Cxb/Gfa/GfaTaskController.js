@@ -274,9 +274,9 @@ var GfaTaskController = {
 		}
 
 		// open round?
-		// if ( day !== round_1 && day !== round_2 ) {
-		// 	return res.json( 401, { err: 'round not open!' });
-		// }
+		if ( day !== round_1 && day !== round_2 ) {
+			return res.json( 401, { err: 'round not open!' });
+		}
 
 		// create report
 		var report = {
