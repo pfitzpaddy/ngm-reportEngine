@@ -79,6 +79,7 @@ var GfaDashboardController = {
 		// set params
 		var params = {
 			indicator: req.param('indicator'),
+			format: req.param('format') ? req.param('format') : false,
 			download: req.param('download') ? true : false,
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
@@ -144,6 +145,7 @@ var GfaDashboardController = {
 		// set params
 		var params = {
 			indicator: req.param('indicator'),
+			format: req.param('format') ? req.param('format') : false,
 			download: req.param('download') ? true : false,
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
@@ -204,6 +206,7 @@ var GfaDashboardController = {
 		// set params
 		var params = {
 			indicator: req.param('indicator'),
+			format: req.param('format') ? req.param('format') : false,
 			download: req.param('download') ? true : false,
 			admin0pcode: req.param('admin0pcode'),
 			organization_tag: req.param('organization_tag'),
@@ -693,10 +696,12 @@ var GfaDashboardController = {
 						if ( err ) return res.negotiate( err );
 
 						// success
-						value = { data: csv };
-
-						// return
-						return res.json( 200, value );
+						if ( params.format === 'csv' ) {
+							res.set('Content-Type', 'text/csv');
+							return res.send( 200, csv );
+						} else {
+							return res.json( 200, { data: csv } );
+						}
 
 					});
 
@@ -716,10 +721,12 @@ var GfaDashboardController = {
 						if ( err ) return res.negotiate( err );
 
 						// success
-						value = { data: csv };
-
-						// return
-						return res.json( 200, value );
+						if ( params.format === 'csv' ) {
+							res.set('Content-Type', 'text/csv');
+							return res.send( 200, csv );
+						} else {
+							return res.json( 200, { data: csv } );
+						}
 
 					});
 
@@ -833,10 +840,12 @@ var GfaDashboardController = {
 						if ( err ) return res.negotiate( err );
 
 						// success
-						value = { data: csv };
-
-						// return
-						return res.json( 200, value );
+						if ( params.format === 'csv' ) {
+							res.set('Content-Type', 'text/csv');
+							return res.send( 200, csv );
+						} else {
+							return res.json( 200, { data: csv } );
+						}
 
 					});
 
@@ -950,10 +959,12 @@ var GfaDashboardController = {
 						if ( err ) return res.negotiate( err );
 
 						// success
-						value = { data: csv };
-
-						// return
-						return res.json( 200, value );
+						if ( params.format === 'csv' ) {
+							res.set('Content-Type', 'text/csv');
+							return res.send( 200, csv );
+						} else {
+							return res.json( 200, { data: csv } );
+						}
 
 					});
 
@@ -968,10 +979,12 @@ var GfaDashboardController = {
 						if ( err ) return res.negotiate( err );
 
 						// success
-						value = { data: csv };
-
-						// return
-						return res.json( 200, value );
+						if ( params.format === 'csv' ) {
+							res.set('Content-Type', 'text/csv');
+							return res.send( 200, csv );
+						} else {
+							return res.json( 200, { data: csv } );
+						}
 
 					});
 
@@ -986,10 +999,12 @@ var GfaDashboardController = {
 						if ( err ) return res.negotiate( err );
 
 						// success
-						value = { data: csv };
-
-						// return
-						return res.json( 200, value );
+						if ( params.format === 'csv' ) {
+							res.set('Content-Type', 'text/csv');
+							return res.send( 200, csv );
+						} else {
+							return res.json( 200, { data: csv } );
+						}
 
 					});
 
@@ -1004,10 +1019,12 @@ var GfaDashboardController = {
 						if ( err ) return res.negotiate( err );
 
 						// success
-						value = { data: csv };
-
-						// return
-						return res.json( 200, value );
+						if ( params.format === 'csv' ) {
+							res.set('Content-Type', 'text/csv');
+							return res.send( 200, csv );
+						} else {
+							return res.json( 200, { data: csv } );
+						}
 
 					});
 			

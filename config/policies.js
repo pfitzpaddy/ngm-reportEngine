@@ -151,6 +151,11 @@ module.exports.policies = {
     '*': true
   },
 
+    // Livelihoods Controller
+  'Country/Cxb/Livelihoods/LivelihoodsTaskController': {
+    '*': true
+  },
+
   /***************************************************************************
   *                                                                          *
   * Here's an example of mapping some policies to run before a controller    *

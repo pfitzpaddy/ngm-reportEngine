@@ -314,7 +314,9 @@ module.exports.routes = {
   'GET /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
   'POST /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
   
-  
+    
+  // WFP GFD
+
   // getKoboData
   'GET /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
   'POST /wfp/gfa/gfd/getKoboData': 'Country/Cxb/Gfa/GfaTaskController.getKoboData',
@@ -328,8 +330,6 @@ module.exports.routes = {
   'GET /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',
   'POST /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',  
 
-  
-
   // get PlannedBeneficiaries
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
   'POST /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
@@ -342,6 +342,15 @@ module.exports.routes = {
   // get AbsentBeneficiaries Indicator
   'GET /wfp/gfa/gfd/getAbsentBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getAbsentBeneficiariesIndicator',
   'POST /wfp/gfa/gfd/getAbsentBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getAbsentBeneficiariesIndicator',  
+
+  // WFP Livelihoods
+
+  // setLivelihoodsDataset
+  'GET /wfp/livelihoods/setLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDataset',
+  'POST /wfp/livelihoods/setLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDataset',
+  // 
+  'GET /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',
+  'POST /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',  
 
   /***************************************************************************
   *                                                                          *

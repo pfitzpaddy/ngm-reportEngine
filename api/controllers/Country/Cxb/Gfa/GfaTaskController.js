@@ -854,7 +854,7 @@ var GfaTaskController = {
 									subject: 'Form Import Error - ' + form.form_title + '!'
 								}, function(err) {
 
-									return error
+									// return error
 									if (err) return res.negotiate( err );
 
 									// add deplotmnet complete
@@ -896,7 +896,7 @@ var GfaTaskController = {
 											subject: 'Form Update Error - ' + form.form_title + '!'
 										}, function(err) {
 
-											return error
+											// return error
 											if (err) return res.negotiate( err );
 
 											// add deplotmnet complete
@@ -1105,7 +1105,6 @@ var GfaTaskController = {
 		GfdForms
 			.findOne()
 			.where({ uuid: uuid })
-			// .where({ uuid: '493277e83b85413183e4d5c79eb31c35' })
 			.exec( function( err, form ) {
 				// return error
 				if (err) return res.negotiate( err );
