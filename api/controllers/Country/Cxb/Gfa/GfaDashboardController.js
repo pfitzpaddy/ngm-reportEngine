@@ -188,8 +188,6 @@ var GfaDashboardController = {
 				// return error
 				if (err) return res.negotiate( err );
 
-				console.log( actual_beneficiaries.length )
-
 				// calculate indicators
 				GfaDashboardController.setIndicator( params, filters, actual_beneficiaries, res );
 
