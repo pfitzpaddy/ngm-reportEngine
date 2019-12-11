@@ -252,7 +252,7 @@ var LivelihoodsTaskController = {
 					d.download_small_url = data[ '_attachments' ][0].download_small_url;
 					d.download_medium_url = data[ '_attachments' ][0].download_medium_url;
 					d.download_large_url = data[ '_attachments' ][0].download_large_url;
-					d._attachments = data[ '_attachments' ];
+					// d._attachments = data[ '_attachments' ];
 				}
 
 				// kobo
