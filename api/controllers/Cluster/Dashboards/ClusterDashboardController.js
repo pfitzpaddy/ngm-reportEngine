@@ -662,7 +662,69 @@ var ClusterDashboardController = {
 					}else{
 							filters.project_donor_id = {};
 
+
+					};
+
+
+                 //fiter implementer partner from projects plan or 4wplus activities dasbhoards
+					if(req.param('implementer') && req.param('implementer') !== 'all'){
+
+						implementing_partner = req.param('implementer');
+						filters.implementing_partners = { 'implementing_partners' :{ $elemMatch : { 'organization_tag' : implementing_partner}}};
+						
+					}else{
+							filters.implementing_partners = {};
+
+					};
+
+
+				
+					//fiter project type and is hrp plan? from projects plan or 4wplus activities dasbhoards
+					if( (req.param('project_type_component')&&req.param('project_type_component')!=='all')  &&  ( req.param('hrpplan') !=='all' && req.param('hrpplan') === 'true') ){
+        
+					        //is not possible implement operator $and
+					        plan_component = req.param('project_type_component');
+					        filters.plan_component = {'plan_component': { $in: [plan_component, 'hrp_plan']}};
+					        
+					      }else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
+					        
+					        plan_component = req.param('project_type_component');
+
+					        filters.plan_component = { 'plan_component' : { $in: [plan_component], $nin: ['hrp_plan']}};
+					        // delete filterObject.project_type_component;
+					        // delete filterObject.hrpplan;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
+					        
+					        plan_component = req.param('project_type_component');
+					        filters.plan_component = { 'plan_component' : { $in: [plan_component]}};
+					        // delete queryProject.project_type_component;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
+					        
+					         filters.plan_component = { 'plan_component': { $in: ['hrp_plan']}};
+					       //  delete queryProject.hrpplan;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
+					         filters.plan_component = { 'plan_component': { $nin: ['hrp_plan']}};
+					      //   delete queryProject.hrpplan;
+					      }else{
+
+					      	filters.plan_component = {};
+
+					      }
+
+					      //fiter activity type from projects plan or 4wplus activities dasbhoards
+
+					if(req.param('activity_type_id') && req.param('activity_type_id') !== 'all'){
+							activity_type_id = req.param('activity_type_id');
+							filters.activity_type_id = { 'activity_type_id': activity_type_id} ;
+
 						};
+
+
+
+		                       
 
 
 				// get beneficiaries by project
@@ -675,6 +737,9 @@ var ClusterDashboardController = {
 					.where( filters.admin2pcode )
 					.where( filters.cluster_id )
 					.where( filters.project_donor_id )
+					.where( filters.implementing_partners)
+					.where( filters.plan_component)
+					.where( filters.activity_type_id)
 					.where( filters.acbar_partners )
 					.where( filters.organization_tag )
 					.where( { project_budget_date_recieved: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } } )
@@ -808,6 +873,53 @@ var ClusterDashboardController = {
 							filterObject.project_donor = { $elemMatch : { 'project_donor_id' : req.param('donor')}};
 
 						}
+
+						//fiter implementer partner from projects plan or 4wplus activities dasbhoards
+
+
+						if(req.param('implementer') && req.param('implementer') !== 'all'){
+							filterObject.implementing_partners = { $elemMatch : { 'organization_tag' : req.param('implementer')}};
+
+						}
+
+						//fiter project type and is hrp plan? from projects plan or 4wplus activities dasbhoards
+
+						 if( (req.param('project_type_component')&&req.param('project_type_component')!=='all')  &&  ( req.param('hrpplan') !=='all' && req.param('hrpplan') === 'true') ){
+        
+					        //is not possible implement operator $and
+					        filterObject.plan_component = {$in: [req.param('project_type_component'), 'hrp_plan']};
+					        ///filterObject.plan_component = {$and: [ { plan_component : {$in: [req.param('project_type_component')]} } , {plan_component: {$in:["hrp_plan"]}}]};
+					        
+					             
+					      }else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
+					        
+					        filterObject.plan_component = { $in: [req.param('project_type_component')], $nin: ['hrp_plan']};
+					        // delete filterObject.project_type_component;
+					        // delete filterObject.hrpplan;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
+					        
+					        filterObject.plan_component = {$in: [req.param('project_type_component').project_type_component]};
+					        // delete queryProject.project_type_component;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
+					       
+					         filterObject.plan_component = {$in: ['hrp_plan']};
+					       //  delete queryProject.hrpplan;
+
+					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
+					         filterObject.plan_component = {$nin: ['hrp_plan']};
+					      //   delete queryProject.hrpplan;
+					      }
+
+					      //fiter activity type from projects plan or 4wplus activities dasbhoards
+
+						  if(req.param('activity_type_id') && req.param('activity_type_id') !== 'all'){
+												//activity_typeid = req.param('activity_type_id');
+							filterObject.activity_type_id = req.param('activity_type_id');
+
+						  }
+
 
 						collection.find(filterObject).toArray(function (err, beneficiaries) {
 							if (err) return res.serverError(err);

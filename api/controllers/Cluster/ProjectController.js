@@ -206,7 +206,8 @@ var ProjectController = {
       }
 
     var allowedParams =
-          ['project_id','organization_id','cluster_id','organization_id','organization_tag','adminRpcode', 'admin0pcode', 'project_start_date', 'project_end_date','donor_id'];
+        ['project_id','organization_id','cluster_id','organization_tag','implementer_id','project_type_component','activity_type_id','hrpplan','adminRpcode', 'admin0pcode','admin1pcode','admin2pcode', 'project_start_date', 'project_end_date', 'donor_id'];
+
 
       // if dissallowed parameters sent
       if (reqQuery && _.difference(Object.keys(reqQuery), allowedParams).length > 0) {
@@ -225,10 +226,80 @@ var ProjectController = {
         if (query.adminRpcode) query.adminRpcode = query.adminRpcode.toUpperCase();
         if (query.admin0pcode) query.admin0pcode = query.admin0pcode.toUpperCase();
 
+        //donor filter from 4wplus project plan and activities dashboards
         if (reqQuery.donor_id) {
           query.project_donor = { $elemMatch: { 'project_donor_id': reqQuery.donor_id } };
           delete query.donor_id;
         }
+
+        //admin1 and admin2 filters
+          var targlocped = new Date(reqQuery.project_end_date);
+          var targlocpsd = new Date(reqQuery.project_start_date);
+         
+        querylocations = {
+          adminRpcode: reqQuery.adminRpcode,
+          admin0pcode: reqQuery.admin0pcode,
+          project_start_date: { $lte: targlocped },
+          project_end_date: { $gte: targlocpsd },
+          organization_tag: { '$nin': [ 'immap', 'arcs' ] } 
+        };
+
+       if(reqQuery.admin1pcode){
+        querylocations.admin1pcode = reqQuery.admin1pcode;
+      }
+
+       delete query.admin1pcode;
+
+        if(reqQuery.admin2pcode){
+        querylocations.admin2pcode = reqQuery.admin2pcode;
+
+      }
+
+      delete query.admin2pcode;
+
+    
+      //implementing partner filter from 4wplus project plan and activities dashboards
+      if( reqQuery.implementer_id){
+         query.implementing_partners = { $elemMatch : { 'organization_tag' : reqQuery.implementer_id}};
+         delete query.implementer_id;
+             
+      }
+
+      //project type and is hrp plan? filter from 4wplus project plan and activities dashboards
+       if( reqQuery.project_type_component &&  (reqQuery.hrpplan && reqQuery.hrpplan === 'true')){
+        
+         query.plan_component = {$in: [reqQuery.project_type_component, 'hrp_plan']};
+         delete query.project_type_component;
+         delete query.hrpplan;
+             
+      }else if(reqQuery.project_type_component && (reqQuery.hrpplan && reqQuery.hrpplan === 'false')){
+        
+        query.plan_component = { $in: [reqQuery.project_type_component], $nin: ['hrp_plan']};
+         delete query.project_type_component;
+         delete query.hrpplan;
+
+      }else if(reqQuery.project_type_component && !reqQuery.hrpplan){
+        
+        query.plan_component = {$in: [reqQuery.project_type_component]};
+         delete query.project_type_component;
+
+      }else if(!reqQuery.project_type_component &&  (reqQuery.hrpplan && reqQuery.hrpplan === 'true')){
+       
+         query.plan_component = {$in: ['hrp_plan']};
+         delete query.hrpplan;
+
+      }else if(!reqQuery.project_type_component &&  (reqQuery.hrpplan && reqQuery.hrpplan === 'false')){
+         query.plan_component = {$nin: ['hrp_plan']};
+         delete query.hrpplan;
+      }
+
+       
+       //activity type filter from 4wplus project plan and activities dashboards
+      if( reqQuery.activity_type_id){
+         query.activity_type = { $elemMatch : { 'activity_type_id' : reqQuery.activity_type_id}};
+         delete query.activity_type_id;
+             
+      }
 
         // exclude immap
         if (!reqQuery.organization_tag && !reqQuery.project_id) {
@@ -242,6 +313,7 @@ var ProjectController = {
           query.project_start_date = { $lte: ped };
           query.project_end_date = { $gte: psd };
         }
+
 
         if (reqQuery.cluster_id) {
           // include multicluster projects
@@ -318,12 +390,13 @@ var ProjectController = {
                     })
                   });
 
-
                   return Promise.props({
                     project: Project.find( queryProject ),
                     budget: BudgetProgress.find( query ),
+
                     targetbeneficiaries: TargetBeneficiaries.find( query ),
-                    targetlocations: TargetLocation.find( query ),
+                   // targetlocations: TargetLocation.find( query ),
+                    targetlocations: TargetLocation.find(querylocations),
                     beneficiaries: queryBeneficiaries,
                     //project documents
                     documents: Documents.find(queryByAdmin),
@@ -337,6 +410,33 @@ var ProjectController = {
       // no project found
       if ( !data.project.length ) return Promise.reject('NO PROJECT');
 
+      //new Projects array to print in the csv
+       $projectsToPrint = [];
+
+             //admin1pcode filter, filter the projects by admin1pcode
+             if(querylocations.admin1pcode){
+
+                    async.each(data.project, function(pro){
+
+                      const exist2  = _.filter(data.targetlocations, { 'project_id': pro.id});
+                        //console.log("TAMAÑO existe2? : ",exist2.length);
+
+                        if(exist2.length >0){
+
+                          $projectsToPrint.push(pro);
+
+                        }
+
+
+
+                    });
+                 }else{ 
+             
+                   $projectsToPrint = data.project
+
+                    
+                  }
+
       // all projects
       $project = [];
 
@@ -346,7 +446,9 @@ var ProjectController = {
       var uppendDataToProject = function(project){
 
                     var projectId = project.id;
-                    var i = data.project.indexOf(project);
+                    //var i = data.project.indexOf(project);
+                    var i = $projectsToPrint.indexOf(project);
+
                     // assemble project data
                     $project[i] = project;
                     $project[i].project_budget_progress = _.filter(data.budget, { 'project_id' : projectId}) ;
@@ -410,7 +512,11 @@ var ProjectController = {
                     // callback if error or post work can be called here `cb()`;
                 };
 
-      async.each(data.project, uppendDataToProject);
+      //async.each(data.project, uppendDataToProject);
+
+
+      async.each($projectsToPrint, uppendDataToProject);
+
 
       return $project;
     },
@@ -430,7 +536,7 @@ var ProjectController = {
 
 
         //columns to COL or columns to others countries
-        if (queryProject.admin0pcode === 'col') {
+        if (queryProject.admin0pcode === 'COL') {
 
           // var fields = [ 'cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone','project_code','project_title', 'project_description', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency','urls_list', 'project_gender_marker','project_donor_list' , 'implementing_partners_list','componente_humanitario','plan_hrp_plan','componente_construccion_de_paz','componente_desarrollo_sostenible','plan_interagencial','componente_flujos_migratorios','plan_rmrp_plan','strategic_objectives_list', 'beneficiary_type_list','activity_type_list','target_beneficiaries_list','undaf_desarrollo_paz_list','acuerdos_de_paz_list','dac_oecd_development_assistance_committee_list','ods_objetivos_de_desarrollo_sostenible_list', 'target_locations_list','createdAt']
 
@@ -539,7 +645,7 @@ var ProjectController = {
 
             //values in columns to COL or values to others countries
 
-            if(queryProject.admin0pcode == 'col'){
+            if(queryProject.admin0pcode == 'COL'){
 
               project.urls_list = seturls(project.documents);
 
