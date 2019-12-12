@@ -225,11 +225,11 @@ var GfaDashboardController = {
 			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
 			report_round: !params.report_round ? {} : { report_round: params.report_round },
 			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
-			organization_tag: params.organization_tag === 'wfp' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
-			site_id: params.site_id === 'all' ? {} : { site_id: params.site_id },
-			admin3pcode: params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
-			admin4pcode: params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
-			admin5pcode: params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
+			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
+			site_id: !params.site_id || params.site_id === 'all' ? {} : { site_id: params.site_id },
+			admin3pcode: !params.admin3pcode || params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
+			admin4pcode: !params.admin4pcode || params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
+			admin5pcode: !params.admin5pcode || params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode }
 		}
 
 		// distribution
