@@ -1167,6 +1167,69 @@ var GfaTaskController = {
 
 	},
 
+	setAbsentDistributionDateById: function( req, res ){
+
+		// check req
+		if ( !req.param('id') && !req.param('distribution_date_actual') ) {
+			return res.json( 401, { err: 'id, distribution_date_actual required!' });
+		}
+
+		// set params
+		var ids = req.param('id');
+		var distribution_date_actual = req.param('distribution_date_actual');
+
+		// remove beneficiary from actual beneficiaries
+		Promise.all([
+			PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+			AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } )
+		])
+		.catch( function( err ) {
+			return res.negotiate( err );
+		})
+		.then( function( result ) {
+			return res.json( 200, { msg: 'Success!' });
+		});
+
+	},
+
+	// by array of ids
+	setAbsentDistributionDatesByArray: function( req, res ){
+
+		// check req
+		if ( !req.param('ids') && !req.param('distribution_date_actual') ) {
+			return res.json( 401, { err: 'ids, distribution_date_actual required!' });
+		}
+
+		// set params
+		var ids = req.param('ids');
+		var distribution_date_actual = req.param('distribution_date_actual');
+
+		// attempted 'in' and native query '$in' to search array without success
+
+		// going for async :'(
+		async.each( ids, function ( id, next ) {
+
+			// remove beneficiary from actual beneficiaries
+			Promise.all([
+				PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+				AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } )
+			])
+			.catch( function( err ) {
+				return res.negotiate( err );
+			})
+			.then( function( result ) {
+				next();
+			});
+
+		}, function ( err ) {
+			// return error
+			if ( err ) return res.negotiate( err );
+			// return success
+			return res.json( 200, { msg: 'Success!' });							
+		});
+
+	},
+
 	// remove beneficiary 
 	removeAbsentBeneficiary: function( req, res ){
 

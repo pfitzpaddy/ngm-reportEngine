@@ -326,10 +326,20 @@ module.exports.routes = {
   // set plan to actual for distribution
   'GET /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
   'POST /wfp/gfa/gfd/setActualDistribution': 'Country/Cxb/Gfa/GfaTaskController.setActualDistribution',
+  // update distribution date
+  'GET /wfp/gfa/gfd/setAbsentDistributionDateById': 'Country/Cxb/Gfa/GfaTaskController.setAbsentDistributionDateById',
+  'POST /wfp/gfa/gfd/setAbsentDistributionDateById': 'Country/Cxb/Gfa/GfaTaskController.setAbsentDistributionDateById',
+  // update distribution dates by array
+  'GET /wfp/gfa/gfd/setAbsentDistributionDatesByArray': 'Country/Cxb/Gfa/GfaTaskController.setAbsentDistributionDatesByArray',
+  'POST /wfp/gfa/gfd/setAbsentDistributionDatesByArray': 'Country/Cxb/Gfa/GfaTaskController.setAbsentDistributionDatesByArray',
+  
   // remove absent beneficiary
   'GET /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',
   'POST /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',  
 
+  // get getDistributionDates
+  'GET /wfp/gfa/gfd/getDistributionDates': 'Country/Cxb/Gfa/GfaDashboardController.getDistributionDates',
+  'POST /wfp/gfa/gfd/getDistributionDates': 'Country/Cxb/Gfa/GfaDashboardController.getDistributionDates',
   // get PlannedBeneficiaries
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
   'POST /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
@@ -348,7 +358,7 @@ module.exports.routes = {
   // setLivelihoodsDataset
   'GET /wfp/livelihoods/setLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDataset',
   'POST /wfp/livelihoods/setLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDataset',
-  // 
+  //  getLivelihoodsDataset
   'GET /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',
   'POST /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',  
 
