@@ -1175,19 +1175,24 @@ var GfaTaskController = {
 		}
 
 		// set params
-		var ids = req.param('id');
+		var id = req.param('id');
 		var distribution_date_actual = req.param('distribution_date_actual');
+
+		// if actual collection is effected
+		var refresh = false;
 
 		// remove beneficiary from actual beneficiaries
 		Promise.all([
 			PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
-			AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } )
+			AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+			ActualBeneficiaries.destroy( { id: id, distribution_date_actual: distribution_date_actual } )
 		])
 		.catch( function( err ) {
 			return res.negotiate( err );
 		})
 		.then( function( result ) {
-			return res.json( 200, { msg: 'Success!' });
+			refresh = result[ 2 ].length;
+			return res.json( 200, { msg: 'Success!', refresh: refresh });
 		});
 
 	},
@@ -1204,7 +1209,10 @@ var GfaTaskController = {
 		var ids = req.param('ids');
 		var distribution_date_actual = req.param('distribution_date_actual');
 
-		// attempted 'in' and native query '$in' to search array without success
+		// if actual collection is effected
+		var refresh = false;
+
+		// attempted 'in' and native mongo query '$in' to search array without success
 
 		// going for async :'(
 		async.each( ids, function ( id, next ) {
@@ -1212,12 +1220,16 @@ var GfaTaskController = {
 			// remove beneficiary from actual beneficiaries
 			Promise.all([
 				PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
-				AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } )
+				AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+				ActualBeneficiaries.destroy( { id: id, distribution_date_actual: distribution_date_actual } )
 			])
 			.catch( function( err ) {
 				return res.negotiate( err );
 			})
 			.then( function( result ) {
+				if ( result[ 2 ].length ) {
+					refresh = true;
+				}
 				next();
 			});
 
@@ -1225,7 +1237,7 @@ var GfaTaskController = {
 			// return error
 			if ( err ) return res.negotiate( err );
 			// return success
-			return res.json( 200, { msg: 'Success!' });							
+			return res.json( 200, { msg: 'Success!', refresh: refresh });							
 		});
 
 	},
