@@ -74,7 +74,7 @@ var GfaDashboardController = {
 				// return error
 				if (err) return res.negotiate( err );
 				// return
-				return res.json( 200, dates );				
+				return res.json( 200, _.sortBy( dates ) );				
 			});
 		});
 	},

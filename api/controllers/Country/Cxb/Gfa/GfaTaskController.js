@@ -1130,6 +1130,7 @@ var GfaTaskController = {
 								
 								// add kobo form ids
 								var absent = planned;
+										absent.distribution_date_actual = end_date.distribution_date_plan;
 										absent.uuid = form.uuid;
 										absent.form_id = form.form_id;
 										absent.form_url = form.form_url;
