@@ -2075,19 +2075,14 @@ var Cluster4wplusDashboardController = {
 										}]
 									};
 
-									beneficiaries = [{totalBeneficiaries:0}];
+									//beneficiaries = [{totalBeneficiaries:0}];
 									
 
 								}
-
-								$beneficiariesOne = beneficiaries[0];
-
-
-							
 								
 								switch (req.param('chart_for')) {
 									case 'beneficiaryAdmin1pcode':
-										if ($beneficiariesOne.totalBeneficiaries < 1 && $beneficiariesOne.totalBeneficiaries < 1) {
+										if (!beneficiaries.length) {
 											
 											var result = {	
 																	data: [{
@@ -2182,6 +2177,8 @@ var Cluster4wplusDashboardController = {
 
 									beneficiaries.forEach(function(clus,i){
 
+										
+
 										beneficiaries.totalBeneficiariesType = beneficiaries.totalBeneficiariesType+clus.totalBeneficiaries 
 
 										/*var newclusterbeneficiary = {
@@ -2204,19 +2201,14 @@ var Cluster4wplusDashboardController = {
 										}]
 									};
 
-									beneficiaries = [{totalBeneficiaries:0}];
+									//beneficiaries = [{totalBeneficiaries:0}];
 									
 
 								}
-
-								$beneficiariesOne = beneficiaries[0];
-
-
-							
 								
 								switch (req.param('chart_for')) {
 									case 'beneficiaryType':
-										if ($beneficiariesOne.totalBeneficiaries < 1 && $beneficiariesOne.totalBeneficiaries < 1) {
+										if (!beneficiaries.length) {
 											
 											var result = {	
 																	data: [{
@@ -2313,19 +2305,15 @@ var Cluster4wplusDashboardController = {
 										}]
 									};
 
-									beneficiaries = [{totalBeneficiaries:0}];
+									//beneficiaries = [{totalBeneficiaries:0}];
 									
 
 								}
-
-								$beneficiariesOne = beneficiaries[0];
-
-
-							
 								
 								switch (req.param('chart_for')) {
 									case 'beneficiaryCluster':
-										if ($beneficiariesOne.totalBeneficiaries < 1 ) {
+
+										if (!beneficiaries.length ) {
 											
 											var result = {	
 																	data: [{
@@ -2453,19 +2441,19 @@ var Cluster4wplusDashboardController = {
 										}]
 									};
 
-									budgetprogress = [{totalBudgetProgress:0}];
+									//budgetprogress = [{totalBudgetProgress:0}];
 									
 
 								}
 
-							$beneficiariesOne = budgetprogress[0];
+							
 							
 								
 								switch (req.param('chart_for')) {
 									case 'FinancingExecutorOrganization':
 
 									
-										if ($beneficiariesOne.totalBudgetProgress < 1) {
+										if (!budgetprogress.length) {
 											
 											/*result.data[0].y = 0;
 											result.data[0].label = 0;
@@ -3046,19 +3034,19 @@ var Cluster4wplusDashboardController = {
 										}]
 									};
 
-									budgetprogress = [{totalBudgetProgress:0}];
+									//budgetprogress = [{totalBudgetProgress:0}];
 									
 
 								}
 
-								$financingOne = budgetprogress[0];
+								
 
 
 							
 								
 								switch (req.param('chart_for')) {
 									case 'financingAdmin1pcode':
-										if ($financingOne.totalBudgetProgress < 1 && $financingOne.totalBudgetProgress < 1) {
+										if (!budgetprogress.length) {
 											
 											var result = {	
 																	data: [{
@@ -3191,12 +3179,11 @@ var Cluster4wplusDashboardController = {
 										}]
 									};
 
-									budgetprogress = [{totalBudgetProgress:0}];
+									//budgetprogress = [{totalBudgetProgress:0}];
 									
 
 								}
 
-								$beneficiariesBudgetOne = budgetprogress[0];
 
 								//console.log("TOTAL-1: ", budgetprogress.totalBudgetProgressCluster);
 
@@ -3207,7 +3194,7 @@ var Cluster4wplusDashboardController = {
 									case 'FinancingCluster':
 
 									//console.log("TOTAL-2: ", budgetprogress.totalBudgetProgressCluster);
-										if ($beneficiariesBudgetOne.totalBudgetProgress < 1 && $beneficiariesBudgetOne.totalBudgetProgress < 1) {
+										if (!budgetprogress.length) {
 											
 											var result = {	
 																	data: [{
