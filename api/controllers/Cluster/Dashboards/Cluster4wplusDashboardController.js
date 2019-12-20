@@ -2733,7 +2733,7 @@ var Cluster4wplusDashboardController = {
 												var neworgimplefinancial = {
 													'y': parseFloat(orgimplementer.TOTALBUDGET),
 													'color':'blue',
-													'name': orgimplementer_name+' ('+orgimplementer.currency_id+')',
+													'name': orgimplementer.organization+' ('+orgimplementer.currency_id+')',
 													'label': (orgimplementer.TOTALBUDGET / (totalFinancialFinalOrgImple))*100
 												};
 

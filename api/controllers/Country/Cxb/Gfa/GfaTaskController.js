@@ -294,9 +294,6 @@ var GfaTaskController = {
 			report.reporting_period = moment().add( 1, 'M' ).set( 'date', 1 ).startOf( 'day' ).format();
 			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_1 ) ).startOf( 'day' ).format();		
 
-			// set filter
-			var filter = { report_round: report.report_round, report_year: moment().year(), report_month_number: moment().month() };
-
 		} else {
 
 			// 
@@ -306,33 +303,40 @@ var GfaTaskController = {
 			report.reporting_period = moment().set( 'date', 1 ).startOf( 'day' ).format();
 			report.reporting_due_date = moment().add( 1, 'M' ).set( 'date', parseInt( round_2 ) ).startOf( 'day' ).format();
 
-			// set filter
-			var filter = { report_round: report.report_round, report_year: moment().subtract( 1, 'M' ).year(), report_month_number: moment().subtract( 1, 'M' ).month() }
-
 		}
-
+		
 		// distribution
 		Distribution
-			.update( filter, { report_status: 'complete' } )
-			.exec( function( err, distribution ){
-
+			.findOne()
+			.where({ report_round: report.report_round })
+			.sort({ reporting_due_date: 'DESC' })
+			.exec( function( err, current_distribution ){
 				// return error
 				if (err) return res.negotiate( err );
 
-				// set report_distribution
-				report.report_distribution = parseInt( distribution[0].report_distribution ) + 2;
-				report.report_distribution = report.report_distribution.toString();
-
-				// find or create
+				// distribution
 				Distribution
-					.updateOrCreate( { report_round: report.report_round, report_month_number: report.report_month_number, report_year: report.report_year }, report, 
-					function( err, distribution ){
-
+					.update( { id: current_distribution.id }, { report_status: 'complete' } )
+					.exec( function( err, new_distribution ){
 						// return error
 						if (err) return res.negotiate( err );
 
-						// return
-						return res.json( 200, { msg: 'Success!' });
+						// set report_distribution
+						report.report_distribution = parseInt( new_distribution[0].report_distribution ) + 2;
+						report.report_distribution = report.report_distribution.toString();
+
+						// find or create
+						Distribution
+							.updateOrCreate( { report_round: report.report_round, report_month_number: report.report_month_number, report_year: report.report_year }, report, 
+							function( err, distribution ){
+
+								// return error
+								if (err) return res.negotiate( err );
+
+								// return
+								return res.json( 200, { msg: 'Success!' });
+
+							});
 
 					});
 
@@ -484,8 +488,7 @@ var GfaTaskController = {
 					}
 
 					// add to planned
-					// planned = Object.assign( { sl_number: d[ 0 ], distribution_date: d[ 1 ] }, organization, distribution, distribution_site, camp_block );
-					planned = Object.assign( { sl_number: d[ 0 ], distribution_date: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
+					planned = Object.assign( { sl_number: d[ 0 ], distribution_date_plan: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ), distribution_date_actual: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
 
 					// variables
 					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ] : d[ 10 ];
@@ -681,8 +684,6 @@ var GfaTaskController = {
 								choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ] = [];
 								// choices beneficiary_type
 								choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'list_name', 'name', 'label'] );
-								// choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary'] );
-								// choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)'] );
 							}
 							// each beneficiary
 							choices_list[ planned_beneficiaries[ i ][ 'site_id' ] ].push( [ 'fcn_id', planned_beneficiaries[ i ].gfd_id + '_' + planned_beneficiaries[ i ].fcn_id + '_' + planned_beneficiaries[ i ].scope_id, planned_beneficiaries[ i ].gfd_id + ' / ' + planned_beneficiaries[ i ].fcn_id + ' / ' + planned_beneficiaries[ i ].scope_id ] );
@@ -703,10 +704,10 @@ var GfaTaskController = {
 
 							// update distribution_round
 							var survey_sheet = workbook.Sheets[ workbook.SheetNames[ 0 ] ];
+							survey_sheet[ 'E5' ].t = 's';
+							survey_sheet[ 'E5' ].v = report_round;
 							survey_sheet[ 'E6' ].t = 's';
-							survey_sheet[ 'E6' ].v = report_round;
-							survey_sheet[ 'E7' ].t = 's';
-							survey_sheet[ 'E7' ].v = report_distribution;
+							survey_sheet[ 'E6' ].v = report_distribution;
 
 							// settings
 							var survey_sheet = workbook.Sheets[ workbook.SheetNames[ 1 ] ];
@@ -720,8 +721,6 @@ var GfaTaskController = {
 							if ( !choices.length ) {
 								choices = [];
 								choices.push( [ 'list_name', 'name', 'label' ] );
-								// choices.push( [ 'beneficiary_type', 'planned_beneficiary', 'Planned Beneficiary' ] );
-								// choices.push( [ 'beneficiary_type', 'missing_beneficiary', 'Planned Beneficiary (not found on form list)' ] );
 							}
 							XLSX_UTILS.book_append_sheet( workbook, XLSX_UTILS.aoa_to_sheet( choices ), 'choices' );
 
@@ -855,7 +854,7 @@ var GfaTaskController = {
 									subject: 'Form Import Error - ' + form.form_title + '!'
 								}, function(err) {
 
-									return error
+									// return error
 									if (err) return res.negotiate( err );
 
 									// add deplotmnet complete
@@ -897,7 +896,7 @@ var GfaTaskController = {
 											subject: 'Form Update Error - ' + form.form_title + '!'
 										}, function(err) {
 
-											return error
+											// return error
 											if (err) return res.negotiate( err );
 
 											// add deplotmnet complete
@@ -1088,17 +1087,19 @@ var GfaTaskController = {
 
 		// set actual_fcn_id
 		var uuid = k_data[ 'formhub/uuid' ];
+		var kobo_id = k_data[ '_id' ];
+		// composite id
 		var gfd_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 0 ];
 		var fcn_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 1 ];
 		var scope_id = k_data[ 'beneficiary_details/fcn_id' ].split( '_' )[ 2 ];
+		// report details
 		var report_distribution = k_data[ 'distribution_information/report_distribution' ];
-		var distribution_date = moment( k_data[ 'distribution_information/distribution_date' ] ).format( 'YYYY-MM-DD' );
 
 		// filter
 		var filter = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution }
-		if ( scope_id ) {
-			filter.scope_id = scope_id;
-		}
+		// if ( scope_id ) {
+		// 	filter.scope_id = scope_id;
+		// }
 
 		// gfd forms
 		GfdForms
@@ -1113,7 +1114,7 @@ var GfaTaskController = {
 					.findOne()
 					.where({ site_id: form.site_id })
 					.where({ report_distribution: report_distribution })
-					.sort({ distribution_date: 'DESC' })
+					.sort({ distribution_date_plan: 'DESC' })
 					.limit( 1 )
 					.exec( function( err, end_date ) {
 						// return error
@@ -1126,16 +1127,25 @@ var GfaTaskController = {
 							.exec( function( err, planned ) {
 								// return error
 								if ( err ) return res.negotiate( err );
+								
+								// add kobo form ids
+								var absent = planned;
+										absent.distribution_date_actual = end_date.distribution_date_plan;
+										absent.uuid = form.uuid;
+										absent.form_id = form.form_id;
+										absent.form_url = form.form_url;
+										absent.kobo_id = kobo_id;
+										absent.distribution_status = 'absent';
 						
 								// update absent table for beneficiary
 								AbsentBeneficiaries
-									.updateOrCreate( filter, planned, function ( err, destroy_result ) {
+									.updateOrCreate( filter, absent, function ( err, destroy_result ) {
 										// return error
 										if ( err ) return res.negotiate( err );
 
 										// set new end date for beneficiary
 										PlannedBeneficiaries
-											.update( filter, { distribution_date: end_date.distribution_date })
+											.update( filter, { distribution_date_actual: end_date.distribution_date_plan })
 											.exec( function( err, updated_plan ) {
 												// return error
 												if ( err ) return res.negotiate( err );
@@ -1158,6 +1168,176 @@ var GfaTaskController = {
 
 	},
 
+	setAbsentDistributionDateById: function( req, res ){
+
+		// check req
+		if ( !req.param('id') && !req.param('distribution_date_actual') ) {
+			return res.json( 401, { err: 'id, distribution_date_actual required!' });
+		}
+
+		// set params
+		var id = req.param('id');
+		var distribution_date_actual = req.param('distribution_date_actual');
+
+		// if actual collection is effected
+		var refresh = false;
+
+		// remove beneficiary from actual beneficiaries
+		Promise.all([
+			PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+			AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+			ActualBeneficiaries.destroy( { id: id, distribution_date_actual: distribution_date_actual } )
+		])
+		.catch( function( err ) {
+			return res.negotiate( err );
+		})
+		.then( function( result ) {
+			refresh = result[ 2 ].length;
+			return res.json( 200, { msg: 'Success!', refresh: refresh });
+		});
+
+	},
+
+	// by array of ids
+	setAbsentDistributionDatesByArray: function( req, res ){
+
+		// check req
+		if ( !req.param('ids') && !req.param('distribution_date_actual') ) {
+			return res.json( 401, { err: 'ids, distribution_date_actual required!' });
+		}
+
+		// set params
+		var ids = req.param('ids');
+		var distribution_date_actual = req.param('distribution_date_actual');
+
+		// if actual collection is effected
+		var refresh = false;
+
+		// attempted 'in' and native mongo query '$in' to search array without success
+
+		// going for async :'(
+		async.each( ids, function ( id, next ) {
+
+			// remove beneficiary from actual beneficiaries
+			Promise.all([
+				PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+				AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
+				ActualBeneficiaries.destroy( { id: id, distribution_date_actual: distribution_date_actual } )
+			])
+			.catch( function( err ) {
+				return res.negotiate( err );
+			})
+			.then( function( result ) {
+				if ( result[ 2 ].length ) {
+					refresh = true;
+				}
+				next();
+			});
+
+		}, function ( err ) {
+			// return error
+			if ( err ) return res.negotiate( err );
+			// return success
+			return res.json( 200, { msg: 'Success!', refresh: refresh });							
+		});
+
+	},
+
+	// remove beneficiary 
+	removeAbsentBeneficiary: function( req, res ){
+
+		// check req
+		if ( !req.param('absent_beneficiary') ) {
+			return res.json( 401, { err: 'absent_beneficiary required!' });
+		}
+		
+		// set actual_fcn_id
+		var absent_beneficiary = req.param( 'absent_beneficiary' );
+
+		// filter
+		var filter = { gfd_id: absent_beneficiary.gfd_id, fcn_id: absent_beneficiary.fcn_id, report_distribution: absent_beneficiary.report_distribution }
+
+		// gfd forms
+		GfdForms
+			.findOne()
+			.where({ site_id: absent_beneficiary.site_id })
+			.where({ report_round: absent_beneficiary.report_round })
+			.exec( function( err, form ) {
+				// return error
+				if (err) return res.negotiate( err );
+
+					AbsentBeneficiaries
+						.findOne()
+						.where( filter )
+						.exec( function( err, absent ) {
+							// return error
+							if (err) return res.negotiate( err );
+
+							// find from plan
+							PlannedBeneficiaries
+								.update( filter, { 
+										distribution_status: 'plan',
+										distribution_date_plan: absent.distribution_date_plan, 
+										distribution_date_actual: absent.distribution_date_actual
+								}).exec( function( err, update ){
+									// return error
+									if ( err ) return res.negotiate( err );
+
+									// if in past, place back to plan / actual
+									if ( moment().isAfter( moment( absent_beneficiary.distribution_date_actual ) ) ) {
+										
+										// set to actual
+										var actual = update[ 0 ];
+										actual.distribution_status = 'actual';
+
+										// remove beneficiary from actual beneficiaries
+										Promise.all([
+											ActualBeneficiaries.create( actual ),
+											AbsentBeneficiaries.destroy( filter )
+										])
+										.catch( function( err ) {
+											return res.negotiate( err );
+										})
+										.then( function( result ) {
+											// 
+											var actual = result[ 0 ];
+											var destroy = result[ 1 ];
+
+											// import updated form
+											var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
+
+											// run curl command
+											EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+												if ( error ) {
+													return res.json( 200, { msg: 'Success, please delete from Kobo Admin!' });
+												} else {
+													return res.json( 200, { msg: 'Success!' });
+												}
+											});
+
+										});
+
+									} else {
+										// remove
+										AbsentBeneficiaries
+											.destroy( filter )
+											.exec( function( err, destroy ) {
+												// return error
+												if ( err ) return res.negotiate( err );
+												// return success
+												return res.json( 200, { msg: 'Success!' });
+											});
+									
+									}
+
+								});
+
+					});
+
+			});
+	
+	}, 
+
 	// set planned to actual
 	setActualDailyDistribution: function( req, res ){
 
@@ -1167,7 +1347,7 @@ var GfaTaskController = {
 		// find from plan
 		PlannedBeneficiaries
 			.find()
-			.where({ distribution_date: today })
+			.where({ distribution_date_actual: today })
 			.exec( function( err, planned_beneficiaries ) {
 				
 				// return error
@@ -1175,14 +1355,26 @@ var GfaTaskController = {
 
 				// if records
 				if ( planned_beneficiaries.length ) {
-					// set to actual
-					ActualBeneficiaries
-						.create( planned_beneficiaries )
-						.exec( function( err, result ) {
+					// set to planned_beneficiaries
+					async.each( planned_beneficiaries, function ( data, next ) {
+
+						// status to actual
+						data.distribution_status = 'actual'
+
+						// set to actual
+						ActualBeneficiaries
+							.updateOrCreate( { id: data.id }, data, function ( err, result ) {
+								// return error
+								if ( err ) return res.negotiate( err );
+								// next
+								next();
+							});
+
+						}, function ( err ) {
 							// return error
 							if ( err ) return res.negotiate( err );
 							// return success
-							return res.json( 200, { msg: 'Success!' });
+							return res.json( 200, { msg: 'Success!' });							
 						});
 
 				}
@@ -1230,6 +1422,9 @@ var GfaTaskController = {
 
 					// set to planned_beneficiaries
 					async.each( planned_beneficiaries, function ( data, next ) {
+
+						// status to actual
+						data.distribution_status = 'actual'
 
 						// set to actual
 						ActualBeneficiaries
