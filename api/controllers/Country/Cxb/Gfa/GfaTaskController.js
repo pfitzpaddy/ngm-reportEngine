@@ -1171,22 +1171,28 @@ var GfaTaskController = {
 	setAbsentDistributionDateById: function( req, res ){
 
 		// check req
-		if ( !req.param('id') && !req.param('distribution_date_actual') ) {
-			return res.json( 401, { err: 'id, distribution_date_actual required!' });
+		if ( !req.param('gfd_id') && !req.param('fcn_id') && !req.param('report_distribution') && !req.param('distribution_date_actual') ) {
+			return res.json( 401, { err: 'gfd_id, fcn_id, report_distribution, distribution_date_actual required!' });
 		}
 
 		// set params
-		var id = req.param('id');
+		var gfd_id = req.param('gfd_id');
+		var fcn_id = req.param('fcn_id');
+		var report_distribution = req.param('report_distribution');
 		var distribution_date_actual = req.param('distribution_date_actual');
 
 		// if actual collection is effected
 		var refresh = false;
 
+		// filters
+		var filter = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution }
+		var filter_date = { gfd_id: gfd_id, fcn_id: fcn_id, report_distribution: report_distribution, distribution_date_actual: distribution_date_actual }
+
 		// remove beneficiary from actual beneficiaries
 		Promise.all([
-			PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
-			AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
-			ActualBeneficiaries.destroy( { id: id, distribution_date_actual: distribution_date_actual } )
+			PlannedBeneficiaries.update( filter, { distribution_date_actual: distribution_date_actual } ),
+			AbsentBeneficiaries.update( filter, { distribution_date_actual: distribution_date_actual } ),
+			ActualBeneficiaries.destroy( filter_date )
 		])
 		.catch( function( err ) {
 			return res.negotiate( err );
@@ -1216,13 +1222,17 @@ var GfaTaskController = {
 		// attempted 'in' and native mongo query '$in' to search array without success
 
 		// going for async :'(
-		async.each( ids, function ( id, next ) {
+		async.each( ids, function ( d, next ) {
+
+			// filters
+			var filter = { gfd_id: d.gfd_id, fcn_id: d.fcn_id, report_distribution: d.report_distribution }
+			var filter_date = { gfd_id: d.gfd_id, fcn_id: d.fcn_id, report_distribution: d.report_distribution, distribution_date_actual: distribution_date_actual }
 
 			// remove beneficiary from actual beneficiaries
 			Promise.all([
-				PlannedBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
-				AbsentBeneficiaries.update( { id: id }, { distribution_date_actual: distribution_date_actual } ),
-				ActualBeneficiaries.destroy( { id: id, distribution_date_actual: distribution_date_actual } )
+				PlannedBeneficiaries.update( filter, { distribution_date_actual: distribution_date_actual } ),
+				AbsentBeneficiaries.update( filter, { distribution_date_actual: distribution_date_actual } ),
+				ActualBeneficiaries.destroy( filter_date )
 			])
 			.catch( function( err ) {
 				return res.negotiate( err );
