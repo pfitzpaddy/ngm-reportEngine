@@ -1294,38 +1294,50 @@ var GfaTaskController = {
 									if ( err ) return res.negotiate( err );
 
 									// if in past, place back to plan / actual
-									if ( moment().isAfter( moment( absent_beneficiary.distribution_date_actual ) ) ) {
+									if ( update.length && moment().isAfter( moment( absent_beneficiary.distribution_date_actual ) ) ) {
 										
 										// set to actual
 										var actual = update[ 0 ];
 										actual.distribution_status = 'actual';
 
 										// remove beneficiary from actual beneficiaries
-										Promise.all([
-											ActualBeneficiaries.create( actual ),
-											AbsentBeneficiaries.destroy( filter )
-										])
-										.catch( function( err ) {
-											return res.negotiate( err );
-										})
-										.then( function( result ) {
-											// 
-											var actual = result[ 0 ];
-											var destroy = result[ 1 ];
+										ActualBeneficiaries
+											.updateOrCreate( filter, actual, function ( err, result ) {
+												// return error
+												if ( err ) return res.negotiate( err );
 
-											// import updated form
-											var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
+												// destroy absent record
+												Promise.all([
+													AbsentBeneficiaries.destroy( filter )
+												])
+												.catch( function( err ) {
+													return res.negotiate( err );
+												})
+												.then( function( result ) {
+													// destroy
+													var destroy = result[ 0 ];
 
-											// run curl command
-											EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
-												if ( error ) {
-													return res.json( 200, { msg: 'Success, please delete from Kobo Admin!' });
-												} else {
-													return res.json( 200, { msg: 'Success!' });
-												}
+													// if absent in db
+													if ( destroy ) {
+														// import updated form
+														var k_remove = 'curl -X DELETE https://kc.humanitarianresponse.info/api/v1/data/' + form.form_id  + '/' + destroy.kobo_id + ' -u ' + form.username + ':' + form.password;
+
+														// run curl command
+														EXEC( k_remove, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+															if ( error ) {
+																return res.json( 200, { msg: 'Success, please delete record from Kobo Admin!' });
+															} else {
+																return res.json( 200, { msg: 'Success!' });
+															}
+														});
+													} else {
+														// return syccess
+														return res.json( 200, { msg: 'Success!' });
+													}
+
+												});
+
 											});
-
-										});
 
 									} else {
 										// remove
