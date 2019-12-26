@@ -2041,12 +2041,14 @@ var ClusterDashboardController = {
 									}
 								  }
 								}
-							]).toArray(function (err, locations) {
+							]).toArray(async function (err, locations) {
 							  	if (err) return res.serverError(err);
 
-								// return no locations
-								if ( !locations.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:34.5, lng:66.0, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
-
+                // return no locations
+								if ( !locations.length ) {
+                  coordinates = await AreaCentroidService.getAreaCentroid(filterObject);
+                  return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat: coordinates.lat, lng: coordinates.lng, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
+                }
 								// length
 								length = locations.length;
 								// foreach location
