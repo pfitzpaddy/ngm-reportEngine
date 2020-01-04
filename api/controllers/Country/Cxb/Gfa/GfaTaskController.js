@@ -34,6 +34,7 @@ var food_distribution_point_lookup = {
 	'Camp 19': 'camp_19', // SCI
 	'Camp 20Ext.': 'camp_20_ext', // SCI
 	'Camp 4Ext.': 'camp_4_ext', // SCI
+	'Chakmerkul': 'chakmerkul', // RIC
 	'Hakimpara': 'hakimpara', // RIC
 	'Jadimura': 'jadimura', // AAH
 	'Jamtoli': 'jamtoli', // RIC
@@ -165,6 +166,19 @@ var camp_block_lookup = {
 	'C20_A': 'CXB-216_B125',
 	'C20_B': 'CXB-216_B126',
 	// 'C20EX_B': 'CXB_234_',
+
+	// NEW C21 DP
+	'C21_A': 'CXB-108_B127',
+	'C21_B': 'CXB-108_B128',
+	'C21_C': 'CXB-108_B129',
+	'C21_D': 'CXB-108_B130',
+	'C21_E': 'CXB-108_B131',
+	'C21_F': 'CXB-108_B132',
+	'C21_G': 'CXB-108_B133',
+	'C21_H': 'CXB-108_B134',
+	'C21_I': 'CXB-108_B135',
+	'C21_J': 'CXB-108_B136',
+
 	'C23_A': 'CXB-032_B136',
 	'C23_B': 'CXB-032_B137',
 	'C24_A': 'CXB-233_B139',
