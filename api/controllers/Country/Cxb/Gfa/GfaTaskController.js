@@ -29,7 +29,7 @@ var food_distribution_point_lookup = {
 	'Bagghona': 'bagghona', // RIC
 	'Balukhali 01': 'balukhali_1', // WVI
 	'Balukhali 02': 'balukhali_2', // WVI
-	'Burmapara': 'burma_para', // SCI
+	'Burmapara': 'burma_para', // RIC
 	'Camp 17': 'camp_17', // SCI
 	'Camp 19': 'camp_19', // SCI
 	'Camp 20Ext.': 'camp_20_ext', // SCI
@@ -138,6 +138,16 @@ var camp_block_lookup = {
 	'C12_B': 'CXB-218_B086',
 	'C12_C': 'CXB-218_B087',
 	'C12_D': 'CXB-218_B088',
+
+	// NEW C13 DP
+	'C13_A': 'CXB-220_B089',
+	'C13_B': 'CXB-220_B090',
+	'C13_C': 'CXB-220_B091',
+	'C13_D': 'CXB-220_B092',
+	'C13_E': 'CXB-220_B093',
+	'C13_F': 'CXB-220_B094',
+	'C13_G': 'CXB-220_B095',
+
 	'C14_A': 'CXB-222_B096',
 	'C14_B': 'CXB-222_B097',
 	'C14_C': 'CXB-222_B098',
@@ -163,6 +173,13 @@ var camp_block_lookup = {
 	'C18_C': 'CXB-215_B118',
 	'C18_D': 'CXB-215_B119',
 	'C18_E': 'CXB-215_B120',
+
+	// NEW C19 DP
+	'C19_A': 'CXB-219_B121',
+	'C19_B': 'CXB-219_B122',
+	'C19_C': 'CXB-219_B123',
+	'C19_D': 'CXB-219_B124',
+
 	'C20_A': 'CXB-216_B125',
 	'C20_B': 'CXB-216_B126',
 	// 'C20EX_B': 'CXB_234_',
