@@ -612,6 +612,9 @@ var GfaDashboardController = {
 								// do template
 								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
 
+									console.log( 'site' );
+									console.log( distribution_plan );
+
 									// group by date
 									var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date_plan' ), 'distribution_date_plan' );
 
