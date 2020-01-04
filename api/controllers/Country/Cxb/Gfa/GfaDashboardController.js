@@ -606,17 +606,11 @@ var GfaDashboardController = {
 								var forms_count = 0;
 								var forms_length = forms.length;
 
-								console.log( 'forms_length' )
-								console.log( forms_length )
-
 								// build template
 								doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
 
 								// do template
 								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
-
-									console.log( 'form' )
-									console.log( form.site_id );
 
 									// group by date
 									var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date_plan' ), 'distribution_date_plan' );
@@ -645,9 +639,6 @@ var GfaDashboardController = {
 
 										// loop each date to allow for PDF generation
 										function doSubBlock( params, form, date_key, sub_block_key, sub_block ) {
-
-											console.log( 'sub_block' )
-											console.log( sub_block_key );
 
 											// html
 											var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
