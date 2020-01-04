@@ -522,7 +522,7 @@ var GfaTaskController = {
 					planned = Object.assign( { sl_number: d[ 0 ], distribution_date_plan: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ), distribution_date_actual: moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' ) }, organization, distribution, distribution_site, camp_block );
 
 					// variables
-					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ] : d[ 10 ];
+					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ].trim() : d[ 10 ].trim();
 					planned.admin5name = d[ 10 ];
 
 					// majhee
