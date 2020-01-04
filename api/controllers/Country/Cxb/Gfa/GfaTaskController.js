@@ -523,7 +523,7 @@ var GfaTaskController = {
 
 					// variables
 					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ].trim() : d[ 10 ].trim();
-					planned.admin5name = d[ 10 ];
+					planned.admin5name = d[ 10 ].trim();
 
 					// majhee
 					planned.majhee_name = d[ 11 ];
