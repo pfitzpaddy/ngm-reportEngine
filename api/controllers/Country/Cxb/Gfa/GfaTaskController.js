@@ -1132,8 +1132,6 @@ var GfaTaskController = {
 		// 	filter.scope_id = scope_id;
 		// }
 
-		console.log( filter );
-
 		// gfd forms
 		GfdForms
 			.findOne()
