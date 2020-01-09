@@ -899,7 +899,7 @@ var ClusterDashboardController = {
 
 					      }else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
 					        
-					        filterObject.plan_component = {$in: [req.param('project_type_component').project_type_component]};
+					        filterObject.plan_component = {$in: [req.param('project_type_component')]};
 					        // delete queryProject.project_type_component;
 
 					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
