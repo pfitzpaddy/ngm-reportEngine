@@ -470,7 +470,7 @@ var GfaTaskController = {
 
 					// get distribution_site
 					site = _.filter( food_distribution_points, function ( s ) {
-						return s.site_id === food_distribution_point_lookup[ d[ 6 ] ];
+						return s.site_id === food_distribution_point_lookup[ d[ 6 ].tirm() ];
 					});
 
 					// set distribution_site
@@ -526,21 +526,21 @@ var GfaTaskController = {
 					planned.admin5name = d[ 10 ].trim();
 
 					// majhee
-					planned.majhee_name = d[ 11 ];
-					planned.majhee_phone = d[ 12 ];
-					planned.fh_name = d[ 14 ];
-					planned.hh_name = d[ 13 ];
-					planned.hh_age = d[ 24 ];
-					planned.hh_gender = d[ 23 ] === 'M' || d[ 23 ] === 'Male' ? 'Male' : 'Female';
+					planned.majhee_name = d[ 11 ].tirm();
+					planned.majhee_phone = d[ 12 ].tirm();
+					planned.fh_name = d[ 14 ].tirm();
+					planned.hh_name = d[ 13 ].tirm();
+					planned.hh_age = d[ 24 ].tirm();
+					planned.hh_gender = d[ 23 ].tirm() === 'M' || d[ 23 ].tirm() === 'Male' ? 'Male' : 'Female';
 					
 					// ids
-					planned.scope_id = d[ 15 ].toString();
-					planned.gfd_id = d[ 17 ].toString();
-					planned.fcn_id = d[ 18 ].toString();
-					planned.govt_id = d[ 19 ].toString();
-					planned.unhcr_case_id = d[ 20 ].toString();
-					planned.unhcr_case_camp = d[ 21 ].toString();
-					planned.progres_id = d[ 22 ].toString();
+					planned.scope_id = d[ 15 ].toString().tirm();
+					planned.gfd_id = d[ 17 ].toString().tirm();
+					planned.fcn_id = d[ 18 ].toString().tirm();
+					planned.govt_id = d[ 19 ].toString().tirm();
+					planned.unhcr_case_id = d[ 20 ].toString().tirm();
+					planned.unhcr_case_camp = d[ 21 ].toString().tirm();
+					planned.progres_id = d[ 22 ].toString().tirm();
 					planned.gfd_modality = d[ 16 ];
 
 					// demographics
