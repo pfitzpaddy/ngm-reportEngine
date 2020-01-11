@@ -344,6 +344,9 @@ module.exports.routes = {
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
   'POST /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
   // get PlannedBeneficiaries Indicator
+  'GET /wfp/gfa/gfd/getBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getBeneficiariesIndicator',
+  'POST /wfp/gfa/gfd/getBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getBeneficiariesIndicator',
+  // get PlannedBeneficiaries Indicator
   'GET /wfp/gfa/gfd/getPlannedBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiariesIndicator',
   'POST /wfp/gfa/gfd/getPlannedBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiariesIndicator',
   // get ActualBeneficiaries Indicator
