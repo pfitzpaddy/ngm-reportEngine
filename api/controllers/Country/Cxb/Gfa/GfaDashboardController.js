@@ -684,65 +684,53 @@ var GfaDashboardController = {
 								// get length
 								var forms_count = 0;
 								var forms_length = forms.length;
-								var distribution_plan = distribution_list[ forms[ forms_count ].site_id ];
 
-								// return zip file
-								function sendZip() {
-									// zip
-									var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
-									// run curl command
-									EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
-										// err
-										if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
-											// success
-											return res.json( 200, { report: folder + '.zip' });
-									});									
-								}
-
-								// build template
-								doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_plan );
+								// run distribution template
+								doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
 
 								// do template
 								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
 
-									console.log( 'doDistributionPoint -----------------' )
-									console.log( forms_count )
-									console.log( forms_length )
+									// site
 									console.log( form.site_id )
 									console.log( distribution_plan.length )
 
-									// group by date
-									var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date_plan' ), 'distribution_date_plan' );
-
-									// distribution_dates
-									var dates_count = 0;
-									var dates_keys = Object.keys( distribution_dates );
-									var dates_length = Object.keys( distribution_dates ).length;
-									var distribution_dates = distribution_list[ forms[ forms_count ].site_id ];
-
-									// if no list
-									if ( !distribution_dates ) {
+									// if NO beneficiaries for site
+									if ( !distribution_plan ) {
+										// next
 										forms_count++;
 										if ( forms_count === forms_length ) {
-											sendZip();
+											// zip
+											var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
+											// run curl command
+											EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
+												// err
+												if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
+													// success
+													return res.json( 200, { report: folder + '.zip' });
+											});
 										} else {
-											doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_dates );
+											doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
 										}
-									}
 
-									// if list
-									if ( distribution_dates ) {
+									} 
+
+									// distribution_plan
+									if ( distribution_plan ) {
+
+										// group by date
+										var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date_plan' ), 'distribution_date_plan' );
+
+										// distribution_dates
+										var dates_count = 0;
+										var dates_keys = Object.keys( distribution_dates );
+										var dates_length = Object.keys( distribution_dates ).length;
 
 										// run PDF function
 										doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
 
 										// loop each date to allow for PDF generation
 										function doDistributionDate( params, form, date_key, distribution_dates ) {
-
-											console.log( 'doDistributionDate -----------------' )
-											console.log( form.site_id )
-											console.log( date_key )
-											console.log( distribution_dates.length )
 
 											// group by date
 											var sub_block = _.groupBy( _.sortBy( distribution_dates[ date_key ], 'admin5name' ), 'admin5name' );
@@ -758,76 +746,62 @@ var GfaDashboardController = {
 											// loop each date to allow for PDF generation
 											function doSubBlock( params, form, date_key, sub_block_key, sub_block ) {
 
-												console.log( 'doSubBlock -----------------' )
-												console.log( form.site_id )
-												console.log( date_key )
-												console.log( sub_block_key )
-												console.log( sub_block.length )
+												// html
+												var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
 
-												// if no list
-												if ( !sub_block ) {
-													sub_block_count++;
-													if ( sub_block_count === sub_block_length ) {
-														sendZip();
-													} else {
-														doSubBlock( params, form, date_key, sub_block_keys[ sub_block_count ], sub_block );
-													}
-												}
-												
-												// // if list
-												if ( sub_block ) {
+												// fs write template
+												fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
+													// err
+													if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
+													
+													// import updated form
+													var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
 
-													// html
-													var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
-
-													// fs write template
-													fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
+													// run curl command
+													EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
 														// err
-														if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
-														
-														// import updated form
-														var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
+														if ( error ) {
+															// return error
+															res.json( 400, { error: 'PDF error!', details: error  } );
+														} else {
+															
+															// delete template
+															fs.unlink( template.dir + template.report + '.html', function ( err ) {
+																// err
+																if ( err ) throw err;
 
-														// run curl command
-														EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
-															// err
-															if ( error ) {
-																// return error
-																res.json( 400, { error: 'PDF error!', details: error  } );
-															} else {
-																
-																// delete template
-																fs.unlink( template.dir + template.report + '.html', function ( err ) {
-																	// err
-																	if ( err ) throw err;
-
-																	// generate master list pdf completed
-																	sub_block_count++;
-																	if ( sub_block_count === sub_block_length ) {
-																		dates_count++;
-																		if ( dates_count === dates_length ) {
-																			forms_count++;
-																			if ( forms_count === forms_length ) {
-																				// return zip folder
-																				sendZip();
-																			} else {
-																				doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
-																			}
+																// generate master list pdf completed
+																sub_block_count++;
+																if ( sub_block_count === sub_block_length ) {
+																	dates_count++;
+																	if ( dates_count === dates_length ) {
+																		forms_count++;
+																		if ( forms_count === forms_length ) {
+																			// zip
+																			var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
+																			// run curl command
+																			EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
+																				// err
+																				if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
+																					// success
+																					return res.json( 200, { report: folder + '.zip' });
+																			});
 																		} else {
-																			doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
+																			doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
 																		}
 																	} else {
-																		doSubBlock( params, form, date_key, sub_block_keys[ sub_block_count ], sub_block );
+																		doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
 																	}
-																});
-															
-															}
+																} else {
+																	doSubBlock( params, form, date_key, sub_block_keys[ sub_block_count ], sub_block );
+																}
+															});
 														
-														});
-
+														}
+													
 													});
 
-												}
+												});
 
 											}
 										
