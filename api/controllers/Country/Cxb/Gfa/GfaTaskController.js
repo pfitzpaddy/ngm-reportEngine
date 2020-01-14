@@ -530,7 +530,7 @@ var GfaTaskController = {
 					planned.majhee_phone = d[ 12 ].trim();
 					planned.fh_name = d[ 14 ].trim();
 					planned.hh_name = d[ 13 ].trim();
-					planned.hh_age = parseIn( d[ 24 ] );
+					planned.hh_age = parseInt( d[ 24 ] );
 					planned.hh_gender = d[ 23 ].trim() === 'M' || d[ 23 ].trim() === 'Male' ? 'Male' : 'Female';
 					
 					// ids
