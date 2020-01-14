@@ -691,6 +691,12 @@ var GfaDashboardController = {
 								// do template
 								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
 
+									console.log( 'doDistributionPoint -----------------' )
+									console.log( forms_count )
+									console.log( forms_length )
+									console.log( form.site_id )
+									console.log( distribution_plan.length )
+
 									// group by date
 									var distribution_dates = _.groupBy( _.sortBy( distribution_plan, 'distribution_date_plan' ), 'distribution_date_plan' );
 
@@ -704,6 +710,11 @@ var GfaDashboardController = {
 
 									// loop each date to allow for PDF generation
 									function doDistributionDate( params, form, date_key, distribution_dates ) {
+
+									console.log( 'doDistributionDate -----------------' )
+									console.log( form.site_id )
+									console.log( date_key )
+									console.log( distribution_dates.length )
 
 										// group by date
 										var sub_block = _.groupBy( _.sortBy( distribution_dates[ date_key ], 'admin5name' ), 'admin5name' );
@@ -719,10 +730,11 @@ var GfaDashboardController = {
 										// loop each date to allow for PDF generation
 										function doSubBlock( params, form, date_key, sub_block_key, sub_block ) {
 
-											console.log( form )
+											console.log( 'doSubBlock -----------------' )
+											console.log( form.site_id )
 											console.log( date_key )
 											console.log( sub_block_key )
-											console.log( sub_block )
+											console.log( sub_block.length )
 
 											// html
 											var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
