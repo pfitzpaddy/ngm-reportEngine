@@ -526,12 +526,12 @@ var GfaTaskController = {
 					planned.admin5name = d[ 10 ].trim();
 
 					// majhee
-					planned.majhee_name = d[ 11 ].tirm();
-					planned.majhee_phone = d[ 12 ].tirm();
-					planned.fh_name = d[ 14 ].tirm();
-					planned.hh_name = d[ 13 ].tirm();
-					planned.hh_age = d[ 24 ].tirm();
-					planned.hh_gender = d[ 23 ].tirm() === 'M' || d[ 23 ].tirm() === 'Male' ? 'Male' : 'Female';
+					planned.majhee_name = d[ 11 ];
+					planned.majhee_phone = d[ 12 ];
+					planned.fh_name = d[ 14 ];
+					planned.hh_name = d[ 13 ];
+					planned.hh_age = parseInt( d[ 24 ] );
+					planned.hh_gender = d[ 23 ].toString().tirm() === 'M' || d[ 23 ].toString().tirm() === 'Male' ? 'Male' : 'Female';
 					
 					// ids
 					planned.scope_id = d[ 15 ].toString().tirm();
