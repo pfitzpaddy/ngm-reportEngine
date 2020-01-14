@@ -534,14 +534,17 @@ var GfaTaskController = {
 					planned.hh_gender = d[ 23 ] === 'M' || d[ 23 ] === 'Male' ? 'Male' : 'Female';
 					
 					// ids
-					planned.scope_id = d[ 15 ].toString().tirm();
-					planned.gfd_id = d[ 17 ].toString().tirm();
-					planned.fcn_id = d[ 18 ].toString().tirm();
-					planned.govt_id = d[ 19 ].toString().tirm();
-					planned.unhcr_case_id = d[ 20 ].toString().tirm();
-					planned.unhcr_case_camp = d[ 21 ].toString().tirm();
-					planned.progres_id = d[ 22 ].toString().tirm();
-					planned.gfd_modality = d[ 16 ];
+					console.log(d[15])
+					console.log(d[15].toString().tirm())
+					console.log(d[15].tirm())
+					planned.scope_id = d[15].toString().tirm();
+					planned.gfd_id = d[17].toString().tirm();
+					planned.fcn_id = d[18].toString().tirm();
+					planned.govt_id = d[19].toString().tirm();
+					planned.unhcr_case_id = d[20].toString().tirm();
+					planned.unhcr_case_camp = d[21].toString().tirm();
+					planned.progres_id = d[22].toString().tirm();
+					planned.gfd_modality = d[16];
 
 					// demographics
 					planned.gfd_family_size = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
