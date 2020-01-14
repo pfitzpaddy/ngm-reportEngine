@@ -691,12 +691,6 @@ var GfaDashboardController = {
 								// do template
 								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
 
-									// site
-									console.log( form.site_id )
-									if ( distribution_plan ) {
-										console.log( distribution_plan.length )
-									}
-
 									// if NO beneficiaries for site
 									if ( !distribution_plan ) {
 										// next
@@ -852,8 +846,6 @@ var GfaDashboardController = {
 
 								// do template
 								function doDistributionPoint( forms_count, forms_length, form, distribution_plan ){
-
-									// console.log( distribution_plan.length )
 
 									// if NO beneficiaries for site
 									if ( !distribution_plan ) {
