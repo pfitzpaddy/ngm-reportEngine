@@ -533,18 +533,25 @@ var GfaTaskController = {
 					planned.hh_age = parseInt( d[ 24 ] );
 					planned.hh_gender = d[ 23 ] === 'M' || d[ 23 ] === 'Male' ? 'Male' : 'Female';
 					
-					// ids
-					console.log(d[15])
-					console.log(d[15].toString().tirm())
-					console.log(d[15].tirm())
-					planned.scope_id = d[15].toString().tirm();
-					planned.gfd_id = d[17].toString().tirm();
-					planned.fcn_id = d[18].toString().tirm();
-					planned.govt_id = d[19].toString().tirm();
-					planned.unhcr_case_id = d[20].toString().tirm();
-					planned.unhcr_case_camp = d[21].toString().tirm();
-					planned.progres_id = d[22].toString().tirm();
-					planned.gfd_modality = d[16];
+					// assign
+					var scope_id = d[15];
+					var gfd_id = d[17];
+					var fcn_id = d[18];
+					var govt_id = d[19];
+					var unhcr_case_id = d[20];
+					var unhcr_case_camp = d[21];
+					var progres_id = d[22];
+					var gfd_modality = d[16];
+
+					// trim
+					planned.scope_id = scope_id.toString().tirm();
+					planned.gfd_id = gfd_id.toString().tirm();
+					planned.fcn_id = fcn_id.toString().tirm();
+					planned.govt_id = govt_id.toString().tirm();
+					planned.unhcr_case_id = unhcr_case_id.toString().tirm();
+					planned.unhcr_case_camp = unhcr_case_camp.toString().tirm();
+					planned.progres_id = progres_id.toString().tirm();
+					planned.gfd_modality = gfd_modality.toString().tirm();
 
 					// demographics
 					planned.gfd_family_size = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
