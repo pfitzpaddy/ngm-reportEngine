@@ -714,7 +714,7 @@ var GfaDashboardController = {
 									console.log( 'doDistributionDate -----------------' )
 									console.log( form.site_id )
 									console.log( date_key )
-									console.log( distribution_dates )
+									console.log( distribution_dates.length )
 
 										// group by date
 										var sub_block = _.groupBy( _.sortBy( distribution_dates[ date_key ], 'admin5name' ), 'admin5name' );
@@ -734,7 +734,7 @@ var GfaDashboardController = {
 											console.log( form.site_id )
 											console.log( date_key )
 											console.log( sub_block_key )
-											console.log( sub_block )
+											console.log( sub_block.length )
 
 											// html
 											var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
