@@ -470,7 +470,7 @@ var GfaTaskController = {
 
 					// get distribution_site
 					site = _.filter( food_distribution_points, function ( s ) {
-						return s.site_id === food_distribution_point_lookup[ d[ 6 ].trim() ];
+						return s.site_id === food_distribution_point_lookup[ d[ 6 ] ];
 					});
 
 					// set distribution_site
