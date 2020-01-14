@@ -719,6 +719,11 @@ var GfaDashboardController = {
 										// loop each date to allow for PDF generation
 										function doSubBlock( params, form, date_key, sub_block_key, sub_block ) {
 
+											console.log( form )
+											console.log( date_key )
+											console.log( sub_block_key )
+											console.log( sub_block )
+
 											// html
 											var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
 
