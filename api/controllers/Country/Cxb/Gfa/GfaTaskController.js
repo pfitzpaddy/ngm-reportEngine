@@ -470,7 +470,7 @@ var GfaTaskController = {
 
 					// get distribution_site
 					site = _.filter( food_distribution_points, function ( s ) {
-						return s.site_id === food_distribution_point_lookup[ d[ 6 ] ];
+						return s.site_id === food_distribution_point_lookup[ d[ 6 ].trim() ];
 					});
 
 					// set distribution_site
@@ -526,32 +526,22 @@ var GfaTaskController = {
 					planned.admin5name = d[ 10 ].trim();
 
 					// majhee
-					planned.majhee_name = d[ 11 ];
-					planned.majhee_phone = d[ 12 ];
-					planned.fh_name = d[ 14 ];
-					planned.hh_name = d[ 13 ];
-					planned.hh_age = parseInt( d[ 24 ] );
-					planned.hh_gender = d[ 23 ] === 'M' || d[ 23 ] === 'Male' ? 'Male' : 'Female';
+					planned.majhee_name = d[ 11 ].trim();
+					planned.majhee_phone = d[ 12 ].trim();
+					planned.fh_name = d[ 14 ].trim();
+					planned.hh_name = d[ 13 ].trim();
+					planned.hh_age = d[ 24 ].trim();
+					planned.hh_gender = d[ 23 ].trim() === 'M' || d[ 23 ].trim() === 'Male' ? 'Male' : 'Female';
 					
-					// assign
-					var scope_id = d[15];
-					var gfd_id = d[17];
-					var fcn_id = d[18];
-					var govt_id = d[19];
-					var unhcr_case_id = d[20];
-					var unhcr_case_camp = d[21];
-					var progres_id = d[22];
-					var gfd_modality = d[16];
-
-					// trim
-					planned.scope_id = scope_id.toString().tirm();
-					planned.gfd_id = gfd_id.toString().tirm();
-					planned.fcn_id = fcn_id.toString().tirm();
-					planned.govt_id = govt_id.toString().tirm();
-					planned.unhcr_case_id = unhcr_case_id.toString().tirm();
-					planned.unhcr_case_camp = unhcr_case_camp.toString().tirm();
-					planned.progres_id = progres_id.toString().tirm();
-					planned.gfd_modality = gfd_modality.toString().tirm();
+					// ids
+					planned.scope_id = d[ 15 ].toString().trim();
+					planned.gfd_id = d[ 17 ].toString().trim();
+					planned.fcn_id = d[ 18 ].toString().trim();
+					planned.govt_id = d[ 19 ].toString().trim();
+					planned.unhcr_case_id = d[ 20 ].toString().trim();
+					planned.unhcr_case_camp = d[ 21 ].toString().trim();
+					planned.progres_id = d[ 22 ].toString().trim();
+					planned.gfd_modality = d[ 16 ];
 
 					// demographics
 					planned.gfd_family_size = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
