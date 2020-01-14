@@ -693,7 +693,9 @@ var GfaDashboardController = {
 
 									// site
 									console.log( form.site_id )
-									console.log( distribution_plan.length )
+									if ( distribution_plan ) {
+										console.log( distribution_plan.length )
+									}
 
 									// if NO beneficiaries for site
 									if ( !distribution_plan ) {
