@@ -531,7 +531,7 @@ var GfaTaskController = {
 					planned.fh_name = d[ 14 ];
 					planned.hh_name = d[ 13 ];
 					planned.hh_age = parseInt( d[ 24 ] );
-					planned.hh_gender = d[ 23 ].toString().tirm() === 'M' || d[ 23 ].toString().tirm() === 'Male' ? 'Male' : 'Female';
+					planned.hh_gender = d[ 23 ] === 'M' || d[ 23 ] === 'Male' ? 'Male' : 'Female';
 					
 					// ids
 					planned.scope_id = d[ 15 ].toString().tirm();
