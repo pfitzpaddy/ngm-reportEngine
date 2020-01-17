@@ -564,12 +564,16 @@ var ReportController = {
 						var b = _under.extend( {}, report_copy, location_copy, beneficiary );
 						// update or create
 						Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: b.id }, b ).exec(function( err, result ){
-                Beneficiaries.findOne({ id: ReportController.set_result(result).id }).populateAll().exec(function (err, result) {
-                  // location.beneficiaries.push( ReportController.set_result( result ) );
-                  // set beneficiaries in the origin order
-                  location.beneficiaries[i] = ReportController.set_result(result);
-                  b_next();
-                });
+								if ( ReportController.set_result(result).id ) {
+	                Beneficiaries.findOne({ id: ReportController.set_result(result).id }).populateAll().exec(function (err, result) {
+	                  // location.beneficiaries.push( ReportController.set_result( result ) );
+	                  // set beneficiaries in the origin order
+	                  location.beneficiaries[i] = ReportController.set_result(result);
+	                  b_next();
+	                });
+	              } else {
+	              	b_next();
+	              }
 							});
 						}, function ( err ) {
 							if ( err ) return err;
