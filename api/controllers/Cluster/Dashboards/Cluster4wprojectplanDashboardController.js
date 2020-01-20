@@ -2255,24 +2255,44 @@ var Cluster4wprojectplanDashboardController = {
 											// // highcharts women
 											var string0_5label = 'Age 0-5: ' + $beneficiaries.age_0_5 + ' - ' + age_0_5PerCent.toFixed(1)+'%';
 											result.data[0].y = $beneficiaries.age_0_5;
+											var value0_5 = Math.round(TotalAge_0_5);
+											var valueformat0_5 = Intl.NumberFormat().format(value0_5);
+											valueformat0_5 = valueformat0_5.replace(/,/g,'.');
+											result.data[0].yformat = valueformat0_5;
 											result.data[0].color = '#c7c7c7';
 											result.data[0].label = age_0_5PerCent;
 											// // highcharts men
 											result.data[1].y = TotalAge_6_11 ;
+											var value6_11 = Math.round(TotalAge_6_11);
+											var valueformat6_11 = Intl.NumberFormat().format(value6_11);
+											valueformat6_11 = valueformat6_11.replace(/,/g,'.');
+											result.data[1].yformat = valueformat6_11;
 											//result.data[1].y = 579 ;
 											result.data[1].label = age_6_11PerCent ;
 											//console.log("LABEL: ",result.data[1]);
 											result.data[1].color = '#90caf9';
 
 											result.data[2].y = TotalAge_12_17;
+											var value12_17 = Math.round(TotalAge_12_17);
+											var valueformat12_17 = Intl.NumberFormat().format(value12_17);
+											valueformat12_17 = valueformat12_17.replace(/,/g,'.');
+											result.data[2].yformat = valueformat12_17;
 											result.data[2].label = age_12_17PerCent ;
 											result.data[2].color = 'red';
 
 											result.data[3].y = TotalAge_18_59;
+											var value18_59 = Math.round(TotalAge_18_59);
+											var valueformat18_59 = Intl.NumberFormat().format(value18_59);
+											valueformat18_59 = valueformat18_59.replace(/,/g,'.');
+											result.data[3].yformat = valueformat18_59;
 											result.data[3].label = age_18_59PerCent ;
 											result.data[3].color = 'blue';
 
 											result.data[4].y = TotalAge_60_more;
+											var value60_more = Math.round(TotalAge_60_more);
+											var valueformat60_more = Intl.NumberFormat().format(value60_more);
+											valueformat60_more = valueformat60_more.replace(/,/g,'.');
+											result.data[4].yformat = valueformat60_more;
 											result.data[4].label = age_60_morePerCent ;
 											result.data[4].color = 'orange';
 											
@@ -2406,24 +2426,46 @@ var Cluster4wprojectplanDashboardController = {
 															// // highcharts women
 															var string0_5label = 'Age 0-5: ' + TotalAge_0_5 + ' - ' + age_0_5PerCent.toFixed(1)+'%';
 															result.data[0].y = TotalAge_0_5;
+															var value0_5 = Math.round(TotalAge_0_5);
+															var valueformat0_5 = Intl.NumberFormat().format(value0_5);
+															valueformat0_5 = valueformat0_5.replace(/,/g,'.');
+															result.data[0].yformat = valueformat0_5;
+
 															result.data[0].color = '#c7c7c7';
 															result.data[0].label = age_0_5PerCent;
-															// // highcharts men
+
+															//highcharts men
 															result.data[1].y = TotalAge_6_11 ;
-															//result.data[1].y = 579 ;
+															var value6_11 = Math.round(TotalAge_6_11);
+															var valueformat6_11 = Intl.NumberFormat().format(value6_11);
+															valueformat6_11 = valueformat6_11.replace(/,/g,'.');
+															result.data[1].yformat = valueformat6_11;
 															result.data[1].label = age_6_11PerCent ;
-															//console.log("LABEL: ",result.data[1]);
 															result.data[1].color = '#90caf9';
 
+
 															result.data[2].y = TotalAge_12_17;
+															var value12_17 = Math.round(TotalAge_12_17);
+															var valueformat12_17 = Intl.NumberFormat().format(value12_17);
+															valueformat12_17 = valueformat12_17.replace(/,/g,'.');
+															result.data[2].yformat = valueformat12_17;
 															result.data[2].label = age_12_17PerCent ;
 															result.data[2].color = 'red';
 
+
 															result.data[3].y = TotalAge_18_59;
+															var value18_59 = Math.round(TotalAge_18_59);
+															var valueformat18_59 = Intl.NumberFormat().format(value18_59);
+															valueformat18_59 = valueformat18_59.replace(/,/g,'.');
+															result.data[3].yformat = valueformat18_59;
 															result.data[3].label = age_18_59PerCent ;
 															result.data[3].color = 'blue';
 
 															result.data[4].y = TotalAge_60_more;
+															var value60_more = Math.round(TotalAge_60_more);
+															var valueformat60_more = Intl.NumberFormat().format(value60_more);
+															valueformat60_more = valueformat60_more.replace(/,/g,'.');
+															result.data[4].yformat = valueformat60_more;
 															result.data[4].label = age_60_morePerCent ;
 															result.data[4].color = 'orange';
 															
@@ -2556,8 +2598,14 @@ var Cluster4wprojectplanDashboardController = {
 
 											beneficiaries.forEach(function(bencluster,i){
 
+
+												var budgetvalue = Math.round(bencluster.totalBeneficiaries);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
 											var newclusterbeneficiary = {
-												'y':bencluster.totalBeneficiaries,
+												'y':budgetvalue,
+												'yformat':valueformat,
 												'color':'blue',
 												'name': bencluster._id.cluster,
 												'label': (bencluster.totalBeneficiaries / (beneficiaries.totalBeneficiariesCluster))*100
@@ -2690,10 +2738,13 @@ var Cluster4wprojectplanDashboardController = {
 															targetbenefgroupsCluster.forEach(function(clus,i){
 
 
-															
+															var budgetvalue = Math.round(clus.TOTALBEN);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
 
 														var newclusbeneficiaryCluster = {
-																'y':clus.TOTALBEN,
+																'y':budgetvalue,
+																'yformat':valueformat,
 																'color':'blue',
 																'name': clus.cluster,
 																'label': (clus.TOTALBEN / (totalBenFinalCluster))*100
@@ -2834,8 +2885,13 @@ var Cluster4wprojectplanDashboardController = {
 											var result = {data: []};
 											beneficiaries.forEach(function(bentype,i){
 
+												var budgetvalue = Math.round(bentype.totalBeneficiaries);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
 											var newclusterbeneficiary = {
-												'y':bentype.totalBeneficiaries,
+												'y':budgetvalue,
+												'yformat':valueformat,
 												'color':'blue',
 												'name': bentype._id.beneficiary_type_name,
 												'label': (bentype.totalBeneficiaries / (beneficiaries.totalBeneficiariesType))*100
@@ -2972,11 +3028,16 @@ var Cluster4wprojectplanDashboardController = {
 
 															targetbenefgroups.forEach(function(ben,i){
 
+																var budgetvalue = Math.round(ben.TOTALBEN);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
 
 															
 
 														var newtypebeneficiary = {
-																'y':ben.TOTALBEN,
+																'y':budgetvalue,
+																'yformat':valueformat,
 																'color':'blue',
 																'name': ben.beneficiary_type_name,
 																'label': (ben.TOTALBEN / (totalBenFinal))*100
@@ -3151,9 +3212,15 @@ var Cluster4wprojectplanDashboardController = {
 										}
 
 
+										var budgetvalue = Math.round(clus.totalBudget);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
+
 
 											var newclusterProjectsBudget = {
-												'y':parseFloat(clus.totalBudget),
+												'y':budgetvalue,
+												'yformat':valueformat,
 												'color':'blue',
 												'name': clus._id.cluster+' ('+clus._id.project_budget_currency+')',
 												'label': (clus.totalBudget / (projectsbudget.totalBudgetCluster))*100
@@ -3317,10 +3384,13 @@ var Cluster4wprojectplanDashboardController = {
 										}
 
 
-															
+															var budgetvalue = Math.round(clus.TOTALBUDGET);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
 
 														var newclusfinancingCluster = {
-																'y':parseFloat(clus.TOTALBUDGET),
+																'y':budgetvalue,
+																'yformat':valueformat,
 																'color':'blue',
 																'name': clus.cluster+' ('+clus.project_budget_currency+')',
 																'label': (clus.TOTALBUDGET / (totalFinancialFinalCluster))*100,
@@ -3494,9 +3564,14 @@ var Cluster4wprojectplanDashboardController = {
 
 												if(i<5){
 
+													var budgetvalue = Math.round(excOrg.totalBudgetOrgEx);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
 
 											var newExecOrgProjectsBudget = {
-												'y':parseFloat(excOrg.totalBudgetOrgEx),
+												'y':budgetvalue,
+												'yformat':valueformat,
 												'color':'blue',
 												'name': excOrg._id.organization+' ('+excOrg._id.project_budget_currency+')',
 												'label': (excOrg.totalBudgetOrgEx / (projectsbudgetorg.totalBudgetExcOrg))*100
@@ -3660,11 +3735,16 @@ var Cluster4wprojectplanDashboardController = {
 											execOrg.TOTALBUDGET = execOrg.TOTALBUDGET.toFixed(2);
 										}
 
+										var budgetvalue = Math.round(execOrg.TOTALBUDGET);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
 
 															
 
 														var newExeOrgfinancingCluster = {
-																'y':parseFloat(execOrg.TOTALBUDGET),
+																'y':budgetvalue,
+																'yformat':valueformat,
 																'color':'blue',
 																'name': execOrg.organization+' ('+execOrg.project_budget_currency+')',
 																'label': (execOrg.TOTALBUDGET / (totalFinancialFinalOrgExec))*100
@@ -3761,7 +3841,7 @@ var Cluster4wprojectplanDashboardController = {
 										if(typeof budgprog.project_budget === 'string'){
 													var stringtonum = parseFloat(budgprog.project_budget);
 
-													console.log("ES STRING select ADMIN1PCODE !!");
+													
 										            	
 
 										            if(stringtonum){
@@ -3949,8 +4029,14 @@ var Cluster4wprojectplanDashboardController = {
 												orgimplementer.organization_tag;
 
 											}
+
+											var budgetvalue = Math.round(orgimplementer.TOTALBUDGET);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
 												var neworgimplefinancial = {
-													'y': parseFloat(orgimplementer.TOTALBUDGET),
+													'y': budgetvalue,
+													'yformat':valueformat,
 													'color':'blue',
 													'name': orgimplementer.organization+' ('+orgimplementer.project_budget_currency+')',
 													'label': (orgimplementer.TOTALBUDGET / (totalFinancialFinalOrgImple))*100
@@ -4056,7 +4142,6 @@ var Cluster4wprojectplanDashboardController = {
 												if(typeof budgprog.project_budget === 'string'){
 													var stringtonum = parseFloat(budgprog.project_budget);
 
-													console.log("ES STRING select ADMIN1PCODE !!");
 										            	
 
 										            if(stringtonum){
@@ -4235,8 +4320,14 @@ var Cluster4wprojectplanDashboardController = {
 																						orgimplement.organization_tag;
 
 																					}
+
+																					var budgetvalue = Math.round(orgimplement.TOTALBUDGET);
+																					var valueformat = Intl.NumberFormat().format(budgetvalue);
+																					valueformat = valueformat.replace(/,/g,'.');
+
 																						var neworgimplefinancial = {
-																							'y': parseFloat(orgimplement.TOTALBUDGET),
+																							'y': budgetvalue,
+																							'yformat':budgetvalue,
 																							'color':'blue',
 																							'name': orgimplement.organization+' ('+orgimplement.project_budget_currency+')',
 																							'label': (orgimplement.TOTALBUDGET / (totalFinancialFinalOrgImple))*100
@@ -4526,8 +4617,15 @@ var Cluster4wprojectplanDashboardController = {
 												orgdon.donor_id;
 
 											}
+
+											var budgetvalue = Math.round(orgdon.TOTALBUDGET);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+												valueformat = valueformat.replace(/,/g,'.');
+
+
 												var neworgdonorfinancial = {
-													'y': parseFloat(orgdon.TOTALBUDGET),
+													'y': budgetvalue,
+													'yformat': valueformat,
 													'color':'blue',
 													'name': donor_name+' ('+orgdon.project_budget_currency+')',
 													'label': (orgdon.TOTALBUDGET / (totalFinancialFinalDonor))*100
@@ -4788,8 +4886,14 @@ var Cluster4wprojectplanDashboardController = {
 																						orgdonor.donor_name;
 
 																					}
+
+																					var budgetvalue = Math.round(orgdonor.TOTALBUDGET);
+																					var valueformat = Intl.NumberFormat().format(budgetvalue);
+																					valueformat = valueformat.replace(/,/g,'.');
+
 																						var newdonorfinancial = {
-																							'y': parseFloat(orgdonor.TOTALBUDGET),
+																							'y': budgetvalue,
+																							'yformat':valueformat,
 																							'color':'blue',
 																							'name': orgdonor_name+' ('+orgdonor.project_budget_currency+')',
 																							'label': (orgdonor.TOTALBUDGET / (totalFinancialFinalDonors))*100
