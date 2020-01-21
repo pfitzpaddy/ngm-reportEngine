@@ -302,7 +302,7 @@ var Cluster4wprojectplanDashboardController = {
 
 								//console.log("TOTAL: ",targloc.length + ' - '+project.id);
 
-								if(targloc.length){
+								if(targloc && targloc.length){
 								//	console.log("VOY A DAR PUSH: ",project.id);
 									totalprojectsupdated.push(project);
 								}
@@ -413,7 +413,7 @@ var Cluster4wprojectplanDashboardController = {
 
 								//console.log("TOTAL: ",targloc.length + ' - '+project.id);
 
-								if(targloc.length){
+								if(targloc && targloc.length){
 								//	console.log("VOY A DAR PUSH: ",project.id);
 									totalprojects.push(project);
 								}
@@ -615,7 +615,7 @@ var Cluster4wprojectplanDashboardController = {
 							.where( filters.admin2pcode ).exec(function(err,targloc){
 
 
-								if(targloc.length){
+								if(targloc && targloc.length){
 
 									
 									totalBeneficiaries = totalBeneficiaries + benefrecord.total_male + benefrecord.total_female;
@@ -787,9 +787,10 @@ var Cluster4wprojectplanDashboardController = {
 							.where( filters.admin1pcode )
 							.where( filters.admin2pcode ).exec(function(err,targloc){
 
-								//console.log("TOTAL: ",targloc.length + ' - '+project.id);
+								
 
-								if(targloc.length){
+
+								if(targloc && targloc.length){
 									
 									if(typeof project.project_budget === 'string'){
 
@@ -977,7 +978,7 @@ var Cluster4wprojectplanDashboardController = {
 											.where( filters.admin1pcode )
 											.where( filters.admin2pcode ).exec(function(err,targloc){
 
-												if(targloc.length){
+												if(targloc && targloc.length){
 
 
 
@@ -1113,8 +1114,9 @@ var Cluster4wprojectplanDashboardController = {
 											.where( filters.admin1pcode )
 											.where( filters.admin2pcode ).exec(function(err,targloc){
 
+												
 
-												if(targloc.length){
+												if(targloc && targloc.length){
 
 					                                  const exist = orgstotal.find( org => org.organization_tag === proj.organization_tag );
 
@@ -1274,7 +1276,7 @@ var Cluster4wprojectplanDashboardController = {
 											.where( filters.admin2pcode ).exec(function(err,targloc){
 
 
-												if(targloc.length){
+												if(targloc && targloc.length){
 
 													projrecord.project_donor.forEach(function (projdonor, j){
 
@@ -1424,7 +1426,7 @@ var Cluster4wprojectplanDashboardController = {
 											.where( filters.admin2pcode ).exec(function(err,targloc){
 
 
-											if(targloc.length){
+											if(targloc && targloc.length){
 
 											projrecord.implementing_partners.forEach(function (partner, j){
 
@@ -1583,7 +1585,7 @@ var Cluster4wprojectplanDashboardController = {
 											.where( filters.admin2pcode ).exec(function(err,targloc){
 
 
-											if(targloc.length){
+											if(targloc && targloc.length){
 
 											//console.log("ID PRJ: ",projrecord.id);
 									//console.log("ID PRJ: ",projrecord.implementing_partners);
@@ -2006,7 +2008,7 @@ var Cluster4wprojectplanDashboardController = {
 												.where( filters.admin1pcode )
 												.where( filters.admin2pcode ).exec(function(err,targloc){
 
-													if(targloc.length){
+													if(targloc && targloc.length){
 															totalprojectsupdated.push(targben);
 
 															totalMale = totalMale+targben.total_male;
@@ -2361,7 +2363,7 @@ var Cluster4wprojectplanDashboardController = {
 												.where( filters.admin1pcode )
 												.where( filters.admin2pcode ).exec(function(err,targloc){
 
-													if(targloc.length){
+													if(targloc && targloc.length){
 
 															totalprojectsupdated.push(targben);
 
@@ -2674,7 +2676,7 @@ var Cluster4wprojectplanDashboardController = {
 										.where( filters.admin1pcode )
 										.where( filters.admin2pcode ).exec(function(err,targloc){
 
-												if(targloc.length){
+												if(targloc && targloc.length){
 
 													listTargetBeneficiariesCluster.push(targben);
 		
@@ -2960,7 +2962,7 @@ var Cluster4wprojectplanDashboardController = {
 										.where( filters.admin1pcode )
 										.where( filters.admin2pcode ).exec(function(err,targloc){
 
-											if(targloc.length){
+											if(targloc && targloc.length){
 
 												listTargetBeneficiaries.push(targben);
 
@@ -3291,7 +3293,7 @@ var Cluster4wprojectplanDashboardController = {
 										.where( filters.admin1pcode )
 										.where( filters.admin2pcode ).exec(function(err,targloc){
 
-											if(targloc.length){
+											if(targloc && targloc.length){
 
 												listProjectsBudgetCluster.push(project);
 
@@ -3325,20 +3327,20 @@ var Cluster4wprojectplanDashboardController = {
 
 									         	totalFinancialFinalCluster = 0;
 
-									         	listProjectsBudgetCluster.forEach(function (project){
+									         	listProjectsBudgetCluster.forEach(function (projt){
 
-									         		if(project.project_budget_currency === 'cop'){
-														var clustotalBudgetsCOPtoUSD = project.project_budget/params.coptousd;
+									         		if(projt.project_budget_currency === 'cop'){
+														var clustotalBudgetsCOPtoUSD = projt.project_budget/params.coptousd;
 														totalFinancialFinalCluster = totalFinancialFinalCluster+clustotalBudgetsCOPtoUSD;
 
-													}else if(project.project_budget_currency === 'eur'){
+													}else if(projt.project_budget_currency === 'eur'){
 
 
-														totalFinancialFinalCluster = totalFinancialFinalCluster+(project.project_budget*params.eurotousd);
+														totalFinancialFinalCluster = totalFinancialFinalCluster+(projt.project_budget*params.eurotousd);
 													
 
 													}else{
-														totalFinancialFinalCluster = totalFinancialFinalCluster+project.project_budget
+														totalFinancialFinalCluster = totalFinancialFinalCluster+projt.project_budget
 
 													}
 									         	});
@@ -3644,7 +3646,7 @@ var Cluster4wprojectplanDashboardController = {
 										.where( filters.admin1pcode )
 										.where( filters.admin2pcode ).exec(function(err,targloc){
 
-											if(targloc.length){
+											if(targloc && targloc.length){
 
 												listProjectsBudgetExOrg.push(project);
 
@@ -4137,10 +4139,12 @@ var Cluster4wprojectplanDashboardController = {
 										.where( filters.admin1pcode )
 										.where( filters.admin2pcode ).exec(function(err,targloc){
 
-											if(targloc.length){
+											
 
-												if(typeof budgprog.project_budget === 'string'){
-													var stringtonum = parseFloat(budgprog.project_budget);
+											if(targloc && targloc.length){
+
+												if(typeof project.project_budget === 'string'){
+													var stringtonum = parseFloat(project.project_budget);
 
 										            	
 
@@ -4150,20 +4154,20 @@ var Cluster4wprojectplanDashboardController = {
 															if(project.project_budget_currency === 'cop'){
 
 
-																totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (project.project_budget/params.coptousd);
+																totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (stringtonum/params.coptousd);
 
 
 															}else if(project.project_budget_currency === 'eur'){
 
 
-																totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (project.project_budget*params.eurotousd);
+																totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (stringtonum*params.eurotousd);
 																
 															
 
 															}else{
 
 
-																totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (project.project_budget);
+																totalFinancialFinalOrgImple = totalFinancialFinalOrgImple + (stringtonum);
 															}
 
 													}else{
@@ -4327,7 +4331,7 @@ var Cluster4wprojectplanDashboardController = {
 
 																						var neworgimplefinancial = {
 																							'y': budgetvalue,
-																							'yformat':budgetvalue,
+																							'yformat':valueformat,
 																							'color':'blue',
 																							'name': orgimplement.organization+' ('+orgimplement.project_budget_currency+')',
 																							'label': (orgimplement.TOTALBUDGET / (totalFinancialFinalOrgImple))*100
@@ -4712,7 +4716,7 @@ var Cluster4wprojectplanDashboardController = {
 										.where( filters.admin1pcode )
 										.where( filters.admin2pcode ).exec(function(err,targloc){
 
-											if(targloc.length){
+											if(targloc && targloc.length){
 
 												if(typeof project.project_budget === 'string'){
 													var stringtonum = parseFloat(project.project_budget);
