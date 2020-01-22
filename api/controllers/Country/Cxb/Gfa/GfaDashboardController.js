@@ -1410,8 +1410,9 @@ var GfaDashboardController = {
 
 			// foreach record
 			var sub_header;
-			var gfd_entitlement;
 			var new_family_size = true;
+			// gfd entitlement
+			var gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 
 			// beneficiary counter
 			var beneficiary_page_count = 1;
@@ -1475,9 +1476,6 @@ var GfaDashboardController = {
 
 				// set beneficiary
 				var b = distribution_groups[ family_size ][ i ];
-
-				// gfd entitlement
-				var gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 
 				// new page?
 				var page_break = new_family_size || ( beneficiary_page_count > beneficiary_page_length );
