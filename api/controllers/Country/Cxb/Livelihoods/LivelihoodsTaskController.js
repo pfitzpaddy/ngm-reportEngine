@@ -17,9 +17,9 @@ const EXEC = require('child_process').exec;
 
 // kobo config
 if ( sails.config.kobo ) {
-	var kobo_user = sails.config.kobo.WFP_LIVELIHOODS_USER;
-	var kobo_password = sails.config.kobo.WFP_LIVELIHOODS_PASSWORD;
-	var kobo_pk = sails.config.kobo.WFP_LIVELIHOODS_PK;
+    var kobo_user = sails.config.kobo.WFP_LIVELIHOODS_USER;
+    var kobo_password = sails.config.kobo.WFP_LIVELIHOODS_PASSWORD;
+    var kobo_pk = sails.config.kobo.WFP_LIVELIHOODS_PK;
 }
 
 // merge geo by distribution_points
