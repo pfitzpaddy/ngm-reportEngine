@@ -745,6 +745,12 @@ var GfaTaskController = {
 					// remove absent
 					var actual = _.filter( distribution, function( d ){ return !_.findWhere( absent_beneficiaries, { fcn_id: d.fcn_id }); });
 
+					console.log( 'Set Actual --------------' );
+					console.log( count );
+					console.log( length );
+					console.log( distribution.length );
+					console.log( actual.length );
+
 					ActualBeneficiaries
 						.create( actual )
 						.exec( function( err, update ){
