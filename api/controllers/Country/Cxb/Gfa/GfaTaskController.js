@@ -527,9 +527,9 @@ var GfaTaskController = {
 
 					// find absent, if any
 					if ( absent_beneficiaries.length ) {
-						var d = _.findWhere( absent_beneficiaries, { fcn_id: fcn_id } );
-						if ( d ) {
-							distribution_date_actual = d.distribution_date_actual;	
+						var absent = _.findWhere( absent_beneficiaries, { fcn_id: fcn_id } );
+						if ( absent ) {
+							distribution_date_actual = absent.distribution_date_actual;	
 						}
 					}
 
