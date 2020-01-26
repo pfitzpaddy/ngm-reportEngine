@@ -541,7 +541,7 @@ var GfaTaskController = {
 
 					// majhee
 					planned.majhee_name = d[ 11 ].trim();
-					planned.majhee_phone = d[ 12 ].trim();
+					planned.majhee_phone = d[ 12 ];
 					planned.fh_name = d[ 14 ].trim();
 					planned.hh_name = d[ 13 ].trim();
 					planned.hh_age = parseInt( d[ 24 ] );
