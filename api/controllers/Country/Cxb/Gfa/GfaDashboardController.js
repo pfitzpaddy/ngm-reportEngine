@@ -729,75 +729,96 @@ var GfaDashboardController = {
 										function doDistributionDate( params, form, date_key, distribution_dates ) {
 
 											// group by date
-											var sub_block = _.groupBy( _.sortBy( distribution_dates[ date_key ], 'admin5name' ), 'admin5name' );
+											var camps = _.groupBy( _.sortBy( distribution_dates[ date_key ], 'admin3name' ), 'admin3name' );
 
 											// distribution_dates
-											var sub_block_count = 0;
-											var sub_block_keys = Object.keys( sub_block );
-											var sub_block_length = Object.keys( sub_block ).length;
+											var camp_count = 0;
+											var camp_keys = Object.keys( camps );
+											var camp_length = Object.keys( camps ).length;
 
 											// run PDF function
-											doSubBlock( params, form, date_key, sub_block_keys[ sub_block_count ], sub_block );
+											doCamp( params, form, date_key, camp_keys[ camp_count ], camps );
 
 											// loop each date to allow for PDF generation
-											function doSubBlock( params, form, date_key, sub_block_key, sub_block ) {
+											function doCamp( params, form, date_key, camp_key, camps ) {
 
-												// html
-												var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
+												// group by date
+												var sub_block = _.groupBy( _.sortBy( camps[ camp_key ], 'admin5name' ), 'admin5name' );
 
-												// fs write template
-												fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
-													// err
-													if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
-													
-													// import updated form
-													var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
+												// distribution_dates
+												var sub_block_count = 0;
+												var sub_block_keys = Object.keys( sub_block );
+												var sub_block_length = Object.keys( sub_block ).length;
 
-													// run curl command
-													EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
+												// run PDF function
+												doSubBlock( params, form, date_key, camp_key, sub_block_keys[ sub_block_count ], sub_block );
+
+												// loop each date to allow for PDF generation
+												function doSubBlock( params, form, date_key, camp_key, sub_block_key, sub_block ) {
+
+													// html
+													var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, camp_key, sub_block_key, sub_block );
+
+													// fs write template
+													fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
 														// err
-														if ( error ) {
-															// return error
-															res.json( 400, { error: 'PDF error!', details: error  } );
-														} else {
-															
-															// delete template
-															fs.unlink( template.dir + template.report + '.html', function ( err ) {
-																// err
-																if ( err ) throw err;
+														if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
+														
+														// import updated form
+														var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
 
-																// generate master list pdf completed
-																sub_block_count++;
-																if ( sub_block_count === sub_block_length ) {
-																	dates_count++;
-																	if ( dates_count === dates_length ) {
-																		forms_count++;
-																		if ( forms_count === forms_length ) {
-																			// zip
-																			var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
-																			// run curl command
-																			EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
-																				// err
-																				if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
-																					// success
-																					return res.json( 200, { report: folder + '.zip' });
-																			});
+														// run curl command
+														EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
+															// err
+															if ( error ) {
+																// return error
+																res.json( 400, { error: 'PDF error!', details: error  } );
+															} else {
+																
+																// delete template
+																fs.unlink( template.dir + template.report + '.html', function ( err ) {
+																	// err
+																	if ( err ) throw err;
+
+																	// generate master list pdf completed
+																	sub_block_count++;
+																	if ( sub_block_count === sub_block_length ) {
+																		camp_count++;
+																		if ( camp_count === camp_length ) {
+																			dates_count++;
+																			if ( dates_count === dates_length ) {
+																				forms_count++;
+																				if ( forms_count === forms_length ) {
+																					// zip
+																					var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
+																					// run curl command
+																					EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
+																						// err
+																						if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
+																							// success
+																							return res.json( 200, { report: folder + '.zip' });
+																					});
+																				} else {
+																					doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
+																				}
+																			} else {
+																				doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
+																			}
 																		} else {
-																			doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
+																			doCamp( params, form, date_key, camp_keys[ camp_count ], camps );
 																		}
 																	} else {
-																		doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
+																		doSubBlock( params, form, date_key, camp_key, sub_block_keys[ sub_block_count ], sub_block );
 																	}
-																} else {
-																	doSubBlock( params, form, date_key, sub_block_keys[ sub_block_count ], sub_block );
-																}
-															});
+																});
+															
+															}
 														
-														}
-													
+														});
+
 													});
 
-												});
+												}
 
 											}
 										
@@ -867,7 +888,7 @@ var GfaDashboardController = {
 
 									} 
 
-									// distribution_plan
+									// distribution_plan ( actual )
 									if ( distribution_plan ) {
 
 										// group by date
@@ -885,75 +906,96 @@ var GfaDashboardController = {
 										function doDistributionDate( params, form, date_key, distribution_dates ) {
 
 											// group by date
-											var sub_block = _.groupBy( _.sortBy( distribution_dates[ date_key ], 'admin5name' ), 'admin5name' );
+											var camps = _.groupBy( _.sortBy( distribution_dates[ date_key ], 'admin3name' ), 'admin3name' );
 
 											// distribution_dates
-											var sub_block_count = 0;
-											var sub_block_keys = Object.keys( sub_block );
-											var sub_block_length = Object.keys( sub_block ).length;
+											var camp_count = 0;
+											var camp_keys = Object.keys( camps );
+											var camp_length = Object.keys( camps ).length;
 
 											// run PDF function
-											doSubBlock( params, form, date_key, sub_block_keys[ sub_block_count ], sub_block );
+											doCamp( params, form, date_key, camp_keys[ camp_count ], camps );
 
 											// loop each date to allow for PDF generation
-											function doSubBlock( params, form, date_key, sub_block_key, sub_block ) {
+											function doCamp( params, form, date_key, camp_key, camps ) {
 
-												// html
-												var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, sub_block_key, sub_block );
+												// group by date
+												var sub_block = _.groupBy( _.sortBy( camps[ camp_key ], 'admin5name' ), 'admin5name' );
 
-												// fs write template
-												fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
-													// err
-													if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
-													
-													// import updated form
-													var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
+												// distribution_dates
+												var sub_block_count = 0;
+												var sub_block_keys = Object.keys( sub_block );
+												var sub_block_length = Object.keys( sub_block ).length;
 
-													// run curl command
-													EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
+												// run PDF function
+												doSubBlock( params, form, date_key, camp_key, sub_block_keys[ sub_block_count ], sub_block );
+
+												// loop each date to allow for PDF generation
+												function doSubBlock( params, form, date_key, camp_key, sub_block_key, sub_block ) {
+
+													// html
+													var template = GfaDashboardController.getDistributionPlanHtmlTemplate( params, form, date_key, camp_key, sub_block_key, sub_block );
+
+													// fs write template
+													fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
 														// err
-														if ( error ) {
-															// return error
-															res.json( 400, { error: 'PDF error!', details: error  } );
-														} else {
-															
-															// delete template
-															fs.unlink( template.dir + template.report + '.html', function ( err ) {
-																// err
-																if ( err ) throw err;
+														if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
+														
+														// import updated form
+														var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
 
-																// generate master list pdf completed
-																sub_block_count++;
-																if ( sub_block_count === sub_block_length ) {
-																	dates_count++;
-																	if ( dates_count === dates_length ) {
-																		forms_count++;
-																		if ( forms_count === forms_length ) {
-																			// zip
-																			var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
-																			// run curl command
-																			EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
-																				// err
-																				if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
-																					// success
-																					return res.json( 200, { report: folder + '.zip' });
-																			});
+														// run curl command
+														EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
+															// err
+															if ( error ) {
+																// return error
+																res.json( 400, { error: 'PDF error!', details: error  } );
+															} else {
+																
+																// delete template
+																fs.unlink( template.dir + template.report + '.html', function ( err ) {
+																	// err
+																	if ( err ) throw err;
+
+																	// generate master list pdf completed
+																	sub_block_count++;
+																	if ( sub_block_count === sub_block_length ) {
+																		camp_count++;
+																		if ( camp_count === camp_length ) {
+																			dates_count++;
+																			if ( dates_count === dates_length ) {
+																				forms_count++;
+																				if ( forms_count === forms_length ) {
+																					// zip
+																					var zip_cmd = 'cd /home/ubuntu/nginx/www/ngm-reportPrint/pdf; zip -r ' + folder + '.zip ' + folder;
+																					// run curl command
+																					EXEC( zip_cmd, { maxBuffer: 1024 * 1024 }, function( error, stdout, stderr ) {
+																						// err
+																						if ( error ) return res.json( 400, { error: 'ZIP error!', details: error  } );
+																							// success
+																							return res.json( 200, { report: folder + '.zip' });
+																					});
+																				} else {
+																					doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
+																				}
+																			} else {
+																				doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
+																			}
 																		} else {
-																			doDistributionPoint( forms_count, forms_length, forms[ forms_count ], distribution_list[ forms[ forms_count ].site_id ] );
+																			doCamp( params, form, date_key, camp_keys[ camp_count ], camps );
 																		}
 																	} else {
-																		doDistributionDate( params, form, dates_keys[ dates_count ], distribution_dates );
+																		doSubBlock( params, form, date_key, camp_key, sub_block_keys[ sub_block_count ], sub_block );
 																	}
-																} else {
-																	doSubBlock( params, form, date_key, sub_block_keys[ sub_block_count ], sub_block );
-																}
-															});
+																});
+															
+															}
 														
-														}
-													
+														});
+
 													});
 
-												});
+												}
 
 											}
 										
@@ -1320,7 +1362,7 @@ var GfaDashboardController = {
 	},
 
 	// return html template for distribution master list
-	getDistributionPlanHtmlTemplate: function( params, form, date_key, sub_block_key, master_roll ) {
+	getDistributionPlanHtmlTemplate: function( params, form, date_key, camp_key, sub_block_key, master_roll ) {
 
 		// html content
 		var page_html_start = '';
@@ -1333,7 +1375,7 @@ var GfaDashboardController = {
 		// template object
 		var template = {
 			dir: '/home/ubuntu/data/html/template/',
-			report: params.organization_tag + '_' + form.site_id + '_' + params.report_round + '_' + params.report_distribution + '_' + date_key + '_' + sub_block_key + '_master_list',
+			report: params.organization_tag + '_' + form.site_id + '_' + params.report_round + '_' + params.report_distribution + '_' + date_key + '_' + camp_key.toLowerCase().replace(' ', '_' ) + '_' + sub_block_key + '_master_list',
 			header_1: 'Master Roll for GFD Point: ' + form.site_name + ', Round ' + form.report_round + ', Distribution ' + params.report_distribution,
 			header_2: 'Distribution Date: ' + moment( date_key ).format( 'MMMM Do YYYY' ),
 			footer: 'Funded by the World Food Programme (WFP)'
@@ -1422,22 +1464,22 @@ var GfaDashboardController = {
 			if ( params.report_round === '1' ) {
 				if ( family_size === 'family_size_1_3' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 1 to 3, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 1 to 3';
 					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 				}
 				if ( family_size === 'family_size_4_7' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 4 to 7, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 4 to 7';
 					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 				}
 				if ( family_size === 'family_size_8_10' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 8 to 10, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 8 to 10';
 					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 				}
 				if ( family_size === 'family_size_11' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 11+, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 11+';
 					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
 				}
 			
@@ -1447,22 +1489,22 @@ var GfaDashboardController = {
 			if ( params.report_round === '2' ) {
 				if ( family_size === 'family_size_1_3' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 1 to 3, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 1 to 3';
 					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 				}
 				if ( family_size === 'family_size_4_7' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 4 to 7, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 4 to 7';
 					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
 				}
 				if ( family_size === 'family_size_8_10' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 8 to 10, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 8 to 10';
 					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
 				}
 				if ( family_size === 'family_size_11' ) {
 					// gfd_entitlement
-					sub_header = 'Family Size 11+, Sub Block ' + sub_block_key;
+					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 11+';
 					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
 				}
 			

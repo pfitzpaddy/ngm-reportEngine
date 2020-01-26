@@ -286,8 +286,7 @@ var GfaTaskController = {
 				return res.json( 200, { list: forms });
 
 			});
-
-
+			
 	},
 
 	// set distribution round
