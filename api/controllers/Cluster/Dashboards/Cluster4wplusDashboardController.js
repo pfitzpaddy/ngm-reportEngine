@@ -1551,10 +1551,10 @@ var Cluster4wplusDashboardController = {
 										}
 									}
 								}*/
-							]).toArray( function (err, resultsLocations) {
+							]).toArray( async function (err, resultsLocations) {
 
 							   resultsLocations.forEach(function(d,i){
-	 
+
 								const exist = locationsMarkTotal.find(locati => (locati._id.site_lat === d._id.admin2lat && locati._id.site_lng === d._id.admin2lng));
 
 								if(!exist){
@@ -1592,8 +1592,10 @@ var Cluster4wplusDashboardController = {
 
 
 					    	 // return no locations
-								if ( !locationsMarkTotal.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:4.5973254, lng:-74.0759398, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
-
+								if ( !locationsMarkTotal.length ) {
+                  coordinates = await AreaCentroidService.getAreaCentroid(filterObjectBenef);
+                  return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:4.5973254, lng:-74.0759398, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
+                }
 								// length
 								length = locationsMarkTotal.length;
 

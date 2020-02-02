@@ -1414,7 +1414,7 @@ var Cluster4wprojectplanDashboardController = {
 
 
 
-										if(projrecord.implementing_partners.length > 0){
+										if(projrecord.implementing_partners && projrecord.implementing_partners.length > 0){
 
 
 
@@ -1573,7 +1573,7 @@ var Cluster4wprojectplanDashboardController = {
 
 
 
-										if(projrecord.implementing_partners.length > 0){
+										if(projrecord.implementing_partners && projrecord.implementing_partners.length > 0){
 
 
 
@@ -1724,12 +1724,15 @@ var Cluster4wprojectplanDashboardController = {
 									}
 								  }
 								}
-							]).toArray(function (err, targetlocations) {
+							]).toArray(async function (err, targetlocations) {
 							  	if (err) return res.serverError(err);
-							
-								// return no locations
-								if ( !targetlocations.length ) return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:4.5973254, lng:-74.0759398, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
 
+								// return no locations
+								if ( !targetlocations.length ) {
+                  coordinates = await AreaCentroidService.getAreaCentroid(filterObject);
+                  return res.json(200, { 'data': { 'marker0': { layer: 'projects', lat: coordinates.lat, lng: coordinates.lng, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } });
+                  // return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat:4.5973254, lng:-74.0759398, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
+                }
 								// length
 								length = targetlocations.length;
 								// foreach location
