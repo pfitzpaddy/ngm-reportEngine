@@ -230,11 +230,18 @@ var LivelihoodsTaskController = {
 
 				// scan
 				if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ] ) {
-					d.progres_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[0];
-					d.progres_case_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[1];
-					d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[2];
-					d.beneficiary_name = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[3];
-					d.beneficiary_gender = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[4];
+                    // string containing ';'?
+                        // no
+                    if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ].indexOf(';') === -1 ) {
+                        d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ];
+                        // yes
+                    } else {
+                        d.progres_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[0];
+                        d.progres_case_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[1];
+                        d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[2];
+                        d.beneficiary_name = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[3];
+                        d.beneficiary_gender = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[4];
+                    }
 				} else {
 					d.fcn_id = data[ 'group_af9zh97/fcn_id' ];
 				}
