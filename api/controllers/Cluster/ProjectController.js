@@ -107,6 +107,7 @@ var ProjectController = {
       delete r.id;
       delete r.createdAt;
       delete r.updatedAt;
+      delete r.implementing_partners;
 
       // async loop target_beneficiaries
       async.each( target_locations, function ( target_location, tl_next ) {
@@ -855,11 +856,17 @@ var ProjectController = {
     delete project_copy_no_cluster.cluster;
     delete project_copy_no_cluster.cluster_id;
 
+    var project_copy_no_implementing_partners = JSON.parse( JSON.stringify( project_copy ) );
+    delete project_copy_no_implementing_partners.implementing_partners;
+
+    var project_copy_no_cluster_no_implementing_partners = JSON.parse( JSON.stringify( project_copy_no_cluster ) );
+    delete project_copy_no_cluster_no_implementing_partners.implementing_partners;
+
     // promise
     Promise.all([
       Project.updateOrCreate( { id: project.id }, project ),
       // budget_progress, target_beneficiaries, target_locations, report, location ( below )
-      Beneficiaries.update( findProject, project_copy_no_cluster ),
+      Beneficiaries.update( findProject, project_copy_no_cluster_no_implementing_partners ),
     ])
     .catch( function( err ) {
       return res.negotiate( err );
@@ -933,7 +940,7 @@ var ProjectController = {
       // ASYNC REQUEST 3
       // async loop target_locations
       async.eachOf( target_locations, function ( d, il, next ) {
-        var t_location = _under.extend( {}, d, project_copy, {
+        var t_location = _under.extend( {}, d, project_copy_no_implementing_partners, {
           name: d.name,
           position: d.position,
           phone: d.phone,
