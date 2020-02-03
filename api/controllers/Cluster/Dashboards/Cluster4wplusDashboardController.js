@@ -1955,10 +1955,29 @@ var Cluster4wplusDashboardController = {
 											
 
 											var TotalAge_0_5 = $beneficiaries.age_0_5;
+											var TotalAge_0_5round = Math.round(TotalAge_0_5);
+											var totalAge_0_5valueformat = Intl.NumberFormat().format(TotalAge_0_5round);
+												totalAge_0_5valueformat = totalAge_0_5valueformat.replace(/,/g,'.');
+
 											var TotalAge_6_11 = $beneficiaries.age_6_11;
+											var TotalAge_6_11round = Math.round(TotalAge_6_11);
+											var totalAge_6_11valueformat = Intl.NumberFormat().format(TotalAge_6_11round);
+												totalAge_6_11valueformat = totalAge_6_11valueformat.replace(/,/g,'.');
+
 											var TotalAge_12_17 = $beneficiaries.age_12_17;
+											var TotalAge_12_17round = Math.round(TotalAge_12_17);
+											var totalAge_12_17valueformat = Intl.NumberFormat().format(TotalAge_12_17round);
+												totalAge_12_17valueformat = totalAge_12_17valueformat.replace(/,/g,'.');
+
 											var TotalAge_18_59 = $beneficiaries.age_18_59;
+											var TotalAge_18_59round = Math.round(TotalAge_18_59);
+											var totalAge_18_59valueformat = Intl.NumberFormat().format(TotalAge_18_59round);
+												totalAge_18_59valueformat = totalAge_18_59valueformat.replace(/,/g,'.');
+
 											var TotalAge_60_more = $beneficiaries.age_60_more;
+											var TotalAge_60_moreround = Math.round(TotalAge_60_more);
+											var totalAge_60_morevalueformat = Intl.NumberFormat().format(TotalAge_60_moreround);
+												totalAge_60_morevalueformat = totalAge_60_morevalueformat.replace(/,/g,'.');
 
 											var TotalAges = $beneficiaries.sexTotal;
 											//var TotalAges = TotalAge_6_11 + TotalAge_0_5 +TotalAge_12_17 +  TotalAge_18_59 + TotalAge_60_more;
@@ -1976,24 +1995,30 @@ var Cluster4wplusDashboardController = {
 
 
 											result.data[0].y = $beneficiaries.age_0_5;
+											result.data[0].yformat = totalAge_0_5valueformat;
 											result.data[0].color = '#c7c7c7';
 											result.data[0].label = age_0_5PerCent;
+
 											// // highcharts men
 											result.data[1].y = TotalAge_6_11 ;
+											result.data[1].yformat = totalAge_6_11valueformat;
 											//result.data[1].y = 579 ;
 											result.data[1].label = age_6_11PerCent ;
 											//console.log("LABEL: ",result.data[1]);
 											result.data[1].color = '#90caf9';
 
 											result.data[2].y = TotalAge_12_17;
+											result.data[2].yformat = totalAge_12_17valueformat;
 											result.data[2].label = age_12_17PerCent ;
 											result.data[2].color = 'red';
 
 											result.data[3].y = TotalAge_18_59;
+											result.data[3].yformat = totalAge_18_59valueformat;
 											result.data[3].label = age_18_59PerCent ;
 											result.data[3].color = 'blue';
 
 											result.data[4].y = TotalAge_60_more;
+											result.data[4].yformat = totalAge_60_morevalueformat;
 											result.data[4].label = age_60_morePerCent ;
 											result.data[4].color = 'orange';
 
@@ -2107,10 +2132,15 @@ var Cluster4wplusDashboardController = {
 
 												if(i<5){
 
+													var benefvalue = Math.round(benadmin1.totalBeneficiaries);
+										var valueformat = Intl.NumberFormat().format(benefvalue);
+										valueformat = valueformat.replace(/,/g,'.');
+
 
 
 													var newadmin1beneficiary = {
-														'y':benadmin1.totalBeneficiaries,
+														'y':benefvalue,
+														'yformat':valueformat,
 														'color':'blue',
 														'name': benadmin1._id.admin1name,
 														'label': (benadmin1.totalBeneficiaries / (beneficiaries.totalBeneficiariesAdmin1))*100
@@ -2227,8 +2257,13 @@ var Cluster4wplusDashboardController = {
 
 											beneficiaries.forEach(function(bentype,i){
 
+												var benefvalue = Math.round(bentype.totalBeneficiaries);
+										var valueformat = Intl.NumberFormat().format(benefvalue);
+										valueformat = valueformat.replace(/,/g,'.');
+
 											var newclusterbeneficiary = {
-												'y':bentype.totalBeneficiaries,
+												'y':benefvalue,
+												'yformat':valueformat,
 												'color':'blue',
 												'name': bentype._id.beneficiary_type_name,
 												'label': (bentype.totalBeneficiaries / (beneficiaries.totalBeneficiariesType))*100
@@ -2332,8 +2367,16 @@ var Cluster4wplusDashboardController = {
 
 											beneficiaries.forEach(function(clus,i){
 
+
+												var benefvalue = Math.round(clus.totalBeneficiaries);
+										var valueformat = Intl.NumberFormat().format(benefvalue);
+										valueformat = valueformat.replace(/,/g,'.');
+
+
+
 											var newclusterbeneficiary = {
-												'y':clus.totalBeneficiaries,
+												'y':benefvalue,
+												'yformat':valueformat,
 												'color':'blue',
 												'name': clus._id.cluster,
 												'label': (clus.totalBeneficiaries / (beneficiaries.totalBeneficiariesCluster))*100
@@ -2498,11 +2541,18 @@ var Cluster4wplusDashboardController = {
 											}
 
 
-												clus.totalBudgetProgress = clus.totalBudgetProgress.toFixed(2);
+												
+
+												var budgetvalue = Math.round(clus.totalBudgetProgress);
+												var valueformat = Intl.NumberFormat().format(budgetvalue);
+										valueformat = valueformat.replace(/,/g,'.');
+
+
 
 
 												var newclusterbudgetProgress = {
-													'y': parseFloat(clus.totalBudgetProgress),
+													'y': budgetvalue,
+													'yformat':valueformat,
 													'color':'blue',
 													'name': org_name+' ('+clus._id.currency_id+')',
 													'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressExecutorOrg))*100
@@ -2731,9 +2781,15 @@ var Cluster4wplusDashboardController = {
 											}
 
 
+											var budgetvalue = Math.round(orgimplementer.TOTALBUDGET);
+											var valueformat = Intl.NumberFormat().format(budgetvalue);
+											valueformat = valueformat.replace(/,/g,'.');
+
 
 												var neworgimplefinancial = {
-													'y': parseFloat(orgimplementer.TOTALBUDGET),
+													//'y': parseFloat(orgimplementer.TOTALBUDGET),
+													'y': budgetvalue,
+													'yformat':valueformat,
 													'color':'blue',
 													'name': orgimplementer.organization+' ('+orgimplementer.currency_id+')',
 													'label': (orgimplementer.TOTALBUDGET / (totalFinancialFinalOrgImple))*100
@@ -2894,8 +2950,7 @@ var Cluster4wplusDashboardController = {
 
 											budgetprogressdonor.forEach(function(donor,i){
 
-										
-											if(i<5){
+												if(i<5){
 											var donor_name;
 											if(donor._id.project_donor_id){
 												donor_name = donor._id.project_donor_name;
@@ -2906,14 +2961,22 @@ var Cluster4wplusDashboardController = {
 											}
 
 
-												donor.totalBudgetProgressDonor = donor.totalBudgetProgressDonor.toFixed(2);
+												//donor.totalBudgetProgressDonor = donor.totalBudgetProgressDonor.toFixed(2);
+
+												var budgetvalue = Math.round(donor.totalBudgetProgressDonor);
+												var valueformat = Intl.NumberFormat().format(budgetvalue);
+												valueformat = valueformat.replace(/,/g,'.');
+
 
 												
 												var newdonorbudgetProgress = {
-													'y': parseFloat(donor.totalBudgetProgressDonor),
+													//'y': parseFloat(donor.totalBudgetProgressDonor),
+													'y': budgetvalue,
+													'yformat':valueformat,
 													'color':'blue',
 													'name': donor_name+' ('+donor._id.currency_id+')',
-													'label': (donor.totalBudgetProgressDonor / (totalBudget))*100
+													'label': (donor.totalBudgetProgressDonor / (totalBudget))*100,
+													/// 'drilldown': donor_name
 												};
 
 
@@ -2924,7 +2987,7 @@ var Cluster4wplusDashboardController = {
 
 											});
 
-										//	console.log("RESULT DATA: ",result.data);
+										
 											
 											return res.json(200, result);
 										}
@@ -3074,10 +3137,15 @@ var Cluster4wplusDashboardController = {
 												if(i<5){
 
 
-														budprogadmin1.totalBudgetProgress = budprogadmin1.totalBudgetProgress.toFixed(2);
+
+														var budgetvalue = Math.round(budprogadmin1.totalBudgetProgress);
+														var valueformat = Intl.NumberFormat().format(budgetvalue);
+										valueformat = valueformat.replace(/,/g,'.');
+
 
 													var newadmin1financing = {
-														'y':parseFloat(budprogadmin1.totalBudgetProgress),
+														'y':budgetvalue,
+														'yformat':valueformat,
 														'color':'blue',
 														'name': budprogadmin1._id.admin1name+' ('+budprogadmin1._id.currency_id+')',
 														'label': (budprogadmin1.totalBudgetProgress / (budgetprogress.totalBudgetProgressAdmin1pcode))*100
@@ -3218,7 +3286,6 @@ var Cluster4wplusDashboardController = {
 											var clustotalBudgetsCOPtoUSDChart = clus.totalBudgetProgress/params.coptousd;
 											//console.log("DESPUES2 : ",clustotalBudgetsCOPtoUSDChart);
 											clus.totalBudgetProgress = clustotalBudgetsCOPtoUSDChart;
-											clus.totalBudgetProgress = clus.totalBudgetProgress.toFixed(2);
 											
 
 										}else if(clus._id.currency_id === 'eur'){
@@ -3227,13 +3294,18 @@ var Cluster4wplusDashboardController = {
 											//console.log("DESPUES EUR: ",clustotalBudgetsEURtoUSDChart);
 											clus.totalBudgetProgress = clustotalBudgetsEURtoUSDChart;
 
-											clus.totalBudgetProgress = clus.totalBudgetProgress.toFixed(2);
 										}
+
+										var budgetvalue = Math.round(clus.totalBudgetProgress);
+										var valueformat = Intl.NumberFormat().format(budgetvalue);
+										valueformat = valueformat.replace(/,/g,'.');
+
 
 
 
 											var newclusterbudgetProgress = {
-												'y':parseFloat(clus.totalBudgetProgress),
+												'y':budgetvalue,
+												'yformat':valueformat,
 												'color':'blue',
 												'name': clus._id.cluster+' ('+clus._id.currency_id+')',
 												'label': (clus.totalBudgetProgress / (budgetprogress.totalBudgetProgressCluster))*100
