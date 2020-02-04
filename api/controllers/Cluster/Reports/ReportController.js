@@ -559,10 +559,10 @@ var ReportController = {
 
 						// async loop report beneficiaries
 						async.eachOf( beneficiaries, function ( beneficiary, i, b_next ) {
-
-						// clone
-						var b = _under.extend( {}, report_copy, location_copy, beneficiary );
-						// update or create
+              delete beneficiary.implementing_partners;
+              // clone
+              var b = _under.extend( {}, report_copy, location_copy, beneficiary );
+              // update or create
 						Beneficiaries.updateOrCreate( _under.extend( {}, findProject, findReport, findLocation, findTargetLocation ), { id: b.id }, b ).exec(function( err, result ){
 								if ( ReportController.set_result(result).id ) {
 	                Beneficiaries.findOne({ id: ReportController.set_result(result).id }).populateAll().exec(function (err, result) {
