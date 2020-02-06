@@ -765,7 +765,7 @@ var GfaDashboardController = {
 														if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
 														
 														// import updated form
-														var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
+														var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd-distribution.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
 
 														// run curl command
 														EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
@@ -842,6 +842,7 @@ var GfaDashboardController = {
 					
 					// run curl command
 					fs.mkdir( dir + folder, { recursive: true }, function( err ) {
+						
 						// err
 						if (err) throw err;
 
@@ -942,7 +943,7 @@ var GfaDashboardController = {
 														if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
 														
 														// import updated form
-														var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
+														var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd-distribution.js "' + template.header_1 + '" "' + template.header_2 + '" "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
 
 														// run curl command
 														EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
@@ -1088,7 +1089,7 @@ var GfaDashboardController = {
 
 					// fieldNames
 					var fieldNames = [
-						'Date (YYYY-MM-DD)',
+						'Distribution Date',
 						'Implementing Partner',
 						'Distribution',
 						'Distribution Point',
@@ -1114,8 +1115,10 @@ var GfaDashboardController = {
 					// food distribution plan
 					var data = [];
 					beneficiaries.reduce( function( res, value ) {
+						
 						// group by organization_tag + admin5pcode + distribution_date_plan
 						var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date_plan;
+						
 						if ( !res[ id ] ) {
 							res[ id ] = value;
 							res[ id ][ 'family_1_to_3' ] = 0;
@@ -1125,7 +1128,7 @@ var GfaDashboardController = {
 							res[ id ][ 'hh_total' ] = 0;
 							data.push( res[ id ] );
 						} else {
-							// tally (initial values set with res[ id ] = value )
+							// tally ( initial values set with res[ id ] = value )
 							res[ id ].rice += value.rice;
 							res[ id ].lentils += value.lentils;
 							res[ id ].oil += value.oil;
@@ -1148,7 +1151,9 @@ var GfaDashboardController = {
 						// count hh's
 						res[ id ][ 'hh_total' ]++;
 
+						// return
 						return res;
+
 					}, {});
 
 					// order by least important to most important
@@ -1207,7 +1212,7 @@ var GfaDashboardController = {
 
 					// fieldNames
 					var fieldNames = [
-						'Date (YYYY-MM-DD)',
+						'Distribution Date',
 						'Implementing Partner',
 						'Distribution',
 						'Distribution Point',
@@ -1233,8 +1238,11 @@ var GfaDashboardController = {
 					// food distribution plan
 					var data = [];
 					beneficiaries.reduce( function( res, value ) {
+						
 						// group by organization_tag + admin5pcode + distribution_date_actual
 						var id = value.organization_tag + '_' + value.admin5pcode + ' ' + value.distribution_date_actual;
+
+						// if empty
 						if ( !res[ id ] ) {
 							res[ id ] = value;
 							res[ id ][ 'family_1_to_3' ] = 0;
@@ -1250,6 +1258,9 @@ var GfaDashboardController = {
 							res[ id ].oil += value.oil;
 							res[ id ].entitlements += value.entitlements;
 						}
+
+						// set date format
+						res[ id ].distribution_date_actual = moment( value.distribution_date_actual ).format( 'YYYY-MM-DD' ).toString();
 
 						// family size
 						if ( value.gfd_family_size >= 0 && value.gfd_family_size <= 3 ) {
@@ -1267,7 +1278,9 @@ var GfaDashboardController = {
 						// count hh's
 						res[ id ][ 'hh_total' ]++;
 
+						// return
 						return res;
+
 					}, {});
 
 					// order by least important to most important
@@ -1332,6 +1345,82 @@ var GfaDashboardController = {
 						} else {
 							return res.json( 200, { data: csv } );
 						}
+
+					});
+
+					break;
+
+				case 'downloads_distribution_closing_balance':
+
+					// folder
+					var dir = '/home/ubuntu/nginx/www/ngm-reportPrint/pdf/';
+					var folder = params.organization_tag + '_round_' + params.report_round + '_distribution_' + params.report_distribution + '_closing_balance_' + moment().unix();
+					
+					// run curl command
+					fs.mkdir( dir + folder, { recursive: true }, function( err ) {
+						
+						// err
+						if (err) throw err;
+
+						// food distribution plan
+						var data = [];
+						beneficiaries.reduce( function( res, value ) {
+							
+							// group by site_id + admin3pcode
+							var id = value.site_id + '_' + value.admin3pcode;
+
+							// if empty
+							if ( !res[ id ] ) {
+								
+								res[ id ] = value;
+								data.push( res[ id ] );
+
+							} else {
+								
+								// tally (initial values set with res[ id ] = value )
+								res[ id ].rice += value.rice;
+								res[ id ].lentils += value.lentils;
+								res[ id ].oil += value.oil;
+								res[ id ].entitlements += value.entitlements;
+
+							}
+
+							// return
+							return res;
+
+						}, {});
+
+						// get template
+						var template = GfaDashboardController.getClosingBalanceHtmlTemplate( params, data );
+
+						// fs write template
+						fs.writeFile( template.dir + template.report + '.html', template.html, function( err ) {
+							// err
+							if( err ) return res.json( 400, { error: 'HTML Template error!', details: err  } );
+							
+							// import updated form
+							var cmd = 'phantomjs /home/ubuntu/nginx/www/ngm-reportPrint/ngm-wfp-gfd-closing.js "' + template.footer + '" ' + template.dir + template.report + '.html ' + dir + folder + '/' + template.report + '.pdf';
+
+							// run curl command
+							EXEC( cmd, { maxBuffer: 1024 * 20480 }, function( error, stdout, stderr ) {
+								// err
+								if ( error ) {
+									// return error
+									res.json( 400, { error: 'PDF error!', details: error  } );
+								} else {
+									
+									// delete template
+									fs.unlink( template.dir + template.report + '.html', function ( err ) {
+										// err
+										if ( err ) throw err;
+											// success
+											return res.json( 200, { report: folder + '/' + template.report + '.pdf' });
+										});
+								}
+
+							});
+
+						});
 
 					});
 
@@ -1542,7 +1631,7 @@ var GfaDashboardController = {
 							'<td align="right" style="border-width: 0px;">' +
 								'<img src="https://reporthub.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="40%" />' +
 							'</td>' +
-						'</table>';	
+						'</table>';
 					
 					// theader
 					page_html_body += '' +
@@ -1645,7 +1734,151 @@ var GfaDashboardController = {
 		// return
 		return template;
 
-	}
+	},
+
+	// return html template for distribution master list
+	getClosingBalanceHtmlTemplate: function( params, data ) {
+
+		// html content
+		var page_html_start = '';
+		var page_html_body = '';
+
+		// template object
+		var template = {
+			dir: '/home/ubuntu/data/html/template/',
+			report: params.organization_tag + '_' + params.report_round + '_' + params.report_distribution + '_closing_balance',
+			footer: 'Funded by the World Food Programme (WFP)'
+		}
+
+		// headers
+		page_html_start = '<!DOCTYPE html>' +
+			'<html lang="en">' +
+				'<head>' +
+					'<title>WFP Integrated Assistance Package in CXB</title>' +
+					'<meta http-equiv="content-type" content="text/html; charset=UTF-8">' +
+					'<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+					'<style type="text/css" media="all">' +
+						'html {' +
+							'margin: 0;' +
+							'zoom: 1;' +
+						'}' +
+					'</style>' +
+				'</head>' +
+				'<style>' +
+						'table {' +
+							'width: 100%' +
+							'font-family: verdana, arial, sans-serif;' +
+							'color: #333333;' +
+							'border-width: 1px;' +
+							'border-color: #3A3A3A;' +
+							'border-collapse: collapse;' +
+						'}' +
+						'table th {' +
+							'border-width: 1px;' +
+							'font-size: 11px;' +
+							'padding: 2px;' +
+							'border-style: solid;' +
+							'border-color: #517994;' +
+							'background-color: #B2CFD8;' +
+						'}' +
+						'table td {' +
+							'border-width: 1px;' +
+							'font-size: 10px;' +
+							'padding: 2px;' +
+							'border-style: solid;' +
+							'border-color: #517994;' +
+							'background-color: #ffffff;' +
+						'}' +
+				'</style>' +
+				'<body>';
+
+				// page header
+				page_html_body = '' +
+					'<table style="border-width: 0px;">' +
+						'<td width="20%" style="border-width: 0px; margin-top:-10px;">' +
+							'<img src="https://reporthub.org/desk/images/logo/wfp-logo-standard-blue-en.png" width="90%" />' +
+						'</td>' +
+						'<td align="center" style="border-width: 0px;">' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:12px; margin:0px; font-weight: 300;">Integrated Assistance Package in CXB</h3>' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:3px; margin:0px; font-weight: 300;">Implementing Partner\'s closing Report</h3>' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; padding-top:3px; margin:0px 0px 0px 0px; color: #616161; font-weight: 300;">Distribution Round ' + params.report_distribution + '</h3>' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; padding-top:3px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">General Food Distribution for Rohyinga Refugees</h3>' +
+						'</td>' +
+						'<td align="right" style="border-width: 0px;">' +
+							'<img src="https://reporthub.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="40%" />' +
+						'</td>' +
+					'</table>' +
+					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:2px; margin:0px; font-weight: 300;">Name of Partner: ' + params.organization_tag.toUpperCase() + '</h3>' +
+					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:0px; margin:0px; font-weight: 300;">District: Cox\'s Bazar</h3>' +
+					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:0px; margin:0px; font-weight: 300;">Upazila: Ukhiya</h3>' +
+					'<table style="width:100%">' +
+					'<br/>' +
+					'<thead>' +
+						'<tr>' +
+							'<th align="left" style="font-family: verdana, arial, sans-serif;">Distribution Point</th>' +
+							'<th align="center" style="font-family: verdana, arial, sans-serif;">Rice</th>' +
+							'<th align="center" style="font-family: verdana, arial, sans-serif;">Pulse</th>' +
+							'<th align="center" style="font-family: verdana, arial, sans-serif;">Oil</th>' +
+							'<th align="center" style="font-family: verdana, arial, sans-serif;">Total</th>' +
+						'</tr>' +
+					'</thead>' +
+						'<tbody>';
+
+					// totals 
+					var total_rice = 0;
+					var total_lentils = 0;
+					var total_oil = 0;
+					var total_total = 0;
+
+					// by dp, camp
+					data.forEach( function( d ){
+						total_rice += Number.parseFloat( d.rice );
+						total_lentils += Number.parseFloat( d.lentils );
+						total_oil += Number.parseFloat( d.oil );
+						total_total += Number.parseFloat( d.rice + d.lentils + d.oil );
+						page_html_body += '' +
+							'<tr>' +
+								'<td align="left" style="font-family: verdana, arial, sans-serif;">' + d.site_name + ', ' + d.admin3name  + '</td>' +
+								'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( d.rice ).toFixed( 3 )  + '</td>' +
+								'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( d.lentils ).toFixed( 3 )  + '</td>' +
+								'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( d.oil ).toFixed( 3 )  + '</td>' +
+								'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( d.rice + d.lentils + d.oil ).toFixed( 3 )  + '</td>' +
+							'</tr>';
+					});
+
+					// total
+					page_html_body += '' +
+						'<tr>' +
+							'<td align="left" style="font-family: verdana, arial, sans-serif;">Total</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_rice ).toFixed( 3 )  + '</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_lentils ).toFixed( 3 )  + '</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_oil ).toFixed( 3 )  + '</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_total ).toFixed( 3 )  + '</td>' +
+						'</tr>';
+
+					page_html_body += '' +
+							'</tbody>' +
+						'</table>' +
+						'<br/>' +
+						'<table style="width: 100%; border-width: 0px; font-family: verdana, arial, sans-serif; font-size: 8px; color: #333333; margin: 5px 0px 0px 0px;">' +
+							'<td style="width: 25%; border-width: 0px;" align="left">' +
+								'Prepared by:' +
+							"</td>" +
+							'<td style="width: 25%; border-width: 0px;" align="left">' +
+								'Checked by:' +
+							"</td>" +
+							'<td style="width: 25%; border-width: 0px;" align="left">' +
+								'Approved by:' +
+							"</td>" +
+						'</table>';
+
+		// set html
+		template.html = page_html_start + page_html_body;
+
+		// return
+		return template;
+
+	}	
 
 }
 
