@@ -1801,18 +1801,17 @@ var GfaDashboardController = {
 						'<td align="center" style="border-width: 0px;">' +
 							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:12px; margin:0px; font-weight: 300;">Integrated Assistance Package in CXB</h3>' +
 							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:3px; margin:0px; font-weight: 300;">Implementing Partner\'s closing Report</h3>' +
-							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; padding-top:3px; margin:0px 0px 0px 0px; color: #616161; font-weight: 300;">Distribution Round ' + params.report_distribution + '</h3>' +
+							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; padding-top:3px; margin:0px 0px 0px 0px; color: #616161; font-weight: 300;">Round ' + params.report_round + ', Distribution ' + params.report_distribution + '</h3>' +
 							'<h3 style="font-family: verdana, arial, sans-serif; font-size: 10px; padding-top:3px; margin:0px 0px 10px 0px; color: #616161; font-weight: 300;">General Food Distribution for Rohyinga Refugees</h3>' +
 						'</td>' +
 						'<td align="right" style="border-width: 0px;">' +
 							'<img src="https://reporthub.org/desk/images/logo/' + params.organization_tag + '-logo.png" width="40%" />' +
 						'</td>' +
 					'</table>' +
-					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:2px; margin:0px; font-weight: 300;">Name of Partner: ' + params.organization_tag.toUpperCase() + '</h3>' +
-					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:0px; margin:0px; font-weight: 300;">District: Cox\'s Bazar</h3>' +
-					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 12px; padding-top:0px; margin:0px; font-weight: 300;">Upazila: Ukhiya</h3>' +
+					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 11px; padding-top:5px; margin:0px; font-weight: 300;">Name of Partner: ' + params.organization_tag.toUpperCase() + '</h3>' +
+					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 11px; padding-top:0px; margin:0px; font-weight: 300;">District: Cox\'s Bazar</h3>' +
+					'<h3 style="font-family: verdana, arial, sans-serif; font-size: 11px; padding-top:0px; padding-bottom:5px; margin:0px; font-weight: 300;">Upazila: Ukhiya</h3>' +
 					'<table style="width:100%">' +
-					'<br/>' +
 					'<thead>' +
 						'<tr>' +
 							'<th align="left" style="font-family: verdana, arial, sans-serif;">Distribution Point</th>' +
