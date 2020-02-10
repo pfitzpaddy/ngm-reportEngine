@@ -74,7 +74,7 @@ var GfaDashboardController = {
 				// return error
 				if (err) return res.negotiate( err );
 				// return
-				return res.json( 200, _.sortBy( dates ) );				
+				return res.json( 200, _.sortBy( dates ) );
 			});
 		});
 	},
@@ -1828,6 +1828,12 @@ var GfaDashboardController = {
 					var total_lentils = 0;
 					var total_oil = 0;
 					var total_total = 0;
+
+					// sort
+					data = _.chain( data )
+									.sortBy( 'admin3name' )
+									.sortBy( 'site_id' )
+									.value();
 
 					// by dp, camp
 					data.forEach( function( d ){
