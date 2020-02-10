@@ -751,7 +751,7 @@ var ProjectController = {
 
       // create project
       project.project_budget_progress = project_budget_progress;
-      project.target_beneficiaries = target_beneficiaries;
+      project.target_beneficiaries = target_beneficiaries ? target_beneficiaries : [];
       project.target_locations = target_locations ? target_locations : [];
       project.project_components_plan = project_components_plan;
 
