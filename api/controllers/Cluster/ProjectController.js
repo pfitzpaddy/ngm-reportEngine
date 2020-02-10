@@ -752,64 +752,61 @@ var ProjectController = {
       // create project
       project.project_budget_progress = project_budget_progress;
       project.target_beneficiaries = target_beneficiaries;
-
-      project.target_locations = target_locations;
-
+      project.target_locations = target_locations ? target_locations : [];
       project.project_components_plan = project_components_plan;
 
-      project.target_locations.forEach( function(location,element2){
+      // implementing partners?
+      project.target_locations.forEach( function( location, element2 ){
 
-      if(typeof(location.implementing_partners) === 'string'){
+        // if implement_partners
+        if( typeof( location.implementing_partners ) === 'string' ){
 
-        var newarray = location.implementing_partners.split(",");
-               location.implementing_partners= [];
+          // 
+          var newarray = location.implementing_partners.split(",");
+          location.implementing_partners= [];
 
-               newarray.forEach( function(imppartner,element2){
+          // new array ?
+          newarray.forEach( function(imppartner,element2){
 
-                var imppartnermayus = imppartner.toUpperCase();
+            var imppartnermayus = imppartner.toUpperCase();
 
-                var imppartnerpush =
-                {
-                  organization_name : imppartner,
-                  organization : imppartnermayus,
-                }
-
-                location.implementing_partners.push(imppartnerpush);
-
-                }
-              );
-
-      }
-     });
-
-
-      if(typeof(project.implementing_partners) === 'string'){
-        // implementing_partners string to array
-
-        var newarray = project.implementing_partners.split(",");
-           project.implementing_partners = [];
-
-
-              newarray.forEach( function(imppartner,element2){
-
-                var imppartnermayus = imppartner.toUpperCase();
-
-                var imppartnerpush =
-                {
-                  organization_name : imppartner,
-                  organization : imppartnermayus,
-                }
-
-                project.implementing_partners.push(imppartnerpush);
-
-                }
-              );
-
-         }else if(!project.implementing_partners){
-
-               project.implementing_partners = [];
-
+            var imppartnerpush = {
+              organization_name : imppartner,
+              organization : imppartnermayus,
             }
+
+            // push to location
+            location.implementing_partners.push(imppartnerpush);
+
+          });
+
+        }
+
+      });
+
+      if( typeof( project.implementing_partners ) === 'string' ){
+        
+        // implementing_partners string to array
+        var newarray = project.implementing_partners.split(",");
+        project.implementing_partners = [];
+
+        // new array?
+        newarray.forEach( function(imppartner,element2){
+
+          var imppartnermayus = imppartner.toUpperCase();
+
+          var imppartnerpush = {
+            organization_name : imppartner,
+            organization : imppartnermayus,
+          }
+
+          project.implementing_partners.push(imppartnerpush);
+
+        });
+
+        } else if ( !project.implementing_partners ){
+          project.implementing_partners = [];
+        }
 
       // return Project
       return res.json( 200, project );
