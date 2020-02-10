@@ -1848,11 +1848,11 @@ var GfaDashboardController = {
 					// total
 					page_html_body += '' +
 						'<tr>' +
-							'<td align="left" style="font-family: verdana, arial, sans-serif;">Total</td>' +
-							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_rice ).toFixed( 3 )  + '</td>' +
-							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_lentils ).toFixed( 3 )  + '</td>' +
-							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_oil ).toFixed( 3 )  + '</td>' +
-							'<td align="center" style="font-family: verdana, arial, sans-serif;">' + Number.parseFloat( total_total ).toFixed( 3 )  + '</td>' +
+							'<td align="left" style="font-family: verdana, arial, sans-serif; font-weight: bold;">Total</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif; font-weight: bold;">' + Number.parseFloat( total_rice ).toFixed( 3 )  + '</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif; font-weight: bold;">' + Number.parseFloat( total_lentils ).toFixed( 3 )  + '</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif; font-weight: bold;">' + Number.parseFloat( total_oil ).toFixed( 3 )  + '</td>' +
+							'<td align="center" style="font-family: verdana, arial, sans-serif; font-weight: bold;">' + Number.parseFloat( total_total ).toFixed( 3 )  + '</td>' +
 						'</tr>';
 
 					page_html_body += '' +
