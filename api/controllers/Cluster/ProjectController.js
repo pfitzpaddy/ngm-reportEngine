@@ -558,6 +558,10 @@ var ProjectController = {
           }
           fields.push('url');
           fieldNames.push('URL');
+          // add hrp beneficiary type
+          fields.splice(20,0,"hrp_beneficiary_type_list");
+          fieldNames.splice(20,0,"HRP Beneficiary Type");
+          
         }
 
         $project = this._projectJson2Csv($project);
@@ -693,6 +697,7 @@ var ProjectController = {
                 setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
                  setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );
+              setKey(project, 'target_beneficiaries', 'hrp_beneficiary_type_list', ['hrp_beneficiary_type_name']);
 
             }
             // setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',

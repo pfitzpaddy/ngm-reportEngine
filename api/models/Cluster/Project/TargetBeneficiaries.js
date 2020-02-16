@@ -192,6 +192,16 @@ module.exports = {
 		},
 
 
+		hrp_beneficiary_type_id:{
+			type: 'string',
+			defaultsTo: ''
+		},
+		hrp_beneficiary_type_name:{
+			type: 'string',
+			defaultsTo: ''
+		},
+
+
 		// beneficiary category
 
 		beneficiary_category_id: {
