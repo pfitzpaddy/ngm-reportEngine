@@ -420,7 +420,7 @@ var GfaTaskController = {
 			Distribution.findOne( { report_distribution: report_distribution } ),
 			Admin4.find( { admin0pcode:'CB', admin4type_name:'Refugee Block' } ),
 			AdminSites.find( { admin0pcode:'CB', site_type_id:'food_distribution_point' } ),
-			AbsentBeneficiaries.find( { admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution } )
+			// AbsentBeneficiaries.find( { admin0pcode: admin0pcode, organization_tag: organization_tag, report_round: report_round, report_distribution: report_distribution } )
 		])
 		.catch( function( err ) {
 			return res.negotiate( err );
@@ -432,7 +432,7 @@ var GfaTaskController = {
 			var distribution = result[ 1 ];
 			var admin4 = result[ 2 ];
 			var food_distribution_points = result[ 3 ];
-			var absent_beneficiaries = result[ 4 ];
+			// var absent_beneficiaries = result[ 4 ];
 
 			// remove attrs
 			organization.organization_id = organization.id;
@@ -523,14 +523,14 @@ var GfaTaskController = {
 					var fcn_id = d[ 18 ].toString().trim();
 					var distribution_date_plan = moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' );
 					var distribution_date_actual = moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' );
-
+					
 					// find absent, if any
-					if ( absent_beneficiaries.length ) {
-						var absent = _.findWhere( absent_beneficiaries, { fcn_id: fcn_id } );
-						if ( absent ) {
-							distribution_date_actual = absent.distribution_date_actual;	
-						}
-					}
+					// if ( absent_beneficiaries.length ) {
+					// 	var absent = _.findWhere( absent_beneficiaries, { fcn_id: fcn_id } );
+					// 	if ( absent ) {
+					// 		distribution_date_actual = absent.distribution_date_actual;	
+					// 	}
+					// }
 
 					// add to planned
 					planned = Object.assign( { sl_number: d[ 0 ], distribution_date_plan: distribution_date_plan, distribution_date_actual: distribution_date_actual }, organization, distribution, distribution_site, camp_block );
@@ -673,7 +673,7 @@ var GfaTaskController = {
 								if ( fs.existsSync( file ) ) { fs.unlinkSync( file ); }
 
 								// return the reports for the project period
-								return res.json( 200, { msg: 'Processing Actual Beneficiaries for Distribution ' + report_distribution });
+								return res.json( 200, { msg: 'Processing completed for Distribution ' + report_distribution });
 
 							});
 
