@@ -1389,9 +1389,9 @@ var ClusterDashboardController = {
 						};
 
               if (params.admin0pcode.toUpperCase() === 'AF') {
-                ix = fields.indexOf('activity_description_name') + 1;
-                ix && fields.splice(ix, 0, 'injury_treatment_same_province');
-                ix && fieldNames.splice(ix, 0, 'injury_treatment_same_province');
+                ix = fields.indexOf('beneficiary_type_name') + 1;
+                ix && fields.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
+                ix && fieldNames.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
               }
 
 							var total = 0;
