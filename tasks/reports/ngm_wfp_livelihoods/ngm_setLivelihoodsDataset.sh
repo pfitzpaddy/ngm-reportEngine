@@ -4,4 +4,4 @@
 # Steps
 #		- run API
 ##################################################
-curl 'https://reporthub.org/api/wfp/livelihoods/setLivelihoodsDataset'
+curl 'https://reporthub.org/api/wfp/livelihoods/setLivelihoodsDatasetActionAid'

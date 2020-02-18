@@ -361,9 +361,12 @@ module.exports.routes = {
 
   // WFP Livelihoods
 
+  // setLivelihoodsDataset ActionAid
+  'GET /wfp/livelihoods/setLivelihoodsDatasetActionAid': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDatasetActionAid',
+  'POST /wfp/livelihoods/setLivelihoodsDatasetActionAid': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDatasetActionAid',
   // setLivelihoodsDataset
-  'GET /wfp/livelihoods/setLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDataset',
-  'POST /wfp/livelihoods/setLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDataset',
+  'GET /wfp/livelihoods/setLivelihoodsDatasetBrac': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDatasetBrac',
+  'POST /wfp/livelihoods/setLivelihoodsDatasetBrac': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDatasetBrac',
   //  getLivelihoodsDataset
   'GET /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',
   'POST /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',  

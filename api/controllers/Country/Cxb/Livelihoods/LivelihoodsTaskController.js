@@ -17,161 +17,42 @@ const EXEC = require('child_process').exec;
 
 // kobo config
 if ( sails.config.kobo ) {
-    var kobo_user = sails.config.kobo.WFP_LIVELIHOODS_USER;
-    var kobo_password = sails.config.kobo.WFP_LIVELIHOODS_PASSWORD;
-    var kobo_pk = sails.config.kobo.WFP_LIVELIHOODS_PK;
+	var kobo_user = sails.config.kobo.WFP_LIVELIHOODS_USER;
+	var kobo_password = sails.config.kobo.WFP_LIVELIHOODS_PASSWORD;
+	var kobo_pk_action_aid = sails.config.kobo.WFP_LIVELIHOODS_PK_ACTION_AID;
+	var kobo_pk_brac = sails.config.kobo.WFP_LIVELIHOODS_PK_BRAC;
 }
 
 // merge geo by distribution_points
 var distribution_points ={
 	'Camp 11 - Common Tailoring Zone': {
-    "admin0lat" : 21.3319360800001,		
-    "admin0lng" : 92.092239666666,		
-    "admin0name" : "Cox Bazar",		
-    "admin0pcode" : "CB",		
-    "admin0type_name" : "Country",		
-    "admin0zoom" : 6,		
-    "admin1lat" : 21.214116084,		
-    "admin1lng" : 92.1074189183921,
-    "admin1name" : "Ukhia",
-    "admin1pcode" : "202294",		
-    "admin1type_name" : "Upazila",		
-    "admin1zoom" : 8,		
-    "admin2lat" : 21.209905802,		
-    "admin2lng" : 92.0840572995521,		
-    "admin2name" : "Palong Khali",		
-    "admin2pcode" : "20229479",		
-    "admin2type_name" : "Union",		
-    "admin2zoom" : 10,		
-    "admin3lat" : 21.1815356957658,		
-    "admin3lng" : 92.1559596391446,		
-    "admin3name" : "Camp 11",		
-    "admin3pcode" : "CXB-217",		
-    "admin3type_name" : "Camp",		
-    "admin3zoom" : 12.0,		
-    "adminRlat" : 4.4715714,		
-    "adminRlng" : 91.1754648,		
-    "adminRname" : "SEARO",		
-    "adminRpcode" : "SEARO",		
-    "adminRtype_name" : "Region",		
-    "adminRzoom" : 3,		
-    "conflict" : false,		
-    "site_id" : 'camp_11_common_tailoring_zone',
-    "site_name" : 'Camp 11 - Common Tailoring Zone',
-    "site_lat": 21.1815356957658,
-    "site_lng": 92.1559596391446
-  },
+		"admin3pcode" : "CXB-217",
+		"site_id" : 'camp_11_common_tailoring_zone',
+		"site_name" : 'Camp 11 - Common Tailoring Zone',
+		"site_lat": 21.1815356957658,
+		"site_lng": 92.1559596391446
+	},
 	'Camp 11 - Men & Boys Center': {
-    "admin0lat" : 21.3319360800001,		
-    "admin0lng" : 92.092239666666,		
-    "admin0name" : "Cox Bazar",		
-    "admin0pcode" : "CB",		
-    "admin0type_name" : "Country",		
-    "admin0zoom" : 6,		
-    "admin1lat" : 21.214116084,		
-    "admin1lng" : 92.1074189183921,
-    "admin1name" : "Ukhia",
-    "admin1pcode" : "202294",		
-    "admin1type_name" : "Upazila",		
-    "admin1zoom" : 8,		
-    "admin2lat" : 21.209905802,		
-    "admin2lng" : 92.0840572995521,		
-    "admin2name" : "Palong Khali",		
-    "admin2pcode" : "20229479",		
-    "admin2type_name" : "Union",		
-    "admin2zoom" : 10,		
-    "admin3lat" : 21.1815356957658,		
-    "admin3lng" : 92.1559596391446,		
-    "admin3name" : "Camp 11",		
-    "admin3pcode" : "CXB-217",		
-    "admin3type_name" : "Camp",		
-    "admin3zoom" : 12.0,		
-    "adminRlat" : 4.4715714,		
-    "adminRlng" : 91.1754648,		
-    "adminRname" : "SEARO",		
-    "adminRpcode" : "SEARO",
-    "adminRtype_name" : "Region",		
-    "adminRzoom" : 3,		
-    "conflict" : false,
-    "site_id" : 'camp_11_men_boys_center',
-    "site_name" : 'Camp 11 - Men & Boys Center',
-    "site_lat": 21.1815356957658,
-    "site_lng": 92.1559596391446
-  },
+		"admin3pcode" : "CXB-217",
+		"site_id" : 'camp_11_men_boys_center',
+		"site_name" : 'Camp 11 - Men & Boys Center',
+		"site_lat": 21.1815356957658,
+		"site_lng": 92.1559596391446
+	},
 	'Camp 12 - Women Friendly Space 1 (WFS 1)': {
-    "admin0lat" : 21.3319360800001,
-    "admin0lng" : 92.092239666666,
-    "admin0name" : "Cox Bazar",
-    "admin0pcode" : "CB",
-    "admin0type_name" : "Country",
-    "admin0zoom" : 6,
-    "admin1lat" : 21.214116084,
-    "admin1lng" : 92.1074189183921,
-    "admin1name" : "Ukhia",
-    "admin1pcode" : "202294",
-    "admin1type_name" : "Upazila",
-    "admin1zoom" : 8,
-    "admin2lat" : 21.209905802,
-    "admin2lng" : 92.0840572995521,
-    "admin2name" : "Palong Khali",
-    "admin2pcode" : "20229479",
-    "admin2type_name" : "Union",
-    "admin2zoom" : 10,
-    "admin3lat" : 21.1794843848965,
-    "admin3lng" : 92.1512797825594,
-    "admin3name" : "Camp 12",
-    "admin3pcode" : "CXB-218",
-    "admin3type_name" : "Camp",
-    "admin3zoom" : 12.0,
-    "adminRlat" : 4.4715714,
-    "adminRlng" : 91.1754648,
-    "adminRname" : "SEARO",
-    "adminRpcode" : "SEARO",
-    "adminRtype_name" : "Region",
-    "adminRzoom" : 3,
-    "conflict" : false,
-    "site_id" : 'camp_12_women_friendly_space_1',
-    "site_name" : 'Camp 12 - Women Friendly Space 1 (WFS 1)',
-    "site_lat": 21.1794843848965,
-    "site_lng": 92.1512797825594
+		"admin3pcode" : "CXB-218",
+		"site_id" : 'camp_12_women_friendly_space_1',
+		"site_name" : 'Camp 12 - Women Friendly Space 1 (WFS 1)',
+		"site_lat": 21.1794843848965,
+		"site_lng": 92.1512797825594
 	},
 	'Camp 12 - Women Friendly Space 2 (WFS 2)': {
-    "admin0lat" : 21.3319360800001,
-    "admin0lng" : 92.092239666666,
-    "admin0name" : "Cox Bazar",
-    "admin0pcode" : "CB",
-    "admin0type_name" : "Country",
-    "admin0zoom" : 6,
-    "admin1lat" : 21.214116084,
-    "admin1lng" : 92.1074189183921,
-    "admin1name" : "Ukhia",
-    "admin1pcode" : "202294",
-    "admin1type_name" : "Upazila",
-    "admin1zoom" : 8,
-    "admin2lat" : 21.209905802,
-    "admin2lng" : 92.0840572995521,
-    "admin2name" : "Palong Khali",
-    "admin2pcode" : "20229479",
-    "admin2type_name" : "Union",
-    "admin2zoom" : 10,
-    "admin3lat" : 21.1794843848965,
-    "admin3lng" : 92.1512797825594,
-    "admin3name" : "Camp 12",
-    "admin3pcode" : "CXB-218",
-    "admin3type_name" : "Camp",
-    "admin3zoom" : 12.0,
-    "adminRlat" : 4.4715714,
-    "adminRlng" : 91.1754648,
-    "adminRname" : "SEARO",
-    "adminRpcode" : "SEARO",
-    "adminRtype_name" : "Region",
-    "adminRzoom" : 3,
-    "conflict" : false,
-    "site_id" : 'camp_12_women_friendly_space_2',
-    "site_name" : 'Camp 12 - Women Friendly Space 2 (WFS 2)',
-    "site_lat": 21.1794843848965,
-    "site_lng": 92.1512797825594
-	},
+		"admin3pcode" : "CXB-218",
+		"site_id" : 'camp_12_women_friendly_space_2',
+		"site_name" : 'Camp 12 - Women Friendly Space 2 (WFS 2)',
+		"site_lat": 21.1794843848965,
+		"site_lng": 92.1512797825594
+	}
 
 }
 
@@ -206,95 +87,260 @@ var LivelihoodsTaskController = {
 	},
 
 	// set livelihoods dataset
-	setLivelihoodsDataset: function( req, res ){
+	setLivelihoodsDatasetActionAid: function( req, res ){
 
 		// dataset
 		var livelihoods = [];
 		
 		// get all
-		var cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/' + kobo_pk + '?format=json -u ' + kobo_user + ':' + kobo_password;
+		var cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/' + kobo_pk_action_aid + '?format=json -u ' + kobo_user + ':' + kobo_password;
 
 		// run curl command
 		EXEC( cmd, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
-			// return error
-			if ( error ) return res.negotiate( error );
-
-			// success
-			kobo = JSON.parse( stdout );
-
-			// each data
-			async.each( kobo, function ( data, next ) {
-
-				// record
-				var d = Object.assign( { _id: data._id }, distribution_points[ data[ 'group_ya0cw08/distribution_point' ] ] );
-
-				// scan
-				if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ] ) {
-                    // string containing ';'?
-                        // no
-                    if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ].indexOf(';') === -1 ) {
-                        d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ];
-                        // yes
-                    } else {
-                        d.progres_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[0];
-                        d.progres_case_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[1];
-                        d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[2];
-                        d.beneficiary_name = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[3];
-                        d.beneficiary_gender = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[4];
-                    }
-				} else {
-					d.fcn_id = data[ 'group_af9zh97/fcn_id' ];
-				}
-
-				// for each
-				d.distribution_date = data[ 'group_ya0cw08/distribution_date' ];
-				d.stipend_amount_bdt = parseInt( data[ 'group_af9zh97/stipend_amount_bdt' ] );
-				
-				// activity_details ( link to MASTER LIST )
-
-				d.remarks = data[ 'group_hr52g97/remarks' ] ? data[ 'group_hr52g97/remarks' ] : '';
-
-				// image
-				if ( data[ '_attachments' ].length ) {
-					d.download_small_url = data[ '_attachments' ][0].download_small_url;
-					d.download_medium_url = data[ '_attachments' ][0].download_medium_url;
-					d.download_large_url = data[ '_attachments' ][0].download_large_url;
-					// d._attachments = data[ '_attachments' ];
-				}
-
-				// kobo
-				d._form_uuid = data[ 'formhub/uuid' ];
-				d._uuid = data._uuid;
-				d._submission_time = data._submission_time;
-
-				// push cleaned data
-				livelihoods.push( d );
-
-				next();
-
-			}, function ( err ) {
-				// return error
-				if ( err ) return res.negotiate( err );
-
-				Livelihoods
-					.destroy({})
-					.exec( function( err, destroy ) {
+			
 						// return error
-						if (err) return res.negotiate( err );
-						// create
+				if ( error ) return res.negotiate( error );
+
+				// success
+				kobo = JSON.parse( stdout );
+
+				// promise
+				Promise.all([
+					Organization.findOne({ admin0pcode: 'CB', organization_tag: 'actionaid' }),
+					Admin3.findOne({ admin3pcode:'CXB-217' }),
+					Admin3.findOne({ admin3pcode:'CXB-218' })
+				])
+				.catch( function( err ) {
+					return res.negotiate( err );
+				})
+				.then( function( result ) {
+
+					// set organization
+					var organization = result[ 0 ];
+							delete organization.id;
+							delete organization.warehouses;
+
+					// camp
+					var camp_cxb_217 = result[ 1 ];
+							delete camp_cxb_217.id;
+					var camp_cxb_218 = result[ 2 ];
+							delete camp_cxb_218.id;
+					
+					// camps
+					var admin_cxb = { 'CXB-217': camp_cxb_217, 'CXB-218': camp_cxb_218 }
+
+					// each data
+					async.each( kobo, function ( data, next ) {
+
+						// distribution point
+						var distribution_point = distribution_points[ data[ 'group_ya0cw08/distribution_point' ] ];
+						var camp = admin_cxb[ distribution_point.admin3pcode ];
+
+						// record
+						var d = Object.assign( { _id: data._id }, organization, camp, distribution_point );
+
+						// scan
+						if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ] ) {
+							// string containing ';'?
+									// no
+							if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ].indexOf(';') === -1 ) {
+								d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ];
+								// yes
+							} else {
+								d.progres_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[0];
+								d.progres_case_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[1];
+								d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[2];
+								d.beneficiary_name = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[3];
+								d.beneficiary_gender = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[4];
+							}
+						} else {
+							d.fcn_id = data[ 'group_af9zh97/fcn_id' ];
+						}
+
+						// for each
+						d.distribution_date = data[ 'group_ya0cw08/distribution_date' ];
+						d.stipend_amount_bdt = parseInt( data[ 'group_af9zh97/stipend_amount_bdt' ] );
+						
+						// activity_details ( link to MASTER LIST )
+						d.remarks = data[ 'group_hr52g97/remarks' ] ? data[ 'group_hr52g97/remarks' ] : '';
+
+						// image
+						if ( data[ '_attachments' ].length ) {
+							d.download_small_url = data[ '_attachments' ][0].download_small_url;
+							d.download_medium_url = data[ '_attachments' ][0].download_medium_url;
+							d.download_large_url = data[ '_attachments' ][0].download_large_url;
+							// d._attachments = data[ '_attachments' ];
+						}
+
+						// kobo
+						d._form_uuid = data[ 'formhub/uuid' ];
+						d._uuid = data._uuid;
+						d._submission_time = data._submission_time;
+
+						// push cleaned data
+						livelihoods.push( d );
+
+						next();
+
+					}, function ( err ) {
+						
+						// return error
+						if ( err ) return res.negotiate( err );
+
 						Livelihoods
-							.create( livelihoods )
-							.exec( function( err, result ) {
+							.destroy({ organization_tag: 'actionaid' })
+							.exec( function( err, destroy ) {
+								
 								// return error
 								if (err) return res.negotiate( err );
-								// return success
-								return res.json( 200, { msg: 'Success!' });
-							});
+								
+								// create
+								Livelihoods
+									.create( livelihoods )
+									.exec( function( err, result ) {
+										// return error
+										if (err) return res.negotiate( err );
+										// return success
+										return res.json( 200, { msg: 'Success!' });
+									});
 
-						});
+							});
+					
+					});
+
+				});
+
 			});
 
-		});
+	},
+
+	// set livelihoods dataset
+	setLivelihoodsDatasetBrac: function( req, res ){
+
+		// dataset
+		var livelihoods = [];
+		
+		// get all
+		var cmd = 'curl -X GET https://kc.humanitarianresponse.info/api/v1/data/' + kobo_pk_brac + '?format=json -u ' + kobo_user + ':' + kobo_password;
+
+		// run curl command
+		EXEC( cmd, { maxBuffer: 1024 * 4096 }, function( error, stdout, stderr ) {
+			
+						// return error
+				if ( error ) return res.negotiate( error );
+
+				// success
+				kobo = JSON.parse( stdout );
+
+				// promise
+				Promise.all([
+					Organization.findOne({ admin0pcode: 'CB', organization_tag: 'brac' }),
+					Admin3.find({ admin0pcode:'CB', admin3type_name:'Camp' })
+				])
+				.catch( function( err ) {
+					return res.negotiate( err );
+				})
+				.then( function( result ) {
+
+					// set organization
+					var organization = result[ 0 ];
+							delete organization.id;
+							delete organization.warehouses;
+					
+					// admin3 camps
+					var camps = result[ 1 ];
+
+					// each data
+					async.each( kobo, function ( data, next ) {
+
+						// distribution point
+						var filter = _.filter( camps, function ( c ) {
+							return c.admin3name === data[ 'group_ya0cw08/distribution_point' ];
+						});
+
+						// camp
+						var camp = filter[ 0 ];
+								delete camp.id;
+								
+						// record
+						var d = Object.assign( { _id: data._id }, organization, camp );
+
+						// id, name
+						d.activity_detail_id = data[ 'group_ya0cw08/activity_detail' ].replace(/ /g, '_').replace('/', '_').toLowerCase();
+						d.activity_detail_name = data[ 'group_ya0cw08/activity_detail' ];
+
+						// scan
+						if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ] ) {
+							// string containing ';'?
+									// no
+							if ( data[ 'group_af9zh97/_4_1_Card_QR_Code' ].indexOf(';') === -1 ) {
+								d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ];
+								// yes
+							} else {
+								d.progres_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[0];
+								d.progres_case_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[1];
+								d.fcn_id = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[2];
+								d.beneficiary_name = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[3];
+								d.beneficiary_gender = data[ 'group_af9zh97/_4_1_Card_QR_Code' ].split(';')[4];
+							}
+						} else {
+							d.fcn_id = data[ 'group_af9zh97/fcn_id' ];
+						}
+
+						// for each
+						d.distribution_date = data[ 'group_ya0cw08/distribution_date' ];
+						d.stipend_amount_bdt = parseInt( data[ 'group_af9zh97/stipend_amount_bdt' ] );
+						
+						// activity_details ( link to MASTER LIST )
+						d.remarks = data[ 'group_hr52g97/remarks' ] ? data[ 'group_hr52g97/remarks' ] : '';
+
+						// image
+						if ( data[ '_attachments' ].length ) {
+							d.download_small_url = data[ '_attachments' ][0].download_small_url;
+							d.download_medium_url = data[ '_attachments' ][0].download_medium_url;
+							d.download_large_url = data[ '_attachments' ][0].download_large_url;
+							// d._attachments = data[ '_attachments' ];
+						}
+
+						// kobo
+						d._form_uuid = data[ 'formhub/uuid' ];
+						d._uuid = data._uuid;
+						d._submission_time = data._submission_time;
+
+						// push cleaned data
+						livelihoods.push( d );
+
+						next();
+
+					}, function ( err ) {
+						
+						// return error
+						if ( err ) return res.negotiate( err );
+
+						Livelihoods
+							.destroy({ organization_tag: 'brac' })
+							.exec( function( err, destroy ) {
+								
+								// return error
+								if (err) return res.negotiate( err );
+								
+								// create
+								Livelihoods
+									.create( livelihoods )
+									.exec( function( err, result ) {
+										// return error
+										if (err) return res.negotiate( err );
+										// return success
+										return res.json( 200, { msg: 'Success!' });
+									});
+
+							});
+					
+					});
+
+				});
+
+			});
 
 	},
 
