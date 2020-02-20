@@ -96,6 +96,9 @@ module.exports = {
 		implementing_partners: {
 			type: 'array'
 		},
+		programme_partners: {
+			type: 'array'
+		},
 		cluster_id: {
 			type: 'string',
 			required: true

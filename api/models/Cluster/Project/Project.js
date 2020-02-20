@@ -56,6 +56,14 @@ module.exports = {
 		implementing_partners: {
 			type: 'array'
 		},
+		// Programme partners
+		programme_partners_checked: {
+			type: 'boolean',
+			defaultsTo: false
+		},
+		programme_partners: {
+			type: 'array'
+		},
 		undaf_desarrollo_paz:{
 			type: 'array'
 		},

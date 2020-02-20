@@ -561,7 +561,7 @@ var ReportController = {
 
 						// async loop report beneficiaries
 						async.eachOf( beneficiaries, function ( beneficiary, i, b_next ) {
-              delete beneficiary.implementing_partners;
+            //   delete beneficiary.implementing_partners;
               // clone
               var b = _under.extend( {}, report_copy, location_copy, beneficiary );
               // update or create
