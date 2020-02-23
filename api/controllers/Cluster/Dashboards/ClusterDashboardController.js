@@ -1178,7 +1178,8 @@ var ClusterDashboardController = {
 								'email',
 								'mpc_purpose_cluster_id',
 								'mpc_purpose_type_name',
-								'organization',
+                'organization',
+                'programme_partners',
 								'implementing_partners',
 								'project_hrp_code',
 								'project_code',
@@ -1288,7 +1289,8 @@ var ClusterDashboardController = {
 								'focal_point_email',
 								'mpc_purpose_cluster_id',
 								'mpc_purpose_type_name',
-								'organization',
+                'organization',
+                'programme_partners',
 								'implementing_partners',
 								'project_hrp_code',
 								'project_code',
@@ -1416,7 +1418,7 @@ var ClusterDashboardController = {
 									d.donor = da.join(', ');
 								}
 
-								//implementing_partner
+								// implementing_partner
 								if (Array.isArray(d.implementing_partners)) {
 									var im = [];
 									d.implementing_partners.forEach(function (impl, i) {
@@ -1425,6 +1427,16 @@ var ClusterDashboardController = {
 									im.sort();
 									d.implementing_partners = im.join(', ');
 								}
+
+                // programme_partners
+								if (Array.isArray(d.programme_partners)) {
+									var pp = [];
+									d.programme_partners.forEach(function (p, i) {
+										if (p) pp.push(p.organization_name);
+									});
+									pp.sort();
+									d.programme_partners = pp.join(', ');
+                }
 
 								//plan_component
 								if (Array.isArray(d.plan_component)) {
