@@ -43,6 +43,9 @@ module.exports = {
 		organization: {
 			type: 'string',
 			required: true
+    },
+    programme_partners: {
+			type: 'array'
 		},
 		implementing_partners: {
 			type: 'array'
@@ -82,7 +85,7 @@ module.exports = {
 			type: 'string',
 			required: true
 		},
-		
+
 //New column plans and components
 		plan_component: {
 			type: 'array'
@@ -149,7 +152,7 @@ module.exports = {
 		activity_description: {
 			type: 'array'
 		},
-		
+
 		// SOs
 		strategic_objectives: {
 			type: 'array'
@@ -199,7 +202,7 @@ module.exports = {
 
 		location_groups: {
 			type: 'array'
-		},    
+		},
 
     notes: {
     	type: 'string'
