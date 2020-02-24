@@ -221,6 +221,8 @@ var GfaDashboardController = {
 		// native filter
 		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.distribution_status, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
 
+		console.log( filter );
+
 		// distribution
 		PlannedBeneficiaries.native( function ( err, collection ){
 			collection.find( filter ).toArray( function ( err, actual_beneficiaries ){
