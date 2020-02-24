@@ -534,7 +534,7 @@ var GfaTaskController = {
 					// actual
 					if ( d[ 48 ] && d[ 48 ] !== 'Not Food Recieved' ) { 
 						distribution_status = 'actual';
-						distribution_date_food_recieved = moment( d[ 48 ] ).format( 'YYYY-MM-DD' ) === 'Invalid date' ? moment( d[ 48 ], 'DD-MM-YYYY' ).format( 'YYYY-MM-DD' ) : moment( d[ 48 ] ).format( 'YYYY-MM-DD' );
+						distribution_date_food_recieved = moment( new Date ( d[ 48 ] ) ).format( 'YYYY-MM-DD' ) === 'Invalid date' ? moment( d[ 48 ], 'DD-MM-YYYY' ).format( 'YYYY-MM-DD' ) : moment( new Date ( d[ 48 ] ) ).format( 'YYYY-MM-DD' );
 					}
 
 					// add to planned
