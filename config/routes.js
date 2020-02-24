@@ -304,9 +304,7 @@ module.exports.routes = {
   // uploadPlannedBeneficiaries
   'GET /wfp/gfa/gfd/processPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processPlannedBeneficiaries',
   'POST /wfp/gfa/gfd/processPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processPlannedBeneficiaries',
-  // uploadPlannedBeneficiaries
-  'GET /wfp/gfa/gfd/processActualBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processActualBeneficiaries',
-  'POST /wfp/gfa/gfd/processActualBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processActualBeneficiaries',
+  
   // setKoboXlsxForm
   'GET /wfp/gfa/gfd/setKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.setKoboXlsxForm',
   'POST /wfp/gfa/gfd/setKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.setKoboXlsxForm',
@@ -347,17 +345,11 @@ module.exports.routes = {
   'GET /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
   'POST /wfp/gfa/gfd/getPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiaries',
   // get PlannedBeneficiaries Indicator
-  'GET /wfp/gfa/gfd/getBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getBeneficiariesIndicator',
-  'POST /wfp/gfa/gfd/getBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getBeneficiariesIndicator',
-  // get PlannedBeneficiaries Indicator
   'GET /wfp/gfa/gfd/getPlannedBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiariesIndicator',
   'POST /wfp/gfa/gfd/getPlannedBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getPlannedBeneficiariesIndicator',
   // get ActualBeneficiaries Indicator
   'GET /wfp/gfa/gfd/getActualBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getActualBeneficiariesIndicator',
   'POST /wfp/gfa/gfd/getActualBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getActualBeneficiariesIndicator',
-  // get AbsentBeneficiaries Indicator
-  'GET /wfp/gfa/gfd/getAbsentBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getAbsentBeneficiariesIndicator',
-  'POST /wfp/gfa/gfd/getAbsentBeneficiariesIndicator': 'Country/Cxb/Gfa/GfaDashboardController.getAbsentBeneficiariesIndicator',  
 
   // WFP Livelihoods
 

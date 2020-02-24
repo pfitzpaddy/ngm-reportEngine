@@ -521,19 +521,24 @@ var GfaTaskController = {
 
 					// get absent distribution_date_actual
 					var fcn_id = d[ 18 ].toString().trim();
+					var distribution_status = 'plan';
 					var distribution_date_plan = moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' );
-					var distribution_date_actual = moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' );
-					
-					// find absent, if any
-					// if ( absent_beneficiaries.length ) {
-					// 	var absent = _.findWhere( absent_beneficiaries, { fcn_id: fcn_id } );
-					// 	if ( absent ) {
-					// 		distribution_date_actual = absent.distribution_date_actual;	
-					// 	}
-					// }
+					var distribution_date_actual = d[ 49 ] ? moment( new Date( d[ 49 ] ) ).format( 'YYYY-MM-DD' ) : moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' );
+					var distribution_date_food_recieved;
+
+					// absent
+					if ( d[ 47 ] && d[ 47 ].toLowerCase().indexOf( 'absent' ) !== -1 ) {
+						distribution_status = 'absent';
+					}
+
+					// actual
+					if ( d[ 48 ] && d[ 48 ] !== 'Not Food Recieved' ) { 
+						distribution_status = 'actual';
+						distribution_date_food_recieved = moment( new Date( d[ 48 ] ) ).format( 'YYYY-MM-DD' );
+					}
 
 					// add to planned
-					planned = Object.assign( { sl_number: d[ 0 ], distribution_date_plan: distribution_date_plan, distribution_date_actual: distribution_date_actual }, organization, distribution, distribution_site, camp_block );
+					planned = Object.assign( { sl_number: d[ 0 ], distribution_status: distribution_status, distribution_date_plan: distribution_date_plan, distribution_date_actual: distribution_date_actual, distribution_date_food_recieved: distribution_date_food_recieved }, organization, distribution, distribution_site, camp_block );
 
 					// variables
 					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ].trim() : d[ 10 ].trim();
@@ -639,6 +644,9 @@ var GfaTaskController = {
 							planned.entitlements = planned.rice + planned.lentils + planned.oil;
 						}
 					}
+
+					// remarks
+					planned.remarks = d[ 47 ];
 					
 					// add report with p to reports
 					planned_beneficiaries.push( planned );
@@ -680,92 +688,6 @@ var GfaTaskController = {
 					});
 
 			});
-
-		});
-
-	},
-
-	// upload planned beneficiaries
-	processActualBeneficiaries: function( req, res ){
-
-		// check req
-		if ( !req.param('admin0pcode') && !req.param('organization_tag') && !req.param('report_round') && !req.param('report_distribution') ) {
-			return res.json( 401, { err: 'admin0pcode, organization_tag, report_round, report_distribution required!' });
-		}
-
-		// set params
-		var admin0pcode = req.param('admin0pcode');
-		var organization_tag = req.param('organization_tag');
-		var report_round = req.param('report_round');
-		var report_distribution = req.param('report_distribution');
-
-		// filter
-		var date_filter = { distribution_date_actual: { '<=': moment().format('YYYY-MM-DD') } }
-		var organization_tag_filter = organization_tag === 'all' ? {} : { organization_tag: organization_tag }
-
-		// assign
-		planned_filter = Object.assign( { admin0pcode: admin0pcode, report_round: report_round, report_distribution: report_distribution }, date_filter, organization_tag_filter );
-		actual_filter = Object.assign( { admin0pcode: admin0pcode, report_round: report_round, report_distribution: report_distribution }, organization_tag_filter );
-
-		// get updated plan, remove actual
-		Promise.all([
-			PlannedBeneficiaries.find( planned_filter ),
-			AbsentBeneficiaries.find( planned_filter ),
-			ActualBeneficiaries.destroy( actual_filter )
-		])
-		.catch( function( err ) {
-			return res.negotiate( err );
-		})
-		.then( function( result ) {
-
-			// plan
-			var planned_beneficiaries = result[ 0 ];
-			var absent_beneficiaries = result[ 1 ];
-
-			// no length
-			if ( !planned_beneficiaries.length ) {
-				return res.json( 200, { msg: 'Updating Kobo Daily Reporting Forms for ' + report_distribution });
-			}
-
-			// length
-			if ( planned_beneficiaries.length ) {
-
-				// group by dates
-				var planned_distribution = _.groupBy( _.sortBy( planned_beneficiaries, 'distribution_date_plan' ), 'distribution_date_plan' );
-
-				// counter
-				var count = 0;
-				var length = Object.keys( planned_distribution ).length;
-
-				// loop object
-				for ( var date in planned_distribution ) {
-
-					// plan
-					var distribution = planned_distribution[ date ];
-
-					// remove absent
-					var actual = _.filter( distribution, function( d ){ return !_.findWhere( absent_beneficiaries, { fcn_id: d.fcn_id }); });
-
-					// create actual
-					ActualBeneficiaries
-						.create( actual )
-						.exec( function( err, update ){
-
-							// return error
-							if (err) return res.negotiate( err );
-
-							// return
-							count++;
-							if ( count === length ){
-								// return
-								return res.json( 200, { msg: 'Updating Kobo Daily Reporting Forms for ' + report_distribution });
-							}
-
-						});
-
-				}
-
-			}
 
 		});
 

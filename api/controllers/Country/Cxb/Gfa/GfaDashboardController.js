@@ -77,6 +77,7 @@ var GfaDashboardController = {
 				return res.json( 200, _.sortBy( dates ) );
 			});
 		});
+	
 	},
 
 	// get planned beneficiaries
@@ -118,85 +119,6 @@ var GfaDashboardController = {
 	},
 
 	// set distribution round
-	getBeneficiariesIndicator: function( req, res ){
-
-		// check req
-		if ( !req.param('indicator') && !req.param('start_date') && !req.param('end_date') ) {
-			return res.json( 401, { err: 'indicator, start_date, end_date required!' });
-		}
-
-		// set params
-		var params = {
-			indicator: req.param('indicator'),
-			format: req.param('format') ? req.param('format') : false,
-			download: req.param('download') ? true : false,
-			admin0pcode: req.param('admin0pcode'),
-			organization_tag: req.param('organization_tag'),
-			report_round: req.param('report_round'),
-			report_distribution: req.param('report_distribution'),
-			site_id: req.param('site_id'),
-			admin3pcode: req.param('admin3pcode'),
-			admin4pcode: req.param('admin4pcode'),
-			admin5pcode: req.param('admin5pcode'),
-			start_date: req.param('start_date'),
-			end_date: req.param('end_date')
-		}
-
-		// filters
-		var filters = {
-			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
-			report_round: !params.report_round ? {} : { report_round: params.report_round },
-			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
-			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'immap' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
-			site_id: !params.site_id || params.site_id === 'all' ? {} : { site_id: params.site_id },
-			admin3pcode: !params.admin3pcode || params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
-			admin4pcode: !params.admin4pcode || params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
-			admin5pcode: !params.admin5pcode || params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode },
-			distribution_date: { '$or': [{ 
-					distribution_date_plan: { '$gte': moment( params.start_date ).format( 'YYYY-MM-DD' ), '$lte': moment( params.end_date ).format( 'YYYY-MM-DD' ) } 
-				},{
-					distribution_date_actual: { '$gte': moment( params.start_date ).format( 'YYYY-MM-DD' ), '$lte': moment( params.end_date ).format( 'YYYY-MM-DD' ) }
-				}] 
-			}
-		}
-		
-		// native filter
-		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
-
-		// planned
-		PlannedBeneficiaries.native( function ( err, planned_collection ){
-			planned_collection.find( filter ).toArray( function ( err, planned_beneficiaries ){
-				// return error
-				if (err) return res.negotiate( err );
-				
-				// actual
-				ActualBeneficiaries.native( function ( err, actual_collection ){
-					actual_collection.find( filter ).toArray( function ( err, actual_beneficiaries ){
-						// return error
-						if (err) return res.negotiate( err );
-						
-						// absent
-						AbsentBeneficiaries.native( function ( err, absent_collection ){
-							absent_collection.find( filter ).toArray( function ( err, absent_beneficiaries ){
-								// return error
-								if (err) return res.negotiate( err );
-
-								// concat arrays
-								var beneficiaries = planned_beneficiaries.concat( actual_beneficiaries, absent_beneficiaries );
-
-								// calculate indicators
-								GfaDashboardController.setIndicator( params, filters, beneficiaries, res );
-
-							});
-						});
-					});
-				});
-			});
-		});
-
-	},
-
-	// set distribution round
 	getPlannedBeneficiariesIndicator: function( req, res ){
 
 		// check req
@@ -213,6 +135,7 @@ var GfaDashboardController = {
 			organization_tag: req.param('organization_tag'),
 			report_round: req.param('report_round'),
 			report_distribution: req.param('report_distribution'),
+			distribution_status: req.param('distribution_status') ? req.param('distribution_status') : false,
 			site_id: req.param('site_id'),
 			admin3pcode: req.param('admin3pcode'),
 			admin4pcode: req.param('admin4pcode'),
@@ -227,6 +150,7 @@ var GfaDashboardController = {
 			report_round: !params.report_round ? {} : { report_round: params.report_round },
 			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
 			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'immap' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
+			distribution_status: !params.distribution_status ? {} : { distribution_status: params.distribution_status },
 			site_id: !params.site_id || params.site_id === 'all' ? {} : { site_id: params.site_id },
 			admin3pcode: !params.admin3pcode || params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
 			admin4pcode: !params.admin4pcode || params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
@@ -240,7 +164,7 @@ var GfaDashboardController = {
 		}
 		
 		// native filter
-		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
+		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.distribution_status, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
 
 		// distribution
 		PlannedBeneficiaries.native( function ( err, collection ){
@@ -271,6 +195,7 @@ var GfaDashboardController = {
 			organization_tag: req.param('organization_tag'),
 			report_round: req.param('report_round'),
 			report_distribution: req.param('report_distribution'),
+			distribution_status: req.param('distribution_status') ? req.param('distribution_status') : false,
 			site_id: req.param('site_id'),
 			admin3pcode: req.param('admin3pcode'),
 			admin4pcode: req.param('admin4pcode'),
@@ -285,81 +210,24 @@ var GfaDashboardController = {
 			report_round: !params.report_round ? {} : { report_round: params.report_round },
 			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
 			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'immap' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
+			distribution_status: !params.distribution_status ? {} : { distribution_status: params.distribution_status },
 			site_id: !params.site_id || params.site_id === 'all' ? {} : { site_id: params.site_id },
 			admin3pcode: !params.admin3pcode || params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
 			admin4pcode: !params.admin4pcode || params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
 			admin5pcode: !params.admin5pcode || params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode },
-			distribution_date: { distribution_date_actual: { '$gte': moment( params.start_date ).format( 'YYYY-MM-DD' ), '$lte': moment( params.end_date ).format( 'YYYY-MM-DD' ) } }
+			distribution_date: { distribution_date_food_recieved: { '$gte': moment( params.start_date ).format( 'YYYY-MM-DD' ), '$lte': moment( params.end_date ).format( 'YYYY-MM-DD' ) } }
 		}
 
 		// native filter
-		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
+		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.distribution_status, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
 
 		// distribution
-		ActualBeneficiaries.native( function ( err, collection ){
+		PlannedBeneficiaries.native( function ( err, collection ){
 			collection.find( filter ).toArray( function ( err, actual_beneficiaries ){
 				// return error
 				if (err) return res.negotiate( err );
 				// calculate indicators
 				GfaDashboardController.setIndicator( params, filters, actual_beneficiaries, res );
-			});
-		});
-
-	},
-
-	// set distribution round
-	getAbsentBeneficiariesIndicator: function( req, res ){
-
-		// check req
-		if ( !req.param('indicator') && !req.param('start_date') && !req.param('end_date') ) {
-			return res.json( 401, { err: 'indicator, start_date, end_date required!' });
-		}
-
-		// set params
-		var params = {
-			indicator: req.param('indicator'),
-			format: req.param('format') ? req.param('format') : false,
-			download: req.param('download') ? true : false,
-			admin0pcode: req.param('admin0pcode'),
-			organization_tag: req.param('organization_tag'),
-			report_round: req.param('report_round'),
-			report_distribution: req.param('report_distribution'),
-			site_id: req.param('site_id'),
-			admin3pcode: req.param('admin3pcode'),
-			admin4pcode: req.param('admin4pcode'),
-			admin5pcode: req.param('admin5pcode'),
-			start_date: req.param('start_date'),
-			end_date: req.param('end_date')
-		}
-
-		// filters
-		var filters = {
-			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
-			report_round: !params.report_round ? {} : { report_round: params.report_round },
-			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
-			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'immap' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
-			site_id: !params.site_id || params.site_id === 'all' ? {} : { site_id: params.site_id },
-			admin3pcode: !params.admin3pcode || params.admin3pcode === 'all' ? {} : { admin3pcode: params.admin3pcode },
-			admin4pcode: !params.admin4pcode || params.admin4pcode === 'all' ? {} : { admin4pcode: params.admin4pcode },
-			admin5pcode: !params.admin5pcode || params.admin5pcode === 'all' ? {} : { admin5pcode: params.admin5pcode },
-			distribution_date: { '$or': [{ 
-					distribution_date_plan: { '$gte': moment( params.start_date ).format( 'YYYY-MM-DD' ), '$lte': moment( params.end_date ).format( 'YYYY-MM-DD' ) } 
-				},{
-					distribution_date_actual: { '$gte': moment( params.start_date ).format( 'YYYY-MM-DD' ), '$lte': moment( params.end_date ).format( 'YYYY-MM-DD' ) }
-				}] 
-			}
-		}
-
-		// native filter
-		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
-
-		// distribution
-		AbsentBeneficiaries.native( function ( err, collection ){
-			collection.find( filter ).toArray( function ( err, absent_beneficiaries ){
-				// return error
-				if (err) return res.negotiate( err );
-				// calculate indicators
-				GfaDashboardController.setIndicator( params, filters, absent_beneficiaries, res );
 			});
 		});
 
