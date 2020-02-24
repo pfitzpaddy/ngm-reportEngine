@@ -534,6 +534,9 @@ var GfaTaskController = {
 					// actual
 					if ( d[ 48 ] && d[ 48 ] !== 'Not Food Recieved' ) { 
 						distribution_status = 'actual';
+						console.log( d[ 48 ] )
+						console.log( new Date( d[ 48 ] ) )
+						console.log( moment( new Date( d[ 48 ] ) ).format( 'YYYY-MM-DD' ) )
 						distribution_date_food_recieved = moment( new Date( d[ 48 ] ) ).format( 'YYYY-MM-DD' );
 					}
 
