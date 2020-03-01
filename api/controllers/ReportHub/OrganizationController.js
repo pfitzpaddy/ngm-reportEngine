@@ -4,7 +4,18 @@
  * @description :: Server-side logic for managing auths
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+  var util = require('util');
 
+  // parse results from sails
+  var set_result =  function( result ) {
+    if( util.isArray( result ) ) {
+      // update ( array )
+      return result[0];
+    } else {
+      // create ( object )
+      return result;
+    }
+  };
 module.exports = {
 
   // get organization by id
@@ -21,16 +32,16 @@ module.exports = {
     // find
     Organization
       .findOne()
-      .populate('warehouses')
       .where( { id: organization_id } )
       .exec( function( err, organization ){
-
         // return error
         if ( err ) return res.negotiate( err );
-
-        // return updated user
-        return res.json( 200, organization );
-
+        StockWarehouse.find({organization_id: organization_id}).exec(function(err, warehouses){
+          if ( err ) return res.negotiate( err );
+          organization.warehouses = warehouses;
+          // return updated user
+          return res.json( 200, organization );
+        })
       })
 
   },
@@ -51,7 +62,7 @@ module.exports = {
 			.exec(function (err, org) {
 				if(org.length){
 					org.forEach(function (d, i) {
-						// if not existing											
+						// if not existing
 							organizations.push({ organization_tag: d.organization_tag, organization_name: d.organization_name, organization: d.organization });
 					});
 					distinct = _.uniq(organizations, function (x) {
@@ -78,7 +89,7 @@ module.exports = {
 	},
   // get org menu
   getOrganizationMenu: function( req, res ){
-    
+
     // request input
     if ( !req.param( 'menu_items' ) ) {
       return res.json( 400, { err: 'menu_items required!' });
@@ -133,7 +144,7 @@ module.exports = {
 
                 // country
                 if ( menu_items.indexOf( 'admin0pcode' ) !== -1 ) {
-                  
+
                   // menu
                   menu.push({
                     'search': true,
@@ -164,7 +175,7 @@ module.exports = {
                       'param': 'admin0pcode',
                       'active': d.admin0pcode,
                       'class': 'grey-text text-darken-2 waves-effect waves-teal waves-teal-lighten-4',
-                      'href': url + d.admin0pcode + '/' + 
+                      'href': url + d.admin0pcode + '/' +
                                 req.param( 'organization_tag' ) + '/' +
                                 req.param( 'project' ) + '/' +
                                 req.param( 'cluster_id' )
@@ -231,14 +242,14 @@ module.exports = {
                   // get unique countries
                   var list = _.uniq( users, function( d ){
                     if ( d.programme_id ) {
-                      return d.programme_id 
+                      return d.programme_id
                     };
                   });
 
                   // sort
                   list.sort(function( a, b ) {
                     if ( a.programme_name && b.programme_name ) {
-                      return a.programme_name.localeCompare( b.programme_name );  
+                      return a.programme_name.localeCompare( b.programme_name );
                     }
                   });
 
@@ -291,7 +302,7 @@ module.exports = {
 
                   // for each
                   list.forEach( function( d, i ) {
-                    
+
                     // admin0name
                     if ( d.admin0pcode === req.param( 'admin0pcode' ) ) {
                       admin0name = d.admin0name;
@@ -499,42 +510,42 @@ module.exports = {
         if ( err ) return res.negotiate( err );
         // return
         return res.json( 200, { success: true } );
-      });    
+      });
 
   },
 
-  setOrganization: function( req, res ){
+  setOrganization: async function( req, res ){
 
+    try {
     // check params
-    if ( !req.param( 'organization' ) ) {
-      return res.json(401, { msg: 'organization required' });
-    }
+      if ( !req.param( 'organization' ) ) {
+        return res.json(401, { msg: 'organization required' });
+      }
 
-    // id params
-    var organization = req.param( 'organization' );
+      // id params
+      const organization = req.param( 'organization' );
+      const warehouses = req.param('organization').warehouses;
+      let organization_copy = JSON.parse( JSON.stringify( organization ) );
+      delete organization_copy.warehouses;
+      // update
+      let organization_update = await Organization.update( { id: organization.id }, organization_copy );
 
-    // update
-    Organization
-      .update( { id: organization.id }, organization )
-      .exec( function( err, update ){
+      organization_update[0].warehouses = [];
 
-        // return error
-        if ( err ) return res.negotiate( err );
-
-        Organization
-          .findOne({ id: organization.id })
-          .populate('warehouses')
-          .exec( function(err, result){
-            
-            // return error
-            if ( err ) return res.negotiate( err );
-
-            // return
-            return res.json( 200, result );
-
-          });
-
+      // update/create warehouses
+      const db_promises = warehouses.map(async function(w, i){
+        if(!w.id) { w.organization_id = organization_update[0].id; }
+        // uncomment update in updateOrCreate
+        // if warehouses are updated (e.g. warehouse_start_date/warehouse_end_date date for warehouses)
+        result = await StockWarehouse.updateOrCreate({}, { id: w.id }, w);
+        organization_update[0].warehouses[i] = set_result( result ) ;
       });
+
+      await Promise.all(db_promises);
+      return res.json(200, organization_update)
+    } catch (err) {
+      return res.negotiate( err );
+    }
 
   }
 

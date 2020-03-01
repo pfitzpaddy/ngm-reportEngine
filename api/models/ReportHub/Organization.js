@@ -56,11 +56,6 @@ module.exports = {
 		project_acbar_partner: {
 			type: 'boolean'
 		},
-    // add reference to Warehouse
-    warehouses: {
-      collection: 'stockwarehouse',
-      via: 'organization_id'
-    }
 	}
 
 };
