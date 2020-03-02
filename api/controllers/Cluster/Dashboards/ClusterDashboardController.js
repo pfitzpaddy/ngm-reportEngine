@@ -76,8 +76,8 @@ var ClusterDashboardController = {
 			cluster_id:  ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' )
 								? {}
 								: ( params.cluster_id !== 'cvwg' )
-									? { or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { contains: params.cluster_id }, cluster_id: "cvwg" } ] }
-									: { or: [{ cluster_id: params.cluster_id }, { activity_description_id: { contains: 'cash' } }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
+									? { cluster_id: params.cluster_id }
+									: { or: [{ cluster_id: params.cluster_id }, { mpc_delivery_type_id: ['cash', 'voucher'] } ] },
 			cluster_id_act: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
 			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
 			activity_description_id: params.activity_description_id === 'all' ? {} : { activity_description_id: params.activity_description_id},
@@ -94,13 +94,13 @@ var ClusterDashboardController = {
 			cluster_id_Native: ( params.cluster_id === 'all' || params.cluster_id === 'rnr_chapter' || params.cluster_id === 'acbar' )
 								? {}
 								: ( params.cluster_id !== 'cvwg' )
-									? { $or: [{ cluster_id: params.cluster_id }, { mpc_purpose_cluster_id: { $regex : params.cluster_id }, cluster_id: "cvwg" } ] }
-									: { $or: [{ cluster_id: params.cluster_id }, { activity_description_id: { $regex: 'cash' } }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] },
+									? { cluster_id: params.cluster_id }
+									: { $or: [{ cluster_id: params.cluster_id }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] },
 			cluster_ids_Native: ( params.cluster_ids.includes('all') || params.cluster_ids.includes('rnr_chapter') || params.cluster_ids.includes('acbar') )
 								? {}
 								: ( params.cluster_ids.includes('cvwg') )
-									? { $or: [{ cluster_id: { $in: params.cluster_ids } }, { activity_description_id: { $regex: 'cash' } }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] }
-									: { $or: [{ cluster_id: { $in: params.cluster_ids } }, { "mpc_purpose.cluster_id" : { $in : params.cluster_ids }, cluster_id: "cvwg"} ] },
+									? { $or: [{ cluster_id: { $in: params.cluster_ids } }, { mpc_delivery_type_id: { $in: ['cash', 'voucher'] } } ] }
+									: { cluster_id: { $in: params.cluster_ids } },
 			is_cluster_ids_array: params.cluster_ids ? true : false,
 			organization_tag_Native: params.organization_tag === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: params.organization_tag },
 			date_Native: { reporting_period: { $gte: new Date( params.start_date ), $lte: new Date( params.end_date )} },
@@ -1176,8 +1176,8 @@ var ClusterDashboardController = {
 								'name',
 								'phone',
 								'email',
-								'mpc_purpose_cluster_id',
-								'mpc_purpose_type_name',
+								// 'mpc_purpose_cluster_id',
+								// 'mpc_purpose_type_name',
                 'organization',
                 'programme_partners',
 								'implementing_partners',
@@ -1287,8 +1287,8 @@ var ClusterDashboardController = {
 								'focal_point_name',
 								'focal_point_phone',
 								'focal_point_email',
-								'mpc_purpose_cluster_id',
-								'mpc_purpose_type_name',
+								// 'mpc_purpose_cluster_id',
+								// 'mpc_purpose_type_name',
                 'organization',
                 'programme_partners',
 								'implementing_partners',
