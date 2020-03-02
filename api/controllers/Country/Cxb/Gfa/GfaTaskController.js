@@ -29,15 +29,15 @@ var food_distribution_point_lookup = {
 	'Bagghona': 'bagghona', // RIC
 	'Balukhali 01': 'balukhali_1', // WVI
 	'Balukhali 02': 'balukhali_2', // WVI
-	'Burmapara': 'burma_para', // RIC
+	'Burmapara_(C13)': 'burma_para', // RIC
 	'Camp 17': 'camp_17', // SCI
 	'Camp 19': 'camp_19', // SCI
 	'Camp 20Ext.': 'camp_20_ext', // SCI
 	'Camp 4Ext.': 'camp_4_ext', // SCI
-	'Chakmerkul': 'chakmerkul', // RIC
+	'Chakmarkul': 'chakmerkul', // RIC
 	'Hakimpara': 'hakimpara', // RIC
 	'Jadimura': 'jadimura', // AAH
-	'Jamtoli': 'jamtoli', // RIC
+	'Jamtoli_(C15)': 'jamtoli', // RIC
 	'Lambasia': 'lambashia', // BRAC
 	'Leda': 'leda_ms', // AAH
 	'Modhurchara 1': 'modhur_chara_1', // BRAC
@@ -50,7 +50,7 @@ var food_distribution_point_lookup = {
 }
 
 // lookup table
-var camp_block_lookup = {
+var camp_block_lookup_v1 = {
 	'C01E_A': 'CXB-201_B001',
 	'C01E_B': 'CXB-201_B002',
 	'C01E_C': 'CXB-201_B003',
@@ -153,6 +153,7 @@ var camp_block_lookup = {
 	'C14_C': 'CXB-222_B098',
 	'C14_D': 'CXB-222_B099',
 	'C14_E': 'CXB-222_B100',
+
 	'C15_A': 'CXB-223_B101',
 	'C15_B': 'CXB-223_B102',
 	'C15_C': 'CXB-223_B103',
@@ -161,6 +162,7 @@ var camp_block_lookup = {
 	'C15_F': 'CXB-223_B106',
 	'C15_G': 'CXB-223_B107',
 	'C15_H': 'CXB-223_B108',
+
 	'C16_A': 'CXB-224_B109',
 	'C16_B': 'CXB-224_B110',
 	'C16_C': 'CXB-224_B111',
@@ -226,6 +228,67 @@ var camp_block_lookup = {
 	// 'NRC_H': 'CXB-089_',
 	// 'NRC_I': 'CXB-089_',
 	// 'NRC_P': 'CXB-089_',
+}
+
+// lookup table
+var camp_block_lookup = {
+	// C15
+	'C15_A': 'CXB-223_B101',
+	'C15_B': 'CXB-223_B102',
+	'C15_C': 'CXB-223_B103',
+	'C15_D': 'CXB-223_B104',
+	'C15_E': 'CXB-223_B105',
+	'C15_F': 'CXB-223_B106',
+	'C15_G': 'CXB-223_B107',
+	'C15_H': 'CXB-223_B108',
+	// C16
+	'C16_A': 'CXB-224_B109',
+	'C16_B': 'CXB-224_B110',
+	'C16_C': 'CXB-224_B111',
+	'C16_D': 'CXB-224_B112',
+	// C13
+	'Camp13-A': 'CXB-220_B089',
+	'Camp13-A': 'CXB-220_B089',
+	'Camp13-B': 'CXB-220_B090',
+	'Camp13-C': 'CXB-220_B091',
+	'Camp13-D': 'CXB-220_B092',
+	'Camp13-E': 'CXB-220_B093',
+	'Camp13-F': 'CXB-220_B094',
+	'Camp13-G': 'CXB-220_B095',
+	// C14
+	'Camp14-A': 'CXB-222_B096',
+	'Camp14-B': 'CXB-222_B097',
+	'Camp14-C': 'CXB-222_B098',
+	'Camp14-D': 'CXB-222_B099',
+	'Camp14-E': 'CXB-222_B100',
+	// C15
+	'Camp15-A': 'CXB-223_B101',
+	'Camp15-B': 'CXB-223_B102',
+	'Camp15-C': 'CXB-223_B103',
+	'Camp15-D': 'CXB-223_B104',
+	'Camp15-E': 'CXB-223_B105',
+	'Camp15-F': 'CXB-223_B106',
+	'Camp15-G': 'CXB-223_B107',
+	'Camp15-H': 'CXB-223_B108',
+	// C16
+	'Camp16-B': 'CXB-224_B110',
+	'Camp16-C': 'CXB-224_B111',
+	// C19
+	'Camp19-A': 'CXB-219_B121',
+	'Camp19-B': 'CXB-219_B122',
+	'Camp19-C': 'CXB-219_B123',
+	'Camp19-D': 'CXB-219_B124',
+	// C21
+	'Camp21-A': 'CXB-108_B127',
+	'Camp21-B': 'CXB-108_B128',
+	'Camp21-C': 'CXB-108_B129',
+	'Camp21-D': 'CXB-108_B130',
+	'Camp21-E': 'CXB-108_B131',
+	'Camp21-F': 'CXB-108_B132',
+	'Camp21-G': 'CXB-108_B133',
+	'Camp21-H': 'CXB-108_B134',
+	'Camp21-I': 'CXB-108_B135',
+	'Camp21-J': 'CXB-108_B136',
 }
 
 // task controller
@@ -396,7 +459,7 @@ var GfaTaskController = {
 		var planned_beneficiaries = [];
 
 		// get sheet with len
-		var sheet_csv = [];
+		var sheet_json = [];
 		var sheet_length = 0;
 		var planned_beneficiaries_import;
 
@@ -405,12 +468,26 @@ var GfaTaskController = {
 
 		// find largest sheet and set to planned_beneficiaries
 		for ( i=0; i < workbook.SheetNames.length; i++ ){
-			//sheet to json
-			sheet_csv[ i ] = XLSX_UTILS.sheet_to_json( workbook.Sheets[ workbook.SheetNames[ i ] ], { defval: '0' });
-			if ( sheet_length < sheet_csv[ i ].length ) {
-				sheet_length = sheet_csv[ i ].length;
-				planned_beneficiaries_import = sheet_csv[ i ];
+			
+			// unhidden tabs
+			if ( workbook.SheetNames[ i ] !== 'Notes' && workbook.SheetNames[ i ] !== 'UNHCRCamp_Block' ) {
+
+				// set range
+				// { s: { c: 0, r: 0 }, e: { c: 31, r: 61179 } }
+				var ws = workbook.Sheets[ workbook.SheetNames[ i ] ];
+				var range = XLSX.utils.decode_range( ws['!ref'] );
+				range.s.r = 1;
+				ws['!ref'] = XLSX.utils.encode_range( range );
+
+				//sheet to json
+				sheet_json[ i ] = XLSX_UTILS.sheet_to_json( ws, { defval: '0' });
+				if ( sheet_length < sheet_json[ i ].length ) {
+					sheet_length = sheet_json[ i ].length;
+					planned_beneficiaries_import = sheet_json[ i ];
+				}
+
 			}
+
 		}
 
 		// distribution
@@ -459,9 +536,6 @@ var GfaTaskController = {
 					d.push( data[ i ] );
 				}
 
-				// if fcn_id
-				// if ( d[ 16 ] ) {
-
 					// attrs
 					var site;
 					var admin;
@@ -471,7 +545,7 @@ var GfaTaskController = {
 
 					// get distribution_site
 					site = _.filter( food_distribution_points, function ( s ) {
-						return s.site_id === food_distribution_point_lookup[ d[ 6 ] ];
+						return s.site_id === food_distribution_point_lookup[ d[ 3 ] ];
 					});
 
 					// set distribution_site
@@ -486,19 +560,9 @@ var GfaTaskController = {
 						}
 					}
 					
-
-					// create camp_block key
-					if ( d[ 9 ].length === 1 ) {
-						var camp_number = d[ 8 ].match( /\d+/g ).map( Number )[ 0 ];
-						var key = 'C';
-								key += camp_number > 9 ? camp_number : '0' + camp_number;
-								key += '_' + d[ 9 ];
-						d[ 9 ] = key;
-					}
-					
 					// set camp_block 
 					admin = _.filter( admin4, function ( b ) {
-						return b.admin4pcode === camp_block_lookup[ d[ 9 ] ];
+						return b.admin4pcode === camp_block_lookup[ d[ 6 ] ];
 					});
 
 					// camp_block
@@ -520,88 +584,54 @@ var GfaTaskController = {
 					}
 
 					// get absent distribution_date_actual
-					var fcn_id = d[ 18 ].toString().trim();
+					var fcn_id = d[ 15 ].toString().trim();
 					var distribution_status = 'plan';
-					var distribution_date_plan = moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' );
-					var distribution_date_actual = d[ 49 ] ? moment( new Date( d[ 49 ] ) ).format( 'YYYY-MM-DD' ) : moment( new Date( d[ 1 ] ) ).format( 'YYYY-MM-DD' );
+					var distribution_date_plan = d[ 26 ] ? moment( d[ 26 ], 'DD/MM/YYYY' ).format( 'YYYY-MM-DD' ) : '';
+					var distribution_date_actual = d[ 28 ] ? moment( d[ 28 ], 'DD/MM/YYYY' ).format( 'YYYY-MM-DD' ) : distribution_date_plan;
 					var distribution_date_food_recieved;
 
 					// absent
-					if ( d[ 47 ] && d[ 47 ].toLowerCase().indexOf( 'absent' ) !== -1 ) {
+					if ( d[ 28 ] && d[ 28 ].toLowerCase().indexOf( 'absent' ) !== -1 ) {
 						distribution_status = 'absent';
 					}
 
 					// actual
-					if ( d[ 48 ] && d[ 48 ] !== 'Not Food Recieved' ) { 
+					if ( d[ 28 ] && d[ 28 ] !== 'Not Food Recieved' ) { 
 						distribution_status = 'actual';
-						distribution_date_food_recieved = moment( new Date ( d[ 48 ] ) ).format( 'YYYY-MM-DD' ) === 'Invalid date' ? moment( d[ 48 ], 'DD-MM-YYYY' ).format( 'YYYY-MM-DD' ) : moment( new Date ( d[ 48 ] ) ).format( 'YYYY-MM-DD' );
+						distribution_date_food_recieved = moment( new Date ( d[ 28 ] ) ).format( 'YYYY-MM-DD' ) === 'Invalid date' ? moment( d[ 28 ], 'DD-MM-YYYY' ).format( 'YYYY-MM-DD' ) : moment( new Date ( d[ 28 ] ) ).format( 'YYYY-MM-DD' );
 					}
 
 					// add to planned
 					planned = Object.assign( { sl_number: d[ 0 ], distribution_status: distribution_status, distribution_date_plan: distribution_date_plan, distribution_date_actual: distribution_date_actual, distribution_date_food_recieved: distribution_date_food_recieved }, organization, distribution, distribution_site, camp_block );
 
-					// variables
-					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 10 ].trim() : d[ 10 ].trim();
-					planned.admin5name = d[ 10 ].trim();
+					// // variables
+					planned.admin5pcode = camp_block && camp_block.admin4pcode ? camp_block.admin4pcode + '_' + d[ 7 ].trim() : d[ 7 ].trim();
+					planned.admin5name = d[ 7 ].trim();
 
 					// majhee
-					planned.majhee_name = d[ 11 ].trim();
-					planned.majhee_phone = d[ 12 ];
-					planned.fh_name = d[ 14 ].trim();
-					planned.hh_name = d[ 13 ].trim();
-					planned.hh_age = parseInt( d[ 24 ] );
-					planned.hh_gender = d[ 23 ].trim() === 'M' || d[ 23 ].trim() === 'Male' ? 'Male' : 'Female';
+					planned.majhee_name = d[ 8 ].trim();
+					planned.majhee_phone = d[ 9 ];
+					planned.hh_name = d[ 10 ].trim();
 					
 					// ids
-					planned.scope_id = d[ 15 ].toString().trim();
-					planned.gfd_id = d[ 17 ].toString().trim();
-					planned.fcn_id = d[ 18 ].toString().trim();
-					planned.govt_id = d[ 19 ].toString().trim();
-					planned.unhcr_case_id = d[ 20 ].toString().trim();
-					planned.unhcr_case_camp = d[ 21 ].toString().trim();
-					planned.progres_id = d[ 22 ].toString().trim();
-					planned.gfd_modality = d[ 16 ];
+					planned.gfa_modality = d[ 2 ];
+					planned.gfd_modality = d[ 13 ] ? d[ 13 ] : 'n/a';
+					planned.scope_id = d[ 12 ].toString().trim();
+					planned.scope_card_id = d[ 14 ].toString().trim();
+					planned.fcn_id = d[ 15 ].toString().trim();
+					planned.govt_id = d[ 16 ].toString().trim();
+					planned.unhcr_case_id = d[ 17 ].toString().trim();
 
 					// demographics
-					planned.gfd_family_size = d[ 35 ] ? parseInt( d[ 35 ] ) : 0;
-					planned.boys_0_5 = d[ 28 ] ? parseInt( d[ 28 ] ) : 0;
-					planned.girls_0_5 = d[ 27 ] ? parseInt( d[ 27 ] ) : 0;
-					planned.boys_5_17 = d[ 30 ] ? parseInt( d[ 30 ] ) :0;
-					planned.girls_5_17 = d[ 29 ] ? parseInt( d[ 29 ] ) : 0;
-					planned.boys = parseInt( planned.boys_0_5 ) + parseInt( planned.boys_5_17 );
-					planned.girls = parseInt( planned.girls_0_5 ) + parseInt( planned.girls_5_17 );
-					planned.men = d[ 32 ] ? parseInt( d[ 32 ] ) : 0;
-					planned.women = d[ 31 ] ? parseInt( d[ 31 ] ) : 0;
-					planned.elderly_men = d[ 34 ] ? parseInt( d[ 34 ] ) : 0;
-					planned.elderly_women = d[ 33 ] ? parseInt( d[ 33 ] ) : 0;
-					planned.total_male = parseInt( planned.boys ) + parseInt( planned.men ) + parseInt( planned.elderly_men );
-					planned.total_female = parseInt( planned.girls ) + parseInt( planned.women ) + parseInt( planned.elderly_women );
-					planned.total_beneficiaries = parseInt( planned.total_male ) + parseInt( planned.total_female );
+					planned.male = d[ 20 ] ? parseInt( d[ 20 ] ) : 0;
+					planned.female = d[ 19 ] ? parseInt( d[ 19 ] ) : 0;
+					planned.gfd_family_size = d[ 18 ] ? parseInt( d[ 18 ] ) : 0;
 
 					// special needs
-					planned.pregnant_hh = d[ 36 ] ? true : false;
-					planned.lactating_hh = d[ 37 ] ? true : false;
-					planned.disabled_hh = d[ 46 ] ? true : false;
-
-					// special needs demographics
-					planned.pregnant_women = d[ 36 ] ? parseInt( d[ 36 ] ) : 0;
-					planned.lactating_women = d[ 37 ] ? parseInt( d[ 37 ] ) : 0;
-
-					// disabled
-					planned.boys_0_5_disabled = d[ 39 ] ? parseInt( d[ 39 ] ) : 0;
-					planned.girls_0_5_disabled = d[ 38 ] ? parseInt( d[ 38 ] ) : 0;
-					planned.boys_5_17_disabled = d[ 41 ] ? parseInt( d[ 41 ] ) : 0;
-					planned.girls_5_17_disabled = d[ 40 ] ? parseInt( d[ 40 ] ) : 0;
-					planned.boys_disabled = parseInt( planned.boys_0_5_disabled ) + parseInt( planned.boys_5_17_disabled );
-					planned.girls_disabled = parseInt( planned.girls_0_5_disabled ) + parseInt( planned.girls_5_17_disabled );
-					planned.men_disabled = d[ 43 ] ? parseInt( d[ 43 ] ) : 0;
-					planned.women_disabled = d[ 42 ] ? parseInt( d[ 42 ] ) : 0;
-					planned.elderly_men_disabled = d[ 45 ] ? parseInt( d[ 45 ] ) : 0;
-					planned.elderly_women_disabled = d[ 44 ] ? parseInt( d[ 44 ] ) : 0;
-					planned.total_male_disabled = parseInt( planned.boys_disabled ) + parseInt( planned.men_disabled ) + parseInt( planned.elderly_men_disabled );
-					planned.total_women_disabled = parseInt( planned.girls_disabled ) + parseInt( planned.women_disabled ) + parseInt( planned.elderly_women_disabled );
-					planned.total_beneficiaries_disabled = parseInt( planned.total_male_disabled ) + parseInt( planned.total_women_disabled );
-
+					planned.disabled_hh = d[ 21 ] ? true : false;
+					planned.disabled_hh_numner = d[ 21 ] ? parseInt( d[ 21 ] ) : false;
+					planned.disabled_hh_category = d[ 23 ] ? d[ 23 ] : false;
+					planned.disabled_hh_evi_support = d[ 22 ];
 
 					// monthly entitlements
 
@@ -646,7 +676,7 @@ var GfaTaskController = {
 					}
 
 					// remarks
-					planned.remarks = d[ 47 ];
+					planned.remarks = d[ 31 ];
 					
 					// add report with p to reports
 					planned_beneficiaries.push( planned );
