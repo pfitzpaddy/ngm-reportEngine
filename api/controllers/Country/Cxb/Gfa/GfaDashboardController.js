@@ -105,6 +105,7 @@ var GfaDashboardController = {
 			.where( organization_tag_filter )
 			.where( { report_round: report_round } )
 			.where( { report_distribution: report_distribution } )
+			.where( { gfa_modality: 'In_Kind' } )
 			.limit( limit )
 			.exec( function( err, planned_beneficiaries ){
 
@@ -147,6 +148,7 @@ var GfaDashboardController = {
 		// filters
 		var filters = {
 			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
+			gfa_modality: { gfa_modality: 'In_Kind' },
 			report_round: !params.report_round ? {} : { report_round: params.report_round },
 			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
 			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'immap' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
@@ -164,7 +166,7 @@ var GfaDashboardController = {
 		}
 		
 		// native filter
-		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.distribution_status, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
+		var filter = Object.assign( filters.admin0pcode, filters.gfa_modality, filters.report_round, filters.report_distribution, filters.organization_tag, filters.distribution_status, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
 
 		// distribution
 		PlannedBeneficiaries.native( function ( err, collection ){
@@ -207,6 +209,7 @@ var GfaDashboardController = {
 		// filters
 		var filters = {
 			admin0pcode: !params.admin0pcode ? {} : { admin0pcode: params.admin0pcode },
+			gfa_modality: { gfa_modality: 'In_Kind' },
 			report_round: !params.report_round ? {} : { report_round: params.report_round },
 			report_distribution: !params.report_distribution ? {} : { report_distribution: params.report_distribution },
 			organization_tag: !params.organization_tag || params.organization_tag === 'wfp' || params.organization_tag === 'immap' || params.organization_tag === 'all' ? {} : { organization_tag: params.organization_tag },
@@ -219,7 +222,7 @@ var GfaDashboardController = {
 		}
 
 		// native filter
-		var filter = Object.assign( filters.admin0pcode, filters.report_round, filters.report_distribution, filters.organization_tag, filters.distribution_status, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
+		var filter = Object.assign( filters.admin0pcode, filters.gfa_modality, filters.report_round, filters.report_distribution, filters.organization_tag, filters.distribution_status, filters.site_id, filters.admin3pcode, filters.admin4pcode, filters.admin5pcode, filters.distribution_date );
 
 		// distribution
 		PlannedBeneficiaries.native( function ( err, collection ){
@@ -1507,11 +1510,11 @@ var GfaDashboardController = {
 						'<thead>' +
 							'<tr>' +
 								'<th>SL#</th>' +
-								'<th>HH Number</th>' +
+								// '<th>HH Number</th>' +
 								'<th>FCN</th>' +
 								'<th>Scope</th>' +
 								'<th>HH Name</th>' +
-								'<th>Gender</th>' +
+								// '<th>Gender</th>' +
 								'<th>Sub Block</th>' +
 								'<th>Family Size</th>' +
 								'<th>GFD</th>' +
@@ -1526,11 +1529,11 @@ var GfaDashboardController = {
 				page_html_body += '' +
 					'<tr>' +
 						'<td align="center" style="font-size:8px">' + b.sl_number  + '</td>' +
-						'<td width="14%" style="font-size:8px">' + b.gfd_id + '</td>' +
+						// '<td width="14%" style="font-size:8px">' + b.gfd_id + '</td>' +
 						'<td style="font-size:8px">' + b.fcn_id + '</td>' +
 						'<td style="font-size:8px">' + b.scope_id + '</td>' +
 						'<td width="12%">' + b.hh_name + '</td>' +
-						'<td align="center">' + b.hh_gender + '</td>' +
+						// '<td align="center">' + b.hh_gender + '</td>' +
 						'<td align="center">' + b.admin5name + '</td>' +
 						'<td align="center">' + b.gfd_family_size + '</td>' +
 						'<td>' + gfd_entitlement + '</td>' +
