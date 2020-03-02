@@ -44,16 +44,16 @@ var AdminDashboardController = {
           // cluster_filter: req.param( 'cluster_id' ) === 'all' || req.param( 'cluster_id' ) === 'acbar' ? {} : { cluster_id: req.param( 'cluster_id' ) },
           cluster_filter: req.param('cluster_id') === 'all' || req.param('cluster_id') === 'acbar' ? {} : { $or: [{ cluster_id: req.param('cluster_id') }, { "activity_type.cluster_id": req.param('cluster_id') }] },
           acbar_partners_filter: req.param( 'cluster_id' ) === 'acbar' ? { project_acbar_partner: true } : {},
-          organization_filter: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '!': $nin_organizations } } : { $or: [{ organization_tag: req.param( 'organization_tag' ) }, { "implementing_partners.organization_tag": req.param('organization_tag') }] },
-          organization_filter_Native: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '$nin': $nin_organizations } } : { $or: [{ organization_tag: req.param( 'organization_tag' ) }, { "implementing_partners.organization_tag": req.param('organization_tag') }] },
+          organization_filter: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '!': $nin_organizations } } : { $or: [{ organization_tag: req.param( 'organization_tag' ) }, { "implementing_partners.organization_tag": req.param('organization_tag') }, { "programme_partners.organization_tag": req.param('organization_tag') }] },
+          organization_filter_Native: req.param( 'organization_tag' ) === 'all' ? { organization_tag: { '$nin': $nin_organizations } } : { $or: [{ organization_tag: req.param( 'organization_tag' ) }, { "implementing_partners.organization_tag": req.param('organization_tag') }, { "programme_partners.organization_tag": req.param('organization_tag') }] },
           adminRpcode_filter: req.param( 'adminRpcode' ) === 'all' ? {} : { adminRpcode: req.param( 'adminRpcode' ).toUpperCase() },
           admin0pcode_filter: req.param( 'admin0pcode' ) === 'all' ? {} : { admin0pcode: req.param( 'admin0pcode' ).toUpperCase() },
           start_date: req.param( 'start_date' ),
           end_date: req.param( 'end_date' )
       }
-  
+
     params.organization_and_cluster_filter_Native = { $and: [params.cluster_filter, params.organization_filter_Native] };
-  
+
     // csv export
     var json2csv = require( 'json2csv' ),
         moment = require( 'moment' ),
@@ -504,7 +504,7 @@ var AdminDashboardController = {
               // reports
               reports.forEach(function (d, i) {
 
-                // if stocks records  
+                // if stocks records
                 Stock
                   .count({ report_id: d.id })
                   .exec(function (err, b) {
@@ -515,7 +515,7 @@ var AdminDashboardController = {
 
                     counter++;
                     if (counter === length) {
-                      
+
                       return res.json(200, { 'value': reports_saved });
 
                     }
@@ -570,7 +570,7 @@ var AdminDashboardController = {
 			case 'progress_beneficiaries':
 				return res.json(200, {})
 				break;
-						
+
     }
 
   },
@@ -711,29 +711,29 @@ var AdminDashboardController = {
         break;
 
       case 'reports_saved':
-        
+
         // match clause for native mongo query
         var filterObject = _.extend({}, params.organization_and_cluster_filter_Native,
                                       params.acbar_partners_filter,
                                       params.adminRpcode_filter,
-                                      params.admin0pcode_filter,  
+                                      params.admin0pcode_filter,
                                       { report_active: true },
                                       params.activity_type_id,
                                       { report_status: 'todo' },
-                                      { reporting_period: 
-                                        { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')), 
+                                      { reporting_period:
+                                        { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')),
                                           '$lte': new Date(params.moment( params.end_date   ).format('YYYY-MM-DD'))
-                                        } 
+                                        }
                                       },
-                                  );  
+                                  );
         // reports due
         Report.native(function(err, collection) {
           if (err) return res.serverError(err);
-        
+
           collection.find(
             filterObject
             ).sort({updatedAt:-1 }).toArray(function (err, reports) {
-                 
+
               // return error
               if (err) return res.negotiate( err );
 
@@ -752,14 +752,14 @@ var AdminDashboardController = {
 
                   // reports ids
                   var reports_array = _.map(reports,function(report){return report._id.toString()});
-                  
+
                   // find saved
                   Beneficiaries.native(function(err, collection) {
                     if (err) return res.serverError(err);
-                  
+
                     collection.aggregate([
-                        { 
-                          $match : {report_id:{"$in":reports_array}} 
+                        {
+                          $match : {report_id:{"$in":reports_array}}
                         },
                         {
                           $group: {
@@ -767,16 +767,16 @@ var AdminDashboardController = {
                           }
                         }
                       ]).toArray(function (err, results) {
-                          
+
                           // err
                           if (err) return res.negotiate(err);
 
                           // for reports not submitted with entries
-                          var non_empty_reports=_.map(results,'_id')  
+                          var non_empty_reports=_.map(results,'_id')
 
                           // status
                           reports.forEach( function( d, i ){
-                                
+
                             // if benficiaries
                             if ( non_empty_reports.indexOf(d._id.toString())>-1) {
                               // add status
@@ -793,7 +793,7 @@ var AdminDashboardController = {
                           });
 
                       });
-                  
+
                   });
                 }
 
@@ -808,24 +808,24 @@ var AdminDashboardController = {
         var filterObject = _.extend({}, params.organization_and_cluster_filter_Native,
                                         params.acbar_partners_filter,
                                         params.adminRpcode_filter,
-                                        params.admin0pcode_filter,  
+                                        params.admin0pcode_filter,
                                         { report_active: true },
                                         params.activity_type_id,
                                         { report_status: 'complete' },
-                                        { reporting_period: 
-                                          { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')), 
+                                        { reporting_period:
+                                          { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')),
                                             '$lte': new Date(params.moment( params.end_date   ).format('YYYY-MM-DD'))
-                                          } 
+                                          }
                                         },
                                       );
 
         Report.native(function(err, collection) {
           if (err) return res.serverError(err);
-        
+
           collection.find(
             filterObject
             ).sort({updatedAt:-1 }).toArray(function (err, reports) {
-              
+
               // return error
               if (err) return res.negotiate( err );
 
@@ -848,10 +848,10 @@ var AdminDashboardController = {
 
                   Beneficiaries.native(function(err, collection) {
                     if (err) return res.serverError(err);
-                  
+
                     collection.aggregate([
-                        { 
-                          $match : {report_id:{"$in":reports_array}} 
+                        {
+                          $match : {report_id:{"$in":reports_array}}
                         },
                         {
                           $group: {
@@ -862,7 +862,7 @@ var AdminDashboardController = {
                         if (err) return res.serverError(err);
 
                         // for reports not submitted with entries
-                        var non_empty_reports=_.map(results,'_id')    
+                        var non_empty_reports=_.map(results,'_id')
 
                         // reports
                         reports.forEach( function( d, i ){
@@ -890,7 +890,7 @@ var AdminDashboardController = {
 
                               // if benficiaries
                               if ( non_empty_reports.indexOf(d._id.toString())<0 ) {
-                                        // add status                   
+                                        // add status
                                         reports[i].status       = '#80cbc4';
                                         reports[i].icon         = 'adjust';
                                         reports[i].status_title = 'Empty Submission';
@@ -900,6 +900,15 @@ var AdminDashboardController = {
                                       if (req.param('organization_tag') !== 'all' && d.implementing_partners && d.implementing_partners.length) {
                                         if (d.implementing_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
                                           reports[i].icon = 'group';
+                                          reports[i].status = '#2196F3';
+                                          reports[i].status_title = 'Complete';
+                                        }
+                                      }
+
+                                      // set programme partners icon
+                                      if (req.param('organization_tag') !== 'all' && d.programme_partners && d.programme_partners.length) {
+                                        if (d.programme_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
+                                          reports[i].icon = 'supervisor_account';
                                           reports[i].status = '#2196F3';
                                           reports[i].status_title = 'Complete';
                                         }
@@ -930,7 +939,7 @@ var AdminDashboardController = {
                                         }
                                       }
                         });
-                        
+
                       });
                   });
                 }
@@ -950,25 +959,25 @@ var AdminDashboardController = {
         var filterObject = _.extend({},	params.organization_and_cluster_filter_Native,
                                       params.acbar_partners_filter,
                                       params.adminRpcode_filter,
-                                      params.admin0pcode_filter,  
+                                      params.admin0pcode_filter,
                                       { report_active: true },
                                       params.activity_type_id,
                                       { report_status: 'todo' },
-                                      { reporting_period: 
-                                        { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')), 
+                                      { reporting_period:
+                                        { '$gte': new Date(params.moment( params.start_date ).format('YYYY-MM-DD')),
                                           '$lte': new Date(params.moment( params.end_date   ).format('YYYY-MM-DD'))
-                                        } 
+                                        }
                                       },
                                   );
-        
+
         // reports due
         Report.native(function(err, collection) {
           if (err) return res.serverError(err);
-        
+
           collection.find(
             filterObject
             ).sort({updatedAt:-1 }).toArray(function (err, reports) {
-                 
+
               // return error
               if (err) return res.negotiate( err );
 
@@ -986,13 +995,13 @@ var AdminDashboardController = {
 
                 // reports ids
                 var reports_array = _.map(reports,function(report){return report._id.toString()});
-                
+
                 Beneficiaries.native(function(err, collection) {
                   if (err) return res.serverError(err);
-                
+
                   collection.aggregate([
-                      { 
-                        $match : {report_id:{"$in":reports_array}} 
+                      {
+                        $match : {report_id:{"$in":reports_array}}
                       },
                       {
                         $group: {
@@ -1003,7 +1012,7 @@ var AdminDashboardController = {
                         if (err) return res.negotiate(err);
 
                         // for reports not submitted with entries
-                        var non_empty_reports=_.map(results,'_id')	
+                        var non_empty_reports=_.map(results,'_id')
 
                         // status
                         reports.forEach( function( d, i ){
@@ -1028,6 +1037,15 @@ var AdminDashboardController = {
                               if (req.param('organization_tag') !== 'all' && d.implementing_partners && d.implementing_partners.length) {
                                 if (d.implementing_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
                                   reports[i].icon = 'group';
+                                  reports[i].status = '#2196F3';
+                                  reports[i].status_title = 'Pending';
+                                }
+                              }
+
+                              // set implementing partners icon
+                              if (req.param('organization_tag') !== 'all' && d.programme_partners && d.programme_partners.length) {
+                                if (d.programme_partners.filter(o => o.organization_tag === req.param('organization_tag')).length) {
+                                  reports[i].icon = 'supervisor_account';
                                   reports[i].status = '#2196F3';
                                   reports[i].status_title = 'Pending';
                                 }
@@ -1144,7 +1162,7 @@ var AdminDashboardController = {
 
         break;
 
-     
+
       case 'reports_complete_total':
 
         // reports total
@@ -1231,7 +1249,7 @@ var AdminDashboardController = {
           });
 
 				break;
-			
+
 			case 'progress_beneficiaries':
 
 				function nFormatter (num) {
@@ -1249,7 +1267,7 @@ var AdminDashboardController = {
 				function filter(){
 					return{
 						adminRpcode_Native: req.param('adminRpcode') === 'hq' ? {} : { adminRpcode: req.param('adminRpcode').toUpperCase() },
-						admin0pcode_Native: req.param('admin0pcode') === 'all' ? {} : { admin0pcode: req.param('admin0pcode').toUpperCase() },						
+						admin0pcode_Native: req.param('admin0pcode') === 'all' ? {} : { admin0pcode: req.param('admin0pcode').toUpperCase() },
 						// cluster_id_Native: (req.param('cluster_id') === 'all' || req.param('cluster_id') === 'rnr_chapter' || req.param('cluster_id') === 'acbar')
 						// 	? {}
 						// 	: (req.param('cluster_id') !== 'cvwg')
@@ -1258,7 +1276,7 @@ var AdminDashboardController = {
 						// cluster_id_Native: (req.param('cluster_id') === 'all' ) ? {} : { cluster_id: req.param('cluster_id') },
 						cluster_id_Native: (req.param('cluster_id') === 'all' ) ? {} : { $or: [{ cluster_id: req.param('cluster_id') }, { "activity_type.cluster_id": req.param('cluster_id') }] },
 						// organization_tag_Native: req.param('organization_tag') === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { organization_tag: req.param('organization_tag') },
-						organization_tag_Native: req.param('organization_tag') === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { $or: [{ organization_tag: req.param('organization_tag') }, { "implementing_partners.organization_tag": req.param('organization_tag') }] },
+						organization_tag_Native: req.param('organization_tag') === 'all' ? { organization_tag: { $nin: $nin_organizations } } : { $or: [{ organization_tag: req.param('organization_tag') }, { "implementing_partners.organization_tag": req.param('organization_tag') }, { "programme_partners.organization_tag": req.param('organization_tag') }] },
 						project_startDateNative: { project_start_date: { $lte: new Date(req.param('end_date')) }},
 						project_endDateNative: { project_end_date: { $gte: new Date(req.param('start_date')) }},
 						default_native: { project_id: { $ne: null }},
@@ -1275,7 +1293,7 @@ var AdminDashboardController = {
 					filters.activity_typeNative,
 					filters.project_startDateNative,
 					filters.project_endDateNative)
-										
+
 				TargetBeneficiaries.native(function (err, results_target_beneficiaries) {
 					if (err) return res.serverError(err);
 					results_target_beneficiaries.aggregate([
@@ -1289,12 +1307,13 @@ var AdminDashboardController = {
 								organization_tag: { $first:'$organization_tag'},
 								organization_id: { $first: '$organization_id' },
 								organization: { $first: '$organization' },
-								implementing_partners: { $first: '$implementing_partners'},								
-								target_total:{ $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }								
+                implementing_partners: { $first: '$implementing_partners'},
+                programme_partners: { $first: '$programme_partners'},
+								target_total:{ $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
 							}
 						}
 					]).toArray(function (err, target_beneficiaries) {
-						
+
 						Beneficiaries.native(function (err, results_report_benefciaries) {
 							if (err) return res.serverError(err);
 							results_report_benefciaries.aggregate([
@@ -1311,14 +1330,14 @@ var AdminDashboardController = {
 										report_total: { $sum: { $add: ["$men", "$women", "$boys", "$girls", "$elderly_men", "$elderly_women"] } }
 									}
 								}
-							]).toArray(function (err, report_beneficairies) {								
-								
+							]).toArray(function (err, report_beneficairies) {
+
 								for(var i=0 ;i<report_beneficairies.length;i++){
 									for(var j=0;j<target_beneficiaries.length;j++){
 										if (target_beneficiaries[j]._id === report_beneficairies[i]._id){
 											target_beneficiaries[j].report_total = report_beneficairies[i].report_total;
 										}
-									}									
+									}
 								}
 								target_beneficiaries.forEach( function (el,i) {
 									if(!el.report_total){
@@ -1345,16 +1364,19 @@ var AdminDashboardController = {
 									}
                   if (el.implementing_partners && Array.isArray(el.implementing_partners)) {
                     el.implementing_partners = el.implementing_partners.map(x => x.organization ? x.organization : x.organization_tag).join(", ");
-                  }						
-								});													
+                  }
+                  if (el.programme_partners && Array.isArray(el.programme_partners)) {
+                    el.programme_partners = el.programme_partners.map(x => x.organization ? x.organization : x.organization_tag).join(", ");
+                  }
+								});
 								return res.json(200, target_beneficiaries);
 							})
 						})
 					})
-					
+
 
 				})
-				
+
 				break;
     }
 
