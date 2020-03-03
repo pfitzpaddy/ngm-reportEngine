@@ -18,7 +18,8 @@ module.exports = {
 
 		// add a reference to Location
     location_id: {
-      model: 'stocklocation'
+      type: 'string',
+			required: true
     },
 
     // project acbar
@@ -226,7 +227,23 @@ module.exports = {
 			required: true
 		}
 
-	}
+  },
+
+    // updateOrCreate
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+    updateOrCreate: function( parent, criteria, values ){
+      var self = this; // reference for use by callbacks
+
+      // if exists
+      if( criteria.id ){
+        return self.update( criteria, values );
+      }else{
+        // set relation
+        for ( key in parent ){ values[ key ] = parent[ key ]; }
+        return self.create( values );
+      }
+
+    }
 
 };
 

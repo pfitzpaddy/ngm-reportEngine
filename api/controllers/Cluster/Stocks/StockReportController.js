@@ -5,11 +5,28 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+ // libs
+var Promise = require('bluebird');
+var util = require('util');
+var async = require('async');
+var moment = require( 'moment' );
+var _under = require('underscore');
+
 // set moment
 var moment = require('moment');
 
-module.exports = {
+var StockReportController = {
 
+  // parse results from sails
+	set_result: function( result ) {
+		if( util.isArray( result ) ) {
+			// update ( array )
+			return result[0];
+		} else {
+			// create ( object )
+			return result;
+		}
+	},
   // get all reports
   getReportsList: function( req, res ) {
 
@@ -18,78 +35,81 @@ module.exports = {
       return res.json( 401, { err: 'filter required!' });
     }
 
-    // get by organization_id & status
-    StockReport
-      .find( req.param( 'filter' ) )
-      .sort( 'report_month ASC' )
-      .populate('stocklocations')
-      .exec ( function( err, reports ){
+    // promise
+		Promise.all([
+			StockReport.find( req.param( 'filter' ) ).sort( 'report_month ASC' ),
+			Stock.find( req.param( 'filter' ) )
+		])
+		.catch( function( err ) {
+			return res.negotiate( err );
+		})
+		.then( function( result ) {
 
-        // return error
-        if ( err ) return res.negotiate( err );
+			// gather results
+			var reports = result[ 0 ];
+			var stocks = result[ 1 ];
 
-        // counter
-        var counter=0,
-            length=reports.length;
+			// async loop reports
+			async.each( reports, function ( report, next ) {
 
-        if (length){
-          reports = _.difference(reports, _.where(reports, {stocklocations:[]}))
-          length = reports.length;
-        }
+				// add status empty
+				report.icon = 'adjust'
+				report.status = '#80cbc4';
+				report.status_title = 'Empty Submission';
 
-        // no reports
-        if ( !length ) {
-          return res.json( 200, reports );
-        }
+				// if report is 'todo' and before due date!
+				if ( report.report_status === 'todo' && moment().isSameOrBefore( moment( report.reporting_due_date ) ) ) {
 
-        // determine status
-        if ( length )  {
+					// add status todo but ok
+					report.icon = 'watch_later';
+					report.status = '#4db6ac';
+					report.status_title = 'ToDo';
 
-          // reports
-          reports.forEach( function( d, i ){
+				}
 
-            // check if form has been edited
-            Stock
-              .count( { report_id: d.id } )
-              .exec(function( err, b ){
+				// if report is 'todo' and past due date!
+				if ( report.report_status === 'todo' && moment().isAfter( moment( report.reporting_due_date ) ) ) {
 
-                // return error
-                if (err) return res.negotiate( err );
+					// set to red (overdue!)
+					report.icon = 'error';
+					report.status = '#e57373'
+					report.status_title = 'Due';
 
-                // add status as green
-                reports[i].status = '#4db6ac';
+				}
 
-                // if report is 'todo' and past due date!
-                if ( reports[i].report_status === 'todo' && moment().isAfter( moment( reports[i].reporting_due_date ) ) ) {
+				// async loop stocks
+				async.each( stocks, function ( stock, b_next ) {
 
-                  // set to red (overdue!)
-                  reports[i].status = '#e57373'
+					// stocks exist for this report
+					if ( report.id === stock.report_id ) {
 
-                  // if beneficiaries ( report has been updated )
-                  if ( b ) {
-                    reports[i].status = '#fff176'
-                  }
-                }
+						// if report is 'todo' and has records ( is saved )
+						if ( report.report_status === 'todo' ) {
+							// if stocks ( report has been updated )
+							if ( stock ) {
+								report.icon = 'watch_later';
+								report.status = '#fff176';
+								report.status_title = 'Pending';
+							}
+						}
+					}
+					b_next();
+				}, function ( err ) {
+					if ( err ) return err;
+					next();
+				});
+			}, function ( err ) {
+				if ( err ) return err;
+				// return
+				return res.json( 200, reports );
+			});
 
-                // reutrn
-                counter++;
-                if ( counter === length ) {
-                  // table
-                  return res.json( 200, reports );
-                }
-
-              });
-
-          });
-
-        }
-
-      });
+    });
 
   },
 
   // get all Reports
-  getReportById: function( req, res ) {
+  getReportById: async function( req, res ) {
 
     // request input
     if ( !req.param( 'id' ) ) {
@@ -98,96 +118,86 @@ module.exports = {
 
     if ( req.param('previous')) var prev = true;
 
-    // report for UI
-    var $report = {};
+    var query = { id: req.param( 'id' ) };
 
-    // get report by organization_id
-    StockReport
-      .findOne( { id: req.param( 'id' ) } )
-      .exec( function( err, report ){
+    let report = await StockReport.findOne( query );
 
-        // return error
-        if (err) return res.negotiate( err );
+    if (prev) {
+      query = {
+        report_month: moment(report.reporting_period).subtract(1, 'M').month(),
+        report_year: moment(report.reporting_period).subtract(1, 'M').year(),
+        organization_tag: report.organization_tag,
+        admin0pcode: report.admin0pcode
+      };
+      report = await StockReport.findOne( query );
+    }
 
-        // clone to update
-        $report = report.toObject();
-        var reporting_period = moment($report.reporting_period)
-          .startOf("month")
-          .format("YYYY-MM-DD");
+    if (report) {
 
-        // get report by organization_id
-        StockLocation
-          .find({
-            report_id: $report.id,
-            or: [{
-              date_inactivated: null
-            }, {
-              date_inactivated: {
-                '>': new Date(reporting_period)
-              }
-            }]
-          })
+    query = { report_id: report.id };
 
-          // .populate('stock')
-          .populateAll()
-          .exec( function( err, locations ){
+    // promise
+		Promise.all([
+			StockLocation.find( query ),
+			Stock.find( query ),
+		])
+		.catch( function( err ) {
+			return res.negotiate( err );
+		})
+		.then( function( result ) {
 
-          // return error
-          if (err) return res.negotiate( err );
+			var locations = result[ 0 ];
+			var stocks = result[ 1 ];
 
-          // add locations ( associations included )
-          $report.stocklocations = locations;
+			// placeholder
+			report.stocklocations = [];
 
-          if (prev) {
-            query_previous = {
-              report_month: moment($report.reporting_period).subtract(1, 'M').month(),
-              report_year: moment($report.reporting_period).subtract(1, 'M').year(),
-              organization_tag: $report.organization_tag,
-              cluster_id: $report.cluster_id,
-              admin0pcode: $report.admin0pcode
-            };
+			// async loop locations
+			async.each( locations, function ( location, next ) {
 
-            StockReport
-              .findOne(query_previous)
-              .exec(function (err, report_prev) {
+				// counter
+				var locations_counter = 0;
+				var locations_features = 1;
 
-                // return error
-                if (err) return res.negotiate(err);
+				// set holders
+				location.stocks = [];
 
-                if (report_prev) {
-                  // clone to update
-                  $report_prev = report_prev.toObject();
+				// set next in locations array
+				var set_next = function ( location ){
+					locations_counter++;
+					if( locations_counter === locations_features ){
+						report.stocklocations.push( location );
+						next();
+					}
+				}
 
-                  // get report by organization_id
-                  StockLocation
-                    .find({
-                      report_id: $report_prev.id
-                    })
-                    // .populate('stock')
-                    .populateAll()
-                    .exec(function (err, locations_prev) {
+				// stocks
+				if ( stocks.length ){
+					async.each( stocks, function ( stock, b_next ) {
+						if ( location.id === stock.location_id ) {
+							// push
+							location.stocks.push( stock );
+						}
+						// next
+						b_next();
+					}, function ( err ) {
+						// error
+						if ( err ) return err;
+						// increment counter
+						set_next( location );
+					});
+				} else {
+					// increment counter
+					set_next( location );
+				}
 
-                      // return error
-                      if (err) return res.negotiate(err);
+			}, function ( err ) {
+				if ( err ) return err;
+				return res.json( 200, report );
+			});
 
-                      // add locations ( associations included )
-                      $report_prev.stocklocations = locations_prev;
-
-                      // return report
-                      return res.json(200, $report_prev);
-
-                    });
-                } else return res.json(200, {});
-              });
-
-
-          } else {
-          // return report
-          return res.json( 200, $report );
-          }
-        });
-
-      });
+    });
+    } else return res.json(200, {});
 
   },
 
@@ -200,43 +210,107 @@ module.exports = {
     }
 
     // get report
-    var $report = req.param( 'report' );
+    var report = req.param( 'report' );
+    var locations = req.param( 'report' ).stocklocations;
 
-    // update report
-    StockReport
-      .update( { id: $report.id }, $report )
-      .exec( function( err, report ){
+    // find
+		var findOrganization = {
+			// organization_id: report.organization_id
+		}
+		var findReport = {
+			report_id: report.id
+		}
+		var findLocation;
+    var findTargetLocation;
 
-        // return error
-        if ( err ) return res.negotiate( err );
+    delete report.createdAt;
+    delete report.updatedAt;
 
-        // clone to update
-        $report = report[0].toObject();
+		StockReport
+    .update( { id: report.id }, report )
+    .exec( function( err, report ){
 
-        // get report by organization_id
-        StockLocation
-          .find( { report_id: $report.id } )
-          // .populate('stock')
-          .populateAll()
-          .exec( function( err, locations ){
+      // return error
+      if ( err ) return res.negotiate( err );
 
-            // return error
-            if (err) return res.negotiate( err );
+      // update / create locations
+      report = report[0];
+      report.stocklocations = [];
 
-            // add locations ( associations included )
-            $report.stocklocations = locations;
+      // prepare for cloning
+      var report_copy = JSON.parse( JSON.stringify( report ) );
+      delete report_copy.id;
+      delete report_copy.createdAt;
+      delete report_copy.updatedAt;
 
-            // return Report
-            return res.json( 200, $report );
+      // async loop report locations
+      async.eachOf( locations, function ( location, li, next ) {
+
+        // set counter
+        var locations_counter = 0;
+        var locations_features = 1;
+
+        // set stocks
+        var stocks = location.stocks;
+
+        // set next in locations array
+        var set_next = function ( location, li ){
+          locations_counter++;
+          if( locations_counter === locations_features ){
+            // report.stocklocations.push( location );
+            report.stocklocations[li] = location;
+            next();
+          }
+        }
+
+        delete location.createdAt;
+        delete location.updatedAt;
+        // update or create
+        StockLocation.updateOrCreate( _under.extend( {}, findOrganization, findReport ), { id: location.id }, location ).exec(function( err, result ){
+
+          // set result, update / create stocks
+          location = Utils.set_result( result );
+          findLocation = { location_id: location.id }
+          findTargetLocation = { stock_warehouse_id: location.stock_warehouse_id }
+          location.stocks = [];
+
+          // prepare for cloning
+          var location_copy = JSON.parse( JSON.stringify( location ) );
+          delete location_copy.id;
+          delete location_copy.createdAt;
+          delete location_copy.updatedAt;
+
+          // async loop report stocks
+          async.eachOf( stocks, function ( stock, i, s_next ) {
+            delete stock.createdAt;
+            delete stock.updatedAt;
+            // clone
+            var s = _under.extend( {}, report_copy, location_copy, stock );
+            // update or create
+            Stock.updateOrCreate( _under.extend( {}, findOrganization, findReport, findLocation, findTargetLocation ), { id: s.id }, s ).exec(function( err, result ){
+                    // location.stocks.push( Utils.set_result( result ) );
+                    // set stocks in the original order
+                    location.stocks[i] = Utils.set_result(result);
+                    s_next();
+              });
+            }, function ( err ) {
+              if ( err ) return res.negotiate( err );
+              // increment counter
+              set_next( location, li );
+            });
 
         });
-
+      }, function ( err ) {
+        if ( err ) return res.negotiate( err );
+        return res.json( 200, report );
       });
+
+    });
 
   },
 
-  // removes reports with stock_warehouse_id
-  removeReportLocation: function( req, res ) {
+  // remove warehouse
+  removeLocationById: async function( req, res ) {
 
     // request input
     if ( !req.param( 'stock_warehouse_id' ) ) {
@@ -246,44 +320,48 @@ module.exports = {
     // stock_warehouse_id
     var stock_warehouse_id = req.param( 'stock_warehouse_id' );
 
-    // uncomment to test diff dates
-    // var inactivation_date = moment('2017-10-03').startOf('month').format('YYYY-MM-DD');
+    try {
+      // find locations containing beneficiaries first
+      const stocks = await Stock.find({ stock_warehouse_id: stock_warehouse_id }, { select: ['location_id'] })
+      const uniq_locations = [...new Set(stocks.map(s => s.location_id))];
 
-    var inactivation_date = moment().format();
-    var month = moment().month(),
-        year  = moment().year();
+      await Promise.all([
+        StockWarehouse.destroy({ id: stock_warehouse_id }),
+        StockLocation.destroy({ stock_warehouse_id: stock_warehouse_id, id: { $nin: uniq_locations } })
+      ])
 
-    // update report
-    StockLocation
-      .update( { stock_warehouse_id: stock_warehouse_id }, { date_inactivated: new Date(inactivation_date), active: false })
-      .exec( function( err, stocklocations ){
+      return res.json(200, { msg: 'Success!' });
 
-        // return error
-        if ( err ) return res.negotiate( err );
+    } catch (err) {
+      return res.negotiate(err);
+    }
 
-        // null all reports locations, else only this month and above
-        var ifCreatedThisMonth = stocklocations[0]&&moment(stocklocations[0].createdOn).format('YYYY-MM') === moment().format('YYYY-MM');
+    },
+    // remove
+    removeStock: function( req, res ){
 
-        if (ifCreatedThisMonth) {
-          var updateQuery = { stock_warehouse_id: stock_warehouse_id };
-        } else {
-          var updateQuery = { stock_warehouse_id: stock_warehouse_id, report_year: year, report_month: { ">=": month } };
-        }
+      // request input
+      if ( !req.param( 'id' ) ) {
+        return res.json(401, { err: 'id required!' });
+      }
 
-        StockLocation
-            .update( updateQuery, { report_id: null })
-            .exec(function (err, stocklocations) {
+      // get report
+      var $id = req.param( 'id' );
 
-              // return error
-              if (err) return res.negotiate(err);
-              // return Report
-              return res.json(200, stocklocations);
+      Stock
+        .destroy({ id: $id })
+        .exec(function( err, b ){
 
-            });
+          // return error
+          if ( err ) return res.json({ err: true, error: err });
+
+          // return reports
+          return res.json( 200, { msg: 'success' } );
 
         });
 
-  }
+    },
 
 };
 
+module.exports = StockReportController;

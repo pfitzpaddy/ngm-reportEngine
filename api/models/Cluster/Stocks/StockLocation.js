@@ -17,7 +17,8 @@ module.exports = {
 	attributes: {
 		// add a reference to Report
 		report_id: {
-			model: 'stockreport'
+			type: 'string',
+			required: true
     },
     date_inactivated: {
       // location status
@@ -177,13 +178,22 @@ module.exports = {
       type: 'date'
     },
 
+  },
+    // updateOrCreate
+    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+    updateOrCreate: function( parent, criteria, values ){
+      var self = this; // reference for use by callbacks
 
-    // add reference to Beneficiaries
-    stocks: {
-      collection: 'stock',
-      via: 'location_id'
+      // if exists
+      if( criteria.id ){
+        return self.update( criteria, values );
+      }else{
+        // set relation
+        for ( key in parent ){ values[ key ] = parent[ key ]; }
+        return self.create( values );
+      }
+
     }
-	}
 
 };
 

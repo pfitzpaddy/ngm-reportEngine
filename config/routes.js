@@ -38,7 +38,7 @@ module.exports.routes = {
   'POST /login': 'ReportHub/UserController.login',
   'POST /create': 'ReportHub/UserController.create',
   'POST /delete': 'ReportHub/UserController.delete',
-  'POST /update': 'ReportHub/UserController.updateLogin',  
+  'POST /update': 'ReportHub/UserController.updateLogin',
   'POST /profile/update': 'ReportHub/UserController.updateProfile',
   'POST /send-email': 'ReportHub/UserController.passwordResetEmail',
   'POST /password-reset': 'ReportHub/UserController.passwordReset',
@@ -143,7 +143,7 @@ module.exports.routes = {
   'POST /cluster/admin/indicator': 'Cluster/Dashboards/AdminDashboardController.getClusterAdminIndicator',
 
   // PROJECTS
-  
+
   // sectors
   'POST /cluster/project/getProjectSectors': 'Cluster/ProjectController.getProjectSectors',
   'GET /cluster/project/getProjectSectors': 'Cluster/ProjectController.getProjectSectors',
@@ -166,7 +166,9 @@ module.exports.routes = {
   'POST /cluster/stock/getReportsList': 'Cluster/Stocks/StockReportController.getReportsList',
   'POST /cluster/stock/getReport': 'Cluster/Stocks/StockReportController.getReportById',
   'POST /cluster/stock/setReport': 'Cluster/Stocks/StockReportController.setReportById',
-  'POST /cluster/stock/removeStockLocation': 'Cluster/Stocks/StockReportController.removeReportLocation',
+  'POST /cluster/stock/removeStockLocation': 'Cluster/Stocks/StockReportController.removeLocationById',
+  'POST /cluster/stock/removeStock': 'Cluster/Stocks/StockReportController.removeStock',
+
 
   // ACTIVITY REPORTS
   'POST /cluster/report/getReportCsv': 'Cluster/Reports/ReportController.getReportCsv',
@@ -182,9 +184,10 @@ module.exports.routes = {
 
   // STOCK / ACTIVITY REPORTS TASKS
   'GET /cluster/report/setStocksToDo': 'Cluster/Reports/ReportTasksController.setStocksToDo',
+  'POST /cluster/report/setStocksToDo/:organization_id/:year/:month': 'Cluster/Reports/ReportTasksController.setStocksToDo',
+
   'GET /cluster/report/setReportsToDo': 'Cluster/Reports/ReportTasksController.setReportsToDo',
 
-  'GET /cluster/report/setStocksToDoPreviousMonth': 'Cluster/Reports/ReportTasksController.setStocksToDoPreviousMonth',
   'GET /cluster/report/setReportsToDoPreviousMonth': 'Cluster/Reports/ReportTasksController.setReportsToDoPreviousMonth',
 
   'GET /cluster/report/setReportsOpen': 'Cluster/Reports/ReportTasksController.setReportsOpen',
@@ -194,18 +197,18 @@ module.exports.routes = {
   // CLUSTER DASHBOARD
   // 'GET /cluster/latestUpdate': 'Cluster/Dashboards/ClusterDashboardController.getlatestUpdate',
   'GET /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator',
-  'POST /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator', 
+  'POST /cluster/indicator': 'Cluster/Dashboards/ClusterDashboardController.getIndicator',
 
   //4wprojectplanDASHBOARD
   'GET /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator',
-  'POST /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator', 
+  'POST /cluster/indicator4wprojectplan': 'Cluster/Dashboards/Cluster4wprojectplanDashboardController.getIndicator',
 
 
-   
-  //4wplus dashboard 
+
+  //4wplus dashboard
 
   'GET /cluster/indicator4wplusdashboard': 'Cluster/Dashboards/Cluster4wplusDashboardController.getIndicator',
-  'POST /cluster/indicator4wplusdashboard': 'Cluster/Dashboards/Cluster4wplusDashboardController.getIndicator', 
+  'POST /cluster/indicator4wplusdashboard': 'Cluster/Dashboards/Cluster4wplusDashboardController.getIndicator',
 
   //find exchange rates from EURO to others currencies
   'GET /cluster/exchangeRatesCurrencies': 'Cluster/Dashboards/Cluster4wplusDashboardController.exchangeRatesCurrencies',
@@ -273,7 +276,7 @@ module.exports.routes = {
  // Edit
  'GET /nutrition/afghanistan/reports/edit/:pk/:dataid': 'Country/Afg/Nutrition/NutritionDashboardController.getEditForm',
 
- // Delete 
+ // Delete
  'DELETE /nutrition/afghanistan/reports/delete/:pk/:dataid': 'Country/Afg/Nutrition/NutritionDashboardController.deleteForm',
 
 	// -------- AF DROUGHT ------------
@@ -289,8 +292,8 @@ module.exports.routes = {
 	'POST /drought/afghanistan/beneficiaries/data': 'Country/Afg/Drought/DroughtDashboardController.getDroughtData',
 
 
-  
-  
+
+
   // -------- CXB GFA ------------
   // setDistributionRound
   'GET /wfp/gfa/gfd/getForms': 'Country/Cxb/Gfa/GfaTaskController.getForms',
@@ -314,8 +317,8 @@ module.exports.routes = {
   // sendKoboManualDeployEmail
   'GET /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
   'POST /wfp/gfa/gfd/sendKoboManualDeployEmail': 'Country/Cxb/Gfa/GfaTaskController.sendKoboManualDeployEmail',
-  
-    
+
+
   // WFP GFD
 
   // getKoboData
@@ -333,10 +336,10 @@ module.exports.routes = {
   // update distribution dates by array
   'GET /wfp/gfa/gfd/setAbsentDistributionDatesByArray': 'Country/Cxb/Gfa/GfaTaskController.setAbsentDistributionDatesByArray',
   'POST /wfp/gfa/gfd/setAbsentDistributionDatesByArray': 'Country/Cxb/Gfa/GfaTaskController.setAbsentDistributionDatesByArray',
-  
+
   // remove absent beneficiary
   'GET /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',
-  'POST /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',  
+  'POST /wfp/gfa/gfd/removeAbsentBeneficiary': 'Country/Cxb/Gfa/GfaTaskController.removeAbsentBeneficiary',
 
   // get getDistributionDates
   'GET /wfp/gfa/gfd/getDistributionDates': 'Country/Cxb/Gfa/GfaDashboardController.getDistributionDates',
@@ -361,7 +364,7 @@ module.exports.routes = {
   'POST /wfp/livelihoods/setLivelihoodsDatasetBrac': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.setLivelihoodsDatasetBrac',
   //  getLivelihoodsDataset
   'GET /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',
-  'POST /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',  
+  'POST /wfp/livelihoods/getLivelihoodsDataset': 'Country/Cxb/Livelihoods/LivelihoodsTaskController.getLivelihoodsDataset',
 
   /***************************************************************************
   *                                                                          *
