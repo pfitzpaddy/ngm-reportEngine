@@ -184,7 +184,6 @@ module.exports = {
 
 
 async function createStockLocations(warehouse, cb) {
-  console.log('start_stock_generation',warehouse)
 
   try {
 
@@ -199,11 +198,12 @@ async function createStockLocations(warehouse, cb) {
 
 
     // prepare for stocklocations
-    warehouse.stock_warehouse_id = warehouse.id;
-    const organization_id = warehouse.organization_id;
-    delete warehouse.id;
-    delete warehouse.createdAt;
-    delete warehouse.updatedAt;
+    let warehouse_copy = JSON.parse( JSON.stringify( warehouse ) );
+    warehouse_copy.stock_warehouse_id = warehouse_copy.id;
+    const organization_id = warehouse_copy.organization_id;
+    delete warehouse_copy.id;
+    delete warehouse_copy.createdAt;
+    delete warehouse_copy.updatedAt;
     // // uncomment for _.merge( {}, organization, report )
     // let organization = await Organization.findOne({ id: organization_id })
     // delete organization.id;
@@ -230,8 +230,8 @@ async function createStockLocations(warehouse, cb) {
           report_month: report.report_month,
           report_year: report.report_year
         }, report);
-        var warehouse_copy = _.merge({}, warehouse, { report_month: new_report.report_month, report_year: new_report.report_year, report_id: new_report.id });
-        await StockLocation.create(warehouse_copy);
+        var l_warehouse_copy = _.merge({}, warehouse_copy, { report_month: new_report.report_month, report_year: new_report.report_year, report_id: new_report.id });
+        await StockLocation.create(l_warehouse_copy);
       });
 
     await Promise.all(db_promises);
