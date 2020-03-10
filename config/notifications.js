@@ -14,10 +14,10 @@ const REPORTING_DUE_DATE_NOTIFICATIONS_CONFIG = [
     reporting_due_date: 10
   }, {
     admin0pcode: "ET",
-    soon: [8],
-    pending: [12],
-    today: [10],
-    reporting_due_date: 10
+    soon: [5],
+    pending: [10],
+    today: [7],
+    reporting_due_date: 7
   }, {
     admin0pcode: "ALL",
     soon: [8],
