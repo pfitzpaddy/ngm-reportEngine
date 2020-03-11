@@ -557,6 +557,7 @@ var UserController = {
                       // email sent
                       return res.json(200, { 'data': 'success' });
                   });
+                
                 }
 
               });
