@@ -635,11 +635,11 @@ var ReportController = {
 			              organization: report.organization,
 			              report_month: report_month,
 			              report_year: report.report_year,
-			              report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + report.project_id + '/' + report.report_id,
+			              report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + report.project_id + '/' + report.id,
 			              senderName: 'ReportHub',
 			            }, {
 			              to: admin_emails,
-			              subject: 'ReportHub Notificaitons: Edit of ' + report.report_month + ' , '  + report.report_year +' Report by ' + report.organization
+			              subject: 'ReportHub Notificaitons: Edit of ' + report_month + ' , '  + report.report_year +' Report by ' + report.organization
 			            }, function(err) {
 			              // return error
 			              if (err) return res.negotiate( err );
