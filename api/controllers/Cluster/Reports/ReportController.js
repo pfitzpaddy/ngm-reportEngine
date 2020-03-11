@@ -603,6 +603,8 @@ var ReportController = {
 	          if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) { return res.json( 200, report ); }
 
 	          // filter
+	          var admin_names = '';
+	          var admin_emails = '';
 	          var filter = { 
 	          	admin0pcode: report.admin0pcode, 
 	          	cluster_id: report.cluster_id, 
