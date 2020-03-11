@@ -626,10 +626,6 @@ var ReportController = {
 								admin_names = admin_names.slice( 0, -1 );
 								admin_emails = admin_emails.slice( 0, -1 );
 
-								console.log( filter );
-								console.log( admin_names );
-								console.log( admin_emails );
-
 								// report_month
 								var report_month = moment( report.reporting_period ).format( 'MMMM' ).toUpperCase();					
 
@@ -643,7 +639,7 @@ var ReportController = {
 			              senderName: 'ReportHub',
 			            }, {
 			              to: admin_emails,
-			              subject: 'ReportHub Notificaitons: Edit of ' + report_month + ' , '  + report_year +' Report by ' + organization
+			              subject: 'ReportHub Notificaitons: Edit of ' + report.report_month + ' , '  + report.report_year +' Report by ' + report.organization
 			            }, function(err) {
 			              // return error
 			              if (err) return res.negotiate( err );
