@@ -639,7 +639,7 @@ var ReportController = {
 			              senderName: 'ReportHub',
 			            }, {
 			              to: admin_emails,
-			              subject: 'ReportHub Notificaitons: Edit of ' + report_month + ' , '  + report.report_year +' Report by ' + report.organization
+			              subject: 'ReportHub Notificaitons: Edit of ' + report_month + ', '  + report.report_year +' Report by ' + report.organization
 			            }, function(err) {
 			              // return error
 			              if (err) return res.negotiate( err );
