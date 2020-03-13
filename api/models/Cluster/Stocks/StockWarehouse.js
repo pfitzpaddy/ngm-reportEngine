@@ -204,9 +204,9 @@ async function createStockLocations(warehouse, cb) {
     delete warehouse_copy.id;
     delete warehouse_copy.createdAt;
     delete warehouse_copy.updatedAt;
-    // // uncomment for _.merge( {}, organization, report )
-    // let organization = await Organization.findOne({ id: organization_id })
-    // delete organization.id;
+    // uncomment for _.merge( {}, organization, report )
+    let organization = await Organization.findOne({ id: organization_id })
+    delete organization.id;
 
 
     reports_array = reports_array.map(m => {
@@ -219,7 +219,7 @@ async function createStockLocations(warehouse, cb) {
               reporting_due_date: moment(s_date).add( m+1, 'M' ).set('date', 10 ).format(),
               organization_id : organization_id
             };
-            // report = _.merge( {}, organization, report )
+            report = _.merge( {}, organization, report );
             return report;
     });
 
