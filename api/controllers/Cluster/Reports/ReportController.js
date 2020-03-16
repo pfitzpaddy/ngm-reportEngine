@@ -7,6 +7,7 @@
 
 // libs
 var Promise = require('bluebird');
+var fs = require('fs');
 var util = require('util');
 var async = require('async');
 var moment = require( 'moment' );
@@ -493,10 +494,11 @@ var ReportController = {
 			return res.json(401, { err: 'report required!' });
 		}
 
-		// get report
+		// params
 		var report = req.param( 'report' );
 		var locations = req.param( 'report' ).locations;
-
+		var email_alert = req.param( 'email_alert' ) ? true : false;
+		
 		// find
 		var findProject = {
 			project_id: report.project_id
@@ -586,8 +588,71 @@ var ReportController = {
 
 					});
 				}, function ( err ) {
+					
+					// err
 					if ( err ) return err;
-					return res.json( 200, report );
+
+					// email alert?
+					if ( !email_alert || ( email_alert && report.admin0pcode !== 'ET' ) ) {
+						// return report
+						return res.json( 200, report );
+
+					} else {
+	          
+	          // if no config file, return, else send email ( PROD )
+	          if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) { return res.json( 200, report ); }
+
+	          // filter
+	          var admin_names = '';
+	          var admin_emails = '';
+	          var filter = { 
+	          	admin0pcode: report.admin0pcode, 
+	          	cluster_id: report.cluster_id, 
+	          	roles: { $in: [ 'CLUSTER' ] }
+	          }
+
+						// native function
+						User.native( function ( err, collection ){
+							collection.find( filter ).toArray( function ( err, admin ){
+								// return error
+								if (err) return res.negotiate( err );
+
+								// set emails
+								admin.forEach(function( d, i ) {
+									admin_names += d.name + ', ';
+									admin_emails += d.email + ',';
+								});
+								// remove last comma
+								admin_names = admin_names.slice( 0, -1 );
+								admin_emails = admin_emails.slice( 0, -1 );
+
+								// report_month
+								var report_month = moment( report.reporting_period ).format( 'MMMM' ).toUpperCase();					
+
+			          // send email
+			          sails.hooks.email.send( 'notification-report-edit', {
+			              recipientNames: admin_names,
+			              organization: report.organization,
+			              report_month: report_month,
+			              report_year: report.report_year,
+			              report_url: 'https://' + req.host + '/desk/#/cluster/projects/report/' + report.project_id + '/' + report.id,
+			              senderName: 'ReportHub',
+			            }, {
+			              to: admin_emails,
+			              subject: 'ReportHub Notificaitons: Edit of ' + report_month + ', '  + report.report_year +' Report by ' + report.organization
+			            }, function(err) {
+			              // return error
+			              if (err) return res.negotiate( err );
+						        // return report
+										return res.json( 200, report );
+			          	
+			          	});
+
+							});
+						});
+
+					}
+
 				});
 
 		});

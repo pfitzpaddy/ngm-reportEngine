@@ -6,6 +6,7 @@
 */
 
 var moment = require('moment');
+var _ = require('lodash');
 
 module.exports = {
 
@@ -19,7 +20,8 @@ module.exports = {
 	attributes: {
 		// relation
 		organization_id: {
-			model: 'organization'
+			type: 'string',
+			required: true
 		},
 		organization_tag: {
 			type: 'string',
@@ -153,231 +155,89 @@ module.exports = {
 
 	},
 
-  // after create - create reports
+  // after create - create reports & locations
   afterCreate: function (values, cb) {
 
-  	// moment
-  	var moment = require('moment');
-  	
-		// warehouse
-		StockWarehouse
-			.find( { organization_id: values.organization_id } )
-			.exec(function(err, warehouses){
-				
-				// return error
-				if ( err ) return cb( err );
-				
-        // daterange for warehouses reports
-        var year_start = moment().startOf('year').format('YYYY-MM-DD'),
-            year_end   = moment().endOf('year').format('YYYY-MM-DD')
+    createStockLocations(values, cb);
 
-				projects = [{
-					project_start_date: year_start,
-					project_end_date:   year_end
-				}];
+  },
 
-				// set
-				generateStockReports( values, projects[0], warehouses, cb );
+  // updateOrCreate
+  // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
+  updateOrCreate: function( parent, criteria, values ){
+    var self = this; // reference for use by callbacks
 
-			});
+    // if exists
+    if( criteria.id ){
+      // uncomment if warehouses updated
+      // return self.update( criteria, values );
+      return values;
+    }else{
+      // set relation
+      for ( key in parent ){ values[ key ] = parent[ key ]; }
+      return self.create( values );
+    }
+
   }
 
 };
 
-// 
-function generateStockReports( stockwarehouse, project, target_locations, cb ){
 
-	// tools
-	var moment = require('moment');
-	// variables
-	var reports = [],
-			// set start date / end date to start and end of respective months
-			s_date = moment( project.project_start_date ).startOf( 'month' ),
-			e_date = moment( project.project_end_date ).endOf( 'month' );
+async function createStockLocations(warehouse, cb) {
 
-	// number of reports
-	var reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
+  try {
 
-	// for each report month
-	for ( m = 0; m < reports_duration; m++ ) {
+    // dates
+    const start_date = warehouse.warehouse_start_date ? moment( warehouse.warehouse_start_date ).startOf('month') : moment().startOf('year')
+    const end_date = warehouse.warehouse_end_date ? moment( warehouse.warehouse_end_date ).endOf( 'M' ) :  moment().endOf( 'M' );
+    const reports_end = moment().endOf( 'M' );
+    const s_date = start_date < reports_end ? start_date : reports_end;
+    const e_date = end_date < reports_end ? end_date : reports_end;
+    const reports_duration = moment.duration( e_date.diff( s_date ) ).asMonths().toFixed(0);
+    var reports_array = Array(parseInt( reports_duration )).fill().map((item, index) => 0 + index);
 
-		// report is true
-		var report_active = true;
 
-		// should be reports just for 2017 period!
-		if ( moment( s_date ).add( m, 'M' ).year() < 2017  ) {
-			report_active = false;
-		}
+    // prepare for stocklocations
+    let warehouse_copy = JSON.parse( JSON.stringify( warehouse ) );
+    warehouse_copy.stock_warehouse_id = warehouse_copy.id;
+    const organization_id = warehouse_copy.organization_id;
+    delete warehouse_copy.id;
+    delete warehouse_copy.createdAt;
+    delete warehouse_copy.updatedAt;
+    // uncomment for _.merge( {}, organization, report )
+    let organization = await Organization.findOne({ id: organization_id })
+    delete organization.id;
 
-		// report_status 'todo' open from 1st of next month
-		var report_status = moment().diff( moment( s_date ).add( m, 'M' ).endOf( 'month' ) ) >= 0 ? 'todo' : 'pending';
 
-		// create report
-		var report = {
-			// defaults
-			report_status: report_status,
-			report_active: report_active,
-			report_month: moment( s_date ).add( m, 'M' ).month(),
-			report_year: moment( s_date ).add( m, 'M' ).year(),
-			reporting_period: moment( s_date ).add( m, 'M' ).set('date', 1).format(),
-			reporting_due_date: moment( s_date ).add( m+1, 'M' ).set('date', 15).format(),
-			stocklocations: []
-		};
+    reports_array = reports_array.map(m => {
+            report = {
+              report_status: 'todo',
+              report_active: true,
+              report_month: moment(s_date).add( m, 'M' ).month(),
+              report_year: moment(s_date).add( m, 'M' ).year(),
+              reporting_period: moment(s_date).add( m, 'M' ).set('date', 1).format(),
+              reporting_due_date: moment(s_date).add( m+1, 'M' ).set('date', 10 ).format(),
+              organization_id : organization_id
+            };
+            report = _.merge( {}, organization, report );
+            return report;
+    });
 
-		// merge with values
-		report = _.merge( {}, report, stockwarehouse );
-		delete report.id;
+    const db_promises = reports_array
+      .map(async function (report) {
+        var new_report = await StockReport.findOrCreate({
+          organization_id: report.organization_id,
+          report_month: report.report_month,
+          report_year: report.report_year
+        }, report);
+        var l_warehouse_copy = _.merge({}, warehouse_copy, { report_month: new_report.report_month, report_year: new_report.report_year, report_id: new_report.id });
+        await StockLocation.create(l_warehouse_copy);
+      });
 
-		// add report to reports
-		reports.push( report );
-
-	}
-
-	// get reportlocations
-	getStockReportLocations( stockwarehouse, reports, target_locations, cb );
-
+    await Promise.all(db_promises);
+    cb();
+  } catch (err) {
+    cb(err);
+  }
 };
-
-// generate an array of reports
-function getStockReportLocations( stockwarehouse, reports, target_locations, cb ) {
-
-	// number of reports to update
-	var report_counter = 0,
-			report_length = reports.length;
-
-	// reports
-	reports.forEach(function(report, r_index){
-
-		// set
-		var target_counter = 0,
-				target_length = target_locations.length;
-
-		// for target_locations
-		target_locations.forEach( function( target_location, t_index ) {
-
-			// existing stocklocation?
-			StockLocation
-				.find({ organization_id: stockwarehouse.organization_id,
-										stock_warehouse_id: target_location.id,
-										report_month: report.report_month,
-                    report_year: report.report_year,
-                    report_id: { '!' : null } })
-				.populateAll()
-				.exec(function(err, stocklocation){
-
-					// return error
-					if ( err ) return cb( err );
-
-					// existing stocklocation
-					if(stocklocation.length){
-						// stocklocations
-						reports[r_index].stocklocations.push(stocklocation);
-					}
-
-					// create stocklocation
-					if(!stocklocation.length){
-						// clone target_location
-						var sl = target_location.toObject();
-								sl.stock_warehouse_id = sl.id;
-								sl.report_month = reports[r_index].report_month;
-								sl.report_year = reports[r_index].report_year;
-								delete sl.id;
-                sl.createdOn  = moment().format();
-						// sl
-						reports[r_index].stocklocations.push(sl);
-					}
-
-					// target++
-					target_counter++;
-					if(target_counter===target_length){
-
-						// report++
-						report_counter++;
-						if(report_counter===report_length){
-							// setreports
-							setStockReports(reports, cb);
-						}
-
-					}			
-
-				});
-			
-		});
-
-	});
-
-};
-
-// set db
-function setStockReports( reports, cb ){
-
-	// number of reports to update
-	var counter = 0,
-			length = reports.length;
-
-	// for each report
-	reports.forEach( function( report, r_index ) {
-
-		StockReport
-			.find( { organization_id: reports[ r_index ].organization_id,
-						report_month: reports[ r_index ].report_month, 
-						report_year: reports[ r_index ].report_year
-					} )
-			.exec(function( err, sReport ){
-				
-				// return error
-				if ( err ) return cb( err );
-
-				// report length
-				if ( sReport.length ) {
-					reports[ r_index ].report_status = sReport[0].report_status;
-				}
-
-				// update (returns array)
-				StockReport
-					.update( { 	organization_id: reports[ r_index ].organization_id,
-											report_month: reports[ r_index ].report_month, 
-											report_year: reports[ r_index ].report_year
-										}, reports[ r_index ] )
-					.exec( function( err, update ) {
-
-						// return error
-						if ( err ) return cb( err );
-
-						// if report
-						if ( update.length ) {
-							// counter
-							counter++;
-							// final update
-							if ( counter === length ) {
-								// next!
-								cb();
-							}
-						}
-						// if no report - create
-						if ( !update.length ) {
-
-							// create with association
-							StockReport
-								.create( reports[ r_index ] )
-								.exec( function( err, new_report ) {
-									// return error
-									if ( err ) return cb( err );
-									// counter
-									counter++;
-									// final update
-									if ( counter === length ) {
-										// next!
-										cb();
-									}
-								});
-						}
-
-					});
-			
-
-			});
-	});
-
-}
 

@@ -89,42 +89,23 @@ module.exports = {
 			type: 'boolean'
 		},
 
-    // add reference to Locations
-    stocklocations: {
-      collection: 'stocklocation',
-      via: 'report_id'
-    },
     notes: {
     	type: 'string'
     }
-	
+
 	},
 
-  // updateOrCreate 
-    // http://stackoverflow.com/questions/25936910/sails-js-model-insert-or-update-records
-  updateOrCreate: function( criteria, values, cb ){
+  updateOrCreate: function( parent, criteria, values ){
     var self = this; // reference for use by callbacks
-    // If no values were specified, return []
-    if (!values) cb( false, [] );
 
-    // find
-    this.findOne( criteria, function ( err, result ){
-      if(err) return cb(err, false);
-
-      // update or create
-      if( result ){
-      	// keep complete reports complete
-      	if ( result.report_status === 'complete' ){
-      		values.report_status = result.report_status;
-      	} 
-	      self.update( criteria, values, function( err, update ){
-					if(err) return cb(err, false);
-					cb( false, update[0] );
-	      });
-	    }else{
-	      self.create( values, cb );
-	    }
-    });
+    // if exists
+    if( criteria.id ){
+      return self.update( criteria, values );
+    }else{
+      // set relation
+      for ( key in parent ){ values[ key ] = parent[ key ]; }
+      return self.create( values );
+    }
 
   }
 
