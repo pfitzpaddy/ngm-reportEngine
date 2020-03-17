@@ -8,7 +8,7 @@
     "async": "^2.6.1",
     "bcrypt-nodejs": "0.0.3",
     "deep-assign": "^2.0.0",
-    "ejs": "~0.8.4",
+    "ejs": "~3.0.1",
     "exceljs": "^3.8.1",
     "googleapis": "^37.2.0",
     "grunt": "0.4.2",
