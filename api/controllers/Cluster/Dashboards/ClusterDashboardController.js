@@ -1512,7 +1512,7 @@ var ClusterDashboardController = {
 			case 'sector_iscg_excel':
 
 				// template path
-				var xlsx_template_path = XLSX_PATH + params.admin0pcode + '/' + XLSX_TEMPLATE + '.xlsx';
+				var xlsx_template_path = XLSX_PATH + params.admin0pcode.toUpperCase() + '/' + XLSX_TEMPLATE + '.xlsx';
 				// xlsx_report
 				var xlsx_report = XLSX_TEMPLATE + params.report  + '.xlsx';
 				// print dir
