@@ -11,6 +11,18 @@ var json2csv = require( 'json2csv' );
 var $nin_organizations = [ 'immap', 'arcs' ];
 var async = require('async');
 
+// xlsx
+const XLSX = require('xlsx');
+const XLSX_UTILS = XLSX.utils;
+
+
+// ExcelJS
+const ExcelJS = require('exceljs');
+// constants
+const XLSX_PATH = '/home/ubuntu/data/template/';
+const XLSX_TEMPLATE = 'ISCG_4W_Template_2020';
+
+// ClusterDashboardController
 var ClusterDashboardController = {
 
 	// flatten json
@@ -47,6 +59,7 @@ var ClusterDashboardController = {
 			ocha: req.param('ocha') ? req.param('ocha') : false,
 			list: req.param('list') ? req.param('list') : false,
 			indicator: req.param('indicator'),
+			report: req.param('report'),
 			cluster_id: req.param('cluster_id'),
 			cluster_ids: req.param('cluster_ids') ? req.param('cluster_ids') : [req.param('cluster_id')],
 			activity_type_id: req.param( 'activity_type_id' ) ? req.param( 'activity_type_id' ) : 'all',
@@ -81,7 +94,7 @@ var ClusterDashboardController = {
 			cluster_id_act: params.cluster_id === 'all' ? {} : { cluster_id: params.cluster_id },
 			activity_type_id: params.activity_type_id === 'all'  ? {} : { activity_type_id: params.activity_type_id },
 			activity_description_id: params.activity_description_id === 'all' ? {} : { activity_description_id: params.activity_description_id},
- 			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
+			acbar_partners: params.cluster_id === 'acbar' ? { project_acbar_partner: true } : {},
 			organization_tag: params.organization_tag === 'all' ? { organization_tag: { '!': $nin_organizations } } : { organization_tag: params.organization_tag },
 			beneficiaries: params.beneficiaries[0] === 'all' ? {} : { beneficiary_type_id: params.beneficiaries },
 			date: { reporting_period: { '>=': new Date( params.start_date ), '<=': new Date( params.end_date ) } },
@@ -617,8 +630,8 @@ var ClusterDashboardController = {
 							'project_budget_date_recieved',
 							'budget_funds_name',
 							'financial_programming_name',
-              'multi_year_funding_name',
-              'multi_year_array',
+							'multi_year_funding_name',
+							'multi_year_array',
 							'reported_on_fts_name',
 							'fts_record_id',
 							'email',
@@ -642,8 +655,8 @@ var ClusterDashboardController = {
 							'Date of Payment',
 							'Incoming Funds',
 							'Financial Programming',
-              'Multi-Year Funding',
-              'Funding Per Year',
+							'Multi-Year Funding',
+							'Funding Per Year',
 							'Reported on FTS',
 							'FTS ID',
 							'Email',
@@ -666,7 +679,7 @@ var ClusterDashboardController = {
 					};
 
 
-                 //fiter implementer partner from projects plan or 4wplus activities dasbhoards
+								 //fiter implementer partner from projects plan or 4wplus activities dasbhoards
 					if(req.param('implementer') && req.param('implementer') !== 'all'){
 
 						implementing_partner = req.param('implementer');
@@ -682,39 +695,39 @@ var ClusterDashboardController = {
 					//fiter project type and is hrp plan? from projects plan or 4wplus activities dasbhoards
 					if( (req.param('project_type_component')&&req.param('project_type_component')!=='all')  &&  ( req.param('hrpplan') !=='all' && req.param('hrpplan') === 'true') ){
 
-					        //is not possible implement operator $and
-					        plan_component = req.param('project_type_component');
-					        filters.plan_component = {'plan_component': { $in: [plan_component, 'hrp_plan']}};
+									//is not possible implement operator $and
+									plan_component = req.param('project_type_component');
+									filters.plan_component = {'plan_component': { $in: [plan_component, 'hrp_plan']}};
 
-					      }else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
+								}else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
 
-					        plan_component = req.param('project_type_component');
+									plan_component = req.param('project_type_component');
 
-					        filters.plan_component = { 'plan_component' : { $in: [plan_component], $nin: ['hrp_plan']}};
-					        // delete filterObject.project_type_component;
-					        // delete filterObject.hrpplan;
+									filters.plan_component = { 'plan_component' : { $in: [plan_component], $nin: ['hrp_plan']}};
+									// delete filterObject.project_type_component;
+									// delete filterObject.hrpplan;
 
-					      }else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
+								}else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
 
-					        plan_component = req.param('project_type_component');
-					        filters.plan_component = { 'plan_component' : { $in: [plan_component]}};
-					        // delete queryProject.project_type_component;
+									plan_component = req.param('project_type_component');
+									filters.plan_component = { 'plan_component' : { $in: [plan_component]}};
+									// delete queryProject.project_type_component;
 
-					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
+								}else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
 
-					         filters.plan_component = { 'plan_component': { $in: ['hrp_plan']}};
-					       //  delete queryProject.hrpplan;
+									 filters.plan_component = { 'plan_component': { $in: ['hrp_plan']}};
+								 //  delete queryProject.hrpplan;
 
-					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
-					         filters.plan_component = { 'plan_component': { $nin: ['hrp_plan']}};
-					      //   delete queryProject.hrpplan;
-					      }else{
+								}else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
+									 filters.plan_component = { 'plan_component': { $nin: ['hrp_plan']}};
+								//   delete queryProject.hrpplan;
+								}else{
 
-					      	filters.plan_component = {};
+									filters.plan_component = {};
 
-					      }
+								}
 
-					      //fiter activity type from projects plan or 4wplus activities dasbhoards
+								//fiter activity type from projects plan or 4wplus activities dasbhoards
 
 					if(req.param('activity_type_id') && req.param('activity_type_id') !== 'all'){
 							activity_type_id = req.param('activity_type_id');
@@ -746,14 +759,14 @@ var ClusterDashboardController = {
 					.exec( function( err, budget ){
 
 						// return error
-            if (err) return res.negotiate( err );
+						if (err) return res.negotiate( err );
 
-            // format multi year
-            budget.forEach(function (d, i) {
-              if (d.multi_year_array && d.multi_year_array.length) {
-                budget[i].multi_year_array = d.multi_year_array.map(e => e.budget + " " + e.year).join("; ")
-              }
-            });
+						// format multi year
+						budget.forEach(function (d, i) {
+							if (d.multi_year_array && d.multi_year_array.length) {
+								budget[i].multi_year_array = d.multi_year_array.map(e => e.budget + " " + e.year).join("; ")
+							}
+						});
 
 						// return csv
 						json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
@@ -804,7 +817,6 @@ var ClusterDashboardController = {
 				});
 
 				break;
-
 
 			case 'beneficiaries_population':
 
@@ -870,6 +882,7 @@ var ClusterDashboardController = {
 						});
 					});
 				}	else	{
+
 					// get beneficiaries export
 					Beneficiaries.native(function(err, collection) {
 						if (err) return res.serverError(err);
@@ -893,39 +906,39 @@ var ClusterDashboardController = {
 
 						 if( (req.param('project_type_component')&&req.param('project_type_component')!=='all')  &&  ( req.param('hrpplan') !=='all' && req.param('hrpplan') === 'true') ){
 
-					        //is not possible implement operator $and
-					        filterObject.plan_component = {$in: [req.param('project_type_component'), 'hrp_plan']};
-					        ///filterObject.plan_component = {$and: [ { plan_component : {$in: [req.param('project_type_component')]} } , {plan_component: {$in:["hrp_plan"]}}]};
+									//is not possible implement operator $and
+									filterObject.plan_component = {$in: [req.param('project_type_component'), 'hrp_plan']};
+									///filterObject.plan_component = {$and: [ { plan_component : {$in: [req.param('project_type_component')]} } , {plan_component: {$in:["hrp_plan"]}}]};
 
 
-					      }else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
+								}else if( (req.param('project_type_component') && req.param('project_type_component')!== 'all') && (req.param('hrpplan')!=='all' && req.param('hrpplan') === 'false') ){
 
-					        filterObject.plan_component = { $in: [req.param('project_type_component')], $nin: ['hrp_plan']};
-					        // delete filterObject.project_type_component;
-					        // delete filterObject.hrpplan;
+									filterObject.plan_component = { $in: [req.param('project_type_component')], $nin: ['hrp_plan']};
+									// delete filterObject.project_type_component;
+									// delete filterObject.hrpplan;
 
-					      }else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
+								}else if((req.param('project_type_component') && req.param('project_type_component')!== 'all') && req.param('hrpplan') ==='all'){
 
-					        filterObject.plan_component = {$in: [req.param('project_type_component')]};
-					        // delete queryProject.project_type_component;
+									filterObject.plan_component = {$in: [req.param('project_type_component')]};
+									// delete queryProject.project_type_component;
 
-					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
+								}else if((req.param('project_type_component') && req.param('project_type_component')=== 'all')  &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'true')){
 
-					         filterObject.plan_component = {$in: ['hrp_plan']};
-					       //  delete queryProject.hrpplan;
+									 filterObject.plan_component = {$in: ['hrp_plan']};
+								 //  delete queryProject.hrpplan;
 
-					      }else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
-					         filterObject.plan_component = {$nin: ['hrp_plan']};
-					      //   delete queryProject.hrpplan;
-					      }
+								}else if((req.param('project_type_component') && req.param('project_type_component')=== 'all') &&  (req.param('hrpplan') !== 'all' && req.param('hrpplan') === 'false')){
+									 filterObject.plan_component = {$nin: ['hrp_plan']};
+								//   delete queryProject.hrpplan;
+								}
 
-					      //fiter activity type from projects plan or 4wplus activities dasbhoards
+								//fiter activity type from projects plan or 4wplus activities dasbhoards
 
-						  if(req.param('activity_type_id') && req.param('activity_type_id') !== 'all'){
+							if(req.param('activity_type_id') && req.param('activity_type_id') !== 'all'){
 												//activity_typeid = req.param('activity_type_id');
 							filterObject.activity_type_id = req.param('activity_type_id');
 
-						  }
+							}
 
 
 						collection.find(filterObject).toArray(function (err, beneficiaries) {
@@ -934,471 +947,471 @@ var ClusterDashboardController = {
 							if(params.admin0pcode.toUpperCase() === 'COL'){
 
 								var fields = [
-								'project_id',
-								'report_id',
-								'_id',
-								'cluster_id',
-								'cluster',
-								'plan_component',
-								'name',
-								'phone',
-								'email',
-								//'mpc_purpose_cluster_id',
-								//'mpc_purpose_type_name',
-								'organization',
-								'implementing_partners',
-								//'project_hrp_code',
-								'project_code',
-								'project_title',
-								'project_start_date',
-								'project_end_date',
-								'donor',
-								'report_month_number',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'admin0pcode',
-								'admin0name',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								/*'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'conflict',*/
-								'site_id',
-								/*'site_class',
-								'site_status',
-								'site_hub_id',
-								'site_hub_name',*/
-								'site_implementation_name',
-								'site_type_name',
-								'site_name',
-								/*'category_type_id',
-								'category_type_name',*/
-								'beneficiary_type_id',
-								'beneficiary_type_name',
-								'beneficiary_category_name',
-								'strategic_objective_id',
-								'strategic_objective_name',
-								'strategic_objective_description',
-								'sector_objective_id',
-								'sector_objective_name',
-								'sector_objective_description',
-								'activity_type_id',
-								'activity_type_name',
-								'activity_description_id',
-								'activity_description_name',
-								/*'activity_detail_id',
-								'activity_detail_name',
-								'remarks',*/
-								'indicator_id',
-								'indicator_name',
-								/*'activity_status_id',
-								'activity_status_name',*/
-								'delivery_type_id',
-								'delivery_type_name',
-								/*'distribution_status',
-								'distribution_start_date',
-								'distribution_end_date',
-								'partial_kits',
-								'kit_details',*/
-								'units',
-								'unit_type_id',
-								'unit_type_name',
-								//'transfer_type_value',
-								'mpc_delivery_type_id',
-								'mpc_delivery_type_name',
-								'mpc_mechanism_type_id',
-								'mpc_mechanism_type_name',
-								//'package_type_id',
-								'households',
-								'families',
-								'boys_0_5',
-								'boys_6_11',
-								'boys_12_17',
-								'boys',
-								'men',
-								'elderly_men',
-								'total_male',
-								'girls_0_5',
-								'girls_6_11',
-								'girls_12_17',
-								'girls',
-								'women',
-								'elderly_women',
-								'total_female',
-								'total_beneficiaries',
-								'admin1lng',
-								'admin1lat',
-								'admin2lng',
-								'admin2lat',
-								//'admin3lng',
-								//'admin3lat',
-								//'admin4lng',
-								//'admin4lat',
-								//'admin5lng',
-								//'admin5lat',
-								'site_lng',
-								'site_lat',
-								'updatedAt',
-								'createdAt'
-							],
+									'project_id',
+									'report_id',
+									'_id',
+									'cluster_id',
+									'cluster',
+									'plan_component',
+									'name',
+									'phone',
+									'email',
+									//'mpc_purpose_cluster_id',
+									//'mpc_purpose_type_name',
+									'organization',
+									'implementing_partners',
+									//'project_hrp_code',
+									'project_code',
+									'project_title',
+									'project_start_date',
+									'project_end_date',
+									'donor',
+									'report_month_number',
+									'report_month',
+									'report_year',
+									'reporting_period',
+									'admin0pcode',
+									'admin0name',
+									'admin1pcode',
+									'admin1name',
+									'admin2pcode',
+									'admin2name',
+									/*'admin3pcode',
+									'admin3name',
+									'admin4pcode',
+									'admin4name',
+									'admin5pcode',
+									'admin5name',
+									'conflict',*/
+									'site_id',
+									/*'site_class',
+									'site_status',
+									'site_hub_id',
+									'site_hub_name',*/
+									'site_implementation_name',
+									'site_type_name',
+									'site_name',
+									/*'category_type_id',
+									'category_type_name',*/
+									'beneficiary_type_id',
+									'beneficiary_type_name',
+									'beneficiary_category_name',
+									'strategic_objective_id',
+									'strategic_objective_name',
+									'strategic_objective_description',
+									'sector_objective_id',
+									'sector_objective_name',
+									'sector_objective_description',
+									'activity_type_id',
+									'activity_type_name',
+									'activity_description_id',
+									'activity_description_name',
+									/*'activity_detail_id',
+									'activity_detail_name',
+									'remarks',*/
+									'indicator_id',
+									'indicator_name',
+									/*'activity_status_id',
+									'activity_status_name',*/
+									'delivery_type_id',
+									'delivery_type_name',
+									/*'distribution_status',
+									'distribution_start_date',
+									'distribution_end_date',
+									'partial_kits',
+									'kit_details',*/
+									'units',
+									'unit_type_id',
+									'unit_type_name',
+									//'transfer_type_value',
+									'mpc_delivery_type_id',
+									'mpc_delivery_type_name',
+									'mpc_mechanism_type_id',
+									'mpc_mechanism_type_name',
+									//'package_type_id',
+									'households',
+									'families',
+									'boys_0_5',
+									'boys_6_11',
+									'boys_12_17',
+									'boys',
+									'men',
+									'elderly_men',
+									'total_male',
+									'girls_0_5',
+									'girls_6_11',
+									'girls_12_17',
+									'girls',
+									'women',
+									'elderly_women',
+									'total_female',
+									'total_beneficiaries',
+									'admin1lng',
+									'admin1lat',
+									'admin2lng',
+									'admin2lat',
+									//'admin3lng',
+									//'admin3lat',
+									//'admin4lng',
+									//'admin4lat',
+									//'admin5lng',
+									//'admin5lat',
+									'site_lng',
+									'site_lat',
+									'updatedAt',
+									'createdAt'
+								],
 
-						fieldNames = [
-								'project_id',
-								'report_id',
-								'beneficiary_id',
-								'cluster_id',
-								'cluster',
-								'plan_component',
-								'focal_point_name',
-								'focal_point_phone',
-								'focal_point_email',
-								//'mpc_purpose_cluster_id',
-								//'mpc_purpose_type_name',
-								'organization',
-								'implementing_partners',
-								//'project_hrp_code',
-								'project_code',
-								'project_title',
-								'project_start_date',
-								'project_end_date',
-								'donor',
-								'report_month_number',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'admin0pcode',
-								'admin0name',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								/*'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'conflict',*/
-								'site_id',
-								/*'site_class',
-								'site_status',
-								'site_hub_id',
-								'site_hub_name',*/
-								'site_implementation_name',
-								'site_type_name',
-								'site_name',
-								/*'category_type_id',
-								'category_type_name',*/
-								'beneficiary_type_id',
-								'beneficiary_type_name',
-								'beneficiary_category_name',
-								'strategic_objective_id',
-								'strategic_objective_name',
-								'strategic_objective_description',
-								'sector_objective_id',
-								'sector_objective_name',
-								'sector_objective_description',
-								'activity_type_id',
-								'activity_type_name',
-								'activity_description_id',
-								'activity_description_name',
-								/*'activity_detail_id',
-								'activity_detail_name',
-								'remarks',*/
-								'indicator_id',
-								'indicator_name',
-								/*'activity_status_id',
-								'activity_status_name',*/
-								'delivery_type_id',
-								'delivery_type_name',
-								/*'distribution_status',
-								'distribution_start_date',
-								'distribution_end_date',
-								'partial_kits',
-								'kit_details',*/
-								'units',
-								'unit_type_id',
-								'unit_type_name',
-								//'transfer_type_value',
-								'mpc_delivery_type_id',
-								'mpc_delivery_type_name',
-								'mpc_mechanism_type_id',
-								'mpc_mechanism_type_name',
-								//'package_type_id',
-								'households',
-								'families',
-								'boys_0_5',
-								'boys_6_11',
-								'boys_12_17',
-								'boys',
-								'men',
-								'elderly_men',
-								'total_male',
-								'girls_0_5',
-								'girls_6_11',
-								'girls_12_17',
-								'girls',
-								'women',
-								'elderly_women',
-								'total_female',
-								'total',
-								'admin1lng',
-								'admin1lat',
-								'admin2lng',
-								'admin2lat',
-								//'admin3lng',
-								//'admin3lat',
-								//'admin4lng',
-								//'admin4lat',
-								//'admin5lng',
-								//'admin5lat',
-								'site_lng',
-								'site_lat',
-								'updatedAt',
-								'createdAt'
-							];
+								fieldNames = [
+									'project_id',
+									'report_id',
+									'beneficiary_id',
+									'cluster_id',
+									'cluster',
+									'plan_component',
+									'focal_point_name',
+									'focal_point_phone',
+									'focal_point_email',
+									//'mpc_purpose_cluster_id',
+									//'mpc_purpose_type_name',
+									'organization',
+									'implementing_partners',
+									//'project_hrp_code',
+									'project_code',
+									'project_title',
+									'project_start_date',
+									'project_end_date',
+									'donor',
+									'report_month_number',
+									'report_month',
+									'report_year',
+									'reporting_period',
+									'admin0pcode',
+									'admin0name',
+									'admin1pcode',
+									'admin1name',
+									'admin2pcode',
+									'admin2name',
+									/*'admin3pcode',
+									'admin3name',
+									'admin4pcode',
+									'admin4name',
+									'admin5pcode',
+									'admin5name',
+									'conflict',*/
+									'site_id',
+									/*'site_class',
+									'site_status',
+									'site_hub_id',
+									'site_hub_name',*/
+									'site_implementation_name',
+									'site_type_name',
+									'site_name',
+									/*'category_type_id',
+									'category_type_name',*/
+									'beneficiary_type_id',
+									'beneficiary_type_name',
+									'beneficiary_category_name',
+									'strategic_objective_id',
+									'strategic_objective_name',
+									'strategic_objective_description',
+									'sector_objective_id',
+									'sector_objective_name',
+									'sector_objective_description',
+									'activity_type_id',
+									'activity_type_name',
+									'activity_description_id',
+									'activity_description_name',
+									/*'activity_detail_id',
+									'activity_detail_name',
+									'remarks',*/
+									'indicator_id',
+									'indicator_name',
+									/*'activity_status_id',
+									'activity_status_name',*/
+									'delivery_type_id',
+									'delivery_type_name',
+									/*'distribution_status',
+									'distribution_start_date',
+									'distribution_end_date',
+									'partial_kits',
+									'kit_details',*/
+									'units',
+									'unit_type_id',
+									'unit_type_name',
+									//'transfer_type_value',
+									'mpc_delivery_type_id',
+									'mpc_delivery_type_name',
+									'mpc_mechanism_type_id',
+									'mpc_mechanism_type_name',
+									//'package_type_id',
+									'households',
+									'families',
+									'boys_0_5',
+									'boys_6_11',
+									'boys_12_17',
+									'boys',
+									'men',
+									'elderly_men',
+									'total_male',
+									'girls_0_5',
+									'girls_6_11',
+									'girls_12_17',
+									'girls',
+									'women',
+									'elderly_women',
+									'total_female',
+									'total',
+									'admin1lng',
+									'admin1lat',
+									'admin2lng',
+									'admin2lat',
+									//'admin3lng',
+									//'admin3lat',
+									//'admin4lng',
+									//'admin4lat',
+									//'admin5lng',
+									//'admin5lat',
+									'site_lng',
+									'site_lat',
+									'updatedAt',
+									'createdAt'
+								];
 
-							}else{
+							} else {
 
-							var fields = [
-								'project_id',
-								'report_id',
-								'_id',
-								'cluster_id',
-								'cluster',
-								'name',
-								'phone',
-								'email',
-								// 'mpc_purpose_cluster_id',
-								// 'mpc_purpose_type_name',
-                'organization',
-                'programme_partners',
-								'implementing_partners',
-								'project_hrp_code',
-								'project_code',
-								'project_title',
-								'project_start_date',
-                'project_end_date',
-                'project_status',
-                'donor',
-                'project_budget',
-                'project_budget_currency',
-								'report_month_number',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'admin0pcode',
-								'admin0name',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'conflict',
-								'site_id',
-								'site_class',
-								'site_status',
-								'site_population',
-								'site_hub_id',
-								'site_hub_name',
-								'site_implementation_name',
-								'site_type_name',
-								'site_name',
-								'category_type_id',
-								'category_type_name',
-								'beneficiary_type_id',
-								'beneficiary_type_name',
-								'beneficiary_category_name',
-								'strategic_objective_id',
-								'strategic_objective_name',
-								'strategic_objective_description',
-								'sector_objective_id',
-								'sector_objective_name',
-								'sector_objective_description',
-								'activity_type_id',
-								'activity_type_name',
-								'activity_description_id',
-								'activity_description_name',
-								'activity_detail_id',
-								'activity_detail_name',
-								'remarks',
-								'indicator_id',
-								'indicator_name',
-								'activity_status_id',
-								'activity_status_name',
-								'delivery_type_id',
-								'delivery_type_name',
-								'distribution_status',
-								'distribution_start_date',
-								'distribution_end_date',
-								'partial_kits',
-								'kit_details',
-								'units',
-								'unit_type_id',
-								'unit_type_name',
-								'transfer_type_value',
-								'mpc_delivery_type_id',
-								'mpc_delivery_type_name',
-								'mpc_mechanism_type_id',
-								'mpc_mechanism_type_name',
-								'package_type_id',
-								'households',
-								'families',
-								'boys',
-								'girls',
-								'men',
-								'women',
-								'elderly_men',
-								'elderly_women',
-								'details',
-								'total_beneficiaries',
-								'admin1lng',
-								'admin1lat',
-								'admin2lng',
-								'admin2lat',
-								'admin3lng',
-								'admin3lat',
-								'admin4lng',
-								'admin4lat',
-								'admin5lng',
-								'admin5lat',
-								'site_lng',
-								'site_lat',
-								'updatedAt',
-								'createdAt'
-							],
+								var fields = [
+									'project_id',
+									'report_id',
+									'_id',
+									'cluster_id',
+									'cluster',
+									'name',
+									'phone',
+									'email',
+									// 'mpc_purpose_cluster_id',
+									// 'mpc_purpose_type_name',
+									'organization',
+									'programme_partners',
+									'implementing_partners',
+									'project_hrp_code',
+									'project_code',
+									'project_title',
+									'project_start_date',
+									'project_end_date',
+									'project_status',
+									'donor',
+									'project_budget',
+									'project_budget_currency',
+									'report_month_number',
+									'report_month',
+									'report_year',
+									'reporting_period',
+									'admin0pcode',
+									'admin0name',
+									'admin1pcode',
+									'admin1name',
+									'admin2pcode',
+									'admin2name',
+									'admin3pcode',
+									'admin3name',
+									'admin4pcode',
+									'admin4name',
+									'admin5pcode',
+									'admin5name',
+									'conflict',
+									'site_id',
+									'site_class',
+									'site_status',
+									'site_population',
+									'site_hub_id',
+									'site_hub_name',
+									'site_implementation_name',
+									'site_type_name',
+									'site_name',
+									'category_type_id',
+									'category_type_name',
+									'beneficiary_type_id',
+									'beneficiary_type_name',
+									'beneficiary_category_name',
+									'strategic_objective_id',
+									'strategic_objective_name',
+									'strategic_objective_description',
+									'sector_objective_id',
+									'sector_objective_name',
+									'sector_objective_description',
+									'activity_type_id',
+									'activity_type_name',
+									'activity_description_id',
+									'activity_description_name',
+									'activity_detail_id',
+									'activity_detail_name',
+									'remarks',
+									'indicator_id',
+									'indicator_name',
+									'activity_status_id',
+									'activity_status_name',
+									'delivery_type_id',
+									'delivery_type_name',
+									'distribution_status',
+									'distribution_start_date',
+									'distribution_end_date',
+									'partial_kits',
+									'kit_details',
+									'units',
+									'unit_type_id',
+									'unit_type_name',
+									'transfer_type_value',
+									'mpc_delivery_type_id',
+									'mpc_delivery_type_name',
+									'mpc_mechanism_type_id',
+									'mpc_mechanism_type_name',
+									'package_type_id',
+									'households',
+									'families',
+									'boys',
+									'girls',
+									'men',
+									'women',
+									'elderly_men',
+									'elderly_women',
+									'details',
+									'total_beneficiaries',
+									'admin1lng',
+									'admin1lat',
+									'admin2lng',
+									'admin2lat',
+									'admin3lng',
+									'admin3lat',
+									'admin4lng',
+									'admin4lat',
+									'admin5lng',
+									'admin5lat',
+									'site_lng',
+									'site_lat',
+									'updatedAt',
+									'createdAt'
+								],
 
-						fieldNames = [
-								'project_id',
-								'report_id',
-								'beneficiary_id',
-								'cluster_id',
-								'cluster',
-								'focal_point_name',
-								'focal_point_phone',
-								'focal_point_email',
-								// 'mpc_purpose_cluster_id',
-								// 'mpc_purpose_type_name',
-                'organization',
-                'programme_partners',
-								'implementing_partners',
-								'project_hrp_code',
-								'project_code',
-								'project_title',
-								'project_start_date',
-                'project_end_date',
-                'project_status',
-                'donor',
-                'project_budget',
-                'project_budget_currency',
-								'report_month_number',
-								'report_month',
-								'report_year',
-								'reporting_period',
-								'admin0pcode',
-								'admin0name',
-								'admin1pcode',
-								'admin1name',
-								'admin2pcode',
-								'admin2name',
-								'admin3pcode',
-								'admin3name',
-								'admin4pcode',
-								'admin4name',
-								'admin5pcode',
-								'admin5name',
-								'conflict',
-								'site_id',
-								'site_class',
-								'site_status',
-								'site_population',
-								'site_hub_id',
-								'site_hub_name',
-								'site_implementation_name',
-								'site_type_name',
-								'site_name',
-								'category_type_id',
-								'category_type_name',
-								'beneficiary_type_id',
-								'beneficiary_type_name',
-								'beneficiary_category_name',
-								'strategic_objective_id',
-								'strategic_objective_name',
-								'strategic_objective_description',
-								'sector_objective_id',
-								'sector_objective_name',
-								'sector_objective_description',
-								'activity_type_id',
-								'activity_type_name',
-								'activity_description_id',
-								'activity_description_name',
-								'activity_detail_id',
-								'activity_detail_name',
-								'remarks',
-								'indicator_id',
-								'indicator_name',
-								'activity_status_id',
-								'activity_status_name',
-								'delivery_type_id',
-								'delivery_type_name',
-								'distribution_status',
-								'distribution_start_date',
-								'distribution_end_date',
-								'partial_kits',
-								'kit_details',
-								'units',
-								'unit_type_id',
-								'unit_type_name',
-								'transfer_type_value',
-								'mpc_delivery_type_id',
-								'mpc_delivery_type_name',
-								'mpc_mechanism_type_id',
-								'mpc_mechanism_type_name',
-								'package_type_id',
-								'households',
-								'families',
-								'boys',
-								'girls',
-								'men',
-								'women',
-								'elderly_men',
-								'elderly_women',
-								'details',
-								'total',
-								'admin1lng',
-								'admin1lat',
-								'admin2lng',
-								'admin2lat',
-								'admin3lng',
-								'admin3lat',
-								'admin4lng',
-								'admin4lat',
-								'admin5lng',
-								'admin5lat',
-								'site_lng',
-								'site_lat',
-								'updatedAt',
-								'createdAt'
-							];
-						};
+								fieldNames = [
+									'project_id',
+									'report_id',
+									'beneficiary_id',
+									'cluster_id',
+									'cluster',
+									'focal_point_name',
+									'focal_point_phone',
+									'focal_point_email',
+									// 'mpc_purpose_cluster_id',
+									// 'mpc_purpose_type_name',
+									'organization',
+									'programme_partners',
+									'implementing_partners',
+									'project_hrp_code',
+									'project_code',
+									'project_title',
+									'project_start_date',
+									'project_end_date',
+									'project_status',
+									'donor',
+									'project_budget',
+									'project_budget_currency',
+									'report_month_number',
+									'report_month',
+									'report_year',
+									'reporting_period',
+									'admin0pcode',
+									'admin0name',
+									'admin1pcode',
+									'admin1name',
+									'admin2pcode',
+									'admin2name',
+									'admin3pcode',
+									'admin3name',
+									'admin4pcode',
+									'admin4name',
+									'admin5pcode',
+									'admin5name',
+									'conflict',
+									'site_id',
+									'site_class',
+									'site_status',
+									'site_population',
+									'site_hub_id',
+									'site_hub_name',
+									'site_implementation_name',
+									'site_type_name',
+									'site_name',
+									'category_type_id',
+									'category_type_name',
+									'beneficiary_type_id',
+									'beneficiary_type_name',
+									'beneficiary_category_name',
+									'strategic_objective_id',
+									'strategic_objective_name',
+									'strategic_objective_description',
+									'sector_objective_id',
+									'sector_objective_name',
+									'sector_objective_description',
+									'activity_type_id',
+									'activity_type_name',
+									'activity_description_id',
+									'activity_description_name',
+									'activity_detail_id',
+									'activity_detail_name',
+									'remarks',
+									'indicator_id',
+									'indicator_name',
+									'activity_status_id',
+									'activity_status_name',
+									'delivery_type_id',
+									'delivery_type_name',
+									'distribution_status',
+									'distribution_start_date',
+									'distribution_end_date',
+									'partial_kits',
+									'kit_details',
+									'units',
+									'unit_type_id',
+									'unit_type_name',
+									'transfer_type_value',
+									'mpc_delivery_type_id',
+									'mpc_delivery_type_name',
+									'mpc_mechanism_type_id',
+									'mpc_mechanism_type_name',
+									'package_type_id',
+									'households',
+									'families',
+									'boys',
+									'girls',
+									'men',
+									'women',
+									'elderly_men',
+									'elderly_women',
+									'details',
+									'total',
+									'admin1lng',
+									'admin1lat',
+									'admin2lng',
+									'admin2lat',
+									'admin3lng',
+									'admin3lat',
+									'admin4lng',
+									'admin4lat',
+									'admin5lng',
+									'admin5lat',
+									'site_lng',
+									'site_lat',
+									'updatedAt',
+									'createdAt'
+								];
+							};
 
-              if (params.admin0pcode.toUpperCase() === 'AF') {
-                ix = fields.indexOf('beneficiary_type_name') + 1;
-                ix && fields.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
-                ix && fieldNames.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
-              }
+							if (params.admin0pcode.toUpperCase() === 'AF') {
+								ix = fields.indexOf('beneficiary_type_name') + 1;
+								ix && fields.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
+								ix && fieldNames.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
+							}
 
 							var total = 0;
 
@@ -1432,7 +1445,7 @@ var ClusterDashboardController = {
 									d.implementing_partners = im.join(', ');
 								}
 
-                // programme_partners
+								// programme_partners
 								if (Array.isArray(d.programme_partners)) {
 									var pp = [];
 									d.programme_partners.forEach(function (p, i) {
@@ -1440,7 +1453,7 @@ var ClusterDashboardController = {
 									});
 									pp.sort();
 									d.programme_partners = pp.join(', ');
-                }
+								}
 
 								//plan_component
 								if (Array.isArray(d.plan_component)) {
@@ -1486,12 +1499,155 @@ var ClusterDashboardController = {
 									}
 								});
 							});
-						})
+
+						});
+					
 					});
+
 				}
 
 				break;
 
+			// CB ISCG Tempalte
+				// cd /home/ubuntu/nginx/www/ngm-reportEngine
+				// npm install exceljs
+			case 'sector_iscg_excel':
+
+				// template path
+				var xlsx_template_path = XLSX_PATH + params.admin0pcode.toUpperCase() + '/' + XLSX_TEMPLATE + '.xlsx';
+				// xlsx_report
+				var xlsx_report = XLSX_TEMPLATE + params.report  + '.xlsx';
+				// print dir
+				var print_dir = '/home/ubuntu/nginx/www/ngm-reportPrint/pdf/';
+
+				// native function
+				Beneficiaries.native( function ( err, collection ){
+					collection.find( filterObject ).toArray( function ( err, beneficiaries ){
+						// return error
+						if (err) return res.negotiate( err );
+
+						// read from a file
+						var workbook = new ExcelJS.Workbook();
+						workbook.xlsx.readFile( xlsx_template_path )
+						  .then(function() {
+						    
+						    // use workbook
+						    var worksheet = workbook.getWorksheet('4W');
+
+						    // data object
+						    var data = {}
+
+						    // aggregate
+						    beneficiaries.forEach(function( d, i ){
+						    	
+						    	// donors string
+						    	var project_donors_string = '';
+						    	if ( d.project_donor ){
+						    		d.project_donor.forEach(function( pd, j ){
+						    			if ( pd.project_donor_name ) {
+						    				project_donors_string += pd.project_donor_name + ', ';
+						    			}
+						    		});
+						    	}
+						    	project_donors_string = project_donors_string.slice(0, -2);
+
+						    	// implementing partners string
+						    	var implementing_partners_string = '';
+						    	if ( d.implementing_partners ){
+						    		d.implementing_partners.forEach(function( ip, j ){
+						    			if ( ip.organization_name ) {
+						    				implementing_partners_string += ip.organization_name + ', ';
+						    			}
+						    		});
+						    	}
+						    	implementing_partners_string = implementing_partners_string.slice(0, -2);
+
+						    	// details
+						    	var activity_detail = d.activity_detail_name ? d.activity_description_name + ' - ' + d.activity_detail_name : d.activity_description_name;
+
+						    	// id
+						    	var id = d.organization_tag + '_' + implementing_partners_string + '-' + project_donors_string + '-' + d.cluster_id + '-' + d.activity_type_id + '-' + activity_detail + '-' + d.admin3pcode + '-' + d.project_start_date + '-' + d.project_end_date + '-' + d.beneficiary_type_id;
+
+						    	// data 
+						    	if ( !data[ id ]  ) {
+						    		// make baseline
+						    		data[ id ] = [
+						    			1,
+						    			d.organization,
+						    			implementing_partners_string,
+						    			'',
+						    			'',
+						    			project_donors_string,
+						    			d.cluster,
+						    			d.activity_type_name,
+						    			activity_detail,
+						    			'',
+						    			'Chittagong',
+						    			d.admin0name,
+						    			d.admin1name,
+						    			d.admin2name,
+						    			d.admin3name,
+						    			moment( d.reporting_period ).format('MM-DD-YY'),
+						    			moment( d.project_start_date ).format('MM-DD-YY'),
+						    			moment( d.project_end_date ).format('MM-DD-YY'),
+						    			d.beneficiary_type_name,
+						    			0,
+						    			0,
+						    			0,
+						    			0,
+						    			0,
+						    			0,
+						    			0,
+						    			0,
+						    			0,
+						    			'',
+						    			d.name,
+						    			d.phone,
+						    			d.email,
+						    			'Chittagong',
+						    			d.admin0pcode,
+						    			d.admin1pcode,
+						    			d.admin2pcode
+						    		];
+						    	}
+
+						    	// simply add numbers
+						    	data[ id ][ 19 ] += d.households;
+						    	data[ id ][ 20 ] += d.total_beneficiaries;
+						    	data[ id ][ 21 ] += d.boys + d.men + d.elderly_men;
+						    	data[ id ][ 22 ] += d.girls + d.women + d.elderly_women;
+						    	data[ id ][ 23 ] += d.women + d.elderly_women;
+						    	data[ id ][ 24 ] += d.men + d.elderly_men;
+						    	data[ id ][ 25 ] += d.girls;
+						    	data[ id ][ 26 ] += d.boys;
+
+						    });
+
+						    // create rows
+						    var count = 1;
+						    var rows = []
+								for ( var key in data ) {
+									data[ key ][ 0 ] = count;
+								  rows.push( data[ key ] );
+								  count++;
+								}
+
+								// add rows to worksheet
+								worksheet.addRows( rows );
+
+						    // write to a file
+								workbook.xlsx.writeFile( print_dir + xlsx_report )
+							  	.then(function() {
+							    	// return
+							    	return res.json( 200, { report: xlsx_report });
+							  	});
+
+							});
+
+					});
+				});
+
+				break;
 
 			// raw data export
 			case 'stocks':
@@ -2041,7 +2197,7 @@ var ClusterDashboardController = {
 									$match : filterObject
 								},
 								{
-								  $group: {
+									$group: {
 									_id: {
 										project_id:'$project_id',
 										site_lat :'$site_lat',
@@ -2064,16 +2220,16 @@ var ClusterDashboardController = {
 										phone:'$phone',
 										email:'$email'
 									}
-								  }
+									}
 								}
 							]).toArray(async function (err, locations) {
-							  	if (err) return res.serverError(err);
+									if (err) return res.serverError(err);
 
-                // return no locations
+								// return no locations
 								if ( !locations.length ) {
-                  coordinates = await AreaCentroidService.getAreaCentroid(filterObject);
-                  return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat: coordinates.lat, lng: coordinates.lng, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
-                }
+									coordinates = await AreaCentroidService.getAreaCentroid(filterObject);
+									return res.json( 200, { 'data': { 'marker0': { layer: 'projects', lat: coordinates.lat, lng: coordinates.lng, message: '<h5 style="text-align:center; font-size:1.5rem; font-weight:100;">NO PROJECTS</h5>' } } } );
+								}
 								// length
 								length = locations.length;
 								// foreach location
