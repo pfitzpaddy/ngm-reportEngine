@@ -471,6 +471,11 @@ module.exports = {
 			type: 'boolean'
 		},
 
+		// vulnerable populations 
+		vulnerable_populations : {
+			type: 'array'
+		},
+
 		// to replace partial_kits + kit_details (potentially units, unit_type_id, unit_type_name)
 		details: {
 			type: 'array'
