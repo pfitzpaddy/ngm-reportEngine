@@ -636,44 +636,68 @@ var GfaTaskController = {
 					// monthly entitlements
 
 					// round 1
-					if ( report_round === '1' ) {
-						if ( planned.gfd_family_size <= 10  ) {
-							planned.rice = 30 / 1000;
-							planned.lentils = 9 / 1000;
-							planned.oil = ( 3 * 0.92 ) / 1000;
-							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						} else {
-							planned.rice = 60 / 1000;
-							planned.lentils = 18 / 1000;
-							planned.oil = ( 6 * 0.92 ) / 1000;
-							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						}
-					}
+					// if ( report_round === '1' ) {
+					// 	if ( planned.gfd_family_size <= 10  ) {
+					// 		planned.rice = 30 / 1000;
+					// 		planned.lentils = 9 / 1000;
+					// 		planned.oil = ( 3 * 0.92 ) / 1000;
+					// 		planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					// 	} else {
+					// 		planned.rice = 60 / 1000;
+					// 		planned.lentils = 18 / 1000;
+					// 		planned.oil = ( 6 * 0.92 ) / 1000;
+					// 		planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					// 	}
+					// }
 
-					// round 2
-					if ( report_round === '2' ) {
-						if ( planned.gfd_family_size >= 1 && planned.gfd_family_size <= 3 ) {
-							planned.rice = 30 / 1000;
-							planned.lentils = 9 / 1000;
-							planned.oil = ( 3 * 0.92 ) / 1000;
-							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						} else if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
-							planned.rice = 30 / 1000;
-							planned.lentils = 9 / 1000;
-							planned.oil = ( 3 * 0.92 ) / 1000;
-							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						} else if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
-							planned.rice = 60 / 1000;
-							planned.lentils = 18 / 1000;
-							planned.oil = ( 6 * 0.92 ) / 1000;
-							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						} else if ( planned.gfd_family_size >= 11 ) {
-							planned.rice = 60 / 1000;
-							planned.lentils = 18 / 1000;
-							planned.oil = ( 6 * 0.92 ) / 1000;
-							planned.entitlements = planned.rice + planned.lentils + planned.oil;
-						}
-					}
+					// // round 2
+					// if ( report_round === '2' ) {
+					// 	if ( planned.gfd_family_size >= 1 && planned.gfd_family_size <= 3 ) {
+					// 		planned.rice = 30 / 1000;
+					// 		planned.lentils = 9 / 1000;
+					// 		planned.oil = ( 3 * 0.92 ) / 1000;
+					// 		planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					// 	} else if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
+					// 		planned.rice = 30 / 1000;
+					// 		planned.lentils = 9 / 1000;
+					// 		planned.oil = ( 3 * 0.92 ) / 1000;
+					// 		planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					// 	} else if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
+					// 		planned.rice = 60 / 1000;
+					// 		planned.lentils = 18 / 1000;
+					// 		planned.oil = ( 6 * 0.92 ) / 1000;
+					// 		planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					// 	} else if ( planned.gfd_family_size >= 11 ) {
+					// 		planned.rice = 60 / 1000;
+					// 		planned.lentils = 18 / 1000;
+					// 		planned.oil = ( 6 * 0.92 ) / 1000;
+					// 		planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					// 	}
+					// }
+
+					// Coronavirus allocation plan
+					if ( planned.gfd_family_size >= 1 && planned.gfd_family_size <= 3 ) {
+						planned.rice = 30 / 1000;
+						planned.lentils = 9 / 1000;
+						planned.oil = ( 3 * 0.92 ) / 1000;
+						planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					} else if ( planned.gfd_family_size >= 4 && planned.gfd_family_size <= 7 ) {
+						planned.rice = 60 / 1000;
+						planned.lentils = 18 / 1000;
+						planned.oil = ( 6 * 0.92 ) / 1000;
+						planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					} else if ( planned.gfd_family_size >= 8 && planned.gfd_family_size <= 10 ) {
+						planned.rice = 90 / 1000;
+						planned.lentils = 27 / 1000;
+						planned.oil = ( 9 * 0.92 ) / 1000;
+						planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					} else if ( planned.gfd_family_size >= 11 ) {
+						planned.rice = 120 / 1000;
+						planned.lentils = 36 / 1000;
+						planned.oil = ( 12 * 0.92 ) / 1000;
+						planned.entitlements = planned.rice + planned.lentils + planned.oil;
+					}					
+
 
 					// remarks
 					planned.remarks = d[ 31 ];

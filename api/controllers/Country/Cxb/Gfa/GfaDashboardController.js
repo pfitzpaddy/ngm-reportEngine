@@ -1421,54 +1421,78 @@ var GfaDashboardController = {
 			var beneficiary_page_length = 15;
 
 			// round 1
-			if ( params.report_round === '1' ) {
-				if ( family_size === 'family_size_1_3' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 1 to 3';
-					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
-				}
-				if ( family_size === 'family_size_4_7' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 4 to 7';
-					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
-				}
-				if ( family_size === 'family_size_8_10' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 8 to 10';
-					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
-				}
-				if ( family_size === 'family_size_11' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 11+';
-					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
-				}
+			// if ( params.report_round === '1' ) {
+			// 	if ( family_size === 'family_size_1_3' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 1 to 3';
+			// 		gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+			// 	}
+			// 	if ( family_size === 'family_size_4_7' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 4 to 7';
+			// 		gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+			// 	}
+			// 	if ( family_size === 'family_size_8_10' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 8 to 10';
+			// 		gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+			// 	}
+			// 	if ( family_size === 'family_size_11' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 11+';
+			// 		gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
+			// 	}
 			
+			// }
+
+			// // round 2
+			// if ( params.report_round === '2' ) {
+			// 	if ( family_size === 'family_size_1_3' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 1 to 3';
+			// 		gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+			// 	}
+			// 	if ( family_size === 'family_size_4_7' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 4 to 7';
+			// 		gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+			// 	}
+			// 	if ( family_size === 'family_size_8_10' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 8 to 10';
+			// 		gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
+			// 	}
+			// 	if ( family_size === 'family_size_11' ) {
+			// 		// gfd_entitlement
+			// 		sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 11+';
+			// 		gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
+			// 	}
+			
+			// }
+
+
+			// Coronavirus
+			if ( family_size === 'family_size_1_3' ) {
+				// gfd_entitlement
+				sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 1 to 3';
+				gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
+			}
+			if ( family_size === 'family_size_4_7' ) {
+				// gfd_entitlement
+				sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 4 to 7';
+				gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
+			}
+			if ( family_size === 'family_size_8_10' ) {
+				// gfd_entitlement
+				sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 8 to 10';
+				gfd_entitlement = 'Rice: 90kg<br/>Pulse: 27kg<br/>Oil: 9L';
+			}
+			if ( family_size === 'family_size_11' ) {
+				// gfd_entitlement
+				sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 11+';
+				gfd_entitlement = 'Rice: 120kg<br/>Pulse: 36kg<br/>Oil: 12L';
 			}
 
-			// round 2
-			if ( params.report_round === '2' ) {
-				if ( family_size === 'family_size_1_3' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 1 to 3';
-					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
-				}
-				if ( family_size === 'family_size_4_7' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 4 to 7';
-					gfd_entitlement = 'Rice: 30kg<br/>Pulse: 9kg<br/>Oil: 3L';
-				}
-				if ( family_size === 'family_size_8_10' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 8 to 10';
-					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
-				}
-				if ( family_size === 'family_size_11' ) {
-					// gfd_entitlement
-					sub_header = camp_key + ', Sub Block ' + sub_block_key + ': Family Size 11+';
-					gfd_entitlement = 'Rice: 60kg<br/>Pulse: 18kg<br/>Oil: 6L';
-				}
-			
-			}
 
 			// for each record
 			for( i=0; i < distribution_groups[ family_size ].length; i++ ){
