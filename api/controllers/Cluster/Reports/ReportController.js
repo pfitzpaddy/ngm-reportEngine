@@ -44,7 +44,8 @@ var ReportController = {
 
 			var fields = [
 						'project_id',
-						'report_id',
+            'report_id',
+            'target_location_reference_id',
 						'cluster',
 						'organization',
 						'username',
@@ -65,7 +66,8 @@ var ReportController = {
 						'report_month',
 						'report_year',
 						'activity_type_name',
-						'activity_description_name',
+            'activity_description_name',
+            'activity_detail_name',
 						'indicator_name',
 						'category_type_name',
 						'beneficiary_type_name',
@@ -79,7 +81,8 @@ var ReportController = {
 						'units',
 						'unit_type_name',
 						'transfer_type_value',
-						'mpc_delivery_type_id',
+            'mpc_delivery_type_id',
+            'mpc_mechanism_type_name',
 						'households',
 						'families',
 						'boys',
@@ -94,10 +97,11 @@ var ReportController = {
 					],
 					fieldNames = [
 						'Project ID',
-						'Report ID',
+            'Report ID',
+            'Target Location ID',
 						'Cluster',
 						'Organization',
-						'Username',
+						'Focal Point',
 						'Email',
 						'HRP Code',
 						'Project Title',
@@ -108,14 +112,15 @@ var ReportController = {
 						'Admin2 Pcode',
 						'Admin2 Name',
 						'Admin3 Pcode',
-						'Admin3 Name',
+            'Admin3 Name',
 						'Site Implementation',
 						'Site Type',
 						'Location Name',
 						'Report Month',
 						'Report Year',
 						'Activity Type',
-						'Activity Description',
+            'Activity Description',
+            'Activity Details',
 						'Indicator',
 						'Category Type',
 						'Beneficiary Type',
@@ -129,7 +134,8 @@ var ReportController = {
 						'Amount',
 						'Unit Type',
 						'Cash Transfers',
-						'Cash Delivery Type',
+            'Cash Delivery Type',
+            'Cash Mechanism Type',
 						'Households',
 						'Families',
 						'Boys',
@@ -155,12 +161,6 @@ var ReportController = {
 					// format  / sum
 					response.forEach(function( d, i ){
 						response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
-						response[i].total = response[i].boys +
-																response[i].girls +
-																response[i].men +
-																response[i].women +
-																response[i].elderly_men +
-																response[i].elderly_women;
 					});
 
 					// return csv
@@ -498,7 +498,7 @@ var ReportController = {
 		var report = req.param( 'report' );
 		var locations = req.param( 'report' ).locations;
 		var email_alert = req.param( 'email_alert' ) ? true : false;
-		
+
 		// find
 		var findProject = {
 			project_id: report.project_id
@@ -588,7 +588,7 @@ var ReportController = {
 
 					});
 				}, function ( err ) {
-					
+
 					// err
 					if ( err ) return err;
 
@@ -598,16 +598,16 @@ var ReportController = {
 						return res.json( 200, report );
 
 					} else {
-	          
+
 	          // if no config file, return, else send email ( PROD )
 	          if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) { return res.json( 200, report ); }
 
 	          // filter
 	          var admin_names = '';
 	          var admin_emails = '';
-	          var filter = { 
-	          	admin0pcode: report.admin0pcode, 
-	          	cluster_id: report.cluster_id, 
+	          var filter = {
+	          	admin0pcode: report.admin0pcode,
+	          	cluster_id: report.cluster_id,
 	          	roles: { $in: [ 'CLUSTER' ] }
 	          }
 
@@ -627,7 +627,7 @@ var ReportController = {
 								admin_emails = admin_emails.slice( 0, -1 );
 
 								// report_month
-								var report_month = moment( report.reporting_period ).format( 'MMMM' ).toUpperCase();					
+								var report_month = moment( report.reporting_period ).format( 'MMMM' ).toUpperCase();
 
 			          // send email
 			          sails.hooks.email.send( 'notification-report-edit', {
@@ -645,7 +645,7 @@ var ReportController = {
 			              if (err) return res.negotiate( err );
 						        // return report
 										return res.json( 200, report );
-			          	
+
 			          	});
 
 							});
