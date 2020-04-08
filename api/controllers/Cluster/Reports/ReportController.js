@@ -52,7 +52,10 @@ var ReportController = {
 						'email',
 						'project_hrp_code',
 						'project_title',
-						'project_code',
+            'project_code',
+            'donors',
+            'programme_partners',
+            'implementing_partners',
 						'admin0name',
 						'admin1pcode',
 						'admin1name',
@@ -91,7 +94,7 @@ var ReportController = {
 						'women',
 						'elderly_men',
 						'elderly_women',
-						'total',
+						'total_beneficiaries',
 						'createdAt',
 						'updatedAt'
 					],
@@ -105,7 +108,10 @@ var ReportController = {
 						'Email',
 						'HRP Code',
 						'Project Title',
-						'Project Code',
+            'Project Code',
+            'Project Donors',
+            'Programme Partners',
+            'Implementing Partners',
 						'Country',
 						'Admin1 Pcode',
 						'Admin1 Name',
@@ -160,6 +166,37 @@ var ReportController = {
 
 					// format  / sum
 					response.forEach(function( d, i ){
+
+            // project donor
+            if (d.project_donor) {
+              var da = [];
+              d.project_donor.forEach(function (d, i) {
+                if (d) da.push(d.project_donor_name);
+              });
+              da.sort();
+              d.donors = da.join(', ');
+            }
+
+            // programme partners
+            if (Array.isArray(d.programme_partners)) {
+              var pp = [];
+              d.programme_partners.forEach(function (p, i) {
+                if (p) pp.push(p.organization);
+              });
+              pp.sort();
+              d.programme_partners = pp.join(', ');
+            }
+
+            // implementing partners
+            if (Array.isArray(d.implementing_partners)) {
+              var ips = [];
+              d.implementing_partners.forEach(function (ip, i) {
+                if (ip) ips.push(ip.organization);
+              });
+              ips.sort();
+              d.implementing_partners = ips.join(', ');
+            }
+
 						response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
 					});
 
