@@ -84,7 +84,7 @@ var ReportController = {
 						'units',
 						'unit_type_name',
 						'transfer_type_value',
-            'mpc_delivery_type_id',
+            'mpc_delivery_type_name',
             'mpc_mechanism_type_name',
 						'households',
 						'families',
