@@ -13,6 +13,8 @@ var async = require('async');
 var moment = require( 'moment' );
 var _under = require('underscore');
 
+const ExcelJS = require('exceljs');
+
 var ReportController = {
 
 	// TASKS
@@ -298,6 +300,147 @@ var ReportController = {
 		}
 
 	},
+
+  getProjectLists: async function( req, res ) {
+
+    // request inputs
+		if ( !req.param( 'project_id' )  ) {
+			return res.json( 400, { err: 'project_id required!' });
+		}
+
+    const report_id = req.param( 'report_id' );
+    const project_id = req.param( 'project_id' );
+
+    try {
+
+      // query project data
+      let project = await Project.findOne({ id: project_id });
+      if (!project) return res.json( 404, { err: 'Project not found!' });
+
+      let reports = [];
+      let locations = [];
+      let activity_types = [];
+
+      if (report_id) {
+        locations = await Location.find({ report_id: report_id });
+        reports = await Report.find({ id: report_id });
+        if (!reports[0]) return res.json( 404, { err: 'Report not found!' });
+        activity_types = reports[0].activity_type;
+      } else {
+        reports = await Report.find({ project_id: project_id });
+        locations = await TargetLocation.find({ project_id: project_id });
+        activity_types = project.activity_type;
+      }
+
+      // query project activities
+      let queryActivities = a => ({ active: 1, cluster_id: a.cluster_id, activity_type_id: a.activity_type_id, admin0pcode: { contains: project.admin0pcode } });
+      let activities = await Promise.all(activity_types.map(a => Activities.find(queryActivities(a))));
+      activities = _.flatten(activities);
+
+      // FORMAT
+      // format activities
+      activities.forEach(function( d, i ){
+        d.unit_type_id = Utils.arrayToString(d.unit_type_id, "unit_type_name");
+        d.mpc_delivery_type_id = Utils.arrayToString(d.mpc_delivery_type_id, "mpc_delivery_type_name");
+        d.mpc_mechanism_type_id = Utils.arrayToString(d.mpc_mechanism_type_id, ["mpc_delivery_type_id", "mpc_mechanism_type_name"]);
+      });
+
+      // format project
+      project.project_donor = Utils.arrayToString(project.project_donor, "project_donor_name")
+      project.programme_partners = Utils.arrayToString(project.programme_partners, "organization")
+      project.implementing_partners = Utils.arrayToString(project.implementing_partners, "organization")
+
+      // format reports
+      reports.forEach(function( d, i ){
+        d.report_month = moment( d.reporting_period ).format( 'MMMM' );
+      });
+
+      // format locations
+      locations.forEach(function( d, i ){
+        d.implementing_partners = Utils.arrayToString(d.implementing_partners, "organization")
+      });
+
+      // XLSX processing
+      let workbook = new ExcelJS.Workbook();
+
+      let worksheetActivities = workbook.addWorksheet('Activities');
+      let worksheetLocations = workbook.addWorksheet('Locations');
+      let worksheetReport = workbook.addWorksheet('Report');
+      let worksheetProject = workbook.addWorksheet('Project');
+
+      // let worksheetPopulationGroups = workbook.addWorksheet('Population Groups');
+      // let worksheetHRPPopulationGroups = workbook.addWorksheet('HRP Population Groups');
+      // let worksheetOther = workbook.addWorksheet('Other');
+
+      // xlsx headers
+      worksheetActivities.columns = [
+        { header: 'Cluster', key: 'cluster', width: 10 },
+        { header: 'Activity Type', key: 'activity_type_name', width: 30 },
+        { header: 'Activity Description', key: 'activity_description_name', width: 30 },
+        { header: 'Activity Details', key: 'activity_detail_name', width: 30 },
+        { header: 'Indicator', key: 'indicator_name', width: 60 },
+        { header: 'Unit Types', key: 'unit_type_id', width: 50 },
+        { header: 'Cash Delivery Types', key: 'mpc_delivery_type_id', width: 50 },
+        { header: 'Cash Mechanism Types', key: 'mpc_mechanism_type_id', width: 50 },
+      ];
+
+      worksheetLocations.columns = [
+        { header: 'Country', key: 'admin0name', width: 30 },
+        { header: 'Admin1 Pcode', key: 'admin1pcode', width: 30 },
+        { header: 'Admin1 Name', key: 'admin1name', width: 30 },
+        { header: 'Admin2 Pcode', key: 'admin2pcode', width: 30 },
+        { header: 'Admin2 Name', key: 'admin2name', width: 30 },
+        { header: 'Admin3 Pcode', key: 'admin3pcode', width: 30 },
+        { header: 'Admin3 Name', key: 'admin3name', width: 30 },
+        { header: 'Site Implementation', key: 'site_implementation_name', width: 30 },
+        { header: 'Site Type', key: 'site_type_name', width: 30 },
+        { header: 'Location Name', key: 'site_name', width: 30 },
+        { header: 'Implementing Partners', key: 'implementing_partners', width: 30 },
+      ];
+
+      worksheetReport.columns = [
+        { header: 'Country', key: 'admin0name', width: 30 },
+        { header: 'Organization', key: 'organization', width: 30 },
+        { header: 'Report Month', key: 'report_month', width: 30 },
+        { header: 'Report Year', key: 'report_year', width: 30 },
+        { header: 'Reporting Period', key: 'reporting_period', width: 30 },
+        { header: 'Reporting Due Date', key: 'reporting_due_date', width: 30 },
+      ];
+
+      worksheetProject.columns = [
+        { header: 'Country', key: 'admin0name', width: 20 },
+        { header: 'Organization', key: 'organization', width: 20 },
+        { header: 'Focal Point', key: 'username', width: 20 },
+        { header: 'Email', key: 'email', width: 20 },
+        { header: 'HRP Code', key: 'project_hrp_code', width: 30 },
+        { header: 'Project Title', key: 'project_title', width: 100 },
+        { header: 'Project Start Date', key: 'project_start_date', width: 30 },
+        { header: 'Project End Date', key: 'project_end_date', width: 30 },
+        { header: 'Project Donors', key: 'project_donor', width: 30 },
+        { header: 'Programme Partners', key: 'programme_partners', width: 30 },
+        { header: 'Implementing Partners', key: 'implementing_partners', width: 30 },
+      ];
+
+      // add rows
+      worksheetActivities.addRows(activities);
+      worksheetLocations.addRows(locations);
+      worksheetReport.addRows(reports);
+      worksheetProject.addRow(project);
+
+      // send response
+      let filename = "Activity Lists " + project.admin0pcode + " " + project.organization + " " + (project.project_title.length > 50 ? project.project_title.substring(0,49) : project.project_title);
+      filename = filename.replace(/,/g, '');
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=' + filename + '.xlsx');
+
+      return workbook.xlsx.write(res);
+
+    } catch (err) {
+      return res.negotiate( err );
+    }
+
+  },
 
 	// get all reports by project id
 	getReportsList: function( req, res ) {
