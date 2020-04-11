@@ -102,6 +102,11 @@ module.exports.policies = {
     '*': true
   },
 
+  // download project lists xlsx by link
+  'Cluster/Reports/ReportController': {
+    'getProjectLists': true
+  },
+
   //Public function to 4wPlus COL getProjectsColAPC in ProjectController
 
   'Cluster/ProjectController': {

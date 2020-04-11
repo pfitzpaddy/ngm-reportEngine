@@ -172,6 +172,8 @@ module.exports.routes = {
 
   // ACTIVITY REPORTS
   'POST /cluster/report/getReportCsv': 'Cluster/Reports/ReportController.getReportCsv',
+  'GET /cluster/report/getProjectLists': 'Cluster/Reports/ReportController.getProjectLists',
+
   'POST /cluster/report/getReportsList': 'Cluster/Reports/ReportController.getReportsList',
   'POST /cluster/report/getReportDetailsById': 'Cluster/Reports/ReportController.getReportDetailsById',
   'POST /cluster/report/getReport': 'Cluster/Reports/ReportController.getReport',
