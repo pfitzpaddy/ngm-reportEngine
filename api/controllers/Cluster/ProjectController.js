@@ -844,7 +844,9 @@ var ProjectController = {
 
     var project_copy_no_cluster_no_implementing_partners = JSON.parse( JSON.stringify( project_copy_no_cluster ) );
     delete project_copy_no_cluster_no_implementing_partners.implementing_partners;
-
+    if (project_copy_no_cluster_no_implementing_partners.project_status === 'complete') {
+      project_copy_no_cluster_no_implementing_partners.report_status = 'complete'
+    }
     // promise
     Promise.all([
       Project.updateOrCreate( { id: project.id }, project ),
@@ -953,6 +955,7 @@ var ProjectController = {
           Report.findOne( { project_id: project_update.id, report_month: d.report_month, report_year: d.report_year } ).then( function ( report ){
             if( !report ) { report = { id: null } }
             if ( report ) { d.report_status = report.report_status; d.report_active = report.report_active, d.updatedAt = report.updatedAt }
+            if ( d.project_status === 'complete' ) d.report_status = 'complete';
             // Report update or create
             Report.updateOrCreate( findProject, { id: report.id }, d ).exec(function( err, result ){
               reports.push( ProjectController.set_result( result ) );
@@ -1022,6 +1025,7 @@ var ProjectController = {
           async.each( locations, function ( d, next ) {
             Location.findOne( { project_id: project_update.id, target_location_reference_id: d.target_location_reference_id, report_month: d.report_month, report_year: d.report_year } ).then( function ( location ){
               if( !location ) { location = { id: null } }
+              if ( d.project_status === 'complete' ) d.report_status = 'complete';
               // relations set in getProjectReportLocations
               Location.updateOrCreate( findProject, { id: location.id }, d ).exec(function( err, result ){
                 // no need to return locations
