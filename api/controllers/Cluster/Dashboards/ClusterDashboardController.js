@@ -1672,16 +1672,30 @@ var ClusterDashboardController = {
 						stocks.forEach(function( d, i ){
 							stocks[ i ].report_month_number = d.report_month+1;
 							stocks[ i ].report_month = moment( d.reporting_period ).format( 'MMMM' );
-							stocks[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
+              stocks[ i ].reporting_period = moment( d.reporting_period ).format( 'YYYY-MM-DD' );
+
+              d.updatedAt = moment(d.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+              d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
+
+              // array to string
+              d.donors = Utils.arrayToString(d.donors, "donor_name");
+              d.implementing_partners = Utils.arrayToString(d.implementing_partners, "organization")
+              // partial kits
+              d.stock_details = Utils.arrayToString(d.stock_details, ["unit_type_name", "unit_type_quantity"]);
+
 						});
 
 						var fields = [
 								'report_id',
 								'location_id',
 								'cluster',
-								'stock_warehouse_id',
+                'stock_warehouse_id',
+                // 'donor',
+                // 'implementing_partners',
+                // 'stock_type_name',
 								'stock_item_type',
                 'stock_item_name',
+                'stock_details',
                 'stock_item_purpose_name',
                 'stock_status_name',
 								'report_month',
@@ -1711,16 +1725,21 @@ var ClusterDashboardController = {
 								'site_name',
 								'number_in_stock',
 								'number_in_pipeline',
-								'beneficiaries_covered',
+                'beneficiaries_covered',
+                'remarks'
 							],
 
 						fieldNames = [
 								'report_id',
 								'location_id',
 								'cluster',
-								'stock_warehouse_id',
+                'stock_warehouse_id',
+                // 'donor',
+                // 'implementing_partners',
+                // 'stock_type_name',
 								'stock_item_type',
                 'stock_item_name',
+                'stock_details',
                 'stock_item_purpose_name',
                 'stock_status_name',
 								'report_month',
@@ -1750,8 +1769,18 @@ var ClusterDashboardController = {
 								'warehouse_name',
 								'number_in_stock',
 								'number_in_pipeline',
-								'beneficiaries_covered',
-							];
+                'beneficiaries_covered',
+                'remarks'
+              ];
+
+              if ( params.admin0pcode.toUpperCase() === 'ET' ) {
+								ix = fields.indexOf('stock_warehouse_id') + 1;
+								ix && fields.splice(ix, 0, 'donors', 'implementing_partners', 'stock_type_name');
+                ix && fieldNames.splice(ix, 0, 'donors', 'implementing_partners', 'stock_type_name');
+
+                ix = fieldNames.indexOf('beneficiaries_covered');
+                ix && fieldNames.splice(ix, 1, 'households_covered');
+              }
 
 						// return csv
 						json2csv({ data: stocks, fields: fields, fieldNames: fieldNames }, function( err, csv ) {

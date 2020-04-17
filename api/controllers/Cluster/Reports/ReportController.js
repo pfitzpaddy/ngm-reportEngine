@@ -201,7 +201,11 @@ var ReportController = {
               d.implementing_partners = ips.join(', ');
             }
 
-						response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
+            response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
+
+            d.updatedAt = moment(d.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
+
 					});
 
 					// return csv
@@ -236,12 +240,14 @@ var ReportController = {
 						'report_month',
 						'report_year',
 						'cluster',
-						'stock_item_name',
+            'stock_item_name',
+            'stock_details',
 						'stock_status_name',
 						'number_in_stock',
 						'number_in_pipeline',
 						'unit_type_name',
-						'beneficiaries_covered',
+            'beneficiaries_covered',
+            'remarks',
 						'createdAt',
 						'updatedAt'
 					],
@@ -262,12 +268,14 @@ var ReportController = {
 						'Stock Month',
 						'Stock Year',
 						'Cluster',
-						'Stock Type',
+            'Stock Type',
+            'Stock Details',
 						'Status',
 						'No. in Stock',
 						'No. in Pipeline',
 						'Units',
-						'Beneficiary Coverage',
+            'Beneficiary Coverage',
+            'Remarks',
 						'Created',
 						'Last Update'
 					];
@@ -283,8 +291,28 @@ var ReportController = {
 
 					// format month
 					response.forEach(function( d, i ){
-						response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
-					});
+            response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
+
+            d.updatedAt = moment(d.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
+
+            // array to string
+            d.donors = Utils.arrayToString(d.donors, "donor_name");
+            d.implementing_partners = Utils.arrayToString(d.implementing_partners, "organization")
+            // partial kits
+            d.stock_details = Utils.arrayToString(d.stock_details, ["unit_type_name", "unit_type_quantity"]);
+          });
+
+          if ( response[0] && response[0].admin0pcode ) {
+            if(response[0].admin0pcode==='ET'){
+              ix = fields.indexOf('cluster') + 1;
+              ix && fields.splice(ix, 0, 'donors', 'implementing_partners', 'stock_type_name');
+              ix && fieldNames.splice(ix, 0, 'Donors', 'Implementing Partners', 'Stock/Pipeline');
+
+              ix = fieldNames.indexOf('Beneficiary Coverage');
+              ix && fieldNames.splice(ix, 1, 'Number HH');
+            }
+          }
 
 					// return csv
 					json2csv({ data: response, fields: fields, fieldNames: fieldNames }, function( err, csv ) {

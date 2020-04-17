@@ -23,14 +23,14 @@ module.exports =  {
       arr.forEach(function (e) {
         propsStr = "";
         if (Array.isArray(props)) {
-          props.forEach(function (p, i) {
-            if (i) propsStr += ': '
-            propsStr += e[p];
+          e[props[0]] && props.forEach(function (p, i) {
+            if (i) propsStr += (i > 1) ? ' ' : ': ';
+            propsStr += e[p] ? e[p] : "n/a" ;
           })
         } else {
-          propsStr += e[props];
+          propsStr += e[props] ? e[props] : "";
         }
-        if (e) strArr.push(propsStr);
+        if (e && propsStr) strArr.push(propsStr);
       });
       strArr.sort();
       str = strArr.join(', ');
