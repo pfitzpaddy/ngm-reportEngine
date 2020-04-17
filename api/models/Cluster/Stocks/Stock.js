@@ -49,6 +49,12 @@ module.exports = {
 		cluster_id: {
 			type: 'string',
 			required: true
+    },
+    donors: {
+			type: 'array'
+    },
+    implementing_partners: {
+			type: 'array'
 		},
 		cluster: {
 			type: 'string',
@@ -182,13 +188,24 @@ module.exports = {
 			required: true
 		},
 
-		// stocks
+    // stocks
+    stock_type_id: {
+      type: 'string',
+      defaultsTo: 'stock'
+    },
+    stock_type_name: {
+      type: 'string',
+      defaultsTo: 'Stock'
+    },
 		stock_item_type: {
 			type: 'string',
 			required: true
 		},
 		stock_item_name: {
 			type: 'string'
+    },
+    stock_details: {
+			type: 'array'
     },
     stock_item_purpose_id: {
 			type: 'string',
@@ -225,7 +242,15 @@ module.exports = {
 		beneficiaries_covered:{
 			type: 'integer',
 			required: true
-		}
+    },
+    // households_covered:{
+		// 	type: 'integer',
+    // },
+
+    // Remarks
+		remarks: {
+			type: 'string'
+		},
 
   },
 
