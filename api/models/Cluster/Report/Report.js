@@ -208,6 +208,10 @@ module.exports = {
     	type: 'string'
     },
 
+	// project_details
+	project_details: {
+		type: 'array'
+	},
 
 
 		/*********** 2016 *************/
