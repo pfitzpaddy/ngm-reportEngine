@@ -1730,8 +1730,10 @@ var ClusterDashboardController = {
 								'site_lat',
 								'site_name',
 								'number_in_stock',
-								'number_in_pipeline',
+                'number_in_pipeline',
                 'beneficiaries_covered',
+                'stock_targeted_groups_id',
+                'stock_targeted_groups_name',
                 'remarks'
 							],
 
@@ -1774,8 +1776,10 @@ var ClusterDashboardController = {
 								'warehouse_lat',
 								'warehouse_name',
 								'number_in_stock',
-								'number_in_pipeline',
+                'number_in_pipeline',
                 'beneficiaries_covered',
+                'stock_targeted_groups_id',
+                'stock_targeted_groups_name',
                 'remarks'
               ];
 

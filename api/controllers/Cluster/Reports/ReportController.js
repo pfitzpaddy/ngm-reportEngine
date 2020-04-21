@@ -245,8 +245,9 @@ var ReportController = {
 						'stock_status_name',
 						'number_in_stock',
 						'number_in_pipeline',
-						'unit_type_name',
+            'unit_type_name',
             'beneficiaries_covered',
+            'stock_targeted_groups_name',
             'remarks',
 						'createdAt',
 						'updatedAt'
@@ -273,8 +274,9 @@ var ReportController = {
 						'Status',
 						'No. in Stock',
 						'No. in Pipeline',
-						'Units',
+            'Units',
             'Beneficiary Coverage',
+            'Targeted Group',
             'Remarks',
 						'Created',
 						'Last Update'
