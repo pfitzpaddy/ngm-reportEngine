@@ -537,8 +537,8 @@ var ProjectController = {
 
 
         } else {
-          var fields = ['cluster', 'organization', 'admin0name', 'id', 'project_status', 'name', 'email', 'phone', 'project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list', 'implementing_partners_list', 'strategic_objectives_list', 'beneficiary_type_list', 'hrp_beneficiary_type_list', 'activity_type_list', 'target_beneficiaries_list', 'target_locations_list', 'createdAt', 'updatedAt', 'total_target_beneficiaries', 'total_beneficiaries', 'url'];
-          var fieldNames = ['Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors', 'Implementing Partners', 'Strategic Objectives', 'Beneficiary types', 'HRP Beneficiary Type', 'Activity types', 'Target Beneficiaries', 'Target locations', 'Created', 'Last Updated', 'Planned Beneficiaries', 'Services to Beneficiaries', 'URL'];
+          var fields = ['cluster', 'organization', 'admin0name', 'id', 'project_status', 'project_details_list', 'name', 'email', 'phone', 'project_title', 'project_description', 'project_hrp_code', 'project_start_date', 'project_end_date', 'project_budget', 'project_budget_currency', 'project_donor_list', 'implementing_partners_list', 'strategic_objectives_list', 'beneficiary_type_list', 'hrp_beneficiary_type_list', 'activity_type_list', 'target_beneficiaries_list', 'target_locations_list', 'createdAt', 'updatedAt', 'total_target_beneficiaries', 'total_beneficiaries', 'url'];
+          var fieldNames = ['Cluster', 'Organization', 'Country', 'Project ID', 'Project Status', 'Project Details', 'Focal Point', 'Email', 'Phone', 'Project Title', 'Project Description', 'HRP Project Code', 'project_start_date', 'project_end_date', 'Project Budget', 'Project Budget Currency', 'Project Donors', 'Implementing Partners', 'Strategic Objectives', 'Beneficiary types', 'HRP Beneficiary Type', 'Activity types', 'Target Beneficiaries', 'Target locations', 'Created', 'Last Updated', 'Planned Beneficiaries', 'Services to Beneficiaries', 'URL'];
           // add cluster only totals
           if (reqQuery.cluster_id) {
             fields.push('total_cluster_target_beneficiaries', 'total_cluster_beneficiaries');
@@ -675,6 +675,8 @@ var ProjectController = {
 
             }else{
                 setKey( project, 'project_donor', 'project_donor_list', ['project_donor_name'] );
+                setKey( project, 'project_details', 'project_details_list', ['project_detail_name'] );
+
                 setKey( project, 'target_beneficiaries', 'target_beneficiaries_list', ['beneficiary_type_name', 'beneficiary_category_name', 'activity_type_name', 'activity_description_name','indicator_name','strategic_objective_name','strategic_objective_description','sector_objective_name','sector_objective_description','delivery_type_name',
             'key:units', 'key:cash_amount', 'key:households', 'key:sessions', 'key:families', 'key:boys', 'key:girls', 'key:men', 'key:women', 'key:elderly_men', 'key:elderly_women', 'key:unit_type_id' ]  );
                  setKey( project, 'target_locations', 'target_locations_list', ['admin0name', 'admin1name','key:admin1pcode','admin2name','key:admin2pcode','site_implementation_name','site_type_name','site_name','key:admin2lng','key:admin2lat', 'key:conflict','key:name', 'email']  );

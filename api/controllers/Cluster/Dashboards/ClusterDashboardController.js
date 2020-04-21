@@ -1410,7 +1410,11 @@ var ClusterDashboardController = {
 							if (params.admin0pcode.toUpperCase() === 'AF') {
 								ix = fields.indexOf('beneficiary_type_name') + 1;
 								ix && fields.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
-								ix && fieldNames.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
+                ix && fieldNames.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
+
+                ix = fields.indexOf('project_status') + 1;
+								ix && fields.splice(ix, 0, 'project_details');
+                ix && fieldNames.splice(ix, 0, 'project_details');
 							}
 
 							var total = 0;
@@ -1454,6 +1458,8 @@ var ClusterDashboardController = {
 									pp.sort();
 									d.programme_partners = pp.join(', ');
 								}
+
+                d.project_details = Utils.arrayToString(d.project_details, "project_detail_name");
 
 								//plan_component
 								if (Array.isArray(d.plan_component)) {
