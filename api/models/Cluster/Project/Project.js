@@ -238,6 +238,10 @@ module.exports = {
 			type: 'array'
 		},
 
+		// project_details
+		project_details:{
+			type: 'array'
+		},
 
 
 

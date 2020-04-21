@@ -744,8 +744,12 @@ module.exports = {
 		// technical order in location form
 		_order: {
 			type: 'integer'
-		}
+		},
 
+		// project_details
+		project_details: {
+			type: 'array'
+		},
 	},
 
   // updateOrCreate
