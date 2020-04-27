@@ -466,8 +466,16 @@ module.exports = {
 		education_female:{
 			type: 'integer',
 			defaultsTo: 0
-		}
+		},
 
+    // project_details
+		project_details: {
+			type: 'array'
+    },
+
+    specifics: {
+      type: 'array'
+    }
 	},
 
   // updateOrCreate

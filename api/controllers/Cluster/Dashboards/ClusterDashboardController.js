@@ -1413,8 +1413,8 @@ var ClusterDashboardController = {
                 ix && fieldNames.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
 
                 ix = fields.indexOf('project_status') + 1;
-								ix && fields.splice(ix, 0, 'project_details');
-                ix && fieldNames.splice(ix, 0, 'project_details');
+								ix && fields.splice(ix, 0, 'project_details', 'specifics');
+                ix && fieldNames.splice(ix, 0, 'project_details', 'specifics');
 							}
 
 							var total = 0;
@@ -1460,6 +1460,7 @@ var ClusterDashboardController = {
 								}
 
                 d.project_details = Utils.arrayToString(d.project_details, "project_detail_name");
+                d.specifics = Utils.arrayToString(d.specifics, "specific_name");
 
 								//plan_component
 								if (Array.isArray(d.plan_component)) {

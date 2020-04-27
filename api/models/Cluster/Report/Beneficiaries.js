@@ -749,7 +749,11 @@ module.exports = {
 		// project_details
 		project_details: {
 			type: 'array'
-		},
+    },
+
+    specifics: {
+      type: 'array'
+    }
 	},
 
   // updateOrCreate
