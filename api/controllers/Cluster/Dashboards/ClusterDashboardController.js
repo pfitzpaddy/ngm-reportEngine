@@ -1239,7 +1239,8 @@ var ClusterDashboardController = {
 									'strategic_objective_description',
 									'sector_objective_id',
 									'sector_objective_name',
-									'sector_objective_description',
+                  'sector_objective_description',
+                  'response',
 									'activity_type_id',
 									'activity_type_name',
 									'activity_description_id',
@@ -1352,7 +1353,8 @@ var ClusterDashboardController = {
 									'strategic_objective_description',
 									'sector_objective_id',
 									'sector_objective_name',
-									'sector_objective_description',
+                  'sector_objective_description',
+                  'response',
 									'activity_type_id',
 									'activity_type_name',
 									'activity_description_id',
@@ -1414,7 +1416,6 @@ var ClusterDashboardController = {
 
                 ix = fields.indexOf('project_status') + 1;
 								ix && fields.splice(ix, 0, 'project_details', 'specifics');
-                ix && fieldNames.splice(ix, 0, 'project_details', 'specifics');
 							}
 
 							var total = 0;
@@ -1460,7 +1461,7 @@ var ClusterDashboardController = {
 								}
 
                 d.project_details = Utils.arrayToString(d.project_details, "project_detail_name");
-                d.specifics = Utils.arrayToString(d.specifics, "specific_name");
+                d.response = Utils.arrayToString(d.specifics, "response_name");
 
 								//plan_component
 								if (Array.isArray(d.plan_component)) {

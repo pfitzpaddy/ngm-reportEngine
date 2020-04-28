@@ -473,7 +473,7 @@ module.exports = {
 			type: 'array'
     },
 
-    specifics: {
+    response: {
       type: 'array'
     }
 	},
