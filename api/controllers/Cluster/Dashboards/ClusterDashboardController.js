@@ -1415,7 +1415,8 @@ var ClusterDashboardController = {
                 ix && fieldNames.splice(ix, 0, 'hrp_beneficiary_type_id', 'hrp_beneficiary_type_name');
 
                 ix = fields.indexOf('project_status') + 1;
-								ix && fields.splice(ix, 0, 'project_details', 'specifics');
+                ix && fields.splice(ix, 0, 'project_details');
+                ix && fieldNames.splice(ix, 0, 'project_details');
 							}
 
 							var total = 0;
@@ -1509,7 +1510,7 @@ var ClusterDashboardController = {
 							});
 
 						});
-					
+
 					});
 
 				}
@@ -1538,7 +1539,7 @@ var ClusterDashboardController = {
 						var workbook = new ExcelJS.Workbook();
 						workbook.xlsx.readFile( xlsx_template_path )
 						  .then(function() {
-						    
+
 						    // use workbook
 						    var worksheet = workbook.getWorksheet('4W');
 
@@ -1547,7 +1548,7 @@ var ClusterDashboardController = {
 
 						    // aggregate
 						    beneficiaries.forEach(function( d, i ){
-						    	
+
 						    	// donors string
 						    	var project_donors_string = '';
 						    	if ( d.project_donor ){
@@ -1576,7 +1577,7 @@ var ClusterDashboardController = {
 						    	// id
 						    	var id = d.organization_tag + '_' + implementing_partners_string + '-' + project_donors_string + '-' + d.cluster_id + '-' + d.activity_type_id + '-' + activity_detail + '-' + d.admin3pcode + '-' + d.project_start_date + '-' + d.project_end_date + '-' + d.beneficiary_type_id;
 
-						    	// data 
+						    	// data
 						    	if ( !data[ id ]  ) {
 						    		// make baseline
 						    		data[ id ] = [
