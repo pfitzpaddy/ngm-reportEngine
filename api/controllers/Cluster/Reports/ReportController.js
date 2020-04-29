@@ -314,6 +314,12 @@ var ReportController = {
               ix = fieldNames.indexOf('Beneficiary Coverage');
               ix && fieldNames.splice(ix, 1, 'Number HH');
             }
+
+            if (response[0].admin0pcode === 'AF') {
+              ix = fields.indexOf('stock_status_name');
+              ix && fields.splice(ix, 0, 'stock_item_purpose_name');
+              ix && fieldNames.splice(ix, 0, 'Purpose');
+            }
           }
 
 					// return csv
