@@ -1163,8 +1163,8 @@ var ProjectController = {
     var project_id = req.param( 'project_id' );
 
     // fields
-    var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'activity_type_name','activity_description_name', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'funding_2017', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
-        fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Activity Type','Activity Description', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', '2017 Funding', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
+    var fields = [ 'cluster', 'organization', 'admin0name', 'project_title', 'project_description', 'project_hrp_code', 'project_budget', 'project_budget_currency', 'project_donor_name', 'grant_id', 'activity_type_name','activity_description_name', 'currency_id', 'project_budget_amount_recieved', 'contribution_status', 'project_budget_date_recieved', 'budget_funds_name', 'financial_programming_name', 'multi_year_funding_name', 'multi_year_array', 'reported_on_fts_name', 'fts_record_id', 'email', 'createdAt', 'comments' ]
+        fieldNames = [ 'Cluster', 'Organization', 'Country', 'Project Title', 'Project Description', 'HRP Project Code', 'Project Budget', 'Project Budget Currency', 'Project Donor', 'Donor Grant ID', 'Activity Type','Activity Description', 'Currency Recieved', 'Ammount Received', 'Contribution Status', 'Date of Payment', 'Incoming Funds', 'Financial Programming', 'Multi-Year Funding', 'Funding Per Year', 'Reported on FTS', 'FTS ID', 'Email', 'createdAt', 'Comments' ];
 
     // get data by project
 
@@ -1175,6 +1175,13 @@ var ProjectController = {
 
         // return error
         if (err) return res.negotiate( err );
+
+        // format multi year
+        budget.forEach(function (d, i) {
+          if (d.multi_year_array && d.multi_year_array.length) {
+            budget[i].multi_year_array = d.multi_year_array.map(e => typeof e.budget === 'undefined' || typeof e.year === 'undefined' ? "" : e.budget + " " + e.year).join("; ")
+          }
+        });
 
         // return csv
         json2csv({ data: budget, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
