@@ -623,7 +623,8 @@ var ClusterDashboardController = {
 							'project_budget',
 							'project_budget_currency',
 							'project_donor_name',
-							'grant_id',
+              'grant_id',
+              'activity_description_name',
 							'currency_id',
 							'project_budget_amount_recieved',
 							'contribution_status',
@@ -648,7 +649,8 @@ var ClusterDashboardController = {
 							'Project Budget',
 							'Project Budget Currency',
 							'Project Donor',
-							'Donor Grant ID',
+              'Donor Grant ID',
+              'Activity Description',
 							'Currency Recieved',
 							'Ammount Received',
 							'Contribution Status',
@@ -764,7 +766,7 @@ var ClusterDashboardController = {
 						// format multi year
 						budget.forEach(function (d, i) {
 							if (d.multi_year_array && d.multi_year_array.length) {
-								budget[i].multi_year_array = d.multi_year_array.map(e => e.budget + " " + e.year).join("; ")
+								budget[i].multi_year_array = d.multi_year_array.map(e => typeof e.budget === 'undefined' || typeof e.year === 'undefined' ? "" : e.budget + " " + e.year).join("; ")
 							}
 						});
 
