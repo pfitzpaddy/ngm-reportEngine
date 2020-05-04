@@ -172,6 +172,8 @@ module.exports.routes = {
 
   // ACTIVITY REPORTS
   'POST /cluster/report/getReportCsv': 'Cluster/Reports/ReportController.getReportCsv',
+  'POST /cluster/project/getProjectCsv': 'Cluster/ReportController.getProjectCsv',
+
   'GET /cluster/report/getProjectLists': 'Cluster/Reports/ReportController.getProjectLists',
 
   'POST /cluster/report/getReportsList': 'Cluster/Reports/ReportController.getReportsList',
@@ -309,7 +311,7 @@ module.exports.routes = {
   // uploadPlannedBeneficiaries
   'GET /wfp/gfa/gfd/processPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processPlannedBeneficiaries',
   'POST /wfp/gfa/gfd/processPlannedBeneficiaries': 'Country/Cxb/Gfa/GfaTaskController.processPlannedBeneficiaries',
-  
+
   // setKoboXlsxForm
   'GET /wfp/gfa/gfd/setKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.setKoboXlsxForm',
   'POST /wfp/gfa/gfd/setKoboXlsxForm': 'Country/Cxb/Gfa/GfaTaskController.setKoboXlsxForm',
