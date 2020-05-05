@@ -1555,6 +1555,53 @@ var ProjectController = {
 
   },
 
+  // request as csv
+	getProjectCsv: function( req, res ) {
+
+    // request input
+    if ( !req.param( 'project_id' ) ) {
+      return res.json( 401, { err: 'project_id required!' });
+    }
+
+    let { fields, fieldNames } = FieldsService.getReportCsvFields();
+
+    // beneficiaries
+    Beneficiaries
+      .find( )
+      .where( { project_id: req.param( 'project_id' ) } )
+      .exec(function( err, response ){
+
+        // error
+        if ( err ) return res.negotiate( err );
+
+        // format  / sum
+        response.forEach(function( d, i ){
+
+          d.implementing_partners = Utils.arrayToString(d.implementing_partners, "organization");
+          d.programme_partners = Utils.arrayToString(d.programme_partners, "organization");
+          d.donors = Utils.arrayToString(d.project_donor, "organization");
+
+          response[i].report_month = moment( response[i].reporting_period ).format( 'MMMM' );
+
+          d.updatedAt = moment(d.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+          d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
+
+        });
+
+        // return csv
+        json2csv({ data: response, fields: fields, fieldNames: fieldNames }, function( err, csv ) {
+
+          // error
+          if ( err ) return res.negotiate( err );
+
+          // success
+          return res.json( 200, { data: csv } );
+
+        });
+
+      });
+
+	},
 };
 
 module.exports = ProjectController;
