@@ -4,18 +4,20 @@
  * @description :: Server-side logic for managing auths
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-  var util = require('util');
+var util = require('util');
+var _ = require('lodash');
 
-  // parse results from sails
-  var set_result =  function( result ) {
-    if( util.isArray( result ) ) {
-      // update ( array )
-      return result[0];
-    } else {
-      // create ( object )
-      return result;
-    }
-  };
+// parse results from sails
+var set_result = function (result) {
+  if (util.isArray(result)) {
+    // update ( array )
+    return result[0];
+  } else {
+    // create ( object )
+    return result;
+  }
+};
+
 module.exports = {
 
   // get organization by id
@@ -28,7 +30,7 @@ module.exports = {
 
     // id params
     var organization_id = req.param( 'organization_id' );
-
+    var warehouses = req.param( 'warehouses' );
     // find
     Organization
       .findOne()
@@ -36,12 +38,18 @@ module.exports = {
       .exec( function( err, organization ){
         // return error
         if ( err ) return res.negotiate( err );
-        StockWarehouse.find({organization_id: organization_id}).exec(function(err, warehouses){
-          if ( err ) return res.negotiate( err );
-          organization.warehouses = warehouses;
-          // return updated user
+
+        if (warehouses) {
+          StockWarehouse.find({organization_id: organization_id}).exec(function(err, warehouses){
+            if ( err ) return res.negotiate( err );
+            organization.warehouses = warehouses;
+            // return updated user
+            return res.json( 200, organization );
+          })
+        } else {
           return res.json( 200, organization );
-        })
+        }
+
       })
 
   },
@@ -517,7 +525,7 @@ module.exports = {
   setOrganization: async function( req, res ){
 
     try {
-    // check params
+      // check params
       if ( !req.param( 'organization' ) ) {
         return res.json(401, { msg: 'organization required' });
       }
@@ -530,18 +538,41 @@ module.exports = {
       // update
       let organization_update = await Organization.update( { id: organization.id }, organization_copy );
 
-      organization_update[0].warehouses = [];
+      if ( warehouses ) {
+        organization_update[0].warehouses = [];
 
-      // update/create warehouses
-      const db_promises = warehouses.map(async function(w, i){
-        if(!w.id) { w.organization_id = organization_update[0].id; }
-        // uncomment update in updateOrCreate
-        // if warehouses are updated (e.g. warehouse_start_date/warehouse_end_date date for warehouses)
-        result = await StockWarehouse.updateOrCreate({}, { id: w.id }, w);
-        organization_update[0].warehouses[i] = set_result( result ) ;
-      });
+        // get warehouses to check if updated
+        let warehouses_db = await StockWarehouse.find({organization_id: organization.id});
 
-      await Promise.all(db_promises);
+        // update/create warehouses
+        const db_promises = Array.isArray(warehouses) && warehouses.map(async function (w, i) {
+
+          // check if document changed and no updated flag is set
+          if (w.id && !w.hasOwnProperty('updated')) {
+
+            let w_db = _.find(warehouses_db, w_db => w_db.id === w.id);
+
+            w_db = { ...w_db };
+            delete w_db.updatedAt;
+            delete w_db.createdAt;
+
+            let w_i = { ...w };
+            delete w_i.updatedAt;
+            delete w_i.createdAt;
+
+            let updated = !_.isEqual(w_i, w_db);
+
+            // set updated flag for updateOrCreate
+            if (updated) w.updated = true;
+
+          }
+          // uncomment in afterUpdate if warehouses are updated (e.g. warehouse_start_date/warehouse_end_date date for warehouses)
+          result = await StockWarehouse.updateOrCreate({ organization_id: organization_update[0].id }, { id: w.id }, w);
+          organization_update[0].warehouses[i] = set_result(result);
+        }) || [];
+
+        await Promise.all(db_promises);
+      }
       return res.json(200, organization_update)
     } catch (err) {
       return res.negotiate( err );
