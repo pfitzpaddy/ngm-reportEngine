@@ -67,6 +67,7 @@ module.exports.routes = {
   'GET /metrics/getUsers': 'ReportHub/MetricsController.getUsers',
   'GET /metrics/getLocations': 'ReportHub/MetricsController.getLocations',
   'GET /metrics/getReports': 'ReportHub/MetricsController.getReports',
+  'GET /metrics/getPerformanceStatistics': 'ReportHub/MetricsController.getPerformanceStatistics',
 
   // User login stats
   'GET /getUserLoginHistoryIndicator': 'ReportHub/OrganizationController.getUserLoginHistoryIndicator',
