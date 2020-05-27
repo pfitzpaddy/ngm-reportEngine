@@ -4,6 +4,7 @@
  * @description :: Server-side logic for managing auths
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+var json2csv = require( 'json2csv' );
 
 module.exports = {
 
@@ -14,7 +15,7 @@ module.exports = {
     Organizations
       .find()
       .exec( function( err, organizations ){
-        
+
         // return error
         if ( err ) return res.negotiate( err );
 
@@ -23,6 +24,61 @@ module.exports = {
 
       })
 
+  },
+
+  getOrganizationsCSV: function (req, res) {
+
+    let filter = {};
+    if (req.param('admin0pcode')) {
+      filter = { or: [{ admin0pcode: { contains: req.param('admin0pcode').toUpperCase() } }, { admin0pcode: { contains: 'ALL' } }] };
+    }
+
+    // get organizations list
+    Organizations
+      .find(filter)
+      .exec(function (err, organizations) {
+
+        // return error
+        if (err) return res.negotiate(err);
+
+        let fields     = ['admin0pcode', 'organization_name', 'organization_tag', 'organization', 'organization_type'];
+        let fieldNames = ['admin0pcode', 'organization_name', 'organization_tag', 'organization', 'organization_type'];
+
+        json2csv({ data: organizations, fields: fields, fieldNames: fieldNames }, function (err, csv) {
+
+          // error
+          if (err) return res.negotiate(err);
+
+          // success
+          res.set('Content-Type', 'text/csv');
+          return res.send(200, csv);
+        });
+
+      });
+
+  },
+
+  setOrganization: async function (req, res) {
+    try {
+      if (!req.param('organization')) {
+        return res.json(400, { err: 'organization required!' });
+      }
+      // check tag not exists
+      if (!req.param('organization').id) {
+        let tagDuplicate = await Organizations.findOne({ organization_tag: req.param('organization').organization_tag });
+        if (tagDuplicate) {
+          return res.json(400, { err: 'Organization Tag already exists!' });
+        }
+      }
+      // update or create
+      let organization = await Organizations.updateOrCreate({ id: req.param('organization').id }, req.param('organization'));
+
+      // return organization
+      return res.json(200, Utils.set_result(organization));
+
+    } catch (err) {
+      return res.negotiate(err);
+    }
   },
 
   // get admin1 list by admin0
@@ -47,7 +103,7 @@ module.exports = {
         if (err) return res.negotiate( err );
 
         // return new Project
-        return res.json( 200, admin1 );        
+        return res.json( 200, admin1 );
 
       });
 
@@ -280,7 +336,7 @@ module.exports = {
     // if !== CB and missing admin1
     if ( req.param( 'admin0pcode') !== 'CB' && !req.param( 'admin1pcode' ) ) {
         // return new Project
-        return res.json( 200, [] ); 
+        return res.json( 200, [] );
     }
 
     // get list
@@ -313,7 +369,7 @@ module.exports = {
       .find()
       .sort('prov_name ASC')
       .exec(function(err, provinces){
-      
+
         // return error
         if (err) return res.negotiate( err );
 
@@ -342,7 +398,7 @@ module.exports = {
       .find()
       .sort('prov_name ASC')
       .exec(function(err, provinces){
-      
+
         // return error
         if (err) return res.negotiate( err );
 
@@ -361,7 +417,7 @@ module.exports = {
       .find()
       .sort('dist_name ASC')
       .exec(function(err, districts){
-      
+
         // return error
         if (err) return res.negotiate( err );
 
@@ -370,6 +426,6 @@ module.exports = {
 
       });
 
-  }  
+  }
 
 };

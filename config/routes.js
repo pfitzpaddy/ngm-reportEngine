@@ -124,6 +124,8 @@ module.exports.routes = {
   // -------- CLUSTER --------
   // Location lists
   'GET /list/organizations': 'ReportHub/ListController.getOrganizations',
+  'GET /list/organizationsCSV': 'ReportHub/ListController.getOrganizationsCSV',
+
   'GET /list/getAdmin1List': 'ReportHub/ListController.getAdmin1List',
   'GET /list/getAdmin2List': 'ReportHub/ListController.getAdmin2List',
   'GET /list/getAdmin3List': 'ReportHub/ListController.getAdmin3List',
@@ -132,7 +134,7 @@ module.exports.routes = {
   'GET /list/getDutyStations': 'ReportHub/ListController.getDutyStations',
   'GET /list/getAdminSites': 'ReportHub/ListController.getAdminSites',
 
-
+  'POST /list/setOrganization': 'ReportHub/ListController.setOrganization',
 
   // Cluster Lists
   'GET /cluster/list/activities': 'Cluster/Lists/ListController.getActivities',
