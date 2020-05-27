@@ -49,7 +49,8 @@ module.exports.policies = {
 
   // public
   'ReportHub/ListController': {
-    '*': true
+    '*': true,
+    'deleteOrganization': ['isAuthorized']
   },
 
   // public
