@@ -81,6 +81,26 @@ module.exports = {
     }
   },
 
+  deleteOrganization: async function (req, res) {
+    try {
+      if (!req.param('id')) {
+        return res.json(400, { err: 'organization id required!' });
+      }
+
+      // delete
+      var deleted = await Organizations.destroy({ id: req.param('id') });
+      // return organization
+      if (deleted.length){
+        return res.json(200, { msg: 'success' });
+      } else {
+        return res.json(400, { err: 'organization not exists!' });
+      }
+
+    } catch (err) {
+      return res.negotiate(err);
+    }
+  },
+
   // get admin1 list by admin0
   getAdmin1List: function( req, res ) {
 

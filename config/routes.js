@@ -135,6 +135,7 @@ module.exports.routes = {
   'GET /list/getAdminSites': 'ReportHub/ListController.getAdminSites',
 
   'POST /list/setOrganization': 'ReportHub/ListController.setOrganization',
+  'POST /list/deleteOrganization': 'ReportHub/ListController.deleteOrganization',
 
   // Cluster Lists
   'GET /cluster/list/activities': 'Cluster/Lists/ListController.getActivities',
