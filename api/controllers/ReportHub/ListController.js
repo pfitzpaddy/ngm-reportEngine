@@ -101,6 +101,38 @@ module.exports = {
     }
   },
 
+  // reset organization collection TODO filter by country
+  resetOrganizations: async function (req, res) {
+    try {
+      if (!Array.isArray(req.body) || !req.body.length || typeof req.body[0] !== 'object') {
+        return res.json(400, { err: 'organizations array required!' });
+      }
+
+      let headers = ['admin0pcode', 'organization_name', 'organization_tag', 'organization', 'organization_type'];
+      // let valid = true;
+      for (var i = 0; i < req.body.length; i++) {
+        for (header of headers) {
+          if (!req.body[i][header]) {
+            return res.json(400, { err: 'incorrect values!' });
+            // valid = false;
+          }
+        }
+      }
+
+      // if (!valid) return res.json(400, { err: 'incorrect values!' });
+
+      // delete
+      await Organizations.destroy({});
+      // create
+      let organizatoins = await Organizations.create(req.body);
+
+      return res.json(200, organizatoins);
+
+    } catch (err) {
+      return res.negotiate(err);
+    }
+  },
+
   // get admin1 list by admin0
   getAdmin1List: function( req, res ) {
 

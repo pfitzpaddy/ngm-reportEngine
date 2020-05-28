@@ -136,6 +136,7 @@ module.exports.routes = {
 
   'POST /list/setOrganization': 'ReportHub/ListController.setOrganization',
   'POST /list/deleteOrganization': 'ReportHub/ListController.deleteOrganization',
+  'POST /list/resetOrganizations': 'ReportHub/ListController.resetOrganizations',
 
   // Cluster Lists
   'GET /cluster/list/activities': 'Cluster/Lists/ListController.getActivities',
