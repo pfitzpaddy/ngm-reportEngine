@@ -34,6 +34,10 @@ module.exports = {
       type: 'string',
       required: true
     },
+    admin0pcode_inactive: {
+      type: 'string',
+      // defaultsTo: ''
+    },
 
   },
 
