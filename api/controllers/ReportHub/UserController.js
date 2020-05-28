@@ -172,6 +172,62 @@ var UserController = {
 
   },
 
+  // Check provided email address and password
+  getAccessToken: function (req, res) {
+
+    // check params
+    if (!req.param( 'user' )) {
+      return res.json(401, { msg: 'user required' });
+    }
+
+    // try to look up user using the provided username/email address
+    User.findOne({
+      username: req.param( 'user' ).username
+
+    }, function foundUser( err, user ) {
+
+      // generic error
+      if ( err ) return res.negotiate( err );
+
+      // user not found
+      if ( !user ) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
+
+      // user not active
+      if ( user.status !== 'active' ) return res.json({ err: true, msg: 'User No Longer Active! Contact Admin' });
+
+      // compare params passpwrd to the encrypted db password
+      require( 'machinepack-passwords' ).checkPassword({
+        passwordAttempt: req.param( 'user' ).password,
+        encryptedPassword: user.password
+      }).exec({
+
+        // error
+        error: function ( err ){
+          return res.negotiate( err );
+        },
+
+        // password incorrect
+        incorrect: function (){
+          return res.json({ err: true, msg: 'Invalid Password! Forgot Password?' });
+        },
+
+        // on success
+        success: function (){
+
+          // add token
+          user.token = jwtToken.issueTokenTime({ sid: user.id, roles: user.roles }, 1);
+
+          // save user data on session
+          req.session.session_user = user;
+
+          res.json( 200, user.token );
+
+        }
+      });
+    });
+
+  },
+
   // get by username for profile
   getUserByUsername: function(req, res){
 

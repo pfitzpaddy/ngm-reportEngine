@@ -36,6 +36,8 @@ module.exports.routes = {
   // User authentication / password reset
   'GET /login': 'ReportHub/UserController.login',
   'POST /login': 'ReportHub/UserController.login',
+  'GET /getAccessToken': 'ReportHub/UserController.getAccessToken',
+  'POST /getAccessToken': 'ReportHub/UserController.getAccessToken',
   'POST /create': 'ReportHub/UserController.create',
   'POST /delete': 'ReportHub/UserController.delete',
   'POST /update': 'ReportHub/UserController.updateLogin',
