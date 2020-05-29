@@ -41,8 +41,8 @@ module.exports = {
         // return error
         if (err) return res.negotiate(err);
 
-        let fields     = ['admin0pcode', 'organization_name', 'organization_tag', 'organization', 'organization_type'];
-        let fieldNames = ['admin0pcode', 'organization_name', 'organization_tag', 'organization', 'organization_type'];
+        let fields     = ['admin0pcode', 'organization_name', 'organization_tag', 'organization', 'organization_type', 'admin0pcode_inactive'];
+        let fieldNames = ['admin0pcode', 'organization_name', 'organization_tag', 'organization', 'organization_type', 'admin0pcode_inactive'];
 
         json2csv({ data: organizations, fields: fields, fieldNames: fieldNames }, function (err, csv) {
 
@@ -51,7 +51,7 @@ module.exports = {
 
           // success
           res.set('Content-Type', 'text/csv');
-          return res.send(200, csv);
+          return res.send(200, { data: csv });
         });
 
       });
