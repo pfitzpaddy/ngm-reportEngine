@@ -60,18 +60,31 @@ module.exports = {
 
   setOrganization: async function (req, res) {
     try {
-      if (!req.param('organization')) {
+      if (!req.param('organization') || !req.param('organization').organization_tag) {
         return res.json(400, { err: 'organization required!' });
       }
+      let organization = req.param('organization');
       // check tag not exists
-      if (!req.param('organization').id) {
-        let tagDuplicate = await Organizations.findOne({ organization_tag: req.param('organization').organization_tag });
-        if (tagDuplicate) {
-          return res.json(400, { err: 'Organization Tag already exists!' });
+      if (!organization.id) {
+        // if tag is in the form of "unhcr::fr"
+        let [organization_tag, language, ...rest] = organization.organization_tag.split('::');
+        organization.organization_tag = organization_tag;
+        // check if language allowed
+        if (language && ['en', 'es', 'fr'].indexOf(language) < 0) {
+          return res.json(400, { err: 'Language not allowed!' });
         }
+        if (language) {
+          // skip
+        } else {
+          let tagDuplicate = await Organizations.findOne({ organization_tag: organization_tag });
+          if (tagDuplicate) {
+            return res.json(400, { err: 'Organization Tag already exists!' });
+          }
+        }
+
       }
       // update or create
-      let organization = await Organizations.updateOrCreate({ id: req.param('organization').id }, req.param('organization'));
+      organization = await Organizations.updateOrCreate({ id: organization.id }, organization);
 
       // return organization
       return res.json(200, Utils.set_result(organization));
