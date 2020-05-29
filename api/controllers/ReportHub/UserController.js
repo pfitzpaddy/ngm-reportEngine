@@ -38,7 +38,7 @@ var UserController = {
           if (err) return res.negotiate( err );
 
           // set token
-          user.token = jwtToken.issueToken({ sid: user.id });
+          user.token = jwtToken.issueToken({ sid: user.id, roles: user.roles });
 
           // save
           user.save( function(err){
@@ -79,7 +79,7 @@ var UserController = {
     User
       .destroy( { id: req.param( 'user' ).id } )
       .exec( function( err ){
-        
+
         // generic error
         if ( err ) return res.negotiate( err );
 
@@ -140,8 +140,8 @@ var UserController = {
           user.visits = user.visits + 1;
 
           // add token
-          user.token = jwtToken.issueToken({ sid: user.id });
-          
+          user.token = jwtToken.issueToken({ sid: user.id, roles: user.roles });
+
           // save user data on session
           req.session.session_user = user;
 
@@ -172,6 +172,62 @@ var UserController = {
 
   },
 
+  // Check provided email address and password
+  getAccessToken: function (req, res) {
+
+    // check params
+    if (!req.param( 'user' )) {
+      return res.json(401, { msg: 'user required' });
+    }
+
+    // try to look up user using the provided username/email address
+    User.findOne({
+      username: req.param( 'user' ).username
+
+    }, function foundUser( err, user ) {
+
+      // generic error
+      if ( err ) return res.negotiate( err );
+
+      // user not found
+      if ( !user ) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
+
+      // user not active
+      if ( user.status !== 'active' ) return res.json({ err: true, msg: 'User No Longer Active! Contact Admin' });
+
+      // compare params passpwrd to the encrypted db password
+      require( 'machinepack-passwords' ).checkPassword({
+        passwordAttempt: req.param( 'user' ).password,
+        encryptedPassword: user.password
+      }).exec({
+
+        // error
+        error: function ( err ){
+          return res.negotiate( err );
+        },
+
+        // password incorrect
+        incorrect: function (){
+          return res.json({ err: true, msg: 'Invalid Password! Forgot Password?' });
+        },
+
+        // on success
+        success: function (){
+
+          // add token
+          user.token = jwtToken.issueTokenTime({ sid: user.id, roles: user.roles }, 1);
+
+          // save user data on session
+          req.session.session_user = user;
+
+          res.json( 200, user.token );
+
+        }
+      });
+    });
+
+  },
+
   // get by username for profile
   getUserByUsername: function(req, res){
 
@@ -195,7 +251,7 @@ var UserController = {
         // return updated user
         return res.json( 200, user );
 
-      }); 
+      });
 
   },
 
@@ -318,7 +374,7 @@ var UserController = {
                   // the following is for tracking of iMMAP staff (for now)
 
                   // update user programme and track
-                  if ( originalUser.programme_id && originalUser.programme_id !== result[0].programme_id || 
+                  if ( originalUser.programme_id && originalUser.programme_id !== result[0].programme_id ||
                         originalUser.contract_start_date && originalUser.contract_start_date.toString() !== result[0].contract_start_date && result[0].contract_start_date.toString() ||
                         originalUser.contract_end_date && originalUser.contract_end_date.toString() !== result[0].contract_end_date && result[0].contract_end_date.toString() ||
                         originalUser.admin0pcode !== result[0].admin0pcode ||
@@ -341,7 +397,7 @@ var UserController = {
 
   },
 
-  // update the profile details 
+  // update the profile details
   updateProfileDetails: function( req, res, originalUser, updatedUser ){
 
     // if country changes, make updates and add new history
@@ -352,7 +408,7 @@ var UserController = {
         .find()
         .where( { admin0pcode: updatedUser.admin0pcode, organization_tag: updatedUser.organization_tag } )
         .exec( function( err, organization ){
-          
+
           // generic error
           if (err) return res.negotiate( err );
 
@@ -365,7 +421,7 @@ var UserController = {
             Organization
               .create( newOrganizationAdmin0 )
               .exec( function( err, newOrganization ) {
-                
+
                 // generic error
                 if (err) return res.negotiate( err );
 
@@ -376,7 +432,7 @@ var UserController = {
                 User
                   .update( { id: updatedUser.id }, { organization_id: newOrganization.id } )
                   .exec( function( err, newOrgUser ){
-                    
+
                     // create new userHistory
                     var newUserHistory = _.clone( newOrgUser[0] );
                         newUserHistory.user_id = newUserHistory.id;
@@ -386,10 +442,10 @@ var UserController = {
                     UserHistory
                       .create( newUserHistory )
                       .exec( function( err, newUserHistory ) {
-                        
+
                         // err
                         if (err) return res.negotiate( err );
-                        
+
                         // return user
                         return res.json( 200, { success: true, user: newOrgUser[0] } );
 
@@ -418,10 +474,10 @@ var UserController = {
                 UserHistory
                   .create( newUserHistory )
                   .exec( function( err, newUserHistory ) {
-                    
+
                     // err
                     if (err) return res.negotiate( err );
-                    
+
                     // return user
                     return res.json( 200, { success: true, user: updatedOrgUser[0] } );
 
@@ -446,10 +502,10 @@ var UserController = {
       UserHistory
         .create( newUserHistory )
         .exec( function( err, newUserHistory ) {
-          
+
           // err
           if (err) return res.negotiate( err );
-          
+
           // return user
           return res.json( 200, { success: true, user: updatedUser } );
 
@@ -458,12 +514,12 @@ var UserController = {
     // date updates only require update to UserHistory
     } else if ( originalUser.contract_start_date.toString() !== updatedUser.contract_start_date.toString() ||
                   originalUser.contract_end_date.toString() !== updatedUser.contract_end_date.toString() ) {
-      
+
       // update userHistory records dates
       UserHistory
         .update( { user_id: updatedUser.id }, { contract_end_date: updatedUser.contract_start_date, contract_end_date: updatedUser.contract_end_date } )
         .exec( function( err, updatedUserHistory ){
-          
+
           // err
           if (err) return res.negotiate( err );
 
@@ -521,7 +577,7 @@ var UserController = {
               name: user[i].name,
               username: user[i].username,
               email: user[i].email,
-              token: jwtToken.issueToken({ sid: user[i].id })
+              token: jwtToken.issueToken({ sid: user[i].id, roles: user[i].roles })
             }
 
             // Add record in reset
@@ -558,7 +614,7 @@ var UserController = {
                       // email sent
                       return res.json(200, { 'data': 'success' });
                   });
-                
+
                 }
 
               });
@@ -606,7 +662,7 @@ var UserController = {
             // new password
             user.password = encryptedPassword;
             // add new token
-            user.token = jwtToken.issueToken( { sid: user.id } );
+            user.token = jwtToken.issueToken( { sid: user.id, roles: user.roles } );
 
             // save updates
             user.save( function( err ) {

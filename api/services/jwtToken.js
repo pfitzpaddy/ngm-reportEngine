@@ -20,3 +20,14 @@ module.exports.verifyToken = function(token, verified) {
             verified // The callback to be call when the verification is done.
          );
 };
+
+// validity in minutes
+module.exports.issueTokenTime = function(payload, time) {
+  return jwt.sign(
+          payload, // This is the payload we want to put inside the token
+          process.env.TOKEN_SECRET || "oursecret", // Secret string which will be used to sign the token
+          {
+            expiresInMinutes: time ? time : 10
+          }
+        );
+};

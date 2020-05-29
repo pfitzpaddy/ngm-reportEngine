@@ -28,12 +28,12 @@ module.exports.policies = {
 
   // Everything resctricted here
   '*': ['isAuthorized'],
-   
+
   // public
   'ReportHub/UserController': {
     '*': true
   },
-  
+
   // public
   'ReportHub/MetricsController': {
     '*': true
@@ -49,7 +49,9 @@ module.exports.policies = {
 
   // public
   'ReportHub/ListController': {
-    '*': true
+    '*': true,
+    'deleteOrganization': ['isAuthorized'],
+    'resetOrganizations': ['isAuthorized', 'isAdmin']
   },
 
   // public
@@ -60,7 +62,7 @@ module.exports.policies = {
   // public
   'Watchkeeper/WatchkeeperController': {
     '*': true
-  },  
+  },
 
   // public
   'Country/Eth/Ctc/CtcController': {
@@ -115,7 +117,7 @@ module.exports.policies = {
   },
 
    // public
-  'Cluster/Dashboards/Cluster4wprojectplanDashboardController': { 
+  'Cluster/Dashboards/Cluster4wprojectplanDashboardController': {
     '*': true
   },
 
@@ -149,7 +151,7 @@ module.exports.policies = {
   // Gfa
   'Country/Cxb/Gfa/GfaTaskController': {
     '*': true
-  }, 
+  },
 
   // Gfa Controller
   'Country/Cxb/Gfa/GfaDashboardController': {
