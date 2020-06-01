@@ -168,6 +168,7 @@ module.exports.routes = {
   'GET /cluster/project/delete': 'Cluster/ProjectController.deleteProjectById',
   'POST /cluster/project/getFinancialDetails': 'Cluster/ProjectController.getFinancialDetails',
 
+  'POST /cluster/project/setBeneficiariesById': 'Cluster/ProjectController.setBeneficiariesById',
 
   // STOCK REPORTS
   'POST /cluster/stock/getReportsList': 'Cluster/Stocks/StockReportController.getReportsList',
@@ -175,6 +176,8 @@ module.exports.routes = {
   'POST /cluster/stock/setReport': 'Cluster/Stocks/StockReportController.setReportById',
   'POST /cluster/stock/removeStockLocation': 'Cluster/Stocks/StockReportController.removeLocationById',
   'POST /cluster/stock/removeStock': 'Cluster/Stocks/StockReportController.removeStock',
+
+  'POST /cluster/stock/setStocksById': 'Cluster/Stocks/StockReportController.setStocksById',
 
 
   // ACTIVITY REPORTS

@@ -1601,7 +1601,52 @@ var ProjectController = {
 
       });
 
-	},
+  },
+
+  // update beneficiaries by id ( cluster admin correction )
+  setBeneficiariesById: function (req, res) {
+    // request input
+    if (!req.param('beneficiaries') || !Array.isArray(req.param('beneficiaries'))) {
+      return res.json(401, { err: 'beneficiaries array required!' });
+    }
+    let beneficiaries = req.param('beneficiaries');
+    let beneficiaries_update = [];
+
+    // return res
+    let returnBeneficiaries = function (err) {
+      if (err) return res.json(500, { err: err });
+      return res.json(200, { beneficiaries: beneficiaries_update });
+    }
+
+    async.eachOf(beneficiaries, function (b, ib, next) {
+      delete b.updatedAt;
+      delete b.createdAt;
+      if (b.id) {
+        let id = b.id;
+        Beneficiaries.update({ id: b.id }, b).exec(function (err, result) {
+          if (err) return next(err);
+          let resultObj = Utils.set_result(result);
+          if (resultObj) {
+            resultObj.updated = true
+            beneficiaries_update[ib] = Utils.set_result(resultObj);
+          } else {
+            b.updated = false
+            b.id = id;
+            beneficiaries_update[ib] = b;
+          }
+          next();
+        });
+      } else {
+        b.updated = false
+        beneficiaries_update[ib] = b;
+        next();
+      }
+    }, function (err) {
+      returnBeneficiaries(err);
+    });
+
+  },
+
 };
 
 module.exports = ProjectController;

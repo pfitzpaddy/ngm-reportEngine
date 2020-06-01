@@ -362,6 +362,50 @@ var StockReportController = {
 
     },
 
+    // update stocks by id ( cluster admin correction )
+  setStocksById: function (req, res) {
+    // request input
+    if (!req.param('stocks') || !Array.isArray(req.param('stocks'))) {
+      return res.json(401, { err: 'stocks array required!' });
+    }
+    let stocks = req.param('stocks');
+    let stocks_update = [];
+
+    // return res
+    let returnStocks = function(err) {
+      if (err) return res.json( 500, { err: err });
+        return res.json( 200, { stocks: stocks_update } );
+    }
+
+    async.eachOf(stocks, function (s, is, next) {
+      delete s.updatedAt;
+      delete s.createdAt;
+      if (s.id) {
+        let id = s.id;
+        Stock.update({ id: s.id }, s).exec(function (err, result) {
+          if (err) return next(err);
+          let resultObj = Utils.set_result(result);
+          if (resultObj) {
+            resultObj.updated = true
+            stocks_update[is] = Utils.set_result(resultObj);
+          } else {
+            s.updated = false
+            s.id = id;
+            stocks_update[is] = s;
+          }
+          next();
+        });
+      } else {
+        s.updated = false
+        stocks_update[is] = s;
+        next();
+      }
+    }, function (err) {
+      returnStocks(err);
+    });
+
+  },
+
 };
 
 module.exports = StockReportController;
