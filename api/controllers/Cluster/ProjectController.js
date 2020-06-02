@@ -1647,6 +1647,36 @@ var ProjectController = {
 
   },
 
+  setBeneficiaryById: function (req, res) {
+    // request input
+    let beneficiary = req.param('beneficiary');
+
+    if (!beneficiary) {
+      return res.json(401, { err: 'beneficiary required!' });
+    }
+
+    if (!beneficiary.id) {
+      return res.json(401, { err: 'id required!' });
+    }
+
+    delete beneficiary.updatedAt;
+    delete beneficiary.createdAt;
+
+    if (beneficiary.id) {
+      Beneficiaries.update({ id: beneficiary.id }, beneficiary).exec(function (err, result) {
+        if (err) return res.negotiate(err);
+        result = Utils.set_result(result);
+        if (!result) {
+          return res.json(404, { err: 'Beneficiary with such id not found!' });
+        }
+        return res.json(200, { beneficiary: result });
+      });
+    } else {
+      return res.json(401, { err: 'id required!' });
+    }
+
+  },
+
 };
 
 module.exports = ProjectController;

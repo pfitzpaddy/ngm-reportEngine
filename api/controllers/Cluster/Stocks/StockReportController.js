@@ -406,6 +406,36 @@ var StockReportController = {
 
   },
 
+  setStockById: function (req, res) {
+    // request input
+    let stock = req.param('stock');
+
+    if (!stock) {
+      return res.json(401, { err: 'stock required!' });
+    }
+
+    if (!stock.id) {
+      return res.json(401, { err: 'id required!' });
+    }
+
+    delete stock.updatedAt;
+    delete stock.createdAt;
+
+    if (stock.id) {
+      Stock.update({ id: stock.id }, stock).exec(function (err, result) {
+        if (err) return res.negotiate(err);
+        result = Utils.set_result(result);
+        if (!result) {
+          return res.json(404, { err: 'Stock with such id not found!' });
+        }
+        return res.json(200, { stock: result });
+      });
+    } else {
+      return res.json(401, { err: 'id required!' });
+    }
+
+  },
+
 };
 
 module.exports = StockReportController;
