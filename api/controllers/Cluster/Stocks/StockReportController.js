@@ -406,7 +406,7 @@ var StockReportController = {
 
   },
 
-  setStockById: function (req, res) {
+  setStockById: async function (req, res) {
     // request input
     let stock = req.param('stock');
 
@@ -418,8 +418,22 @@ var StockReportController = {
       return res.json(401, { err: 'id required!' });
     }
 
+    // check if user can modify record
+    let edit = await AuthService.canEditRecord(req.token, 'Stock', stock.id);
+    if (edit.err){
+      return res.json(edit.code, { err: err.err });
+    }
+
     delete stock.updatedAt;
     delete stock.createdAt;
+    // update of next fields not allowed
+    delete stock.adminRpcode;
+    delete stock.admin0pcode;
+    delete stock.organization;
+    delete stock.organization_id;
+    delete stock.organization_tag;
+    delete stock.report_id;
+    delete stock.location_id;
 
     if (stock.id) {
       Stock.update({ id: stock.id }, stock).exec(function (err, result) {

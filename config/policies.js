@@ -146,7 +146,9 @@ module.exports.policies = {
     // public
   'Cluster/Stocks/StockReportController': {
     '*': true,
-    'setStocksById': ['isAuthorized', 'isClusterAdmin']
+    'setStocksById': ['isAuthorized', 'isClusterAdmin'],
+    'setStockById' : ['isAuthorized'],
+    'removeStock'  : ['isAuthorized']
   },
 
 

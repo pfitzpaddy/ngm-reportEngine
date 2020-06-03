@@ -1628,7 +1628,7 @@ var ProjectController = {
           let resultObj = Utils.set_result(result);
           if (resultObj) {
             resultObj.updated = true
-            beneficiaries_update[ib] = Utils.set_result(resultObj);
+            beneficiaries_update[ib] = resultObj;
           } else {
             b.updated = false
             b.id = id;
@@ -1644,10 +1644,9 @@ var ProjectController = {
     }, function (err) {
       returnBeneficiaries(err);
     });
-
   },
 
-  setBeneficiaryById: function (req, res) {
+  setBeneficiaryById: async function (req, res) {
     // request input
     let beneficiary = req.param('beneficiary');
 
@@ -1659,8 +1658,24 @@ var ProjectController = {
       return res.json(401, { err: 'id required!' });
     }
 
+    // check if user can modify record
+    let edit = await AuthService.canEditRecord(req.token, 'Beneficiaries', beneficiary.id);
+    if (edit.err){
+      return res.json(edit.code, { err: err.err });
+    }
+
     delete beneficiary.updatedAt;
     delete beneficiary.createdAt;
+    // update of next fields not allowed
+    delete beneficiary.adminRpcode;
+    delete beneficiary.admin0pcode;
+    delete beneficiary.organization;
+    delete beneficiary.organization_id;
+    delete beneficiary.organization_tag;
+    delete beneficiary.report_id;
+    delete beneficiary.project_id;
+    delete beneficiary.location_id;
+
 
     if (beneficiary.id) {
       Beneficiaries.update({ id: beneficiary.id }, beneficiary).exec(function (err, result) {
