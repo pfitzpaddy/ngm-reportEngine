@@ -82,6 +82,7 @@ module.exports.routes = {
   'POST /proxy': 'ReportHub/FileController.proxy',
   'GET /export': 'ReportHub/FileController.export',
   'GET /getBeneficiairiesCsv': 'ReportHub/FileController.getBeneficiairiesCsv',
+  'POST /uploadList': 'ReportHub/FileController.uploadList',
 
   // Documents
   'GET /listProjectDocuments/:project_id': 'ReportHub/FileController.listProjectDocuments',

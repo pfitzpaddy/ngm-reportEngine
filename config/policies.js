@@ -44,7 +44,8 @@ module.exports.policies = {
     'print': true,
     'proxy': true,
     'export': true,
-    'getBeneficiairiesCsv': true
+    'getBeneficiairiesCsv': true,
+    'uploadList': ['isAuthorized', 'isAdmin']
   },
 
   // public
