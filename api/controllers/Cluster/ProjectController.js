@@ -1601,7 +1601,97 @@ var ProjectController = {
 
       });
 
-	},
+  },
+
+  // update beneficiaries by id ( cluster admin correction )
+  setBeneficiariesById: function (req, res) {
+    // request input
+    if (!req.param('beneficiaries') || !Array.isArray(req.param('beneficiaries'))) {
+      return res.json(401, { err: 'beneficiaries array required!' });
+    }
+    let beneficiaries = req.param('beneficiaries');
+    let beneficiaries_update = [];
+
+    // return res
+    let returnBeneficiaries = function (err) {
+      if (err) return res.json(500, { err: err });
+      return res.json(200, { beneficiaries: beneficiaries_update });
+    }
+
+    async.eachOf(beneficiaries, function (b, ib, next) {
+      delete b.updatedAt;
+      delete b.createdAt;
+      if (b.id) {
+        let id = b.id;
+        Beneficiaries.update({ id: b.id }, b).exec(function (err, result) {
+          if (err) return next(err);
+          let resultObj = Utils.set_result(result);
+          if (resultObj) {
+            resultObj.updated = true
+            beneficiaries_update[ib] = resultObj;
+          } else {
+            b.updated = false
+            b.id = id;
+            beneficiaries_update[ib] = b;
+          }
+          next();
+        });
+      } else {
+        b.updated = false
+        beneficiaries_update[ib] = b;
+        next();
+      }
+    }, function (err) {
+      returnBeneficiaries(err);
+    });
+  },
+
+  setBeneficiaryById: async function (req, res) {
+    // request input
+    let beneficiary = req.param('beneficiary');
+
+    if (!beneficiary) {
+      return res.json(401, { err: 'beneficiary required!' });
+    }
+
+    if (!beneficiary.id) {
+      return res.json(401, { err: 'id required!' });
+    }
+
+    // check if user can modify record
+    let edit = await AuthService.canEditRecord(req.token, 'Beneficiaries', beneficiary.id);
+    if (edit.err){
+      return res.json(edit.code, { err: err.err });
+    }
+
+    delete beneficiary.updatedAt;
+    delete beneficiary.createdAt;
+    // update of next fields not allowed
+    delete beneficiary.adminRpcode;
+    delete beneficiary.admin0pcode;
+    delete beneficiary.organization;
+    delete beneficiary.organization_id;
+    delete beneficiary.organization_tag;
+    delete beneficiary.report_id;
+    delete beneficiary.project_id;
+    delete beneficiary.location_id;
+
+
+    if (beneficiary.id) {
+      Beneficiaries.update({ id: beneficiary.id }, beneficiary).exec(function (err, result) {
+        if (err) return res.negotiate(err);
+        result = Utils.set_result(result);
+        if (!result) {
+          return res.json(404, { err: 'Beneficiary with such id not found!' });
+        }
+        return res.json(200, { beneficiary: result });
+      });
+    } else {
+      return res.json(401, { err: 'id required!' });
+    }
+
+  },
+
 };
 
 module.exports = ProjectController;
