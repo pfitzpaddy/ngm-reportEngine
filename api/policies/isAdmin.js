@@ -13,7 +13,7 @@ module.exports = function(req, res, next) {
 
   let admin = false;
   console.log(req.token)
-  if (req.token.roles && Array.isArray(req.token.roles)) {
+  if (req.token && req.token.roles && Array.isArray(req.token.roles)) {
     admin = adminRoles.some((val) => req.token.roles.indexOf(val) !== -1);
   } else if (req.session && req.session.session_user && req.session.session_user.roles && Array.isArray(req.session.session_user.roles)) {
     console.log(req.session.session_user.roles)

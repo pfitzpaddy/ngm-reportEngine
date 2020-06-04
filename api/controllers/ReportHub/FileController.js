@@ -643,6 +643,109 @@ module.exports = {
 
 	},
 
+  // import list from file to collection with cmd
+  uploadList: function (req, res) {
+
+    if (!req.param('list')) {
+      return res.json(401, { err: 'list param required!' });
+    }
+
+    if (!req._fileparser.upstreams.length) {
+      return res.json(401, { err: 'File required!' });
+    }
+
+    let list = req.param('list');
+
+    let scriptPath = __dirname + '/../../../tasks/db/lists/';
+
+    let uploadPath = __dirname + '/../../../.tmp/uploads/lists/';
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath);
+    }
+
+    let logPath = uploadPath + 'importlog.txt';
+
+    let COMMANDS = {
+      organizations: {
+        cmd: 'mongoimport -d ngmReportHub -c organizations --drop --headerline --type csv --file ',
+      },
+      donors: {
+        cmd: 'mongoimport -d ngmHealthCluster -c donors --drop --headerline --type csv --file '
+      },
+      activities: {
+        cmd: 'mongoimport -d ngmHealthCluster -c activities --drop --headerline --type csv --file ',
+        process: 'mongo < ' + scriptPath + 'process_activities.js'
+      },
+      stockitems: {
+        cmd: 'mongoimport -d ngmHealthCluster -c stockitems --drop --headerline --type csv --file ',
+        process: 'mongo < ' + scriptPath + 'process_stockitems.js'
+      }
+    };
+
+    if (!COMMANDS[list] || !COMMANDS[list].cmd) {
+      return res.json(401, { err: 'No such list' });
+    }
+    let cmd = COMMANDS[list].cmd;
+    let process = COMMANDS[list].process;
+
+
+    let logToFile = function (msg) {
+      fs.appendFile(logPath, new Date() + ' (' + list + '): ' + JSON.stringify(msg) + '\n', function () { });
+    }
+
+    req.file('file').upload({ dirname: 'lists' }, function onUploadComplete(err, files) {
+
+      //	if error return and send 500 error with error
+      if (err) return res.serverError(err);
+
+      let exec = require('child_process').exec;
+      cmd = cmd + files[0].fd;
+
+      exec(cmd,
+        function (importerror, stdout, stderr) {
+          if (!importerror) {
+            if (process) {
+              exec(process, function (procerror, stdout, stderr) {
+                if (procerror) {
+                  logToFile(procerror);
+                  res.json(500, {
+                    error: 'Process error!'
+                  });
+                } else if (stdout.indexOf('E QUERY') > -1) {
+                  // return error
+                  logToFile(stdout);
+                  res.json(500, {
+                    error: 'Process shell error!'
+                  });
+                } else {
+                  logToFile(files[0]);
+                  res.json(
+                    200, { msg: 'Success!' }
+                  );
+                }
+              }
+              );
+            } else {
+              logToFile(files[0]);
+              res.json(
+                200, { msg: 'Success!' }
+              );
+            }
+
+          } else {
+            // return error
+            res.json(500, {
+              error: 'Import error!'
+            });
+          }
+        }
+      );
+
+    });
+
+  },
+
 	//
   print: async function (req, res) {
 
