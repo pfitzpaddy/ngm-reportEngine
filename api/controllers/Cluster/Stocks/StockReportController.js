@@ -362,6 +362,94 @@ var StockReportController = {
 
     },
 
+    // update stocks by id ( cluster admin correction )
+  setStocksById: function (req, res) {
+    // request input
+    if (!req.param('stocks') || !Array.isArray(req.param('stocks'))) {
+      return res.json(401, { err: 'stocks array required!' });
+    }
+    let stocks = req.param('stocks');
+    let stocks_update = [];
+
+    // return res
+    let returnStocks = function(err) {
+      if (err) return res.json( 500, { err: err });
+        return res.json( 200, { stocks: stocks_update } );
+    }
+
+    async.eachOf(stocks, function (s, is, next) {
+      delete s.updatedAt;
+      delete s.createdAt;
+      if (s.id) {
+        let id = s.id;
+        Stock.update({ id: s.id }, s).exec(function (err, result) {
+          if (err) return next(err);
+          let resultObj = Utils.set_result(result);
+          if (resultObj) {
+            resultObj.updated = true
+            stocks_update[is] = Utils.set_result(resultObj);
+          } else {
+            s.updated = false
+            s.id = id;
+            stocks_update[is] = s;
+          }
+          next();
+        });
+      } else {
+        s.updated = false
+        stocks_update[is] = s;
+        next();
+      }
+    }, function (err) {
+      returnStocks(err);
+    });
+
+  },
+
+  setStockById: async function (req, res) {
+    // request input
+    let stock = req.param('stock');
+
+    if (!stock) {
+      return res.json(401, { err: 'stock required!' });
+    }
+
+    if (!stock.id) {
+      return res.json(401, { err: 'id required!' });
+    }
+
+    // check if user can modify record
+    let edit = await AuthService.canEditRecord(req.token, 'Stock', stock.id);
+    if (edit.err){
+      return res.json(edit.code, { err: err.err });
+    }
+
+    delete stock.updatedAt;
+    delete stock.createdAt;
+    // update of next fields not allowed
+    delete stock.adminRpcode;
+    delete stock.admin0pcode;
+    delete stock.organization;
+    delete stock.organization_id;
+    delete stock.organization_tag;
+    delete stock.report_id;
+    delete stock.location_id;
+
+    if (stock.id) {
+      Stock.update({ id: stock.id }, stock).exec(function (err, result) {
+        if (err) return res.negotiate(err);
+        result = Utils.set_result(result);
+        if (!result) {
+          return res.json(404, { err: 'Stock with such id not found!' });
+        }
+        return res.json(200, { stock: result });
+      });
+    } else {
+      return res.json(401, { err: 'id required!' });
+    }
+
+  },
+
 };
 
 module.exports = StockReportController;

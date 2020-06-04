@@ -113,7 +113,8 @@ module.exports.policies = {
   //Public function to 4wPlus COL getProjectsColAPC in ProjectController
 
   'Cluster/ProjectController': {
-    'getProjectsColAPC': true
+    'getProjectsColAPC': true,
+    'setBeneficiariesById': ['isAuthorized', 'isClusterAdmin']
     //'*': true
   },
 
@@ -145,7 +146,10 @@ module.exports.policies = {
 
     // public
   'Cluster/Stocks/StockReportController': {
-    '*': true
+    '*': true,
+    'setStocksById': ['isAuthorized', 'isClusterAdmin'],
+    'setStockById' : ['isAuthorized'],
+    'removeStock'  : ['isAuthorized']
   },
 
 
