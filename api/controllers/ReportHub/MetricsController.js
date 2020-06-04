@@ -315,7 +315,8 @@ module.exports = MetricsController = {
                 if (err) reject(err)
                 collection.aggregate([
                   { $match : filterObjectByDateCreated },
-                  { $group: { _id:  "$cluster",  count: { $sum: 1 } } },
+                  { $group: { _id:  { user_id: "$user_id", cluster : "$cluster" } } },
+                  { $group: { _id:  "$_id.cluster",  count: { $sum: 1 } } },
                   { $project: { cluster: "$_id", count: "$count", _id: 0 } }
                 ]).toArray(function (err, results) {
                   if (err) reject(err)
@@ -329,7 +330,8 @@ module.exports = MetricsController = {
               if (err) reject(err)
               collection.aggregate([
                 { $match : filterObjectByDateUpdated },
-                { $group: { _id:  "$cluster",  count: { $sum: 1 } } },
+                { $group: { _id:  { user_id: "$user_id", cluster : "$cluster" } } },
+                { $group: { _id:  "$_id.cluster",  count: { $sum: 1 } } },
                 { $project: { cluster: "$_id", count: "$count", _id: 0 } }
               ]).toArray(function (err, results) {
                 if (err) reject(err)
