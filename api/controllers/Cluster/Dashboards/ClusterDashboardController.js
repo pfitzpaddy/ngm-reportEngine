@@ -1464,11 +1464,10 @@ var ClusterDashboardController = {
 								}
 
                 d.project_details = Utils.arrayToString(d.project_details, "project_detail_name");
-                d.response = Utils.arrayToString(d.specifics, "response_name");
+                d.response = Utils.arrayToString(d.response, "response_name");
 
 								//plan_component
 								if (Array.isArray(d.plan_component)) {
-
 									d.plan_component = d.plan_component.join(', ');
 								}
 
