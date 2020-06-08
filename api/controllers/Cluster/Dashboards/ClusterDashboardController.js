@@ -55,7 +55,8 @@ var ClusterDashboardController = {
 
 		// return params
 		return {
-			csv: req.param('csv') ? req.param('csv') : false,
+      csv: req.param('csv') ? req.param('csv') : false,
+      json: req.param('json') ? req.param('json') : false,
 			ocha: req.param('ocha') ? req.param('ocha') : false,
 			list: req.param('list') ? req.param('list') : false,
 			indicator: req.param('indicator'),
@@ -854,36 +855,29 @@ var ClusterDashboardController = {
 
 
 			// raw data export
-			case 'beneficiaries':
-				if ( !params.csv ) {
-					// total sum
-					Beneficiaries.native(function(err, collection) {
-						if (err) return res.serverError(err);
+      case 'beneficiaries':
 
-						collection.aggregate(
-							[
-								{
-									$match : filterObject
-								},
-								{
-									$group:
-									{
-										_id: null,
-									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
-									total:  { $sum: { $add: [ "$total_beneficiaries" ] } }
-									}
-								}
-							]
-						).toArray(function (err, beneficiaries) {
-							if (err) return res.serverError(err);
+        // download beneficiairies in json format
+        if (params.json) {
 
-							var total = beneficiaries[0]?beneficiaries[0].total:0;
+          Beneficiaries.native(function (err, collection) {
+            if (err) return res.serverError(err);
 
-							return res.json( 200, { 'value': total } );
+            if (req.param('activity_type_id') && req.param('activity_type_id') !== 'all') {
+              filterObject.activity_type_id = req.param('activity_type_id');
+            }
 
-						});
-					});
-				}	else	{
+            collection.find(filterObject).toArray(function (err, beneficiaries) {
+              if (err) return res.serverError(err);
+
+              return res.json(200, { data: beneficiaries });
+
+            });
+
+          });
+
+        // download beneficiairies in CSV format
+        } else if (params.csv) {
 
 					// get beneficiaries export
 					Beneficiaries.native(function(err, collection) {
@@ -1514,6 +1508,34 @@ var ClusterDashboardController = {
 
 					});
 
+				} else {
+					// total sum
+					Beneficiaries.native(function(err, collection) {
+						if (err) return res.serverError(err);
+
+						collection.aggregate(
+							[
+								{
+									$match : filterObject
+								},
+								{
+									$group:
+									{
+										_id: null,
+									// total:  { $sum: { $add: [ "$men", "$women","$boys","$girls","$elderly_men","$elderly_women" ] } }
+									total:  { $sum: { $add: [ "$total_beneficiaries" ] } }
+									}
+								}
+							]
+						).toArray(function (err, beneficiaries) {
+							if (err) return res.serverError(err);
+
+							var total = beneficiaries[0]?beneficiaries[0].total:0;
+
+							return res.json( 200, { 'value': total } );
+
+						});
+					});
 				}
 
 				break;
@@ -1678,6 +1700,7 @@ var ClusterDashboardController = {
 						// return error
 						if (err) return res.negotiate( err );
 
+            if (!params.json) {
 						// format stocks
 						stocks.forEach(function( d, i ){
 							stocks[ i ].report_month_number = d.report_month+1;
@@ -1817,7 +1840,10 @@ var ClusterDashboardController = {
 								return res.json( 200, { data: csv } );
 							}
 
-						});
+            });
+          } else {
+              return res.json(200, { data: stocks });
+          }
 
 					});
 
