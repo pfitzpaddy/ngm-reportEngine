@@ -1419,6 +1419,7 @@ var ClusterDashboardController = {
 
 							// format beneficiaries
 							async.eachLimit(beneficiaries, 200, function (d, next) {
+                d._id = d._id.toString();
 								// hrp code
 								if (!d.project_hrp_code) {
 									d.project_hrp_code = '-';
@@ -1472,6 +1473,8 @@ var ClusterDashboardController = {
 								d.report_month_number = d.report_month + 1;
 								d.report_month = moment(d.reporting_period).format('MMMM');
 								d.reporting_period = moment(d.reporting_period).format('YYYY-MM-DD');
+                d.project_start_date = moment(d.project_start_date).format('YYYY-MM-DD');
+                d.project_end_date = moment(d.project_end_date).format('YYYY-MM-DD');
 								d.updatedAt = moment(d.updatedAt).format('YYYY-MM-DD HH:mm:ss');
 								d.createdAt = moment(d.createdAt).format('YYYY-MM-DD HH:mm:ss');
 								// grand total
@@ -1720,7 +1723,8 @@ var ClusterDashboardController = {
 
 						var fields = [
 								'report_id',
-								'location_id',
+                'location_id',
+                'id',
 								'cluster',
                 'stock_warehouse_id',
                 // 'donor',
@@ -1766,7 +1770,8 @@ var ClusterDashboardController = {
 
 						fieldNames = [
 								'report_id',
-								'location_id',
+                'location_id',
+                'stock_id',
 								'cluster',
                 'stock_warehouse_id',
                 // 'donor',
