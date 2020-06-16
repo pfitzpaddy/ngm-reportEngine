@@ -309,6 +309,23 @@ module.exports = {
 			defaultsTo: 0
 		},
 
+		grant_type_id:{
+			type: 'string'
+		},
+		grant_type_name:{
+			type: 'string'
+		},
+		transfer_category_id:{
+			type: 'string'
+		},
+		transfer_category_name:{
+			type: 'string'
+		},
+		total_amount:{
+			type:'integer', 
+			defaultsTo:0
+		},
+
 		// indicator
 			// sessions -> training
 		sessions:{
