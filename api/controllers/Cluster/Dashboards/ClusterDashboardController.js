@@ -1174,8 +1174,8 @@ var ClusterDashboardController = {
 									'createdAt'
 								];
 
-							} 
-							
+							}
+
 							if(params.admin0pcode.toUpperCase() === 'NG' && params.cluster_id === 'child_protection'){
 
 								var fields = [
@@ -1420,7 +1420,7 @@ var ClusterDashboardController = {
 									'createdAt'
 								];
 							}else if(params.admin0pcode.toUpperCase() === 'NG' && params.cluster_id === 'gbv'){
-							
+
 								var fields = [
 									'project_id',
 									'report_id',
@@ -1748,7 +1748,12 @@ var ClusterDashboardController = {
 									'mpc_delivery_type_name',
 									'mpc_mechanism_type_id',
 									'mpc_mechanism_type_name',
-									'package_type_id',
+                  'package_type_id',
+                  'transfer_category_id',
+									'transfer_category_name',
+                  'grant_type_id',
+                  'grant_type_name',
+                  'total_amount',
 									'households',
 									'families',
 									'boys',
@@ -1861,8 +1866,13 @@ var ClusterDashboardController = {
 									'mpc_delivery_type_id',
 									'mpc_delivery_type_name',
 									'mpc_mechanism_type_id',
-									'mpc_mechanism_type_name',
-									'package_type_id',
+                  'mpc_mechanism_type_name',
+                  'package_type_id',
+                  'transfer_category_id',
+									'transfer_category_name',
+                  'grant_type_id',
+                  'grant_type_name',
+                  'total_amount',
 									'households',
 									'families',
 									'boys',
