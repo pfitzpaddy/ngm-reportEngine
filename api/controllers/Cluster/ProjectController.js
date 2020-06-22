@@ -900,10 +900,10 @@ var ProjectController = {
 
       // ASYNC REQUEST 1
       // async loop target_beneficiaries
-      async.each( project_budget_progress, function ( d, next ) {
+      async.eachOf( project_budget_progress, function ( d, ibp, next ) {
         var budget = _under.extend( {}, d, project_copy_no_cluster );
         BudgetProgress.updateOrCreate( findProject, { id: budget.id }, budget ).exec(function( err, result ){
-          project_update.project_budget_progress.push( ProjectController.set_result( result ) );
+          project_update.project_budget_progress[ibp] = ProjectController.set_result( result );
           next();
         });
       }, function ( err ) {
