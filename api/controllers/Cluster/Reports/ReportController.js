@@ -268,6 +268,8 @@ var ReportController = {
         d.unit_type_id = Utils.arrayToString(d.unit_type_id, "unit_type_name");
         d.mpc_delivery_type_id = Utils.arrayToString(d.mpc_delivery_type_id, "mpc_delivery_type_name");
         d.mpc_mechanism_type_id = Utils.arrayToString(d.mpc_mechanism_type_id, ["mpc_delivery_type_id", "mpc_mechanism_type_name"]);
+        d.mpc_transfer_category_id = Utils.arrayToString(d.mpc_transfer_category_id, ["transfer_category_id", "transfer_category_name"]);
+        d.mpc_grant_type_id = Utils.arrayToString(d.mpc_grant_type_id, ["grant_type_id", "grant_type_name"]);
       });
 
       // format project
@@ -307,6 +309,8 @@ var ReportController = {
         { header: 'Unit Types', key: 'unit_type_id', width: 50 },
         { header: 'Cash Delivery Types', key: 'mpc_delivery_type_id', width: 50 },
         { header: 'Cash Mechanism Types', key: 'mpc_mechanism_type_id', width: 50 },
+        { header: 'Cash Transfer Categories', key: 'mpc_transfer_category_id', width: 30 },
+        { header: 'Cash Grant Types', key: 'mpc_grant_type_id', width: 50 },
       ];
 
       worksheetLocations.columns = [
