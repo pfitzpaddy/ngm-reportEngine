@@ -291,7 +291,7 @@ var StockReportController = {
                     // location.stocks.push( Utils.set_result( result ) );
                     // set stocks in the original order
                     location.stocks[i] = Utils.set_result(result);
-                    s_next();
+                    s_next(err);
               });
             }, function ( err ) {
               if ( err ) return res.negotiate( err );
