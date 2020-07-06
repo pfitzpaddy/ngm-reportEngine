@@ -67,6 +67,14 @@ module.exports = {
 		email: {
 			type: 'string',
 			required: true
+    },
+    report_active: {
+			type: 'boolean',
+			defaultsTo: true
+		},
+		report_status: {
+			type: 'string',
+			defaultsTo: 'todo'
 		},
 		// region/country id
     adminRpcode: {
