@@ -265,6 +265,8 @@ var StockReportController = {
 
         delete location.createdAt;
         delete location.updatedAt;
+        location.report_status = report_copy.report_status;
+        location.report_active = report_copy.report_active;
         // update or create
         StockLocation.updateOrCreate( _under.extend( {}, findOrganization, findReport ), { id: location.id }, location ).exec(function( err, result ){
 
@@ -286,12 +288,14 @@ var StockReportController = {
             delete stock.updatedAt;
             // clone
             var s = _under.extend( {}, report_copy, location_copy, stock );
+            s.report_status = report_copy.report_status;
+            s.report_active = report_copy.report_active;
             // update or create
             Stock.updateOrCreate( _under.extend( {}, findOrganization, findReport, findLocation, findTargetLocation ), { id: s.id }, s ).exec(function( err, result ){
                     // location.stocks.push( Utils.set_result( result ) );
                     // set stocks in the original order
                     location.stocks[i] = Utils.set_result(result);
-                    s_next();
+                    s_next(err);
               });
             }, function ( err ) {
               if ( err ) return res.negotiate( err );

@@ -1937,7 +1937,7 @@ var ClusterDashboardController = {
 								if (Array.isArray(d.implementing_partners)) {
 									var im = [];
 									d.implementing_partners.forEach(function (impl, i) {
-										if (impl) im.push(impl.organization_name);
+										if (impl) im.push(impl.organization);
 									});
 									im.sort();
 									d.implementing_partners = im.join(', ');
@@ -1947,7 +1947,7 @@ var ClusterDashboardController = {
 								if (Array.isArray(d.programme_partners)) {
 									var pp = [];
 									d.programme_partners.forEach(function (p, i) {
-										if (p) pp.push(p.organization_name);
+										if (p) pp.push(p.organization);
 									});
 									pp.sort();
 									d.programme_partners = pp.join(', ');
