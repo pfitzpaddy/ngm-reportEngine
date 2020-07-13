@@ -115,7 +115,10 @@ var UserController = {
       if ( !user ) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
 
       // user not active
-      if ( user.status !== 'active' ) return res.json({ err: true, msg: 'User No Longer Active! Contact Admin' });
+      if (user.status !== 'active') {
+        let msg = user.visits ? 'User No Longer Active! Contact Admin' : 'User in not Active! Contact Admin';
+        return res.json({ err: true, msg: msg });
+      }
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
@@ -193,7 +196,10 @@ var UserController = {
       if ( !user ) return res.json({ err: true, msg: 'Invalid Username! User exists?' });
 
       // user not active
-      if ( user.status !== 'active' ) return res.json({ err: true, msg: 'User No Longer Active! Contact Admin' });
+      if ( user.status !== 'active' ) {
+        let msg = user.visits ? 'User No Longer Active! Contact Admin' : 'User in not Active! Contact Admin';
+        return res.json({ err: true, msg: msg });
+      }
 
       // compare params passpwrd to the encrypted db password
       require( 'machinepack-passwords' ).checkPassword({
