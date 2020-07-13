@@ -594,6 +594,20 @@ module.exports = {
     } catch (err) {
       return res.negotiate( err );
     }
+  },
+
+  getTeamOrganizationsByFilter: async function (req, res) {
+    try {
+      // check params
+      if (!req.param('filter')) {
+        return res.json(401, { msg: 'filter required' });
+      }
+      let organizations = await Organization.find(req.param('filter'));
+      organizations = _.sortBy(organizations, 'organization_tag');
+      return res.json(200, organizations)
+    } catch (err) {
+      return res.negotiate(err);
+    }
   }
 
 };
