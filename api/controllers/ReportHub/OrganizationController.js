@@ -578,6 +578,22 @@ module.exports = {
       return res.negotiate( err );
     }
 
+  },
+
+  setOrganizationAttributes: async function(req, res){
+    try {
+      // check params
+      if ( !req.param( 'organization' ) || !req.param( 'organization' ).id ) {
+        return res.json(401, { msg: 'organization required' });
+      }
+      // id params
+      const organization = req.param( 'organization' );
+      // update
+      let organization_update = await Organization.update( { id: organization.id }, organization );
+      return res.json(200, organization_update)
+    } catch (err) {
+      return res.negotiate( err );
+    }
   }
 
 };

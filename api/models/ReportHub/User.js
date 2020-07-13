@@ -211,13 +211,18 @@ module.exports = {
       user.password = encryptedPassword;
 
       // check if organization with closed registration
-      Organizations.findOne({ or: [{ admin0pcode: { contains: user.admin0pcode } }, { admin0pcode: { contains: 'ALL' } }], organization_tag: user.organization_tag, organization: user.organization, organization_name: user.organization_name }).exec(function (err, o) {
+      // Organizations.findOne({ or: [{ admin0pcode: { contains: user.admin0pcode } }, { admin0pcode: { contains: 'ALL' } }], organization_tag: user.organization_tag, organization: user.organization, organization_name: user.organization_name }).exec(function (err, o) {
+      //   if ( err ) return next( err );
+      //   if (o && o.closed_registration && o.closed_registration.indexOf(user.admin0pcode) !== -1) {
+      //     user.status = PENDING_STATUS;
+      //     user.visits = 0;
+      //   }
+      Organization.findOne({ admin0pcode: user.admin0pcode, organization_tag: user.organization_tag, organization: user.organization }).exec(function (err, o) {
         if ( err ) return next( err );
-        if (o && o.closed_registration && o.closed_registration.indexOf(user.admin0pcode) !== -1) {
+        if (o && o.closed_registration){
           user.status = PENDING_STATUS;
           user.visits = 0;
         }
-
         // check if org exists
         Organization
           .find()
