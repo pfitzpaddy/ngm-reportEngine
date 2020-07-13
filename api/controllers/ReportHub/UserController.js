@@ -664,6 +664,9 @@ var UserController = {
             // add new token
             user.token = jwtToken.issueToken( { sid: user.id, roles: user.roles } );
 
+            // update visit information
+            user.visits = user.visits + 1;
+
             // save updates
             user.save( function( err ) {
 
@@ -671,7 +674,17 @@ var UserController = {
               if ( err ) return res.negotiate( err );
 
               // return updated user
-              return res.json( 200, user );
+              res.json( 200, user );
+
+              var userHistory = _.clone( user );
+                userHistory.user_id = user.id;
+                delete userHistory.id;
+                delete userHistory.updatedAt;
+
+              UserLoginHistory
+                .create(userHistory).exec(function (err) { });
+
+              return;
 
             });
 
