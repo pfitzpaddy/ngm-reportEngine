@@ -4,6 +4,8 @@
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
+const PENDING_STATUS = 'deactivated';
+const ACTIVE_STATUS = 'active';
 
 module.exports = {
 
@@ -202,68 +204,82 @@ module.exports = {
 		// require( 'bcrypt' ).hash( user.password, 10, function passwordEncrypted( err, encryptedPassword ) {
 		var bcrypt = require('bcrypt-nodejs');
 		bcrypt.hash( user.password, bcrypt.genSaltSync( 10 ), null, function passwordEncrypted( err, encryptedPassword ) {
-			
+
 			// return error
 			if ( err ) return next( err );
-				
+
 			// encrypt password
-			user.password = encryptedPassword;
+      user.password = encryptedPassword;
 
-			// check if org exists
-	    Organization
-	    	.find()
-	    	// .where( { admin0pcode: user.admin0pcode, cluster_id: user.cluster_id, organization: user.organization } )
-	    	.where( { admin0pcode: user.admin0pcode, organization: user.organization } )
-	    	.exec(function ( err, organization ){
-			  	
-				  // error
-				  if ( err ) return next( err );
+      // check if organization with closed registration
+      // Organizations.findOne({ or: [{ admin0pcode: { contains: user.admin0pcode } }, { admin0pcode: { contains: 'ALL' } }], organization_tag: user.organization_tag, organization: user.organization, organization_name: user.organization_name }).exec(function (err, o) {
+      //   if ( err ) return next( err );
+      //   if (o && o.closed_registration && o.closed_registration.indexOf(user.admin0pcode) !== -1) {
+      //     user.status = PENDING_STATUS;
+      //     user.visits = 0;
+      //   }
+      Organization.findOne({ admin0pcode: user.admin0pcode, organization_tag: user.organization_tag, organization: user.organization }).exec(function (err, o) {
+        if ( err ) return next( err );
+        if (o && o.closed_registration){
+          user.status = PENDING_STATUS;
+          user.visits = 0;
+        }
+        // check if org exists
+        Organization
+          .find()
+          // .where( { admin0pcode: user.admin0pcode, cluster_id: user.cluster_id, organization: user.organization } )
+          .where( { admin0pcode: user.admin0pcode, organization: user.organization } )
+          .exec(function ( err, organization ){
 
-				  // if org exists, add
-				  if( organization.length ){
+            // error
+            if ( err ) return next( err );
 
-				  	// organization_id
-				  	user.organization_id = organization[0].id;
+            // if org exists, add
+            if( organization.length ){
 
-						// next!
-						next();
+              // organization_id
+              user.organization_id = organization[0].id;
 
-						// else create
-				  } else{
+              // next!
+              next();
 
-				  	// create org_id
-				  	Organization.create({
-				  		adminRpcode: user.adminRpcode,
-				  		adminRname: user.adminRname,
-				  		admin0pcode: user.admin0pcode,
-				  		admin0name: user.admin0name,
-				  		organization_type: user.organization_type,
-				  		organization_name: user.organization_name,
-				  		organization_tag: user.organization_tag,
-				  		organization: user.organization,
-				  		// cluster_id: user.cluster_id,
-				  		// cluster: user.cluster
-				  	}).exec(function (err, created){
-							
-							// return error
-							if ( err ) return next( err );
-						
-							// organization_id
-							user.organization_id = created.id;
+              // else create
+            } else {
 
-							// set the first user as ORG!
-							user.roles.push('ORG');
+              // create org_id
+              Organization.create({
+                adminRpcode: user.adminRpcode,
+                adminRname: user.adminRname,
+                admin0pcode: user.admin0pcode,
+                admin0name: user.admin0name,
+                organization_type: user.organization_type,
+                organization_name: user.organization_name,
+                organization_tag: user.organization_tag,
+                organization: user.organization,
+                // cluster_id: user.cluster_id,
+                // cluster: user.cluster
+              }).exec(function (err, created){
 
-							// next!
-							next();						
+                // return error
+                if ( err ) return next( err );
 
-						});
+                // organization_id
+                user.organization_id = created.id;
 
-				  }
-				  
-				});
+                // set the first user as ORG!
+                user.roles.push('ORG');
 
-		});			
+                // next!
+                next();
+
+              });
+
+            }
+
+          });
+      });
+
+		});
 
 	},
 
@@ -288,13 +304,12 @@ module.exports = {
 
 			  // if no config file, return, else send email ( PROD )
 			  if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) return next();
-
 			  // if more then 1 user for that org
-				if ( admin.length > 1 ) {
+        if (admin.length > 1 || (admin.length && user.status === PENDING_STATUS)) {
 
 					// get ORGs
 					org_admin = admin.filter(function( user ) {
-						return user.roles.indexOf( 'ORG' ) !== -1; 
+						return user.roles.indexOf( 'ORG' ) !== -1;
 					});
 
 					// set admin
@@ -309,8 +324,8 @@ module.exports = {
 					org_names = org_names.slice( 0, -1 );
 					org_emails = org_emails.slice( 0, -1 );
 
-	        // send email
-	        sails.hooks.email.send( 'new-user', {
+          if (user.status === PENDING_STATUS) {
+            sails.hooks.email.send( 'new-user-pending', {
 	            org_names: org_names,
 	            sector: user.cluster,
 	            username: user.username,
@@ -322,21 +337,98 @@ module.exports = {
 	            sendername: 'ReportHub'
 	          }, {
 	            to: org_emails,
-	            subject: 'ReportHub - New ' + admin[0].organization + ' User !'
+	            subject: 'ReportHub - New ' + admin[0].organization + ' User Pending!'
 	          }, function(err) {
-		
 							// return
 						  if ( err ) return next( err );
-
 					  	// next
-							next();
+              next();
+            });
+          } else {
+            // send email
+            sails.hooks.email.send( 'new-user', {
+                org_names: org_names,
+                sector: user.cluster,
+                username: user.username,
+                name: user.name,
+                position: user.position,
+                phone: user.phone,
+                email: user.email,
+                url: 'https://reporthub.org/desk/#/profile/' + user.username,
+                sendername: 'ReportHub'
+              }, {
+                to: org_emails,
+                subject: 'ReportHub - New ' + admin[0].organization + ' User!'
+              }, function(err) {
 
-	          });
+                // return
+                if ( err ) return next( err );
 
+                // next
+                next();
+
+              });
+          }
+        // if no active users for that org notify cluster and country admins
 	    	} else {
+          User
+            .find()
+            // or: [{ cluster_tag: user.cluster_tag, roles: { in: ['CLUSTER'] } }, { roles: { in: ['COUNTRY_ADMIN'] } }]
+            .where({ admin0pcode: user.admin0pcode, or: [{ cluster_tag: user.cluster_tag, roles: { $in: ['CLUSTER'] } }, { roles: { $in: ['COUNTRY_ADMIN'] } }], status: "active" })
+            .sort('createdAt ASC')
+            .exec( function( err, admin ){
+              if ( err ) return next( err );
+              if ( admin.length ) {
+                // set emails
+                var admin_names = '';
+	              var admin_emails = '';
+								admin.forEach(function( d, i ) {
+									admin_names += d.name + ', ';
+									admin_emails += d.email + ',';
+								});
+								// remove last comma
+								admin_names = admin_names.slice( 0, -1 );
+                admin_emails = admin_emails.slice( 0, -1 );
 
-			  	// next
-					next();
+                // new organization by default ORG
+                let isNewOrganization = false;
+                if (user.roles.indexOf( 'ORG' ) !== -1){
+                  isNewOrganization = true;
+                }
+                if (user.status === PENDING_STATUS) {
+                  template = 'cluster-new-user-pending';
+                  subject = isNewOrganization ? 'ReportHub - New Organization ' + user.organization + ' Pending!' : 'ReportHub - New ' + user.organization + ' User Pending!';
+                } else {
+                  template = 'cluster-new-user';
+                  subject = isNewOrganization ? 'ReportHub - New Organization ' + user.organization + '!' : 'ReportHub - New ' + user.organization + ' User!';
+                }
+                // send email
+                sails.hooks.email.send( template, {
+                  org_names: admin_names,
+                  sector: user.cluster,
+                  organization: user.organization,
+                  username: user.username,
+                  name: user.name,
+                  position: user.position,
+                  phone: user.phone,
+                  email: user.email,
+                  url: 'https://reporthub.org/desk/#/profile/' + user.username,
+                  sendername: 'ReportHub'
+                }, {
+                  to: admin_emails,
+                  subject: subject
+                }, function(err) {
+
+                  // return
+                  if ( err ) return next( err );
+                  // next
+                  next();
+
+                });
+              } else {
+                next();
+              }
+            })
 
 	    	}
 

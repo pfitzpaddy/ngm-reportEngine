@@ -132,7 +132,6 @@ module.exports = {
           .where( adminRpcode_filter )
           .where( admin0pcode_filter )
           .where( organization_filter )
-          .where( cluster_id_filter )
           .exec( function( err, organizations ){
 
             // return error
@@ -578,6 +577,36 @@ module.exports = {
       return res.negotiate( err );
     }
 
+  },
+
+  setOrganizationAttributes: async function(req, res){
+    try {
+      // check params
+      if ( !req.param( 'organization' ) || !req.param( 'organization' ).id ) {
+        return res.json(401, { msg: 'organization required' });
+      }
+      // id params
+      const organization = req.param( 'organization' );
+      // update
+      let organization_update = await Organization.update( { id: organization.id }, organization );
+      return res.json(200, organization_update)
+    } catch (err) {
+      return res.negotiate( err );
+    }
+  },
+
+  getTeamOrganizationsByFilter: async function (req, res) {
+    try {
+      // check params
+      if (!req.param('filter')) {
+        return res.json(401, { msg: 'filter required' });
+      }
+      let organizations = await Organization.find(req.param('filter'));
+      organizations = _.sortBy(organizations, 'organization_tag');
+      return res.json(200, organizations)
+    } catch (err) {
+      return res.negotiate(err);
+    }
   }
 
 };

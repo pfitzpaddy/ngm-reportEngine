@@ -60,9 +60,11 @@ module.exports.routes = {
   'GET /getOrganizationIndicator': 'ReportHub/OrganizationController.getOrganizationIndicator',
   'POST /getOrganizationIndicator': 'ReportHub/OrganizationController.getOrganizationIndicator',
   'GET /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
-	'POST /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
+  'POST /setOrganizationPartner': 'ReportHub/OrganizationController.setOrganizationPartner',
+  'POST /setOrganizationAttributes': 'ReportHub/OrganizationController.setOrganizationAttributes',
 	'GET /getOrganizationsByFilter': 'ReportHub/OrganizationController.getOrganizationsByFilter',
 	'POST /getOrganizationsByFilter': 'ReportHub/OrganizationController.getOrganizationsByFilter',
+	'POST /getTeamOrganizationsByFilter': 'ReportHub/OrganizationController.getTeamOrganizationsByFilter',
 
   // Metrics
   'POST /metrics/set': 'ReportHub/MetricsController.set',

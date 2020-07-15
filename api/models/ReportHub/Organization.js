@@ -55,6 +55,10 @@ module.exports = {
 		// },
 		project_acbar_partner: {
 			type: 'boolean'
+    },
+
+    closed_registration: {
+			type: 'boolean'
 		},
 	}
 

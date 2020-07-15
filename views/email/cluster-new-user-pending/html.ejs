@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- Default home page -->
+<html>
+	<head>
+		<style>
+		</style>
+	</head>
+	<body>
+		<p>Hi <%= org_names %></p>
+		<p>
+			A new user has registered to <%= organization %>. The details are provided below;
+			<ul>
+				<li><b>Sector: </b><%= sector %></li>
+				<li><b>Username: </b><%= username %></li>
+				<li><b>Name: </b><%= name %></li>
+				<li><b>Position: </b><%= position %></li>
+				<li><b>Phone: </b><%= phone %></li>
+				<li><b>Email: </b><%= email %></li>
+				<br/>
+			</ul>
+		</p>
+		<p>
+			If you recognize this user as a member of <%= organization %>, please enable them from <%= organization %> from the user <a title="Profile <%= username %>" href="<%= url %>">Profile Page</a>.
+    </p>
+		<p>
+			Alternatively, please feel free to respond to this email to inform the ReportHub team.
+		</p>
+
+		<p><br/><%= sendername %></p>
+
+	</body>
+</html>
