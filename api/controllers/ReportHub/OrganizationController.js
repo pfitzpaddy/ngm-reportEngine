@@ -132,7 +132,6 @@ module.exports = {
           .where( adminRpcode_filter )
           .where( admin0pcode_filter )
           .where( organization_filter )
-          .where( cluster_id_filter )
           .exec( function( err, organizations ){
 
             // return error
