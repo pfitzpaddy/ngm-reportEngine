@@ -5,6 +5,7 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 const PENDING_STATUS = 'deactivated';
+const ACTIVE_STATUS = 'active';
 
 module.exports = {
 

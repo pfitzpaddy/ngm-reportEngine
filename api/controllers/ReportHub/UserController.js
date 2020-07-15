@@ -4,6 +4,8 @@
  * @description :: Server-side logic for managing auths
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+const PENDING_STATUS = 'deactivated';
+const ACTIVE_STATUS = 'active';
 
 var UserController = {
 
@@ -337,6 +339,33 @@ var UserController = {
               // generic error
               if (err) return res.negotiate( err );
 
+              // if new user activated notify that user
+              if (!result[0].visits && updatedUser.status === ACTIVE_STATUS && originalUser.status === PENDING_STATUS) {
+                // if no config file, return, else send email ( PROD )
+                var fs = require('fs');
+                if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) return res.json(200, { 'data': 'No email config' });
+
+                // send email
+                sails.hooks.email.send( 'new-user-activated', {
+                    name: result[0].name,
+                    username: result[0].username,
+                    sendername: 'ReportHub',
+                    url: 'https://reporthub.org/desk/#/profile/' + result[0].username,
+                  }, {
+                    to: result[0].email,
+                    subject: 'ReportHub User Activated!'
+                  }, function(err) {
+
+                    // return error
+                    if (err) return res.negotiate( err );
+
+                    // email sent
+                    return res.json(200, { success: true, user: result[0] });
+                });
+
+              // else update profile
+              } else {
+
               // if change in organization or country do not update collections
               if (originalUser.admin0pcode !== updatedUser.admin0pcode || originalUser.organization_tag !== updatedUser.organization_tag) {
                   var updatedRelationsUser = {}
@@ -392,7 +421,7 @@ var UserController = {
                     return res.json( 200, { success: true, user: result[0] } );
                   }
                 });
-
+              }
             });
 
         });
