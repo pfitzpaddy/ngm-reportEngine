@@ -401,10 +401,8 @@ var UserController = {
                 StockReport.update( findOriginalUser, updatedRelationsUser ),
                 StockWarehouse.update( findOriginalUser, updatedRelationsUser )
               ])
-                .catch( function(err) {
-                  return res.negotiate( err );
-                })
-                .done( function() {
+
+                .then( function() {
 
                   // the following is for tracking of iMMAP staff (for now)
 
@@ -420,6 +418,8 @@ var UserController = {
                   } else {
                     return res.json( 200, { success: true, user: result[0] } );
                   }
+                }).catch( function(err) {
+                  return res.negotiate( err );
                 });
               }
             });
