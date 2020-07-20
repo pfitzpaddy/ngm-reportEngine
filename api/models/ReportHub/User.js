@@ -373,8 +373,7 @@ module.exports = {
 	    	} else {
           User
             .find()
-            // or: [{ cluster_tag: user.cluster_tag, roles: { in: ['CLUSTER'] } }, { roles: { in: ['COUNTRY_ADMIN'] } }]
-            .where({ admin0pcode: user.admin0pcode, or: [{ cluster_tag: user.cluster_tag, roles: { $in: ['CLUSTER'] } }, { roles: { $in: ['COUNTRY_ADMIN'] } }], status: "active" })
+            .where({ admin0pcode: user.admin0pcode, or: [{ cluster_id: user.cluster_id, roles: { $in: ['CLUSTER'] } }, { roles: { $in: ['COUNTRY_ADMIN'] } }], status: "active" })
             .sort('createdAt ASC')
             .exec( function( err, admin ){
               if ( err ) return next( err );
