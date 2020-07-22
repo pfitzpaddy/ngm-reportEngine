@@ -5,6 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 const PENDING_STATUS = 'deactivated';
+const DEACTIVATED_STATUS = 'deactivated';
 const ACTIVE_STATUS = 'active';
 
 var UserController = {
@@ -729,6 +730,169 @@ var UserController = {
 
     });
 
+  },
+
+  notifyInactiveUsers: async function (req, res) {
+
+    var moment = require('moment');
+    var fs = require('fs');
+
+    try {
+        if (req.param('months') && !parseInt(req.param('months')) || !parseInt(req.param('months')) || parseInt(req.param('months')) < 6) {
+        return res.json(200, { 'msg': 'incorrect months param (should be number and more than 6)!', 'users': false })
+      }
+      const months = req.param('months') || 12;
+      const admin0 = req.param('admin0pcode') ? { admin0pcode: req.param('admin0pcode') } : {}
+      let filter = Object.assign({ updatedAt: { '<=': moment().subtract(months, 'M').format('YYYY-MM-DD') } }, admin0);
+      let users = await User.find(filter);
+      if (!users.length) return res.json( 200, { 'msg': 'success', 'users': false })
+
+      nStore = {};
+
+      for (const user of users) {
+        if ( !nStore[ user.email ] ) {
+          // add for notification email template
+          nStore[ user.email ] = {
+            email: user.email,
+            name: user.name,
+            usernameStore: [user.username],
+            usernamesString: user.username
+          };
+        } else {
+          nStore[ user.email ].usernameStore.push(user.username);
+          nStore[ user.email ].usernamesString += ', ';
+          nStore[ user.email ].usernamesString += user.username;
+        }
+      }
+      let counter = 0;
+      const length = Object.keys(nStore).length;
+
+      if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) { return res.json( 200, [] ); }
+
+      for ( const email in nStore ) {
+        // send email
+        sails.hooks.email.send( 'user-inactive-notification', {
+          name: nStore[email].name,
+          email: email,
+          usernameStore: nStore[email].usernameStore,
+          usernamesString: nStore[email].usernamesString,
+          profileBaseUrl: 'https://reporthub.org/desk/#/profile/',
+          sendername: 'ReportHub',
+          period: months + ' months'
+        },{
+          to: email,
+          subject: 'ReportHub - Inactive User!'
+        }, function(err) {
+
+          // return error
+          if (err) return res.negotiate( err );
+
+          // add to counter
+          counter++;
+          if ( counter === length ) {
+            // email sent
+            return res.json( 200, { 'msg': 'success', 'users': nStore });
+          }
+
+        });
+      }
+      // return res.json(200, nStore)
+    } catch (err) {
+      return res.negotiate(err);
+    }
+  },
+
+  deactivateInactiveUsers: async function (req, res) {
+
+    var moment = require('moment');
+    var fs = require('fs');
+
+    try {
+      if (req.param('months') && !parseInt(req.param('months')) || !parseInt(req.param('months')) || parseInt(req.param('months')) < 6) {
+        return res.json(200, { 'msg': 'incorrect months param (should be number and more than 6)!', 'users': false })
+      }
+      const months = req.param('months') || 12;
+      const admin0 = req.param('admin0pcode') ? { admin0pcode: req.param('admin0pcode') } : {}
+      let filter = Object.assign({ updatedAt: { $lte: new Date(moment().subtract(months, 'M').format('YYYY-MM-DD')) } }, admin0);
+
+      // User.autoUpdatedAt = true;
+      // let users = await User.update(filter, { 'status': DEACTIVATED_STATUS });
+      // User.autoUpdatedAt = false;
+
+      User.native(async function (err, collection) {
+        try {
+        // update not to modify UpdatedAt, or set autoUpdatedAt to false
+        var records = await collection.find(filter, { _id: 1 }).toArray();
+        if (!records) return res.json(200, { 'msg': 'success', 'users': false });
+        // Build an array of records
+        var updatedRecords = [];
+        records.forEach(function(record) {
+          updatedRecords.push(record._id);
+        });
+        await collection.update(filter, { $set: { 'status': DEACTIVATED_STATUS } }, { multi: true })
+        // users = await collection.find(filter).toArray();
+        var users = await collection.find({ _id: { '$in': updatedRecords }}).toArray();
+
+        if (!users.length) return res.json( 200, { 'msg': 'success', 'users': false });
+        nStore = {};
+
+        for (const user of users) {
+          if ( !nStore[ user.email ] ) {
+            // add for notification email template
+            nStore[ user.email ] = {
+              email: user.email,
+              name: user.name,
+              usernameStore: [user.username],
+              usernamesString: user.username
+            };
+          } else {
+            nStore[ user.email ].usernameStore.push(user.username);
+            nStore[ user.email ].usernamesString += ', ';
+            nStore[ user.email ].usernamesString += user.username;
+          }
+        }
+
+        let counter = 0;
+        const length = Object.keys(nStore).length;
+
+        if ( !fs.existsSync( '/home/ubuntu/nginx/www/ngm-reportEngine/config/email.js' ) ) { return res.json( 200, [] ); }
+
+        for ( const email in nStore ) {
+          // send email
+          sails.hooks.email.send( 'user-deactivated-notification', {
+            name: nStore[email].name,
+            email: email,
+            usernameStore: nStore[email].usernameStore,
+            usernamesString: nStore[email].usernamesString,
+            profileBaseUrl: 'https://reporthub.org/desk/#/profile/',
+            reason: 'have been inactive for more than ' + months + ' months and have been deactivated',
+            sendername: 'ReportHub'
+          },{
+            to: email,
+            subject: 'ReportHub - User Deactivated!'
+          }, function(err) {
+
+            // return error
+            if (err) return res.negotiate( err );
+
+            // add to counter
+            counter++;
+            if ( counter === length ) {
+
+              // email sent
+              return res.json( 200, { 'msg': 'success', 'users': nStore });
+            }
+
+          });
+        }
+     } catch(err){
+      return res.negotiate(err);
+     }
+    });
+
+    } catch (err) {
+      return res.negotiate(err);
+    }
   }
 
 };

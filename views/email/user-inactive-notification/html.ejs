@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!-- Default home page -->
+<html>
+	<head>
+		<style>
+		</style>
+	</head>
+	<body>
+		<p>Hi <%= name %>,</p>
+		<p>
+      The following ReportHub users have been inactive for more than <%= period %>:
+    </p>
+    <ul>
+    <% for(var i=0; i < usernameStore.length; i++) { %>
+      <li><a title="Profile <%= usernameStore[i] %>" href="<%= profileBaseUrl + usernameStore[i] %>"><%= usernameStore[i] %></a></li>
+    <% } %>
+    </ul>
+    <p>
+        Please login to ReportHub to confirm the users. You can review the user profiles by the above links.
+    </p>
+		<p><%= sendername %></p>
+
+	</body>
+</html>

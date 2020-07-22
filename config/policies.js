@@ -31,7 +31,9 @@ module.exports.policies = {
 
   // public
   'ReportHub/UserController': {
-    '*': true
+    '*': true,
+    'notifyInactiveUsers': ['isAuthorized', 'isAdmin'],
+    'deactivateInactiveUsers': ['isAuthorized', 'isAdmin']
   },
 
   // public

@@ -47,6 +47,10 @@ module.exports.routes = {
   // user
   'GET /getUserByUsername': 'ReportHub/UserController.getUserByUsername',
   'POST /getUserByUsername': 'ReportHub/UserController.getUserByUsername',
+  'GET /notifyInactiveUsers': 'ReportHub/UserController.notifyInactiveUsers',
+  'POST /notifyInactiveUsers': 'ReportHub/UserController.notifyInactiveUsers',
+  'GET /deactivateInactiveUsers': 'ReportHub/UserController.deactivateInactiveUsers',
+  'POST /deactivateInactiveUsers': 'ReportHub/UserController.deactivateInactiveUsers',
 
   // org
   'GET /getOrganization': 'ReportHub/OrganizationController.getOrganization',
