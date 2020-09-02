@@ -10,7 +10,7 @@
     "deep-assign": "^2.0.0",
     "ejs": "~0.8.4",
     "exceljs": "^3.8.1",
-    "googleapis": "^37.2.0",
+    "googleapis": "^59.0.0",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-coffee": "~0.10.1",
